@@ -9,6 +9,11 @@ export interface Result {
   duration: number;
   category: string;
   color: string;
+  latitude: number;
+  longitude: number;
+  description?: string;
+  rating?: number;
+  openingHours?: string;
 }
 
 interface ResultsListProps {
