@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Facebook, Mail, User, Google } from "lucide-react";
+import { Facebook, Mail, User, Chrome } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -63,7 +63,7 @@ const Register = () => {
               className="w-full"
               onClick={handleGoogleRegister}
             >
-              <Google className="mr-2 h-4 w-4" />
+              <Chrome className="mr-2 h-4 w-4" />
               Continuer avec Google
             </Button>
             <Button
