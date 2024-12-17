@@ -8,6 +8,9 @@ interface MapProps {
   center: [number, number];
 }
 
+// Set your Mapbox token here
+mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHJwOWhtYmkwMjF2MnFxcmVwczhtZjd1In0.Aoi8Z_MhGtQUu1p_TUTi0A';
+
 const Map = ({ results, center }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -16,8 +19,6 @@ const Map = ({ results, center }: MapProps) => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN';
-    
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
@@ -54,7 +55,7 @@ const Map = ({ results, center }: MapProps) => {
       el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
 
       const marker = new mapboxgl.Marker(el)
-        .setLngLat([0, 0]) // You'll need to add coordinates to your results
+        .setLngLat([result.longitude || 0, result.latitude || 0]) // Use actual coordinates from result
         .setPopup(
           new mapboxgl.Popup({ offset: 25 })
             .setHTML(`<h3>${result.name}</h3><p>${result.address}</p>`)
