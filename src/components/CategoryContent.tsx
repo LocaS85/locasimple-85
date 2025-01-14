@@ -1,8 +1,8 @@
 import React from 'react';
 import { useCategory } from './CategoryContext';
 import { CATEGORIES } from '@/types/categories';
-import { AddressForm } from './AddressForm';
-import { SubCategoryList } from './SubCategoryList';
+import { AddressForm } from '@/components/AddressForm';
+import { SubCategoryList } from '@/components/SubCategoryList';
 
 export const CategoryContent = () => {
   const { selectedCategory } = useCategory();
