@@ -19,7 +19,10 @@ const mockPlace = {
   website: 'https://example.com',
   latitude: 48.8566,
   longitude: 2.3522,
-  color: 'blue-500'
+  color: 'blue-500',
+  // Adding required properties from Result type
+  distance: 0.5,
+  duration: 10
 };
 
 const PlaceDetails = () => {
@@ -85,6 +88,15 @@ const PlaceDetails = () => {
           <div>
             <h2 className="text-xl font-semibold mb-2">Description</h2>
             <p className="text-gray-600">{mockPlace.description}</p>
+          </div>
+
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center space-x-2">
+              <Navigation className="w-4 h-4" />
+              <span>{mockPlace.distance}km</span>
+              <span>•</span>
+              <span>{mockPlace.duration} min</span>
+            </div>
           </div>
 
           <Button className="w-full">
