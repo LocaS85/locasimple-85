@@ -1,50 +1,63 @@
 
 import React, { useState } from 'react';
-import SearchBar from '@/components/SearchBar';
-import FilterPanel from '@/components/FilterPanel';
-import ResultsList from '@/components/ResultsList';
-import Map from '@/components/Map';
-import { Button } from '@/components/ui/button';
-import { History, Star } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { History, Star, Search as SearchIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
 
 const Search = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [radius, setRadius] = useState(5);
-  const [transportMode, setTransportMode] = useState('driving');
-  const [resultsCount, setResultsCount] = useState(5);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    category: "",
+    distance: "10",
+    transport: "car",
+    radius: "10",
+  });
+  const [history, setHistory] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [results, setResults] = useState<Result[]>([]);
 
-  const handleSearch = (query: string) => {
-    // Simulate search results for now
-    const mockResults: Result[] = [
-      {
-        id: '1',
-        name: 'Restaurant Le Français',
-        address: '123 Rue de Paris',
-        distance: 0.5,
-        duration: 10,
-        category: 'restaurant',
-        color: 'primary',
-        latitude: 48.8584,
-        longitude: 2.2945
-      },
-      {
-        id: '2',
-        name: 'Café de la Place',
-        address: '45 Avenue des Champs-Élysées',
-        distance: 1.2,
-        duration: 15,
-        category: 'bar',
-        color: 'secondary',
-        latitude: 48.8738,
-        longitude: 2.3012
-      }
-    ];
-    setResults(mockResults);
-    setSearchQuery(query);
+  const handleSearch = () => {
+    if (searchQuery.trim() !== "") {
+      setHistory([...history, searchQuery]);
+      console.log("Recherche pour :", searchQuery, filters);
+      
+      // Simulate search results
+      const mockResults: Result[] = [
+        {
+          id: '1',
+          name: 'Restaurant Le Français',
+          address: '123 Rue de Paris',
+          distance: 0.5,
+          duration: 10,
+          category: 'restaurant',
+          color: 'primary',
+          latitude: 48.8584,
+          longitude: 2.2945
+        },
+        {
+          id: '2',
+          name: 'Café de la Place',
+          address: '45 Avenue des Champs-Élysées',
+          distance: 1.2,
+          duration: 15,
+          category: 'bar',
+          color: 'secondary',
+          latitude: 48.8738,
+          longitude: 2.3012
+        }
+      ];
+      setResults(mockResults);
+    }
   };
 
   return (
@@ -57,35 +70,107 @@ const Search = () => {
         <div className="flex h-[calc(100vh-2rem)] bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Left Panel */}
           <div className="w-96 h-full flex flex-col p-4 space-y-4 border-r">
-            <SearchBar onSearch={handleSearch} />
-            
+            {/* Search Input */}
             <div className="flex space-x-2">
-              <Button variant="outline" className="flex-1">
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Rechercher une adresse ou un lieu..."
+                className="w-full"
+              />
+              <Button onClick={handleSearch}>
+                <SearchIcon className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Filters */}
+            <div className="grid grid-cols-2 gap-2">
+              <Select
+                value={filters.category}
+                onValueChange={(value) => setFilters({ ...filters, category: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="restaurant">Restaurant</SelectItem>
+                  <SelectItem value="bar">Bar</SelectItem>
+                  <SelectItem value="park">Parc</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.distance}
+                onValueChange={(value) => setFilters({ ...filters, distance: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Distance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">0-5 km</SelectItem>
+                  <SelectItem value="10">0-10 km</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.transport}
+                onValueChange={(value) => setFilters({ ...filters, transport: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Transport" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="car">Voiture</SelectItem>
+                  <SelectItem value="bike">Vélo</SelectItem>
+                  <SelectItem value="walk">Marche</SelectItem>
+                  <SelectItem value="public">Transport public</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={filters.radius}
+                onValueChange={(value) => setFilters({ ...filters, radius: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Rayon" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 km</SelectItem>
+                  <SelectItem value="10">10 km</SelectItem>
+                  <SelectItem value="15">15 km</SelectItem>
+                  <SelectItem value="20">20 km</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* History and Favorites Buttons */}
+            <div className="flex space-x-4">
+              <Button variant="outline" onClick={() => console.log("Historique")} className="flex-1">
                 <History className="mr-2 h-4 w-4" />
                 Historique
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" onClick={() => console.log("Favoris")} className="flex-1">
                 <Star className="mr-2 h-4 w-4" />
                 Favoris
               </Button>
             </div>
 
-            <FilterPanel
-              radius={radius}
-              onRadiusChange={setRadius}
-              transportMode={transportMode}
-              onTransportModeChange={setTransportMode}
-              resultsCount={resultsCount}
-              onResultsCountChange={setResultsCount}
-            />
-
+            {/* Results List */}
             <div className="flex-1 overflow-auto">
-              <ResultsList
-                results={results}
-                onResultClick={(result) => {
-                  console.log('Selected result:', result);
-                }}
-              />
+              {results.map((result) => (
+                <div
+                  key={result.id}
+                  className="p-4 border-b hover:bg-gray-50 cursor-pointer"
+                  onClick={() => console.log('Selected:', result)}
+                >
+                  <h3 className="font-medium">{result.name}</h3>
+                  <p className="text-sm text-gray-500">{result.address}</p>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {result.distance} km • {result.duration} min
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
