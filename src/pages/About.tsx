@@ -1,5 +1,6 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Users, Building } from "lucide-react";
+import { Info, Users, Building, Heart, Lightbulb, Shield } from "lucide-react";
 
 const About = () => {
   return (
@@ -44,10 +45,49 @@ const About = () => {
         </Card>
       </div>
 
+      <h2 className="text-3xl font-semibold text-center mb-8">Nos Valeurs</h2>
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
+        <Card>
+          <CardHeader>
+            <Heart className="w-12 h-12 text-highlight mb-4" />
+            <CardTitle>Accessibilité</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              Nous croyons que la technologie doit être accessible à tous. Notre interface est conçue pour être simple et intuitive, permettant à chacun de trouver facilement ce qu'il cherche.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <Lightbulb className="w-12 h-12 text-success mb-4" />
+            <CardTitle>Innovation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              L'innovation est au cœur de notre approche. Nous développons constamment de nouvelles fonctionnalités pour améliorer l'expérience utilisateur et faciliter la recherche de lieux.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <Shield className="w-12 h-12 text-primary mb-4" />
+            <CardTitle>Fiabilité</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600">
+              La fiabilité est notre priorité. Nous nous engageons à fournir des informations précises et à jour pour garantir la meilleure expérience possible à nos utilisateurs.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-2xl font-semibold mb-6">Nos Valeurs</h2>
+        <h2 className="text-2xl font-semibold mb-6">Notre Engagement</h2>
         <p className="text-gray-600 mb-8">
-          Nous croyons en la simplicité, l'efficacité et l'innovation. Notre objectif est de rendre la technologie accessible à tous et de contribuer à une meilleure organisation du quotidien.
+          Nous nous engageons à maintenir les plus hauts standards de qualité et d'éthique dans tout ce que nous faisons. Notre objectif est de créer une communauté où chacun peut facilement trouver et partager les meilleurs endroits à découvrir.
         </p>
       </div>
     </div>
