@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, MapPin, Clock, Heart } from "lucide-react";
+import { User, MapPin, Clock, Heart, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const handleDeleteAccount = () => {
     console.log("Compte supprimé");
     // Logique de suppression du compte à implémenter
@@ -31,6 +32,15 @@ const Profile = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+      <Button 
+        variant="ghost" 
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retour
+      </Button>
+
       <div className="flex items-center space-x-4 p-4">
         <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
           <User className="w-10 h-10 text-primary" />

@@ -2,10 +2,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Phone, MessageSquare } from "lucide-react";
+import { Mail, Phone, MessageSquare, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Contact = () => {
+  const navigate = useNavigate();
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success("Message envoyé avec succès !");
@@ -13,6 +16,15 @@ const Contact = () => {
 
   return (
     <div className="container mx-auto py-12 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retour
+      </Button>
+
       <h1 className="text-4xl font-bold text-center mb-12">Contactez-nous</h1>
 
       <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">

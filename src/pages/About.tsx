@@ -1,10 +1,22 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Users, Building, Heart, Lightbulb, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Info, Users, Building, Heart, Lightbulb, Shield, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const About = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="container mx-auto py-12 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retour
+      </Button>
+
       <h1 className="text-4xl font-bold text-center mb-12">À propos de LocaSimple</h1>
       
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">

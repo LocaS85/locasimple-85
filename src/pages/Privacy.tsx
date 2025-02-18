@@ -1,9 +1,22 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Lock, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Shield, Lock, Eye, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Privacy = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="container mx-auto py-12 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retour
+      </Button>
+
       <div className="text-center mb-12">
         <Shield className="w-12 h-12 mx-auto text-primary mb-4" />
         <h1 className="text-4xl font-bold mb-4">Politique de Confidentialité</h1>

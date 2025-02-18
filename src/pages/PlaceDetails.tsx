@@ -1,10 +1,8 @@
-
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Map from '@/components/Map';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, Clock, Phone, Globe, Star, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 // Mock data for demonstration
 const mockPlace = {

@@ -6,11 +6,23 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { HelpCircle, Search, MessageCircle } from "lucide-react";
+import { HelpCircle, Search, MessageCircle, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Help = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="container mx-auto py-12 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retour
+      </Button>
+
       <div className="text-center mb-12">
         <HelpCircle className="w-12 h-12 mx-auto text-primary mb-4" />
         <h1 className="text-4xl font-bold mb-4">Centre d'aide</h1>
