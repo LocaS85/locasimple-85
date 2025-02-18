@@ -57,17 +57,37 @@ const Profile = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom complet</Label>
-                <Input id="name" placeholder="John Doe" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstname">Prénom</Label>
+                  <Input id="firstname" placeholder="John" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nom</Label>
+                  <Input id="name" placeholder="Doe" />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="john@example.com" />
+                <Input id="email" type="email" placeholder="john@exemple.com" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone</Label>
                 <Input id="phone" placeholder="+33 6 12 34 56 78" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">Adresse postale</Label>
+                <Input id="address" placeholder="123 rue de la Paix" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="postal-code">Code postal</Label>
+                  <Input id="postal-code" placeholder="75000" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="city">Ville</Label>
+                  <Input id="city" placeholder="Paris" />
+                </div>
               </div>
               <Button>Sauvegarder les modifications</Button>
 
