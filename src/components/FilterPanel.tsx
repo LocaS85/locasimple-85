@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Car, Walking, Bike, Bus, Train } from 'lucide-react';
 
 interface FilterPanelProps {
   radius: number;
@@ -20,6 +22,14 @@ const FilterPanel = ({
   resultsCount,
   onResultsCountChange,
 }: FilterPanelProps) => {
+  const transportModes = [
+    { value: 'driving', label: 'Voiture', icon: Car },
+    { value: 'walking', label: 'À pied', icon: Walking },
+    { value: 'cycling', label: 'Vélo', icon: Bike },
+    { value: 'transit', label: 'Transport en commun', icon: Bus },
+    { value: 'train', label: 'Train', icon: Train },
+  ];
+
   return (
     <div className="space-y-6 p-4 bg-white rounded-lg shadow-sm">
       <div className="space-y-2">
@@ -40,10 +50,14 @@ const FilterPanel = ({
             <SelectValue placeholder="Choisir un mode" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="driving">En voiture</SelectItem>
-            <SelectItem value="walking">À pied</SelectItem>
-            <SelectItem value="cycling">À vélo</SelectItem>
-            <SelectItem value="transit">Transport en commun</SelectItem>
+            {transportModes.map(({ value, label, icon: Icon }) => (
+              <SelectItem key={value} value={value}>
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4" />
+                  <span>{label}</span>
+                </div>
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -58,10 +72,11 @@ const FilterPanel = ({
             <SelectValue placeholder="Nombre de résultats" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="3">3 résultats</SelectItem>
-            <SelectItem value="5">5 résultats</SelectItem>
-            <SelectItem value="10">10 résultats</SelectItem>
-            <SelectItem value="20">20 résultats</SelectItem>
+            {[2, 3, 4, 5, 6, 8, 10].map((num) => (
+              <SelectItem key={num} value={num.toString()}>
+                {num} résultats
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
