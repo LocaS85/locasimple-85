@@ -9,8 +9,8 @@ interface LayoutProps {
 
 const Layout = ({ className }: LayoutProps) => {
   return (
-    <div className={cn("min-h-screen flex flex-col", className)}>
-      <main className="flex-1">
+    <div className={cn("min-h-screen flex flex-col w-full", className)}>
+      <main className="flex-1 w-full">
         <Outlet />
       </main>
       <Footer />

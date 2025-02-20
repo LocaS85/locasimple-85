@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '@/components/SearchBar';
@@ -68,19 +67,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-white py-20 text-center">
+      <section className="bg-white py-10 md:py-20 px-4 text-center">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold mb-4">LocaSimple</h1>
-          <p className="text-xl text-gray-600 mb-8">Simplifiez vos trajets, optimisez votre temps</p>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">LocaSimple</h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-8 px-4">Simplifiez vos trajets, optimisez votre temps</p>
           <div className="space-y-4">
-            <Button asChild size="lg" className="mb-4">
+            <Button asChild size="lg" className="w-full sm:w-auto mb-4">
               <Link to="/register">Essayer maintenant</Link>
             </Button>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/pricing" className="text-primary hover:underline">
                 Voir nos plans d'abonnement
               </Link>
@@ -90,8 +89,8 @@ const Index = () => {
       </section>
 
       {/* Search Section */}
-      <div className="flex h-[calc(100vh-20rem)] bg-gray-50">
-        <div className="w-96 h-full flex flex-col p-4 space-y-4 border-r bg-white">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-20rem)]">
+        <div className="w-full lg:w-96 h-full flex flex-col p-4 space-y-4 border-b lg:border-b-0 lg:border-r bg-white">
           <SearchBar onSearch={(query) => console.log('Searching:', query)} />
           <CategorySelector
             categories={categories}
@@ -118,7 +117,7 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="flex-1 relative">
+        <div className="flex-1 relative min-h-[300px] lg:min-h-0">
           <Map
             results={results}
             center={[2.3522, 48.8566]} // Paris coordinates
@@ -127,35 +126,35 @@ const Index = () => {
       </div>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-10 md:py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Fonctionnalités principales</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">Fonctionnalités principales</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="text-center p-6"
+              className="text-center p-4 md:p-6"
             >
-              <h3 className="text-xl font-semibold mb-4">Recherche multi-catégories</h3>
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Recherche multi-catégories</h3>
               <p className="text-gray-600">Trouvez plusieurs types de lieux en une seule recherche</p>
             </motion.div>
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-center p-6"
+              className="text-center p-4 md:p-6"
             >
-              <h3 className="text-xl font-semibold mb-4">Itinéraires optimisés</h3>
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Itinéraires optimisés</h3>
               <p className="text-gray-600">Calculez les meilleurs trajets selon vos préférences</p>
             </motion.div>
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-center p-6"
+              className="text-center p-4 md:p-6"
             >
-              <h3 className="text-xl font-semibold mb-4">Favoris personnalisés</h3>
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Favoris personnalisés</h3>
               <p className="text-gray-600">Enregistrez vos lieux préférés pour y accéder rapidement</p>
             </motion.div>
           </div>

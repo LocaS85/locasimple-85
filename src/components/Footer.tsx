@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white py-8 mt-auto">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <h4 className="font-semibold mb-4">À propos</h4>
             <ul className="space-y-2">
@@ -29,7 +29,7 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-semibold mb-4">Suivez-nous</h4>
-            <div className="flex space-x-4">
+            <div className="flex flex-wrap gap-4">
               <a href="#" className="hover:text-gray-300">Twitter</a>
               <a href="#" className="hover:text-gray-300">Facebook</a>
               <a href="#" className="hover:text-gray-300">LinkedIn</a>
@@ -37,7 +37,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="text-center mt-8 pt-8 border-t border-gray-700">
-          <p>&copy; {new Date().getFullYear()} LocaSimple. Tous droits réservés.</p>
+          <p className="text-sm sm:text-base">&copy; {new Date().getFullYear()} LocaSimple. Tous droits réservés.</p>
         </div>
       </div>
     </footer>
