@@ -3,7 +3,7 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Walking, Bike, Bus, Train } from 'lucide-react';
+import { Car, PersonStanding, Bike, Bus, Train } from 'lucide-react';
 
 interface FilterPanelProps {
   radius: number;
@@ -24,7 +24,7 @@ const FilterPanel = ({
 }: FilterPanelProps) => {
   const transportModes = [
     { value: 'driving', label: 'Voiture', icon: Car },
-    { value: 'walking', label: 'À pied', icon: Walking },
+    { value: 'walking', label: 'À pied', icon: PersonStanding },
     { value: 'cycling', label: 'Vélo', icon: Bike },
     { value: 'transit', label: 'Transport en commun', icon: Bus },
     { value: 'train', label: 'Train', icon: Train },

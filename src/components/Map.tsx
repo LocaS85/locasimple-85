@@ -15,8 +15,60 @@ const Map = ({ results, center }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const routesRef = useRef<mapboxgl.Map[]>([]);
   const [mapboxToken, setMapboxToken] = useState('');
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+
+  const addRoute = async (start: [number, number], end: [number, number], color: string) => {
+    if (!map.current || !mapboxToken) return;
+
+    try {
+      const query = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxToken}`
+      );
+      const json = await query.json();
+      const data = json.routes[0];
+      const route = data.geometry.coordinates;
+
+      const geojson = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: route
+        }
+      };
+
+      // Si la source existe déjà, mettre à jour les données
+      if (map.current.getSource(`route-${color}`)) {
+        const source = map.current.getSource(`route-${color}`) as mapboxgl.GeoJSONSource;
+        source.setData(geojson as any);
+      } else {
+        // Sinon, ajouter une nouvelle source et une nouvelle couche
+        map.current.addSource(`route-${color}`, {
+          type: 'geojson',
+          data: geojson as any
+        });
+
+        map.current.addLayer({
+          id: `route-${color}`,
+          type: 'line',
+          source: `route-${color}`,
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': color,
+            'line-width': 4,
+            'line-opacity': 0.75
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error adding route:', error);
+    }
+  };
 
   const initializeMap = () => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -45,11 +97,18 @@ const Map = ({ results, center }: MapProps) => {
   useEffect(() => {
     if (!map.current || !isMapInitialized) return;
 
-    // Clear existing markers
+    // Clear existing markers and routes
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
+    routesRef.current.forEach((route: any) => {
+      if (map.current?.getLayer(route)) {
+        map.current.removeLayer(route);
+        map.current.removeSource(route);
+      }
+    });
+    routesRef.current = [];
 
-    // Add new markers
+    // Add new markers and routes
     results.forEach((result, index) => {
       const el = document.createElement('div');
       el.className = 'marker';
@@ -72,11 +131,15 @@ const Map = ({ results, center }: MapProps) => {
         .addTo(map.current);
 
       markersRef.current.push(marker);
+
+      // Add route from center to this result
+      addRoute(center, [result.longitude, result.latitude], result.color);
     });
 
     // Fit bounds to show all markers if there are any
     if (results.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
+      bounds.extend(center);
       results.forEach(result => {
         bounds.extend([result.longitude, result.latitude]);
       });
