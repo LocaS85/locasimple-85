@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Facebook, Scan, Mail, Lock } from "lucide-react";
+import { Facebook, Chrome, Scan, Mail, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -29,6 +29,11 @@ const Login = () => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
     toast.success("Connexion réussie !");
+  };
+
+  const handleGoogleLogin = () => {
+    console.log("Connexion avec Google");
+    toast.info("Connexion avec Google en cours...");
   };
 
   const handleFacebookLogin = () => {
@@ -85,6 +90,15 @@ const Login = () => {
         </div>
 
         <div className="space-y-4">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleLogin}
+          >
+            <Chrome className="mr-2 h-4 w-4 text-red-500" />
+            Continuer avec Google
+          </Button>
+
           <Button
             variant="outline"
             className="w-full"
