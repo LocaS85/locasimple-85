@@ -12,6 +12,8 @@ interface FilterPanelProps {
   onTransportModeChange: (value: string) => void;
   resultsCount: number;
   onResultsCountChange: (value: number) => void;
+  duration?: number;
+  onDurationChange?: (value: number) => void;
 }
 
 const FilterPanel = ({
@@ -21,6 +23,8 @@ const FilterPanel = ({
   onTransportModeChange,
   resultsCount,
   onResultsCountChange,
+  duration = 15,
+  onDurationChange = () => {},
 }: FilterPanelProps) => {
   const transportModes = [
     { value: 'driving', label: 'Voiture', icon: Car },
@@ -30,17 +34,28 @@ const FilterPanel = ({
     { value: 'train', label: 'Train', icon: Train },
   ];
 
+  const distanceOptions = [1, 2, 3, 5, 7, 10];
+  const durationOptions = [5, 10, 15, 20, 25, 30];
+
   return (
     <div className="space-y-6 p-4 bg-white rounded-lg shadow-sm">
       <div className="space-y-2">
-        <Label>Rayon de recherche ({radius} km)</Label>
-        <Slider
-          value={[radius]}
-          onValueChange={(values) => onRadiusChange(values[0])}
-          min={1}
-          max={20}
-          step={1}
-        />
+        <Label>Distance ({radius} km)</Label>
+        <Select 
+          value={radius.toString()} 
+          onValueChange={(value) => onRadiusChange(parseInt(value))}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Choisir une distance" />
+          </SelectTrigger>
+          <SelectContent>
+            {distanceOptions.map((km) => (
+              <SelectItem key={km} value={km.toString()}>
+                {km} km
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
@@ -56,6 +71,25 @@ const FilterPanel = ({
                   <Icon className="h-4 w-4" />
                   <span>{label}</span>
                 </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Durée maximale ({duration} minutes)</Label>
+        <Select 
+          value={duration.toString()} 
+          onValueChange={(value) => onDurationChange(parseInt(value))}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Choisir une durée" />
+          </SelectTrigger>
+          <SelectContent>
+            {durationOptions.map((min) => (
+              <SelectItem key={min} value={min.toString()}>
+                {min} minutes
               </SelectItem>
             ))}
           </SelectContent>
