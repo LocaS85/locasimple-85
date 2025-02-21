@@ -13,6 +13,7 @@ import { History, Star, Search as SearchIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
+import { toast } from 'sonner';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,7 +32,7 @@ const Search = () => {
       setHistory([...history, searchQuery]);
       console.log("Recherche pour :", searchQuery, filters);
       
-      // Simulate search results
+      // Simule des résultats de recherche
       const mockResults: Result[] = [
         {
           id: '1',
@@ -57,6 +58,7 @@ const Search = () => {
         }
       ];
       setResults(mockResults);
+      toast.success(`${mockResults.length} résultats trouvés`);
     }
   };
 
@@ -86,34 +88,6 @@ const Search = () => {
             {/* Filters */}
             <div className="grid grid-cols-2 gap-2">
               <Select
-                value={filters.category}
-                onValueChange={(value) => setFilters({ ...filters, category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Catégorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="restaurant">Restaurant</SelectItem>
-                  <SelectItem value="bar">Bar</SelectItem>
-                  <SelectItem value="park">Parc</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={filters.distance}
-                onValueChange={(value) => setFilters({ ...filters, distance: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Distance" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">0-5 km</SelectItem>
-                  <SelectItem value="10">0-10 km</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
                 value={filters.transport}
                 onValueChange={(value) => setFilters({ ...filters, transport: value })}
               >
@@ -122,9 +96,10 @@ const Search = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="car">Voiture</SelectItem>
+                  <SelectItem value="walk">À pied</SelectItem>
                   <SelectItem value="bike">Vélo</SelectItem>
-                  <SelectItem value="walk">Marche</SelectItem>
-                  <SelectItem value="public">Transport public</SelectItem>
+                  <SelectItem value="transit">Transport en commun</SelectItem>
+                  <SelectItem value="train">Train</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -143,6 +118,23 @@ const Search = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Results count selector */}
+            <Select
+              value={filters.distance}
+              onValueChange={(value) => setFilters({ ...filters, distance: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Nombre de résultats" />
+              </SelectTrigger>
+              <SelectContent>
+                {[2, 3, 4, 5, 6, 8, 10].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} résultats
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* History and Favorites Buttons */}
             <div className="flex space-x-4">
@@ -178,7 +170,7 @@ const Search = () => {
           <div className="flex-1 relative">
             <Map
               results={results}
-              center={[2.3522, 48.8566]} // Paris coordinates
+              center={[2.3522, 48.8566]}
             />
           </div>
         </div>

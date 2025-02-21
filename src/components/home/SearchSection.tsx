@@ -7,6 +7,9 @@ import ResultsList from '@/components/ResultsList';
 import Map from '@/components/Map';
 import type { Category } from '@/components/CategorySelector';
 import type { Result } from '@/components/ResultsList';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Car, PersonStanding, Bike, Bus, Train } from 'lucide-react';
 
 interface SearchSectionProps {
   categories: Category[];
@@ -33,15 +36,40 @@ const SearchSection = ({
   onResultsCountChange,
   results,
 }: SearchSectionProps) => {
+  const transportModes = [
+    { value: 'driving', label: 'Voiture', Icon: Car },
+    { value: 'walking', label: 'À pied', Icon: PersonStanding },
+    { value: 'cycling', label: 'Vélo', Icon: Bike },
+    { value: 'transit', label: 'Transport en commun', Icon: Bus },
+    { value: 'train', label: 'Train', Icon: Train },
+  ];
+
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-20rem)]">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-5rem)]">
       <div className="w-full lg:w-96 h-full flex flex-col p-4 space-y-4 border-b lg:border-b-0 lg:border-r bg-white">
         <SearchBar onSearch={(query) => console.log('Searching:', query)} />
+        
+        <div className="flex flex-wrap gap-2">
+          {transportModes.map(({ value, label, Icon }) => (
+            <Button
+              key={value}
+              variant={transportMode === value ? "default" : "outline"}
+              size="sm"
+              onClick={() => onTransportModeChange(value)}
+              className="flex items-center gap-2"
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </Button>
+          ))}
+        </div>
+
         <CategorySelector
           categories={categories}
           selectedCategories={selectedCategories}
           onSelect={onCategorySelect}
         />
+
         <FilterPanel
           radius={radius}
           onRadiusChange={onRadiusChange}
@@ -50,6 +78,7 @@ const SearchSection = ({
           resultsCount={resultsCount}
           onResultsCountChange={onResultsCountChange}
         />
+
         <div className="flex-1 overflow-auto">
           <ResultsList
             results={results}
