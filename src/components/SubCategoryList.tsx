@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { SubCategory } from '@/types/categories';
-import { FilterPanel } from '@/components/FilterPanel';
+import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

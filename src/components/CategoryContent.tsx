@@ -7,7 +7,7 @@ import { SubCategoryList } from '@/components/SubCategoryList';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Home, Search } from 'lucide-react';
-import { FilterPanel } from '@/components/FilterPanel';
+import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
