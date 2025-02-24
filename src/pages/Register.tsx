@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Facebook, Mail, User, Chrome } from "lucide-react";
+import { Facebook, Mail, User, Chrome, ArrowLeft } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -49,7 +49,16 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute left-4 top-4"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+
         <CardHeader>
           <CardTitle>Créer un compte</CardTitle>
           <CardDescription>

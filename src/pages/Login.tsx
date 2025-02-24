@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +5,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Facebook, Chrome, Scan, Mail, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Facebook, Chrome, Scan, Mail, Lock, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const formSchema = z.object({
@@ -16,6 +15,7 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  const navigate = useNavigate();
   const [isFaceIDAvailable, setIsFaceIDAvailable] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,14 +43,12 @@ const Login = () => {
 
   const handleFaceIDLogin = async () => {
     try {
-      // Vérification de la disponibilité de l'API FaceID
       const supported = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
       if (!supported) {
         toast.error("Face ID n'est pas disponible sur cet appareil");
         return;
       }
 
-      // Création des options pour l'authentification
       const options = {
         publicKey: {
           challenge: new Uint8Array(32),
@@ -59,7 +57,6 @@ const Login = () => {
         }
       };
 
-      // Démarrage de l'authentification biométrique
       await navigator.credentials.get(options);
       toast.success("Authentification Face ID réussie !");
     } catch (error) {
@@ -68,7 +65,6 @@ const Login = () => {
     }
   };
 
-  // Vérification de la disponibilité de Face ID au chargement
   React.useEffect(() => {
     async function checkFaceIDAvailability() {
       try {
@@ -83,7 +79,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-lg">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-lg relative">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute left-4 top-4"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Connexion</h1>
           <p className="text-gray-600">Connectez-vous pour accéder à vos lieux favoris</p>
