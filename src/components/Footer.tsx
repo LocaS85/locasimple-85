@@ -21,10 +21,11 @@ const Footer = () => {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
+            <h4 className="font-semibold mb-4">Menu</h4>
             <ul className="space-y-2">
-              <li><Link to="/faq" className="hover:text-gray-300">FAQ</Link></li>
-              <li><Link to="/help" className="hover:text-gray-300">Aide</Link></li>
+              <li><Link to="/register" className="hover:text-gray-300">S'inscrire</Link></li>
+              <li><Link to="/login" className="hover:text-gray-300">Se connecter</Link></li>
+              <li><Link to="/logout" className="hover:text-gray-300">Se déconnecter</Link></li>
             </ul>
           </div>
           <div>
@@ -32,7 +33,6 @@ const Footer = () => {
             <div className="flex flex-wrap gap-4">
               <a href="#" className="hover:text-gray-300">Twitter</a>
               <a href="#" className="hover:text-gray-300">Facebook</a>
-              <a href="#" className="hover:text-gray-300">LinkedIn</a>
             </div>
           </div>
         </div>

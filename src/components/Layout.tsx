@@ -1,6 +1,7 @@
 
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
+import Navbar from "./Navbar";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -10,6 +11,7 @@ interface LayoutProps {
 const Layout = ({ className }: LayoutProps) => {
   return (
     <div className={cn("min-h-screen flex flex-col w-full", className)}>
+      <Navbar />
       <main className="flex-1 w-full">
         <Outlet />
       </main>
