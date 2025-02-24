@@ -7,9 +7,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Globe } from "lucide-react";
+import { useState } from "react";
+
+interface Language {
+  code: string;
+  name: string;
+  flag: string;
+}
 
 const Navbar = () => {
+  const languages: Language[] = [
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' }
+  ];
+
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>(languages[0]);
+
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
@@ -43,19 +57,18 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <Globe className="h-5 w-5" />
+                  <span className="text-xl">{selectedLanguage.flag}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white">
-                <DropdownMenuItem>
-                  <span className="mr-2">🇫🇷</span> Français
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span className="mr-2">🇬🇧</span> English
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span className="mr-2">🇪🇸</span> Español
-                </DropdownMenuItem>
+                {languages.map((lang) => (
+                  <DropdownMenuItem 
+                    key={lang.code}
+                    onClick={() => setSelectedLanguage(lang)}
+                  >
+                    <span className="mr-2">{lang.flag}</span> {lang.name}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
