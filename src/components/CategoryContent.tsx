@@ -38,8 +38,19 @@ export const CategoryContent = () => {
   const canAddAddress = currentAddresses.length < 10;
   const isMainAddress = selectedCategory === 'adresse-principale';
 
+  // Liste des catégories qui ne doivent pas avoir de filtres
+  const categoriesWithoutFilters = [
+    'alimentation',
+    'achats',
+    'services',
+    'sante',
+    'divertissement',
+    'hebergement'
+  ];
+
+  const showFilters = !showAddressForm && !categoriesWithoutFilters.includes(selectedCategory);
+
   const handleSearch = () => {
-    // Préparer les paramètres de recherche
     const searchParams = new URLSearchParams({
       category: selectedCategory,
       radius: radius.toString(),
@@ -48,7 +59,6 @@ export const CategoryContent = () => {
       results: resultsCount.toString()
     });
 
-    // Rediriger vers la page de recherche avec les paramètres
     navigate(`/search?${searchParams.toString()}`);
     toast.success('Recherche lancée');
   };
@@ -79,8 +89,7 @@ export const CategoryContent = () => {
           <AddressForm categoryId={selectedCategory} />
         )}
 
-        {/* Ajout du panneau de filtres */}
-        {!showAddressForm && (
+        {showFilters && (
           <div className="space-y-6">
             <FilterPanel
               radius={radius}
