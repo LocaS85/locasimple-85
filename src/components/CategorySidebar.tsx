@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useCategory } from './CategoryContext';
 import { CATEGORIES } from '@/types/categories';
