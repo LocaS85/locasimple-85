@@ -12,7 +12,7 @@ const Categories = () => {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Button 
         variant="ghost" 
         className="m-4"
@@ -23,13 +23,13 @@ const Categories = () => {
       </Button>
       <SidebarProvider defaultOpen>
         <CategoryProvider>
-          <div className="flex min-h-screen w-full">
+          <div className="flex flex-1 w-full">
             <CategorySidebar />
             <CategoryContent />
           </div>
         </CategoryProvider>
       </SidebarProvider>
-    </>
+    </div>
   );
 };
 
