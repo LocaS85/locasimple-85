@@ -12,7 +12,7 @@ const Layout = ({ className }: LayoutProps) => {
   return (
     <div className={cn("min-h-screen flex flex-col w-full", className)}>
       <Navbar />
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full mt-16"> {/* Ajout d'une marge en haut pour compenser la navbar fixe */}
         <Outlet />
       </main>
       <Footer />

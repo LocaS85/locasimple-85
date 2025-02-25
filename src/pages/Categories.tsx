@@ -12,7 +12,7 @@ const Categories = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-[calc(100vh-4rem)]"> {/* Ajusté pour prendre en compte la hauteur de la navbar */}
       <Button 
         variant="ghost" 
         className="m-4"
@@ -23,7 +23,7 @@ const Categories = () => {
       </Button>
       <SidebarProvider defaultOpen>
         <CategoryProvider>
-          <div className="flex flex-1 w-full">
+          <div className="flex flex-1 w-full overflow-hidden"> {/* Ajout d'overflow-hidden pour gérer le scroll correctement */}
             <CategorySidebar />
             <CategoryContent />
           </div>
