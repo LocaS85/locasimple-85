@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import {
   TabsList, 
   TabsTrigger 
 } from '@/components/ui/tabs';
-import { ArrowLeft, ArrowRight, MapPin, Clock, Ruler, Mic, Car, Bike, UserWalking, Bus, Train } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Clock, Ruler, Mic, Car, Bike, User, Bus, Train } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Search = () => {
@@ -41,7 +42,7 @@ const Search = () => {
   const transportModes = [
     { name: "Voiture", icon: <Car className="h-4 w-4 mr-2" /> },
     { name: "Vélo", icon: <Bike className="h-4 w-4 mr-2" /> },
-    { name: "À pied", icon: <UserWalking className="h-4 w-4 mr-2" /> },
+    { name: "À pied", icon: <User className="h-4 w-4 mr-2" /> }, // Changé UserWalking pour User
     { name: "Transport en commun", icon: <Bus className="h-4 w-4 mr-2" /> },
     { name: "Train", icon: <Train className="h-4 w-4 mr-2" /> }
   ];
