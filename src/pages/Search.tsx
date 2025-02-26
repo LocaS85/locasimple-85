@@ -28,14 +28,18 @@ const Search = () => {
   const [selectedDistance, setSelectedDistance] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState(null);
   const [distanceUnit, setDistanceUnit] = useState('km');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
+  const [isPanelExpanded, setIsPanelExpanded] = useState(true);
+  const [startY, setStartY] = useState(0);
+  const [offsetY, setOffsetY] = useState(0);
+  const panelRef = useRef(null);
   const categoriesRef = useRef(null);
+  const favoritesRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedTransports, setSelectedTransports] = useState<string[]>([]);
-  const favoritesRef = useRef(null);
-  
+
   const categories = [
     "Restaurant", "Hôtel", "Bar", "Café", "Shopping", "Attraction", "Transport", 
     "Parc", "Musée", "Cinéma", "Théâtre", "Bibliothèque", "Plage", "Montagne", "Plus"
@@ -147,11 +151,6 @@ const Search = () => {
     return `${hours} h`;
   };
 
-  const [isPanelExpanded, setIsPanelExpanded] = useState(true);
-  const [startY, setStartY] = useState(0);
-  const [offsetY, setOffsetY] = useState(0);
-  const panelRef = useRef(null);
-  
   const handlePanelTouchStart = (e: React.TouchEvent) => {
     setStartY(e.touches[0].clientY);
   };
