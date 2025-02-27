@@ -25,7 +25,12 @@ const TransportSection = ({ selectedTransports, onTransportClick }: TransportSec
 
   return (
     <div className="px-4 py-3">
-      <div className="flex flex-wrap gap-2">
+      <div className="mb-2 flex justify-center">
+        <div className="rounded-full border-2 border-black px-6 py-1 bg-white">
+          Transport
+        </div>
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">
         {transportModes.map((mode, index) => (
           <Button 
             key={index}

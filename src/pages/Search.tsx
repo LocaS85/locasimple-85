@@ -7,6 +7,8 @@ import CategorySection from '@/components/search/CategorySection';
 import TransportSection from '@/components/search/TransportSection';
 import SearchFilters from '@/components/search/SearchFilters';
 import Navigation from '@/components/search/Navigation';
+import { Button } from '@/components/ui/button';
+import { Search as SearchIcon } from 'lucide-react';
 
 const Search = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -64,6 +66,11 @@ const Search = () => {
 
   const handlePanelTouchEnd = () => {
     setOffsetY(0);
+  };
+
+  const handleSearch = () => {
+    toast.success("Recherche lancée !");
+    // Implémentation de la recherche
   };
 
   return (
@@ -140,6 +147,16 @@ const Search = () => {
             selectedDistance={selectedDistance}
             selectedDuration={selectedDuration}
           />
+
+          <div className="flex justify-center py-4">
+            <Button 
+              onClick={handleSearch}
+              className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-8 py-2"
+            >
+              <SearchIcon className="h-4 w-4 mr-2" />
+              Recherche
+            </Button>
+          </div>
         </div>
       </motion.div>
 

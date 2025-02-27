@@ -28,6 +28,7 @@ const SearchFilters = ({
 }: SearchFiltersProps) => {
   const [kmRadius, setKmRadius] = useState(5);
   const [timeRadius, setTimeRadius] = useState(30);
+  const [filterType, setFilterType] = useState<'distance' | 'duration'>('distance');
   
   const handleKmRadiusChange = (value: number[]) => {
     setKmRadius(value[0]);
@@ -39,11 +40,115 @@ const SearchFilters = ({
   
   return (
     <div className="px-4 py-3">
-      <div className="flex justify-between gap-4">
+      <div className="flex justify-center mb-4">
+        <div className="inline-flex rounded-full border-2 border-black overflow-hidden">
+          <Button
+            type="button"
+            onClick={() => setFilterType('distance')}
+            className={`px-6 py-2 transition-colors rounded-none ${
+              filterType === 'distance' 
+                ? 'bg-blue-500 text-white'
+                : 'bg-white text-black hover:bg-gray-100'
+            }`}
+          >
+            Distance
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setFilterType('duration')}
+            className={`px-6 py-2 transition-colors rounded-none ${
+              filterType === 'duration' 
+                ? 'bg-purple-500 text-white'
+                : 'bg-white text-black hover:bg-gray-100'
+            }`}
+          >
+            Durée
+          </Button>
+        </div>
+      </div>
+
+      <div className="bg-gray-100 rounded-lg p-4 mb-4">
+        {filterType === 'distance' && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium">Distance</h4>
+              <Tabs value={distanceUnit} onValueChange={onDistanceUnitChange} className="ml-1">
+                <TabsList className="h-6 px-1">
+                  <TabsTrigger 
+                    value="km" 
+                    className={`px-1 text-xs h-5 ${
+                      distanceUnit === 'km' ? 'bg-blue-500 text-white' : ''
+                    }`}
+                  >
+                    km
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="mi" 
+                    className={`px-1 text-xs h-5 ${
+                      distanceUnit === 'mi' ? 'bg-orange-500 text-white' : ''
+                    }`}
+                  >
+                    mi
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="text-center">
+                {distanceUnit === 'km' ? 
+                  (kmRadius < 1 ? `${(kmRadius * 1000).toFixed(0)} m` : `${kmRadius} km`) : 
+                  `${(kmRadius * 0.621371).toFixed(1)} mi`}
+              </div>
+              <Slider 
+                defaultValue={[5]} 
+                max={100} 
+                step={kmRadius < 1 ? 0.1 : 1}
+                min={0.1} 
+                value={[kmRadius]}
+                onValueChange={handleKmRadiusChange}
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>100m</span>
+                <span>50km</span>
+                <span>100km</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {filterType === 'duration' && (
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">Durée</h4>
+            <div className="space-y-2">
+              <div className="text-center">
+                {timeRadius < 60 
+                  ? `${timeRadius} minutes` 
+                  : `${Math.floor(timeRadius / 60)}h${timeRadius % 60 ? ` ${timeRadius % 60}min` : ''}`}
+              </div>
+              <Slider 
+                defaultValue={[30]} 
+                max={300} 
+                step={timeRadius < 60 ? 5 : 15} 
+                min={5} 
+                value={[timeRadius]}
+                onValueChange={handleTimeRadiusChange}
+              />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>5min</span>
+                <span>1h</span>
+                <span>5h</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-center">
         <Popover>
           <PopoverTrigger asChild>
-            <Button className="w-1/2 rounded-full border-2 border-black bg-white text-black hover:bg-gray-100 justify-between">
-              <span>Nombre autour de moi</span>
+            <Button className="rounded-full border-2 border-black bg-white text-black hover:bg-gray-100">
+              Nombre de résultats
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
@@ -60,78 +165,11 @@ const SearchFilters = ({
             </div>
           </PopoverContent>
         </Popover>
-        
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button className="w-1/2 rounded-full border-2 border-black bg-white text-black hover:bg-gray-100 justify-between">
-              <span>Distance</span>
-              <div className="flex items-center">
-                <Tabs value={distanceUnit} onValueChange={onDistanceUnitChange} className="ml-1">
-                  <TabsList className="h-6 px-1">
-                    <TabsTrigger 
-                      value="km" 
-                      className={`px-1 text-xs h-5 ${
-                        distanceUnit === 'km' ? 'bg-blue-500 text-white' : ''
-                      }`}
-                    >
-                      km
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="mi" 
-                      className={`px-1 text-xs h-5 ${
-                        distanceUnit === 'mi' ? 'bg-orange-500 text-white' : ''
-                      }`}
-                    >
-                      mi
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-4">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Distance ({distanceUnit === 'km' ? 
-                  (kmRadius < 1 ? `${kmRadius * 1000} m` : `${kmRadius} km`) : 
-                  `${(kmRadius * 0.621371).toFixed(1)} mi`})</h4>
-                <Slider 
-                  defaultValue={[5]} 
-                  max={100} 
-                  step={kmRadius < 1 ? 0.1 : 1}
-                  min={0.1} 
-                  onValueChange={handleKmRadiusChange}
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>100m</span>
-                  <span>50km</span>
-                  <span>100km</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Durée ({timeRadius} min)</h4>
-                <Slider 
-                  defaultValue={[30]} 
-                  max={300} 
-                  step={timeRadius < 60 ? 5 : 15} 
-                  min={5} 
-                  onValueChange={handleTimeRadiusChange}
-                />
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>5min</span>
-                  <span>1h</span>
-                  <span>5h</span>
-                </div>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
       </div>
 
       <div className="mt-4 bg-gray-100 rounded-lg p-3">
         <h3 className="font-bold mb-2 text-center">Résultats :</h3>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {selectedDuration && (
             <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
               {selectedDuration} min
