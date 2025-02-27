@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import SearchBar from '@/components/search/SearchBar';
 import CategorySection from '@/components/search/CategorySection';
 import TransportSection from '@/components/search/TransportSection';
@@ -27,6 +29,20 @@ const Search = () => {
 
   const handleMicClick = () => {
     setIsRecording(!isRecording);
+  };
+
+  const handleLocationClick = () => {
+    toast.info("Localisation en cours...");
+    // Implémentation de la localisation
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        toast.success("Position obtenue !");
+        // Utiliser position.coords.latitude et position.coords.longitude
+      },
+      (error) => {
+        toast.error("Impossible d'obtenir votre position");
+      }
+    );
   };
 
   const handlePanelTouchStart = (e: React.TouchEvent) => {
@@ -83,6 +99,7 @@ const Search = () => {
             <SearchBar 
               isRecording={isRecording}
               onMicClick={handleMicClick}
+              onLocationClick={handleLocationClick}
             />
           </div>
 
@@ -95,7 +112,6 @@ const Search = () => {
                 ? prev.filter(c => c !== category)
                 : [...prev, category]
             )}
-            highlightColor="blue"
           />
 
           <CategorySection
@@ -107,7 +123,6 @@ const Search = () => {
                 ? prev.filter(f => f !== favorite)
                 : [...prev, favorite]
             )}
-            highlightColor="purple"
           />
 
           <TransportSection

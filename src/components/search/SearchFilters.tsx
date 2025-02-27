@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { 
   Popover,
   PopoverContent,
@@ -25,6 +26,17 @@ const SearchFilters = ({
   selectedDistance,
   selectedDuration 
 }: SearchFiltersProps) => {
+  const [kmRadius, setKmRadius] = useState(5);
+  const [timeRadius, setTimeRadius] = useState(30);
+  
+  const handleKmRadiusChange = (value: number[]) => {
+    setKmRadius(value[0]);
+  };
+  
+  const handleTimeRadiusChange = (value: number[]) => {
+    setTimeRadius(value[0]);
+  };
+  
   return (
     <div className="px-4 py-3">
       <div className="flex justify-between gap-4">
@@ -77,11 +89,48 @@ const SearchFilters = ({
               </div>
             </Button>
           </PopoverTrigger>
+          <PopoverContent className="w-full p-4">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Distance ({distanceUnit === 'km' ? 
+                  (kmRadius < 1 ? `${kmRadius * 1000} m` : `${kmRadius} km`) : 
+                  `${(kmRadius * 0.621371).toFixed(1)} mi`})</h4>
+                <Slider 
+                  defaultValue={[5]} 
+                  max={100} 
+                  step={kmRadius < 1 ? 0.1 : 1}
+                  min={0.1} 
+                  onValueChange={handleKmRadiusChange}
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>100m</span>
+                  <span>50km</span>
+                  <span>100km</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Durée ({timeRadius} min)</h4>
+                <Slider 
+                  defaultValue={[30]} 
+                  max={300} 
+                  step={timeRadius < 60 ? 5 : 15} 
+                  min={5} 
+                  onValueChange={handleTimeRadiusChange}
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>5min</span>
+                  <span>1h</span>
+                  <span>5h</span>
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
         </Popover>
       </div>
 
       <div className="mt-4 bg-gray-100 rounded-lg p-3">
-        <h3 className="font-bold mb-2">Résultats :</h3>
+        <h3 className="font-bold mb-2 text-center">Résultats :</h3>
         <div className="flex flex-wrap gap-2">
           {selectedDuration && (
             <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
@@ -93,6 +142,11 @@ const SearchFilters = ({
               {distanceUnit === 'km' ? 
                 (selectedDistance < 1 ? `${selectedDistance * 1000} m` : `${selectedDistance} km`) : 
                 `${(selectedDistance * 0.621371).toFixed(1)} mi`}
+            </div>
+          )}
+          {!selectedDistance && !selectedDuration && (
+            <div className="text-gray-500 text-sm text-center w-full">
+              Aucun filtre appliqué
             </div>
           )}
         </div>
