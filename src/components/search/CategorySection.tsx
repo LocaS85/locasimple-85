@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface CategorySectionProps {
   title: string;
@@ -76,6 +77,30 @@ const CategorySection = ({
     }
   };
 
+  const renderItem = (item: string, index: number) => {
+    if (item === "Plus") {
+      return (
+        <Link to="/categories" key={index}>
+          <Button 
+            className={`rounded-full border-2 border-black whitespace-nowrap px-4 py-1 h-auto flex-shrink-0 transition-colors ${getItemColor(item)}`}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </Link>
+      );
+    }
+    
+    return (
+      <Button 
+        key={index} 
+        className={`rounded-full border-2 border-black whitespace-nowrap px-4 py-1 h-auto flex-shrink-0 transition-colors ${getItemColor(item)}`}
+        onClick={() => onItemClick?.(item)}
+      >
+        {item}
+      </Button>
+    );
+  };
+
   return (
     <div className={`px-4 py-3 ${className}`}>
       <div className="mb-2 flex justify-center">
@@ -96,15 +121,7 @@ const CategorySection = ({
           onMouseUp={handleDragEnd}
           onMouseLeave={handleDragEnd}
         >
-          {items.map((item, index) => (
-            <Button 
-              key={index} 
-              className={`rounded-full border-2 border-black whitespace-nowrap px-4 py-1 h-auto flex-shrink-0 transition-colors ${getItemColor(item)}`}
-              onClick={() => onItemClick?.(item)}
-            >
-              {item === "Plus" ? <Plus className="h-4 w-4" /> : item}
-            </Button>
-          ))}
+          {items.map((item, index) => renderItem(item, index))}
         </div>
         
         <ArrowRight className="h-6 w-6 ml-2 text-gray-400 cursor-pointer hover:text-black" />

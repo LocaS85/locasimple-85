@@ -9,7 +9,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent } from "./ui/sheet";
 import { useState } from "react";
-import { Menu, Search, User, MapPin, HelpCircle, Info } from "lucide-react";
+import { Menu, Search, MapPin, Info } from "lucide-react";
 
 interface Language {
   code: string;
@@ -32,8 +32,6 @@ const Navbar = () => {
     { to: "/search", label: "Recherche", icon: <Search className="h-4 w-4 mr-2" /> },
     { to: "/categories", label: "Catégories", icon: <MapPin className="h-4 w-4 mr-2" /> },
     { to: "/about", label: "À propos", icon: <Info className="h-4 w-4 mr-2" /> },
-    { to: "/help", label: "Aide", icon: <HelpCircle className="h-4 w-4 mr-2" /> },
-    { to: "/contact", label: "Contact", icon: <User className="h-4 w-4 mr-2" /> },
   ];
 
   // Helper function to check if a link is active
