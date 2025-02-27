@@ -2,13 +2,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 import SearchBar from '@/components/search/SearchBar';
 import CategorySection from '@/components/search/CategorySection';
 import TransportSection from '@/components/search/TransportSection';
 import SearchFilters from '@/components/search/SearchFilters';
 import Navigation from '@/components/search/Navigation';
 import { Button } from '@/components/ui/button';
-import { Search as SearchIcon } from 'lucide-react';
+import { Search as SearchIcon, ArrowLeft } from 'lucide-react';
 
 const Search = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -75,8 +76,13 @@ const Search = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative">
-      <div className="bg-black text-white p-6 flex justify-center items-center">
+      <div className="bg-black text-white p-6 flex items-center justify-between">
+        <Link to="/" className="flex items-center text-white">
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Retour
+        </Link>
         <h1 className="text-xl font-bold">Carte Maps</h1>
+        <div className="w-20"></div> {/* Spacer pour équilibrer le header */}
       </div>
 
       <motion.div

@@ -1,35 +1,129 @@
 
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { FacebookIcon, InstagramIcon, TwitterIcon, YoutubeIcon, MapPin } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white py-8 mt-auto">
+    <footer className="bg-gray-100 pt-12 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h4 className="font-semibold mb-4">À propos</h4>
-            <ul className="space-y-2">
-              <li><Link to="/about" className="hover:text-gray-300">À propos de nous</Link></li>
-              <li><Link to="/contact" className="hover:text-gray-300">Contact</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Légal</h4>
-            <ul className="space-y-2">
-              <li><Link to="/terms" className="hover:text-gray-300">Conditions d'utilisation</Link></li>
-              <li><Link to="/privacy" className="hover:text-gray-300">Politique de confidentialité</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Suivez-nous</h4>
-            <div className="flex flex-wrap gap-4">
-              <a href="#" className="hover:text-gray-300">Twitter</a>
-              <a href="#" className="hover:text-gray-300">Facebook</a>
+            <Link to="/" className="flex items-center text-xl font-bold text-primary mb-4">
+              <MapPin className="mr-2 h-5 w-5" />
+              LocaSimple
+            </Link>
+            <p className="text-sm text-gray-600 mb-4">
+              Simplifiez vos trajets, optimisez votre temps avec des solutions de localisation rapides et efficaces.
+            </p>
+            <div className="flex space-x-4">
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <FacebookIcon size={20} />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <TwitterIcon size={20} />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <InstagramIcon size={20} />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <YoutubeIcon size={20} />
+              </a>
             </div>
           </div>
+          
+          <div>
+            <h3 className="font-semibold mb-4">Navigation</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/" className="text-gray-600 hover:text-primary transition-colors">
+                  Accueil
+                </Link>
+              </li>
+              <li>
+                <Link to="/search" className="text-gray-600 hover:text-primary transition-colors">
+                  Recherche
+                </Link>
+              </li>
+              <li>
+                <Link to="/categories" className="text-gray-600 hover:text-primary transition-colors">
+                  Catégories
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
+                  À propos
+                </Link>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="font-semibold mb-4">Aide</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/help" className="text-gray-600 hover:text-primary transition-colors">
+                  Centre d'aide
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-gray-600 hover:text-primary transition-colors">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-gray-600 hover:text-primary transition-colors">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link to="/pricing" className="text-gray-600 hover:text-primary transition-colors">
+                  Abonnements
+                </Link>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="font-semibold mb-4">Légal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/terms" className="text-gray-600 hover:text-primary transition-colors">
+                  Conditions d'utilisation
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-gray-600 hover:text-primary transition-colors">
+                  Politique de confidentialité
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookies" className="text-gray-600 hover:text-primary transition-colors">
+                  Cookies
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="text-center mt-8 pt-8 border-t border-gray-700">
-          <p className="text-sm sm:text-base">&copy; {new Date().getFullYear()} LocaSimple. Tous droits réservés.</p>
+        
+        <Separator className="my-8" />
+        
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} LocaSimple. Tous droits réservés.
+          </p>
+          <div className="flex space-x-4 mt-4 md:mt-0">
+            <Link to="/terms" className="text-sm text-gray-500 hover:text-primary">
+              Conditions
+            </Link>
+            <Link to="/privacy" className="text-sm text-gray-500 hover:text-primary">
+              Confidentialité
+            </Link>
+            <Link to="/cookies" className="text-sm text-gray-500 hover:text-primary">
+              Cookies
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

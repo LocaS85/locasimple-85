@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, MapPin, Clock, Heart, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { User, MapPin, Clock, Heart, ArrowLeft, Home, Search } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +23,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const Profile = () => {
   const navigate = useNavigate();
+  
   const handleDeleteAccount = () => {
-    console.log("Compte supprimé");
-    // Logique de suppression du compte à implémenter
+    toast.success("Votre compte a été supprimé avec succès");
+    navigate("/");
+  };
+
+  const handleSaveChanges = () => {
+    toast.success("Modifications enregistrées avec succès");
   };
 
   return (
@@ -99,7 +106,22 @@ const Profile = () => {
                   <Input id="city" placeholder="Paris" />
                 </div>
               </div>
-              <Button>Sauvegarder les modifications</Button>
+              <Button onClick={handleSaveChanges}>Sauvegarder les modifications</Button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
+                <Link to="/">
+                  <Button variant="outline" className="w-full">
+                    <Home className="mr-2 h-4 w-4" />
+                    Retour à l'accueil
+                  </Button>
+                </Link>
+                <Link to="/search">
+                  <Button variant="outline" className="w-full">
+                    <Search className="mr-2 h-4 w-4" />
+                    Rechercher
+                  </Button>
+                </Link>
+              </div>
 
               <div className="pt-6 border-t mt-6">
                 <h3 className="text-lg font-semibold text-destructive mb-4">Zone dangereuse</h3>
@@ -139,15 +161,36 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center space-x-4 p-4 border rounded-lg">
-                  <Heart className="text-red-500" />
-                  <div>
-                    <h3 className="font-medium">Restaurant Le Petit Bistrot</h3>
-                    <p className="text-sm text-muted-foreground">
-                      123 rue de la Paix, Paris
-                    </p>
+                {[1, 2, 3].map((i) => (
+                  <Link to={`/place/${i}`} key={i}>
+                    <div className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="h-12 w-12 bg-gray-200 rounded-md flex items-center justify-center">
+                        <MapPin className="text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium">{`Restaurant Exemple ${i}`}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {`${123 + i} rue de la Paix, Paris`}
+                        </p>
+                      </div>
+                      <Heart className="text-red-500 h-5 w-5" />
+                    </div>
+                  </Link>
+                ))}
+                
+                {[1, 2, 3].length === 0 && (
+                  <div className="text-center py-8">
+                    <Heart className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                    <h3 className="text-xl font-medium mb-2">Aucun favori</h3>
+                    <p className="text-gray-500 mb-4">Vous n'avez pas encore de lieux favoris</p>
+                    <Button asChild>
+                      <Link to="/search">
+                        <Search className="mr-2 h-4 w-4" />
+                        Rechercher des lieux
+                      </Link>
+                    </Button>
                   </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -163,13 +206,20 @@ const Profile = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center space-x-4 p-4 border rounded-lg">
-                  <Clock className="text-muted-foreground" />
-                  <div>
-                    <h3 className="font-medium">Recherche: Restaurants à Paris</h3>
-                    <p className="text-sm text-muted-foreground">Il y a 2 jours</p>
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center space-x-4 p-4 border rounded-lg">
+                    <Clock className="text-muted-foreground h-5 w-5" />
+                    <div>
+                      <h3 className="font-medium">{`Recherche: ${i === 1 ? 'Restaurants à Paris' : i === 2 ? 'Hôtels à Lyon' : i === 3 ? 'Cafés à Marseille' : 'Musées à Toulouse'}`}</h3>
+                      <p className="text-sm text-muted-foreground">Il y a {i} jour{i > 1 ? 's' : ''}</p>
+                    </div>
+                    <Link to="/search" className="ml-auto">
+                      <Button variant="ghost" size="sm">
+                        <Search className="h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
