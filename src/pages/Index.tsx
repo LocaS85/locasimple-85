@@ -165,11 +165,15 @@ const Index = () => {
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Catégories de base</span>
+                  <span>Rayon de recherche jusqu'à 5 km</span>
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Itinéraires simples</span>
+                  <span>Filtre par distance uniquement</span>
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 text-green-500 mr-2" />
+                  <span>Max 3 résultats par recherche</span>
                 </li>
               </ul>
               <Button asChild className="w-full" variant="outline">
@@ -198,11 +202,15 @@ const Index = () => {
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Toutes les catégories</span>
+                  <span>Rayon de recherche jusqu'à 25 km</span>
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Itinéraires optimisés</span>
+                  <span>Filtres avancés (durée et distance)</span>
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 text-green-500 mr-2" />
+                  <span>Jusqu'à 10 résultats par recherche</span>
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
@@ -232,7 +240,15 @@ const Index = () => {
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span>API d'accès</span>
+                  <span>Rayon de recherche illimité</span>
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 text-green-500 mr-2" />
+                  <span>Filtres personnalisables</span>
+                </li>
+                <li className="flex items-center">
+                  <Check className="h-5 w-5 text-green-500 mr-2" />
+                  <span>Résultats illimités par recherche</span>
                 </li>
                 <li className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
