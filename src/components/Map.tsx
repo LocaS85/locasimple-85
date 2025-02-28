@@ -93,7 +93,7 @@ const Map = ({ results, center }: MapProps) => {
     } catch (error) {
       console.error('Error initializing map:', error);
     }
-  }, [mapContainer, center]);
+  }, [mapContainer, center, isMapInitialized]);
 
   useEffect(() => {
     if (!map.current || !isMapInitialized) return;
