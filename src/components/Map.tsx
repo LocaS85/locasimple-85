@@ -2,8 +2,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import type { Result } from './ResultsList';
 
 interface MapProps {
@@ -16,8 +14,10 @@ const Map = ({ results, center }: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const routesRef = useRef<mapboxgl.Map[]>([]);
-  const [mapboxToken, setMapboxToken] = useState('');
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+  
+  // Token Mapbox intégré directement
+  const mapboxToken = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw';
 
   const addRoute = async (start: [number, number], end: [number, number], color: string) => {
     if (!map.current || !mapboxToken) return;
@@ -70,8 +70,9 @@ const Map = ({ results, center }: MapProps) => {
     }
   };
 
-  const initializeMap = () => {
-    if (!mapContainer.current || !mapboxToken) return;
+  // Initialiser la carte automatiquement au chargement du composant
+  useEffect(() => {
+    if (!mapContainer.current || isMapInitialized) return;
 
     try {
       mapboxgl.accessToken = mapboxToken;
@@ -92,7 +93,7 @@ const Map = ({ results, center }: MapProps) => {
     } catch (error) {
       console.error('Error initializing map:', error);
     }
-  };
+  }, [mapContainer, center]);
 
   useEffect(() => {
     if (!map.current || !isMapInitialized) return;
@@ -146,7 +147,7 @@ const Map = ({ results, center }: MapProps) => {
       map.current.fitBounds(bounds, { padding: 50 });
     }
 
-  }, [results, isMapInitialized]);
+  }, [results, isMapInitialized, center]);
 
   // Cleanup
   useEffect(() => {
@@ -154,27 +155,6 @@ const Map = ({ results, center }: MapProps) => {
       map.current?.remove();
     };
   }, []);
-
-  if (!isMapInitialized) {
-    return (
-      <div className="p-4 space-y-4">
-        <p className="text-sm text-gray-600">
-          Pour initialiser la carte, veuillez entrer votre token Mapbox public. 
-          Vous pouvez le trouver dans votre tableau de bord Mapbox.
-        </p>
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            value={mapboxToken}
-            onChange={(e) => setMapboxToken(e.target.value)}
-            placeholder="Entrez votre token Mapbox public"
-            className="flex-1"
-          />
-          <Button onClick={initializeMap}>Initialiser la carte</Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative w-full h-full">
