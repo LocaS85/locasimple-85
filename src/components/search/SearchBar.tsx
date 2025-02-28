@@ -8,16 +8,26 @@ interface SearchBarProps {
   isRecording: boolean;
   onMicClick: () => void;
   onLocationClick?: () => void;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const SearchBar = ({ isRecording, onMicClick, onLocationClick }: SearchBarProps) => {
+const SearchBar = ({ 
+  isRecording, 
+  onMicClick, 
+  onLocationClick,
+  value = '',
+  onChange
+}: SearchBarProps) => {
   return (
     <div className="relative w-full max-w-md mx-auto">
       <div className="relative flex items-center w-full">
         <Input 
           type="text" 
           placeholder="Rechercher un lieu..." 
-          className="w-full rounded-full border-2 border-black pr-20 pl-4 py-6" 
+          className="w-full rounded-full border-2 border-black pr-20 pl-4 py-6"
+          value={value}
+          onChange={onChange}
         />
         <div className="absolute right-2 flex space-x-1">
           <Button 

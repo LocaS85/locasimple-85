@@ -18,30 +18,54 @@ interface SearchFiltersProps {
   onDistanceUnitChange: (unit: string) => void;
   selectedDistance: number | null;
   selectedDuration: number | null;
+  onDistanceChange?: (value: number | null) => void;
+  onDurationChange?: (value: number | null) => void;
 }
 
 const SearchFilters = ({ 
   distanceUnit, 
   onDistanceUnitChange,
   selectedDistance,
-  selectedDuration 
+  selectedDuration,
+  onDistanceChange,
+  onDurationChange
 }: SearchFiltersProps) => {
-  const [kmRadius, setKmRadius] = useState(5);
-  const [timeRadius, setTimeRadius] = useState(30);
-  const [filterType, setFilterType] = useState<'distance' | 'duration'>('distance');
-  const [showFilter, setShowFilter] = useState(false);
+  const [kmRadius, setKmRadius] = useState(selectedDistance || 5);
+  const [timeRadius, setTimeRadius] = useState(selectedDuration || 30);
+  const [filterType, setFilterType] = useState<'distance' | 'duration'>(selectedDistance ? 'distance' : 'duration');
+  const [showFilter, setShowFilter] = useState(true);
+  const [resultsCount, setResultsCount] = useState(5);
   
   const handleKmRadiusChange = (value: number[]) => {
     setKmRadius(value[0]);
+    if (onDistanceChange) {
+      onDistanceChange(value[0]);
+    }
   };
   
   const handleTimeRadiusChange = (value: number[]) => {
     setTimeRadius(value[0]);
+    if (onDurationChange) {
+      onDurationChange(value[0]);
+    }
   };
 
   const handleFilterTypeChange = (type: 'distance' | 'duration') => {
     setFilterType(type);
     setShowFilter(true);
+    
+    // Mettre à jour le filtre sélectionné en fonction du type
+    if (type === 'distance') {
+      if (onDistanceChange) onDistanceChange(kmRadius);
+      if (onDurationChange) onDurationChange(null);
+    } else {
+      if (onDistanceChange) onDistanceChange(null);
+      if (onDurationChange) onDurationChange(timeRadius);
+    }
+  };
+
+  const handleResultsCountChange = (count: number) => {
+    setResultsCount(count);
   };
   
   return (
@@ -108,7 +132,7 @@ const SearchFilters = ({
                     `${(kmRadius * 0.621371).toFixed(1)} mi`}
                 </div>
                 <Slider 
-                  defaultValue={[5]} 
+                  defaultValue={[kmRadius]} 
                   max={100} 
                   step={kmRadius < 1 ? 0.1 : 1}
                   min={0.1} 
@@ -134,7 +158,7 @@ const SearchFilters = ({
                     : `${Math.floor(timeRadius / 60)}h${timeRadius % 60 ? ` ${timeRadius % 60}min` : ''}`}
                 </div>
                 <Slider 
-                  defaultValue={[30]} 
+                  defaultValue={[timeRadius]} 
                   max={300} 
                   step={timeRadius < 60 ? 5 : 15} 
                   min={5} 
@@ -156,7 +180,7 @@ const SearchFilters = ({
         <Popover>
           <PopoverTrigger asChild>
             <Button className="rounded-full border-2 border-black bg-white text-black hover:bg-gray-100">
-              Nombre de résultats
+              Nombre de résultats: {resultsCount}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-full p-0">
@@ -165,7 +189,8 @@ const SearchFilters = ({
                 <Button 
                   key={`nbr-${i+1}`} 
                   variant="outline"
-                  className="h-10 w-10"
+                  className={`h-10 w-10 ${resultsCount === i+1 ? 'bg-blue-100' : ''}`}
+                  onClick={() => handleResultsCountChange(i+1)}
                 >
                   {i+1}
                 </Button>
