@@ -47,7 +47,7 @@ const Plan = () => {
       ],
       buttonText: "Essayer 14 jours gratuits",
       popular: true,
-      link: "/register?plan=premium",
+      link: "/payment?plan=premium",
     },
     {
       name: "Pro",
@@ -67,7 +67,7 @@ const Plan = () => {
       limitations: [],
       buttonText: "Contactez-nous",
       popular: false,
-      link: "/contact?plan=pro",
+      link: "/payment?plan=pro",
     },
   ];
 

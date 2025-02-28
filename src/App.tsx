@@ -21,6 +21,7 @@ import About from "./pages/About";
 import Help from "./pages/Help";
 import Search from "./pages/Search";
 import Plan from "./pages/Plan";
+import Payment from "./pages/Payment";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/help" element={<Help />} />
             <Route path="/plan" element={<Plan />} />
+            <Route path="/payment" element={<Payment />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
