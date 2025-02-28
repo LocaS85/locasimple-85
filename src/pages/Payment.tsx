@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   CreditCard, 
   Building, 
-  PaypalLogo, 
+  CreditCard as PaypalIcon, // Utiliser une icône existante comme substitut
   CalendarDays, 
   CalendarClock,
   ArrowRight, 
@@ -225,7 +225,7 @@ const Payment = () => {
                   }`}
                   onClick={() => setPaymentMethod('paypal')}
                 >
-                  <PaypalLogo className={`h-8 w-8 mb-2 ${paymentMethod === 'paypal' ? 'text-primary' : 'text-gray-500'}`} />
+                  <PaypalIcon className={`h-8 w-8 mb-2 ${paymentMethod === 'paypal' ? 'text-primary' : 'text-gray-500'}`} />
                   <span className="text-sm">PayPal</span>
                 </button>
               </div>
