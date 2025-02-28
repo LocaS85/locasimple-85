@@ -20,6 +20,7 @@ import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Help from "./pages/Help";
 import Search from "./pages/Search";
+import Plan from "./pages/Plan";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/about" element={<About />} />
             <Route path="/help" element={<Help />} />
+            <Route path="/plan" element={<Plan />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

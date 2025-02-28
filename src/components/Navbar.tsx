@@ -9,7 +9,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent } from "./ui/sheet";
 import { useState } from "react";
-import { Menu, Search, MapPin, Info } from "lucide-react";
+import { Menu, Search, MapPin, Info, Map } from "lucide-react";
 
 interface Language {
   code: string;
@@ -31,6 +31,7 @@ const Navbar = () => {
   const navLinks = [
     { to: "/search", label: "Recherche", icon: <Search className="h-4 w-4 mr-2" /> },
     { to: "/categories", label: "Catégories", icon: <MapPin className="h-4 w-4 mr-2" /> },
+    { to: "/plan", label: "Plans", icon: <Map className="h-4 w-4 mr-2" /> },
     { to: "/about", label: "À propos", icon: <Info className="h-4 w-4 mr-2" /> },
   ];
 
