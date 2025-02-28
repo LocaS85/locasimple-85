@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Search, Navigation, MapPin, Info, Phone, Map } from 'lucide-react';
+import { Search, Navigation, MapPin, Info, Phone, Map, Check } from 'lucide-react';
 
 const Index = () => {
   const [showLaunchScreen, setShowLaunchScreen] = useState(true);
