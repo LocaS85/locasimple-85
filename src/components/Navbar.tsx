@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -43,7 +44,7 @@ const Navbar = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
       <div className="container mx-auto px-4 flex justify-between items-center h-16">
         <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold text-primary">Locasphere</Link>
+          <Link to="/" className="text-xl font-bold text-primary">LocaSimple</Link>
         </div>
 
         <nav className="hidden md:flex items-center space-x-6">
