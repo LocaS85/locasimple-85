@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   CreditCard, 
   Building, 
-  CreditCard as PaypalIcon, // Utiliser une icône existante comme substitut
+  CreditCard as PaypalIcon,
   CalendarDays, 
   CalendarClock,
   ArrowRight, 

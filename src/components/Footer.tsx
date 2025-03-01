@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FacebookIcon, InstagramIcon, TwitterIcon, YoutubeIcon, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 const Footer = () => {
@@ -17,20 +17,6 @@ const Footer = () => {
             <p className="text-sm text-gray-600 mb-4">
               Simplifiez vos trajets, optimisez votre temps avec des solutions de localisation rapides et efficaces.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                <FacebookIcon size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                <TwitterIcon size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                <InstagramIcon size={20} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                <YoutubeIcon size={20} />
-              </a>
-            </div>
           </div>
           
           <div>
