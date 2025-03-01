@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { render } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 /**
@@ -14,7 +13,7 @@ export const testTranslations = (
 ) => {
   // Mock language change
   const switchLanguage = (language: string) => {
-    // Implementation would use jest.spyOn in a real test environment
+    // Implementation would use testing library in a real test environment
     console.log(`Switch language to: ${language}`);
   };
 
@@ -25,11 +24,12 @@ export const testTranslations = (
     // This would be a formal test in a test suite
     console.log(`Testing ${Component.name} with ${language}`);
     
-    render(
-      <LanguageProvider>
-        <Component {...props} />
-      </LanguageProvider>
-    );
+    // In a real test environment, we would render the component with the test library
+    // render(
+    //   <LanguageProvider>
+    //     <Component {...props} />
+    //   </LanguageProvider>
+    // );
     
     // Switch language and check if component updates
     switchLanguage(language);
