@@ -10,7 +10,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import PlaceDetails from "./pages/PlaceDetails";
-import Categories from "./pages/Categories";
 import Pricing from "./pages/Pricing";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
@@ -19,7 +18,6 @@ import Privacy from "./pages/Privacy";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Help from "./pages/Help";
-import Search from "./pages/Search";
 import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -36,8 +34,6 @@ const App = () => (
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/categories" element={<Categories />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/place/:id" element={<PlaceDetails />} />
               <Route path="/pricing" element={<Pricing />} />
