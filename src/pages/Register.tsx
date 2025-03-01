@@ -52,17 +52,18 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md relative">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-4 top-4"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+      <Card className="w-full max-w-md">
+        <div className="p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        </div>
 
-        <CardHeader>
+        <CardHeader className="pt-0">
           <CardTitle>{t('createAccount')}</CardTitle>
           <CardDescription>
             {t('preferredMethod')}
