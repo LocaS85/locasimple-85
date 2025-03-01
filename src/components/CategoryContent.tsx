@@ -11,10 +11,12 @@ import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const CategoryContent = () => {
   const { selectedCategory, addresses } = useCategory();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   // États pour les filtres
   const [radius, setRadius] = useState(5);
@@ -25,7 +27,7 @@ export const CategoryContent = () => {
   if (!selectedCategory) {
     return (
       <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold">Sélectionnez une catégorie</h1>
+        <h1 className="text-2xl font-bold">{t('selectCategory')}</h1>
       </div>
     );
   }
@@ -60,7 +62,7 @@ export const CategoryContent = () => {
     });
 
     navigate(`/search?${searchParams.toString()}`);
-    toast.success('Recherche lancée');
+    toast.success(t('searchStarted'));
   };
 
   return (
@@ -70,7 +72,7 @@ export const CategoryContent = () => {
           <h1 className="text-2xl font-bold">{category.name}</h1>
           {showAddressForm && (
             <span className="text-sm text-muted-foreground">
-              {currentAddresses.length}/10 adresses
+              {currentAddresses.length}/10 {t('addresses')}
             </span>
           )}
         </div>
@@ -78,9 +80,9 @@ export const CategoryContent = () => {
         {isMainAddress && currentAddresses.length === 0 && (
           <Alert>
             <Home className="h-4 w-4" />
-            <AlertTitle>Adresse principale</AlertTitle>
+            <AlertTitle>{t('mainAddress')}</AlertTitle>
             <AlertDescription>
-              Définissez votre adresse principale. Cette adresse sera utilisée comme point de référence pour calculer les distances.
+              {t('mainAddressDescription')}
             </AlertDescription>
           </Alert>
         )}
@@ -108,7 +110,7 @@ export const CategoryContent = () => {
               size="lg"
             >
               <Search className="w-4 h-4 mr-2" />
-              Rechercher
+              {t('search')}
             </Button>
           </div>
         )}

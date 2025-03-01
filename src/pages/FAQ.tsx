@@ -1,56 +1,72 @@
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const FAQ = () => {
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+
   return (
     <div className="container mx-auto py-12 px-4">
+      <Button 
+        variant="ghost" 
+        className="mb-4"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        {t('back')}
+      </Button>
+      
       <div className="text-center mb-12">
         <HelpCircle className="w-12 h-12 mx-auto text-primary mb-4" />
-        <h1 className="text-4xl font-bold mb-4">Foire Aux Questions</h1>
+        <h1 className="text-4xl font-bold mb-4">{t('faq')}</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Trouvez rapidement des réponses aux questions les plus fréquemment posées sur LocaSimple.
+          {t('faqDescription')}
         </p>
       </div>
 
       <div className="max-w-3xl mx-auto">
         <Accordion type="single" collapsible className="space-y-4">
           <AccordionItem value="item-1">
-            <AccordionTrigger>Comment fonctionne LocaSimple ?</AccordionTrigger>
+            <AccordionTrigger>{t('howLocaSimpleWorks')}</AccordionTrigger>
             <AccordionContent>
-              LocaSimple est une plateforme qui vous permet de rechercher et d'optimiser vos trajets en fonction de vos besoins. Entrez simplement votre destination et vos préférences, et nous vous proposerons les meilleurs itinéraires.
+              {t('howLocaSimpleWorksAnswer')}
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="item-2">
-            <AccordionTrigger>L'application est-elle gratuite ?</AccordionTrigger>
+            <AccordionTrigger>{t('isAppFree')}</AccordionTrigger>
             <AccordionContent>
-              LocaSimple propose une version gratuite avec des fonctionnalités de base et des forfaits premium pour accéder à des fonctionnalités avancées. Consultez notre page de tarification pour plus de détails.
+              {t('isAppFreeAnswer')}
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="item-3">
-            <AccordionTrigger>Comment puis-je créer un compte ?</AccordionTrigger>
+            <AccordionTrigger>{t('howToCreateAccount')}</AccordionTrigger>
             <AccordionContent>
-              La création d'un compte est simple et rapide. Cliquez sur le bouton "S'inscrire", remplissez le formulaire avec vos informations et validez votre email. Vous pouvez aussi vous connecter avec Google ou Facebook.
+              {t('howToCreateAccountAnswer')}
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="item-4">
-            <AccordionTrigger>Quels types de lieux puis-je rechercher ?</AccordionTrigger>
+            <AccordionTrigger>{t('whatPlacesCanISearch')}</AccordionTrigger>
             <AccordionContent>
-              Vous pouvez rechercher une grande variété de lieux : restaurants, bars, parcs, commerces, lieux culturels, et bien plus encore. Nos filtres vous permettent d'affiner votre recherche selon vos préférences.
+              {t('whatPlacesCanISearchAnswer')}
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="item-5">
-            <AccordionTrigger>Comment fonctionne la recherche multi-destinations ?</AccordionTrigger>
+            <AccordionTrigger>{t('howMultiDestinationsWork')}</AccordionTrigger>
             <AccordionContent>
-              La recherche multi-destinations vous permet d'optimiser vos trajets entre plusieurs points d'intérêt. Ajoutez simplement toutes vos destinations, et nous calculerons l'itinéraire le plus efficace.
+              {t('howMultiDestinationsWorkAnswer')}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
