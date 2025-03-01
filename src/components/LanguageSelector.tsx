@@ -39,7 +39,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           {languages.find(lang => lang.code === language)?.name || 'Language'}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="bg-gray-100">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
