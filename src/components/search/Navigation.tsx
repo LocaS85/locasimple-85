@@ -3,9 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 import { MapPin, Bookmark, Settings } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Navigation = () => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   // Fonction pour vérifier si un lien est actif
   const isActive = (path: string) => location.pathname === path;
@@ -21,7 +23,7 @@ const Navigation = () => {
       >
         <Link to="/plan" className="flex items-center justify-center">
           <MapPin className="mr-2 h-4 w-4" />
-          Plan
+          {t('plans')}
         </Link>
       </Button>
       <Button 
@@ -31,7 +33,7 @@ const Navigation = () => {
       >
         <Link to="/profile" className="flex items-center justify-center">
           <Bookmark className="mr-2 h-4 w-4" />
-          Enregistré
+          {t('saved')}
         </Link>
       </Button>
       <Button 
@@ -41,7 +43,7 @@ const Navigation = () => {
       >
         <Link to="/profile/settings" className="flex items-center justify-center">
           <Settings className="mr-2 h-4 w-4" />
-          Paramètre
+          {t('settings')}
         </Link>
       </Button>
     </div>

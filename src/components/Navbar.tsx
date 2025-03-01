@@ -8,8 +8,9 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent } from "./ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, Search, MapPin, Info, Map } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Language {
   code: string;
@@ -21,18 +22,30 @@ const Navbar = () => {
   const languages: Language[] = [
     { code: 'fr', name: 'Français', flag: '🇫🇷' },
     { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' }
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+    { code: 'pt', name: 'Português', flag: '🇵🇹' }
   ];
 
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>(languages[0]);
+  const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
+  // Set selected language from context
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>(
+    languages.find(lang => lang.code === language) || languages[0]
+  );
+
+  // Update context when language changes
+  useEffect(() => {
+    setLanguage(selectedLanguage.code);
+  }, [selectedLanguage, setLanguage]);
+
   const navLinks = [
-    { to: "/search", label: "Recherche", icon: <Search className="h-4 w-4 mr-2" /> },
-    { to: "/categories", label: "Catégories", icon: <MapPin className="h-4 w-4 mr-2" /> },
-    { to: "/plan", label: "Plans", icon: <Map className="h-4 w-4 mr-2" /> },
-    { to: "/about", label: "À propos", icon: <Info className="h-4 w-4 mr-2" /> },
+    { to: "/search", label: t("search"), icon: <Search className="h-4 w-4 mr-2" /> },
+    { to: "/categories", label: t("categories"), icon: <MapPin className="h-4 w-4 mr-2" /> },
+    { to: "/plan", label: t("plans"), icon: <Map className="h-4 w-4 mr-2" /> },
+    { to: "/about", label: t("about"), icon: <Info className="h-4 w-4 mr-2" /> },
   ];
 
   // Helper function to check if a link is active
@@ -71,10 +84,10 @@ const Navbar = () => {
           {/* Actions de droite pour desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login">
-              <Button variant="ghost" className="hover:bg-gray-100 hover:text-primary">Connexion</Button>
+              <Button variant="ghost" className="hover:bg-gray-100 hover:text-primary">{t("login")}</Button>
             </Link>
             <Link to="/register">
-              <Button className="hover:bg-primary/90">Inscription</Button>
+              <Button className="hover:bg-primary/90">{t("register")}</Button>
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -134,7 +147,7 @@ const Navbar = () => {
                       onClick={() => setIsOpen(false)}
                     >
                       <Button variant="ghost" className="w-full justify-start hover:bg-gray-100">
-                        Connexion
+                        {t("login")}
                       </Button>
                     </Link>
                     <Link 
@@ -143,7 +156,7 @@ const Navbar = () => {
                       onClick={() => setIsOpen(false)}
                     >
                       <Button className="w-full justify-start hover:bg-primary/90">
-                        Inscription
+                        {t("register")}
                       </Button>
                     </Link>
                   </div>

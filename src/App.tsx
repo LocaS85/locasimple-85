@@ -22,38 +22,41 @@ import Help from "./pages/Help";
 import Search from "./pages/Search";
 import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/place/:id" element={<PlaceDetails />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/plan" element={<Plan />} />
-            <Route path="/payment" element={<Payment />} />
-          </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/admin" element={<Admin />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <LanguageProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/place/:id" element={<PlaceDetails />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/plan" element={<Plan />} />
+              <Route path="/payment" element={<Payment />} />
+            </Route>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 
