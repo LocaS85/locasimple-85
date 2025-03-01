@@ -36,14 +36,14 @@ const SearchBar = ({
           <Button 
             onClick={onLocationClick}
             className="bg-transparent hover:bg-gray-100 text-gray-500 p-1"
-            title="Utiliser ma position"
+            title={t('useMyLocation')}
           >
             <MapPin className="h-5 w-5" />
           </Button>
           <Button 
             onClick={onMicClick}
             className={`${isRecording ? 'text-red-500' : 'text-gray-500'} bg-transparent hover:bg-gray-100 p-1`}
-            title="Recherche vocale"
+            title={t('voiceSearch')}
           >
             <Mic className="h-5 w-5" />
           </Button>
