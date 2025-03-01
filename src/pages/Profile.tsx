@@ -24,9 +24,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   const handleDeleteAccount = () => {
     toast.success("Votre compte a été supprimé avec succès");
@@ -45,7 +47,7 @@ const Profile = () => {
         onClick={() => navigate(-1)}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Retour
+        {t('back')}
       </Button>
 
       <div className="flex items-center space-x-4 p-4">
@@ -53,95 +55,95 @@ const Profile = () => {
           <User className="w-10 h-10 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Mon Profil</h1>
+          <h1 className="text-2xl font-bold">{t('myProfile')}</h1>
           <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
         </div>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="favorites">Favoris</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
+          <TabsTrigger value="profile">{t('profile')}</TabsTrigger>
+          <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
+          <TabsTrigger value="history">{t('history')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
           <Card>
             <CardHeader>
-              <CardTitle>Informations personnelles</CardTitle>
+              <CardTitle>{t('personalInfo')}</CardTitle>
               <CardDescription>
-                Mettez à jour vos informations personnelles ici
+                {t('updatePersonalInfo')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstname">Prénom</Label>
+                  <Label htmlFor="firstname">{t('firstName')}</Label>
                   <Input id="firstname" placeholder="John" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nom</Label>
+                  <Label htmlFor="name">{t('lastName')}</Label>
                   <Input id="name" placeholder="Doe" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('email')}</Label>
                 <Input id="email" type="email" placeholder="john@exemple.com" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('phone')}</Label>
                 <Input id="phone" placeholder="+33 6 12 34 56 78" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address">Adresse postale</Label>
+                <Label htmlFor="address">{t('postalAddress')}</Label>
                 <Input id="address" placeholder="123 rue de la Paix" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="postal-code">Code postal</Label>
+                  <Label htmlFor="postal-code">{t('postalCode')}</Label>
                   <Input id="postal-code" placeholder="75000" />
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="city">Ville</Label>
+                  <Label htmlFor="city">{t('city')}</Label>
                   <Input id="city" placeholder="Paris" />
                 </div>
               </div>
-              <Button onClick={handleSaveChanges}>Sauvegarder les modifications</Button>
+              <Button onClick={handleSaveChanges}>{t('saveChanges')}</Button>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
                 <Link to="/">
                   <Button variant="outline" className="w-full">
                     <Home className="mr-2 h-4 w-4" />
-                    Retour à l'accueil
+                    {t('backToHome')}
                   </Button>
                 </Link>
                 <Link to="/search">
                   <Button variant="outline" className="w-full">
                     <Search className="mr-2 h-4 w-4" />
-                    Rechercher
+                    {t('search')}
                   </Button>
                 </Link>
               </div>
 
               <div className="pt-6 border-t mt-6">
-                <h3 className="text-lg font-semibold text-destructive mb-4">Zone dangereuse</h3>
+                <h3 className="text-lg font-semibold text-destructive mb-4">{t('dangerZone')}</h3>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive">
-                      Supprimer mon compte
+                      {t('deleteAccount')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer votre compte ?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Cette action est irréversible. Toutes vos données personnelles, favoris et historique seront définitivement supprimés.
+                        {t('deleteConfirmDescription')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        Supprimer définitivement
+                        {t('confirmDelete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -154,9 +156,9 @@ const Profile = () => {
         <TabsContent value="favorites">
           <Card>
             <CardHeader>
-              <CardTitle>Mes favoris</CardTitle>
+              <CardTitle>{t('favorites')}</CardTitle>
               <CardDescription>
-                Lieux et itinéraires que vous avez sauvegardés
+                {t('favoritesDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -181,12 +183,12 @@ const Profile = () => {
                 {[1, 2, 3].length === 0 && (
                   <div className="text-center py-8">
                     <Heart className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-xl font-medium mb-2">Aucun favori</h3>
-                    <p className="text-gray-500 mb-4">Vous n'avez pas encore de lieux favoris</p>
+                    <h3 className="text-xl font-medium mb-2">{t('noFavorites')}</h3>
+                    <p className="text-gray-500 mb-4">{t('noFavoritesDescription')}</p>
                     <Button asChild>
                       <Link to="/search">
                         <Search className="mr-2 h-4 w-4" />
-                        Rechercher des lieux
+                        {t('searchPlaces')}
                       </Link>
                     </Button>
                   </div>
@@ -199,9 +201,9 @@ const Profile = () => {
         <TabsContent value="history">
           <Card>
             <CardHeader>
-              <CardTitle>Historique des recherches</CardTitle>
+              <CardTitle>{t('searchHistory')}</CardTitle>
               <CardDescription>
-                Vos dernières recherches et itinéraires
+                {t('searchHistoryDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -211,7 +213,7 @@ const Profile = () => {
                     <Clock className="text-muted-foreground h-5 w-5" />
                     <div>
                       <h3 className="font-medium">{`Recherche: ${i === 1 ? 'Restaurants à Paris' : i === 2 ? 'Hôtels à Lyon' : i === 3 ? 'Cafés à Marseille' : 'Musées à Toulouse'}`}</h3>
-                      <p className="text-sm text-muted-foreground">Il y a {i} jour{i > 1 ? 's' : ''}</p>
+                      <p className="text-sm text-muted-foreground">{t('daysAgo')} {i} {i > 1 ? t('days') : t('day')}</p>
                     </div>
                     <Link to="/search" className="ml-auto">
                       <Button variant="ghost" size="sm">

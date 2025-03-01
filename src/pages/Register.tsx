@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,10 +14,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -60,9 +63,9 @@ const Register = () => {
         </Button>
 
         <CardHeader>
-          <CardTitle>Créer un compte</CardTitle>
+          <CardTitle>{t('createAccount')}</CardTitle>
           <CardDescription>
-            Choisissez votre méthode d'inscription préférée
+            {t('preferredMethod')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -73,7 +76,7 @@ const Register = () => {
               onClick={handleGoogleRegister}
             >
               <Chrome className="mr-2 h-4 w-4" />
-              Continuer avec Google
+              {t('continueWithGoogle')}
             </Button>
             <Button
               variant="outline"
@@ -81,7 +84,7 @@ const Register = () => {
               onClick={handleFacebookRegister}
             >
               <Facebook className="mr-2 h-4 w-4" />
-              Continuer avec Facebook
+              {t('continueWithFacebook')}
             </Button>
           </div>
 
@@ -91,14 +94,14 @@ const Register = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-white px-2 text-muted-foreground">
-                Ou inscrivez-vous avec
+                {t('orSignUp')}
               </span>
             </div>
           </div>
 
           <form onSubmit={handleEmailRegister} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
+              <Label htmlFor="name">{t('fullName')}</Label>
               <Input
                 id="name"
                 type="text"
@@ -109,7 +112,7 @@ const Register = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -120,7 +123,7 @@ const Register = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -131,15 +134,15 @@ const Register = () => {
             </div>
             <Button type="submit" className="w-full">
               <Mail className="mr-2 h-4 w-4" />
-              S'inscrire avec Email
+              {t('signUpWithEmail')}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-center text-gray-500">
-            Déjà inscrit ?{" "}
+            {t('alreadyRegistered')}{" "}
             <Link to="/login" className="text-primary hover:underline">
-              Connectez-vous
+              {t('signIn')}
             </Link>
           </div>
         </CardFooter>

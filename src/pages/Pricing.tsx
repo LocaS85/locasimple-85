@@ -11,17 +11,19 @@ import {
   CardDescription 
 } from '@/components/ui/card';
 import { CheckCircle2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const plans = [
     {
       id: 'premium',
-      name: 'Premium',
+      name: t('premium'),
       price: '9,99€',
-      period: 'par mois',
-      description: 'Pour les utilisateurs réguliers',
+      period: t('perMonth'),
+      description: t('forRegularUsers'),
       features: [
         'Recherches illimitées',
         'Rayon de recherche jusqu\'à 25 km',
@@ -31,10 +33,10 @@ const Pricing = () => {
     },
     {
       id: 'pro',
-      name: 'Pro',
+      name: t('pro'),
       price: '19,99€',
-      period: 'par mois',
-      description: 'Pour les professionnels',
+      period: t('perMonth'),
+      description: t('forProfessionals'),
       features: [
         'Toutes les fonctionnalités Premium',
         'Rayon de recherche illimité',
@@ -49,9 +51,9 @@ const Pricing = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">Tarifs simples et transparents</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('simplePricing')}</h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Choisissez le plan qui correspond à vos besoins. Tous nos plans incluent une période d'essai de 7 jours.
+          {t('choosePlan')}
         </p>
       </div>
 
@@ -60,7 +62,7 @@ const Pricing = () => {
           <Card key={plan.id} className={`border ${plan.popular ? 'border-primary shadow-lg relative' : 'border-gray-200'}`}>
             {plan.popular && (
               <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-lg">
-                Populaire
+                {t('popular')}
               </div>
             )}
             <CardHeader>
@@ -86,7 +88,7 @@ const Pricing = () => {
                 className={`w-full ${plan.popular ? '' : 'bg-gray-800 hover:bg-gray-700'}`}
                 onClick={() => navigate(`/payment?plan=${plan.id}`)}
               >
-                Choisir ce plan
+                {t('choosePlan')}
               </Button>
             </CardFooter>
           </Card>
@@ -94,12 +96,12 @@ const Pricing = () => {
       </div>
 
       <div className="mt-16 text-center">
-        <h2 className="text-2xl font-bold mb-4">Vous avez des besoins particuliers ?</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('specificNeeds')}</h2>
         <p className="text-lg text-gray-600 mb-6">
-          Contactez-nous pour obtenir un plan personnalisé adapté à vos besoins spécifiques.
+          {t('contactForCustomPlan')}
         </p>
         <Button variant="outline" onClick={() => navigate('/contact')}>
-          Nous contacter
+          {t('contactUs')}
         </Button>
       </div>
     </div>

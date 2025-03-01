@@ -3,6 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Mic, MapPin } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchBarProps {
   isRecording: boolean;
@@ -19,12 +20,14 @@ const SearchBar = ({
   value = '',
   onChange
 }: SearchBarProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="relative w-full max-w-md mx-auto">
       <div className="relative flex items-center w-full">
         <Input 
           type="text" 
-          placeholder="Rechercher un lieu..." 
+          placeholder={t('searchPlaceholder')}
           className="w-full rounded-full border-2 border-black pr-20 pl-4 py-6"
           value={value}
           onChange={onChange}
