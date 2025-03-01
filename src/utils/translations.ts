@@ -127,7 +127,9 @@ const translations: Translations = {
     allModes: "Tous les modes",
     allModesPlus: "Tous + personnalisés",
     questionsAboutPlans: "Vous avez des questions sur nos plans ?",
-    contactTeam: "Contactez notre équipe"
+    contactTeam: "Contactez notre équipe",
+    useMyLocation: "Utiliser ma position",
+    voiceSearch: "Recherche vocale"
   },
   en: {
     search: "Search",
@@ -206,7 +208,6 @@ const translations: Translations = {
     choosePlan: "Choose this plan",
     specificNeeds: "Do you have specific needs?",
     contactForCustomPlan: "Contact us to get a customized plan tailored to your specific needs.",
-    contactUs: "Contact us",
     websiteLabel: "Website",
     description: "Description",
     getDirections: "Get directions",
@@ -251,7 +252,9 @@ const translations: Translations = {
     allModes: "All modes",
     allModesPlus: "All modes + custom",
     questionsAboutPlans: "Do you have questions about our plans?",
-    contactTeam: "Contact our team"
+    contactTeam: "Contact our team",
+    useMyLocation: "Use my location",
+    voiceSearch: "Voice search"
   },
   es: {
     search: "Búsqueda",
@@ -330,7 +333,6 @@ const translations: Translations = {
     choosePlan: "Elegir este plan",
     specificNeeds: "¿Tiene necesidades específicas?",
     contactForCustomPlan: "Contáctenos para obtener un plan personalizado adaptado a sus necesidades específicas.",
-    contactUs: "Contáctenos",
     websiteLabel: "Sitio web",
     description: "Descripción",
     getDirections: "Obtener indicaciones",
@@ -375,7 +377,9 @@ const translations: Translations = {
     allModes: "Todos los modos",
     allModesPlus: "Todos + personalizados",
     questionsAboutPlans: "¿Tiene preguntas sobre nuestros planes?",
-    contactTeam: "Contacte a nuestro equipo"
+    contactTeam: "Contacte a nuestro equipo",
+    useMyLocation: "Usar mi ubicación",
+    voiceSearch: "Búsqueda por voz"
   },
   it: {
     search: "Ricerca",
@@ -454,7 +458,6 @@ const translations: Translations = {
     choosePlan: "Scegli questo piano",
     specificNeeds: "Hai esigenze specifiche?",
     contactForCustomPlan: "Contattaci per ottenere un piano personalizzato adatto alle tue esigenze specifiche.",
-    contactUs: "Contattaci",
     websiteLabel: "Sito web",
     description: "Descrizione",
     getDirections: "Ottieni indicazioni",
@@ -499,7 +502,9 @@ const translations: Translations = {
     allModes: "Tutte le modalità",
     allModesPlus: "Tutte + personalizzate",
     questionsAboutPlans: "Hai domande sui nostri piani?",
-    contactTeam: "Contatta il nostro team"
+    contactTeam: "Contatta il nostro team",
+    useMyLocation: "Usa la mia posizione",
+    voiceSearch: "Ricerca vocale"
   },
   pt: {
     search: "Pesquisa",
@@ -567,7 +572,7 @@ const translations: Translations = {
     sendNotifications: "Enviar notificações importantes",
     accountSecurity: "Garantir a segurança da sua conta",
     dataProtection: "Proteção de dados",
-    dataProtectionDetails: "Implementamos medidas de segurança técnicas e organizacionais para proteger seus dados pessoais contra acesso não autorizado, modificação, divulgação ou destrução.",
+    dataProtectionDetails: "Implementamos medidas de segurança técnicas e organizacionais para proteger seus dados pessoais contra acesso não autorizado, modificação, divulgação ou destruição.",
     simplePricing: "Preços simples e transparentes",
     premiumPlan: "Premium",
     proPlan: "Pro",
@@ -578,7 +583,6 @@ const translations: Translations = {
     choosePlan: "Escolher este plano",
     specificNeeds: "Você tem necessidades específicas?",
     contactForCustomPlan: "Contate-nos para obter um plano personalizado adaptado às suas necessidades específicas.",
-    contactUs: "Contate-nos",
     websiteLabel: "Site",
     description: "Descrição",
     getDirections: "Obter direções",
@@ -623,7 +627,9 @@ const translations: Translations = {
     allModes: "Todos os modos",
     allModesPlus: "Todos + personalizados",
     questionsAboutPlans: "Você tem perguntas sobre nossos planos?",
-    contactTeam: "Contate nossa equipe"
+    contactTeam: "Contate nossa equipe",
+    useMyLocation: "Usar minha localização",
+    voiceSearch: "Pesquisa por voz"
   }
 };
 
