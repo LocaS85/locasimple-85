@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -61,7 +60,6 @@ const Navbar = () => {
           <Link to="/" className="text-gray-600 hover:text-primary">{t('home')}</Link>
           <Link to="/search" className="text-gray-600 hover:text-primary">{t('search')}</Link>
           <Link to="/about" className="text-gray-600 hover:text-primary">{t('about')}</Link>
-          <Link to="/contact" className="text-gray-600 hover:text-primary">{t('contact')}</Link>
           <Link to="/login">
             <Button variant="outline" size="sm" className="ml-2">
               <User className="h-4 w-4 mr-2" />
@@ -105,9 +103,6 @@ const Navbar = () => {
               </Link>
               <Link to="/about" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('about')}
-              </Link>
-              <Link to="/contact" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
-                {t('contact')}
               </Link>
               <Link to="/login" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('login')}
