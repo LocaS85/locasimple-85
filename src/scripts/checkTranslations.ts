@@ -9,7 +9,7 @@
 
 // This is a simplified implementation that would be expanded in a real project
 export const checkTranslationCoverage = async () => {
-  const translations = (await import('../utils/translations')).default;
+  const { translations } = await import('../utils/translations');
   const languages = Object.keys(translations);
   
   // Get all keys from all languages
