@@ -1,121 +1,121 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Search, Map, Info, MessageSquare, User, Menu } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { AlignJustify, X, User, Search } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Navbar = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isMenuOpen && !target.closest('.mobile-menu') && !target.closest('.menu-button')) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Left side - Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <Map className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">LocaSimple</span>
-          </Link>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+      <div className="container mx-auto px-4 flex justify-between items-center h-16">
+        <div className="flex items-center">
+          <Link to="/" className="text-xl font-bold text-primary">Locasphere</Link>
+        </div>
 
-          {/* Center - Desktop Navigation */}
-          <div className="hidden md:flex space-x-4">
-            <Button variant="ghost" asChild>
-              <Link to="/search" className="flex items-center">
-                <Search className="mr-2 h-4 w-4" />
+        <nav className="hidden md:flex items-center space-x-6">
+          <form onSubmit={handleSearch} className="relative w-64">
+            <Input
+              type="text"
+              placeholder={t('search_placeholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          </form>
+          <Link to="/" className="text-gray-600 hover:text-primary">{t('home')}</Link>
+          <Link to="/search" className="text-gray-600 hover:text-primary">{t('search')}</Link>
+          <Link to="/about" className="text-gray-600 hover:text-primary">{t('about')}</Link>
+          <Link to="/contact" className="text-gray-600 hover:text-primary">{t('contact')}</Link>
+          <Link to="/login">
+            <Button variant="outline" size="sm" className="ml-2">
+              <User className="h-4 w-4 mr-2" />
+              {t('login')}
+            </Button>
+          </Link>
+          <LanguageSelector variant="ghost" size="sm" />
+        </nav>
+
+        <div className="flex items-center md:hidden space-x-2">
+          <LanguageSelector variant="ghost" size="sm" />
+          <button onClick={toggleMenu} className="menu-button p-2 focus:outline-none">
+            {isMenuOpen ? (
+              <X className="h-6 w-6 text-gray-600" />
+            ) : (
+              <AlignJustify className="h-6 w-6 text-gray-600" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <div className="mobile-menu md:hidden bg-white shadow-lg absolute w-full">
+          <div className="py-4 px-4">
+            <form onSubmit={handleSearch} className="relative mb-4">
+              <Input
+                type="text"
+                placeholder={t('search_placeholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            </form>
+            <div className="flex flex-col space-y-3">
+              <Link to="/" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
+                {t('home')}
+              </Link>
+              <Link to="/search" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('search')}
               </Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/categories" className="flex items-center">
-                <Map className="mr-2 h-4 w-4" />
-                {t('categories')}
-              </Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/about" className="flex items-center">
-                <Info className="mr-2 h-4 w-4" />
+              <Link to="/about" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('about')}
               </Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/contact" className="flex items-center">
-                <MessageSquare className="mr-2 h-4 w-4" />
+              <Link to="/contact" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('contact')}
               </Link>
-            </Button>
-          </div>
-
-          {/* Right side - Auth + Language Selector */}
-          <div className="flex items-center space-x-2">
-            <LanguageSelector variant="ghost" size="sm" />
-            
-            <Button variant="ghost" asChild>
-              <Link to="/profile" className="md:flex items-center hidden">
-                <User className="mr-2 h-4 w-4" />
-                {t('profile')}
+              <Link to="/login" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
+                {t('login')}
               </Link>
-            </Button>
-            
-            {/* Mobile Menu */}
-            <div className="md:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>LocaSimple</SheetTitle>
-                  </SheetHeader>
-                  <div className="space-y-4 mt-8">
-                    <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link to="/search" className="flex items-center">
-                        <Search className="mr-2 h-4 w-4" />
-                        {t('search')}
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link to="/categories" className="flex items-center">
-                        <Map className="mr-2 h-4 w-4" />
-                        {t('categories')}
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link to="/about" className="flex items-center">
-                        <Info className="mr-2 h-4 w-4" />
-                        {t('about')}
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link to="/contact" className="flex items-center">
-                        <MessageSquare className="mr-2 h-4 w-4" />
-                        {t('contact')}
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link to="/profile" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        {t('profile')}
-                      </Link>
-                    </Button>
-                  </div>
-                </SheetContent>
-              </Sheet>
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      )}
+    </header>
   );
 };
 

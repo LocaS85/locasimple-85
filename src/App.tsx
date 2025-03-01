@@ -20,6 +20,7 @@ import About from "./pages/About";
 import Help from "./pages/Help";
 import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
+import Search from "./pages/Search";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/help" element={<Help />} />
               <Route path="/plan" element={<Plan />} />
               <Route path="/payment" element={<Payment />} />
+              <Route path="/search" element={<Search />} />
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
