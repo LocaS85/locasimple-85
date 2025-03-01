@@ -58,7 +58,6 @@ const Navbar = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           </form>
           <Link to="/" className="text-gray-600 hover:text-primary">{t('home')}</Link>
-          <Link to="/search" className="text-gray-600 hover:text-primary">{t('search')}</Link>
           <Link to="/about" className="text-gray-600 hover:text-primary">{t('about')}</Link>
           <Link to="/login">
             <Button variant="outline" size="sm" className="ml-2">
@@ -97,9 +96,6 @@ const Navbar = () => {
             <div className="flex flex-col space-y-3">
               <Link to="/" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('home')}
-              </Link>
-              <Link to="/search" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
-                {t('search')}
               </Link>
               <Link to="/about" className="text-gray-600 hover:text-primary py-2" onClick={() => setIsMenuOpen(false)}>
                 {t('about')}
