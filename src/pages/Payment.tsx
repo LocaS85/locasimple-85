@@ -80,10 +80,26 @@ const Payment = () => {
   
   const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setCardDetails(prev => ({ ...prev, [name]: value }));
+    
+    // Here's the fix: we need to handle each property explicitly instead of using dynamic property
+    if (name === 'cardNumber') {
+      setCardDetails(prev => ({ ...prev, cardNumber: value }));
+    } else if (name === 'cardHolder') {
+      setCardDetails(prev => ({ ...prev, cardHolder: value }));
+    } else if (name === 'expiryDate') {
+      setCardDetails(prev => ({ ...prev, expiryDate: value }));
+    } else if (name === 'cvv') {
+      setCardDetails(prev => ({ ...prev, cvv: value }));
+    }
     
     // Basic form validation
-    const { cardNumber, cardHolder, expiryDate, cvv } = { ...cardDetails, [name]: value };
+    const updatedDetails = { ...cardDetails };
+    if (name === 'cardNumber') updatedDetails.cardNumber = value;
+    if (name === 'cardHolder') updatedDetails.cardHolder = value;
+    if (name === 'expiryDate') updatedDetails.expiryDate = value;
+    if (name === 'cvv') updatedDetails.cvv = value;
+    
+    const { cardNumber, cardHolder, expiryDate, cvv } = updatedDetails;
     setFormValid(
       paymentMethod === 'card' 
         ? cardNumber.length >= 16 && cardHolder.length > 3 && expiryDate.length === 5 && cvv.length >= 3
