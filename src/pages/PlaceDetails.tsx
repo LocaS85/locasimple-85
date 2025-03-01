@@ -32,11 +32,11 @@ const PlaceDetails = () => {
   const { t } = useLanguage();
 
   const handleFavorite = () => {
-    toast.success("Ajouté aux favoris !");
+    toast.success(t('addedToFavorites') || "Ajouté aux favoris !");
   };
 
   const handleShare = () => {
-    toast.success("Lien copié dans le presse-papier !");
+    toast.success(t('linkCopied') || "Lien copié dans le presse-papier !");
   };
 
   return (

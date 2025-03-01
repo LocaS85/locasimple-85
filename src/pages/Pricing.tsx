@@ -15,7 +15,26 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const getLocalizedFeatures = (planId: string) => {
+    if (planId === 'premium') {
+      return [
+        t('premiumFeature1') || 'Recherches illimitées',
+        t('premiumFeature2') || 'Rayon de recherche jusqu\'à 25 km',
+        t('premiumFeature3') || 'Filtres avancés (durée et distance)',
+        t('premiumFeature4') || 'Jusqu\'à 10 résultats par recherche'
+      ];
+    } else {
+      return [
+        t('proFeature1') || 'Toutes les fonctionnalités Premium',
+        t('proFeature2') || 'Rayon de recherche illimité',
+        t('proFeature3') || 'Filtres personnalisables',
+        t('proFeature4') || 'Résultats illimités par recherche',
+        t('proFeature5') || 'Support prioritaire'
+      ];
+    }
+  };
 
   const plans = [
     {
@@ -24,12 +43,7 @@ const Pricing = () => {
       price: '9,99€',
       period: t('perMonth'),
       description: t('forRegularUsers'),
-      features: [
-        'Recherches illimitées',
-        'Rayon de recherche jusqu\'à 25 km',
-        'Filtres avancés (durée et distance)',
-        'Jusqu\'à 10 résultats par recherche'
-      ]
+      features: getLocalizedFeatures('premium')
     },
     {
       id: 'pro',
@@ -37,13 +51,7 @@ const Pricing = () => {
       price: '19,99€',
       period: t('perMonth'),
       description: t('forProfessionals'),
-      features: [
-        'Toutes les fonctionnalités Premium',
-        'Rayon de recherche illimité',
-        'Filtres personnalisables',
-        'Résultats illimités par recherche',
-        'Support prioritaire'
-      ],
+      features: getLocalizedFeatures('pro'),
       popular: true
     }
   ];

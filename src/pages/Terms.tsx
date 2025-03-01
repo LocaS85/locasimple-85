@@ -28,7 +28,7 @@ const Terms = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">1. {t('acceptTerms').split('.')[0]}</h2>
+            <h2 className="text-xl font-semibold mb-4">1. {t('acceptTerms')?.split('.')[0] || 'Acceptation des Conditions'}</h2>
             <p className="text-gray-600 mb-4">
               {t('acceptTerms')}
             </p>
@@ -37,7 +37,7 @@ const Terms = () => {
 
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">2. {t('serviceDescription').split(' ')[0]}</h2>
+            <h2 className="text-xl font-semibold mb-4">2. {t('serviceDescription')?.split(' ')[0] || 'Description'}</h2>
             <p className="text-gray-600 mb-4">
               {t('serviceDescription')}
             </p>
@@ -48,7 +48,7 @@ const Terms = () => {
           <CardContent className="pt-6">
             <h2 className="text-xl font-semibold mb-4">3. {t('termsOfService')}</h2>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
-              {t('termsOfServiceDetails').split('\n').map((item, index) => (
+              {(t('termsOfServiceDetails')?.split('\n') || []).map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>

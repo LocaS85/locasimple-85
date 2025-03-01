@@ -31,12 +31,12 @@ const Profile = () => {
   const { t } = useLanguage();
   
   const handleDeleteAccount = () => {
-    toast.success("Votre compte a été supprimé avec succès");
+    toast.success(t('accountDeleted') || "Votre compte a été supprimé avec succès");
     navigate("/");
   };
 
   const handleSaveChanges = () => {
-    toast.success("Modifications enregistrées avec succès");
+    toast.success(t('changesSaved') || "Modifications enregistrées avec succès");
   };
 
   return (
@@ -56,7 +56,7 @@ const Profile = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold">{t('myProfile')}</h1>
-          <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
+          <p className="text-muted-foreground">{t('updatePersonalInfo')}</p>
         </div>
       </div>
 
