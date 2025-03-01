@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,13 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Mail, Phone, MessageSquare, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Contact = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message envoyé avec succès !");
+    toast.success(t('messageSent'));
   };
 
   return (
@@ -22,37 +25,37 @@ const Contact = () => {
         onClick={() => navigate(-1)}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Retour
+        {t('back')}
       </Button>
 
-      <h1 className="text-4xl font-bold text-center mb-12">Contactez-nous</h1>
+      <h1 className="text-4xl font-bold text-center mb-12">{t('contactUs')}</h1>
 
       <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         <Card>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Nom</Label>
-                <Input id="name" placeholder="Votre nom" required />
+                <Label htmlFor="name">{t('name')}</Label>
+                <Input id="name" placeholder={t('yourName')} required />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="votre@email.com" required />
+                <Label htmlFor="email">{t('email')}</Label>
+                <Input id="email" type="email" placeholder={t('yourEmail')} required />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t('message')}</Label>
                 <textarea
                   id="message"
                   className="min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Votre message..."
+                  placeholder={t('yourMessage')}
                   required
                 />
               </div>
 
               <Button type="submit" className="w-full">
-                Envoyer le message
+                {t('sendMessage')}
               </Button>
             </form>
           </CardContent>
@@ -62,7 +65,7 @@ const Contact = () => {
           <div className="flex items-center gap-4">
             <Mail className="w-6 h-6 text-primary" />
             <div>
-              <h3 className="font-semibold">Email</h3>
+              <h3 className="font-semibold">{t('email')}</h3>
               <p className="text-gray-600">contact@locasimple.com</p>
             </div>
           </div>
@@ -70,7 +73,7 @@ const Contact = () => {
           <div className="flex items-center gap-4">
             <Phone className="w-6 h-6 text-secondary" />
             <div>
-              <h3 className="font-semibold">Téléphone</h3>
+              <h3 className="font-semibold">{t('phone')}</h3>
               <p className="text-gray-600">+33 1 23 45 67 89</p>
             </div>
           </div>
@@ -78,8 +81,8 @@ const Contact = () => {
           <div className="flex items-center gap-4">
             <MessageSquare className="w-6 h-6 text-accent" />
             <div>
-              <h3 className="font-semibold">Support</h3>
-              <p className="text-gray-600">Disponible 7j/7 de 9h à 18h</p>
+              <h3 className="font-semibold">{t('support')}</h3>
+              <p className="text-gray-600">{t('supportAvailability')}</p>
             </div>
           </div>
         </div>
