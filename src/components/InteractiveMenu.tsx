@@ -175,7 +175,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
               </div>
             </div>
             
-            {/* Tabs for Distance/Duration */}
+            {/* Tabs for Distance/Durée */}
             <div className="px-4 py-4 border-t">
               <Tabs 
                 defaultValue="distance" 
@@ -184,13 +184,19 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                 className="w-full"
               >
                 <TabsList className="w-full mb-4 grid grid-cols-2">
-                  <TabsTrigger value="distance" className="flex gap-1 items-center">
+                  <TabsTrigger 
+                    value="distance" 
+                    className="flex gap-1 items-center bg-primary text-white data-[state=active]:bg-primary"
+                  >
                     <Compass className="h-4 w-4" />
                     {t('distance')}
                   </TabsTrigger>
-                  <TabsTrigger value="duration" className="flex gap-1 items-center">
+                  <TabsTrigger 
+                    value="duration" 
+                    className="flex gap-1 items-center bg-secondary text-white data-[state=active]:bg-secondary"
+                  >
                     <Clock className="h-4 w-4" />
-                    {t('duration')}
+                    Durée
                   </TabsTrigger>
                 </TabsList>
                 
@@ -202,7 +208,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                         size="sm" 
                         variant={unit === 'km' ? 'default' : 'outline'} 
                         onClick={() => handleUnitChange('km')}
-                        className="px-2 py-1 h-7"
+                        className={cn("px-2 py-1 h-7", unit === 'km' ? "bg-primary" : "")}
                       >
                         KM
                       </Button>
@@ -210,7 +216,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                         size="sm" 
                         variant={unit === 'miles' ? 'default' : 'outline'} 
                         onClick={() => handleUnitChange('miles')}
-                        className="px-2 py-1 h-7"
+                        className={cn("px-2 py-1 h-7", unit === 'miles' ? "bg-accent" : "")}
                       >
                         {t('miles')}
                       </Button>
@@ -240,7 +246,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                         size="sm" 
                         variant={timeUnit === 'minutes' ? 'default' : 'outline'} 
                         onClick={() => handleTimeUnitChange('minutes')}
-                        className="px-2 py-1 h-7"
+                        className={cn("px-2 py-1 h-7", timeUnit === 'minutes' ? "bg-secondary" : "")}
                       >
                         {t('minutes')}
                       </Button>
@@ -248,7 +254,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                         size="sm" 
                         variant={timeUnit === 'hours' ? 'default' : 'outline'} 
                         onClick={() => handleTimeUnitChange('hours')}
-                        className="px-2 py-1 h-7"
+                        className={cn("px-2 py-1 h-7", timeUnit === 'hours' ? "bg-accent" : "")}
                       >
                         {t('hours')}
                       </Button>
@@ -270,9 +276,9 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
               </Tabs>
             </div>
             
-            {/* Number of results */}
+            {/* Number of results - updated label */}
             <div className="px-4 py-4 border-t">
-              <h3 className="text-sm font-medium mb-2">{t('results_count')}: {resultsCount}</h3>
+              <h3 className="text-sm font-medium mb-2">Nombre autour de moi: {resultsCount}</h3>
               <Slider
                 value={[resultsCount]}
                 min={1}
@@ -287,9 +293,9 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
               </div>
             </div>
             
-            {/* Transport modes */}
+            {/* Transport modes - updated label */}
             <div className="px-4 py-4 border-t">
-              <h3 className="text-sm font-medium mb-2">{t('transport_mode')}</h3>
+              <h3 className="text-sm font-medium mb-2">Transport</h3>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {transportModes.map((mode) => (
                   <Button 
