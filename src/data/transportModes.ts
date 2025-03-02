@@ -1,6 +1,6 @@
 
-import { Car, PersonStanding, Bike, Bus } from 'lucide-react';
 import React from 'react';
+import { Car, PersonStanding, Bike, Bus } from 'lucide-react';
 
 export interface TransportMode {
   id: string;

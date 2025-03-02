@@ -23,18 +23,6 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  if (radiusType !== 'duration') {
-    return (
-      <TabsTrigger 
-        value="duration" 
-        className="flex gap-1 items-center text-white data-[state=active]:bg-secondary"
-      >
-        <Clock className="h-4 w-4" />
-        Durée
-      </TabsTrigger>
-    );
-  }
-
   return (
     <>
       <TabsTrigger 
@@ -45,19 +33,21 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
         Durée
       </TabsTrigger>
       
-      <TabsContent value="duration" className="space-y-4">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-sm font-medium">
-            {t('max_duration')}: {duration} {timeUnit === 'minutes' ? 'min' : 'h'}
-          </h3>
-          <TimeUnitSelector timeUnit={timeUnit} onTimeUnitChange={onTimeUnitChange} />
-        </div>
-        <DurationSlider 
-          duration={duration} 
-          timeUnit={timeUnit} 
-          onDurationChange={onDurationChange} 
-        />
-      </TabsContent>
+      {radiusType === 'duration' && (
+        <TabsContent value="duration" className="space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-sm font-medium">
+              {t('max_duration')}: {duration} {timeUnit === 'minutes' ? 'min' : 'h'}
+            </h3>
+            <TimeUnitSelector timeUnit={timeUnit} onTimeUnitChange={onTimeUnitChange} />
+          </div>
+          <DurationSlider 
+            duration={duration} 
+            timeUnit={timeUnit} 
+            onDurationChange={onDurationChange} 
+          />
+        </TabsContent>
+      )}
     </>
   );
 };
