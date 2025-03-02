@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'react-router-dom';
@@ -23,7 +22,6 @@ const Search = () => {
   const [selectedResult, setSelectedResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   
-  // User location (Paris by default)
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   
   const form = useForm({
@@ -34,7 +32,6 @@ const Search = () => {
     },
   });
 
-  // Get query params from URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get('q');
@@ -44,7 +41,6 @@ const Search = () => {
     }
   }, [location]);
 
-  // Get user location if possible
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -61,7 +57,6 @@ const Search = () => {
   const handleSearch = async (query: string) => {
     setLoading(true);
     try {
-      // For demo, generate mock results
       const mockResults = generateMockResults(query, userLocation, form.getValues());
       setResults(mockResults);
     } catch (error) {
@@ -76,21 +71,18 @@ const Search = () => {
     location: [number, number], 
     filters: { category: string; sortBy: string; radius: string }
   ): Result[] => {
-    // Generate random coordinates within radius
     const radius = parseInt(filters.radius);
-    const count = Math.floor(Math.random() * 10) + 5; // 5-15 results
+    const count = Math.floor(Math.random() * 10) + 5;
     
     const colors = ['primary', 'secondary', 'success', 'accent', 'highlight'];
     
     const results: Result[] = Array.from({ length: count }, (_, i) => {
-      // Random offset within radius (in degrees, rough approximation)
       const randomAngle = Math.random() * Math.PI * 2;
-      const randomDistance = Math.random() * radius * 0.01; // ~1km per 0.01 degree
+      const randomDistance = Math.random() * radius * 0.01;
       
       const longitude = location[0] + randomDistance * Math.cos(randomAngle);
       const latitude = location[1] + randomDistance * Math.sin(randomAngle);
       
-      // Calculate actual distance (simplified)
       const distance = calculateDistance(location[1], location[0], latitude, longitude);
       
       return {
@@ -99,7 +91,7 @@ const Search = () => {
         address: `${i + 100} ${query.charAt(0).toUpperCase() + query.slice(1)} Street`,
         category: ['restaurant', 'cafe', 'store', 'service', 'entertainment'][Math.floor(Math.random() * 5)],
         distance: distance,
-        duration: Math.floor(distance * 3), // ~20km/h walking speed
+        duration: Math.floor(distance * 3),
         color: colors[i % colors.length],
         latitude,
         longitude,
@@ -108,7 +100,6 @@ const Search = () => {
       };
     });
     
-    // Sort results
     if (filters.sortBy === 'distance') {
       results.sort((a, b) => a.distance - b.distance);
     } else if (filters.sortBy === 'rating') {
@@ -117,10 +108,9 @@ const Search = () => {
     
     return results;
   };
-  
-  // Calculate distance between two points (Haversine formula)
+
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a = 
@@ -128,10 +118,10 @@ const Search = () => {
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
       Math.sin(dLon/2) * Math.sin(dLon/2); 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const distance = R * c; // Distance in km
+    const distance = R * c;
     return Math.round(distance * 10) / 10;
   };
-  
+
   const deg2rad = (deg: number): number => {
     return deg * (Math.PI/180);
   };
@@ -148,7 +138,6 @@ const Search = () => {
     <div className="container mx-auto py-6 px-4 md:px-6">
       <h1 className="text-2xl font-bold mb-6">{t('search_title')}</h1>
       
-      {/* Search bar */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-grow">
           <Input
@@ -164,9 +153,11 @@ const Search = () => {
         </Button>
       </div>
       
-      {/* Main content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Filters panel */}
+        <div className="lg:col-span-3 h-[400px] mb-6">
+          <Map results={results} center={userLocation} />
+        </div>
+        
         <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-sm">
           <h2 className="font-semibold text-lg mb-4">{t('filters')}</h2>
           
@@ -278,9 +269,7 @@ const Search = () => {
           </Form>
         </div>
         
-        {/* Results section */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Toggle view buttons (visible only on mobile) */}
           <div className="flex justify-center lg:hidden mb-4 bg-white rounded-lg shadow-sm p-2">
             <div className="inline-flex rounded-md shadow-sm">
               <Button
@@ -302,7 +291,6 @@ const Search = () => {
             </div>
           </div>
           
-          {/* Results count */}
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <h2 className="text-lg font-semibold">
               {loading ? (
@@ -313,26 +301,8 @@ const Search = () => {
             </h2>
           </div>
           
-          {/* Map and list views */}
-          <div className={`lg:grid lg:grid-cols-2 gap-4 ${view === 'map' ? 'block' : 'hidden'} lg:block`}>
-            {/* Map view - full width on mobile when selected, half width on desktop */}
-            <div className="lg:col-span-1 h-[500px] mb-4 lg:mb-0">
-              <Map results={results} center={userLocation} />
-            </div>
-            
-            {/* List view - hidden on mobile when map is selected, always visible on desktop */}
-            <div className={`lg:col-span-1 ${view === 'list' ? 'block' : 'hidden lg:block'}`}>
-              <div className="bg-gray-50 p-4 rounded-lg shadow-sm h-[500px] overflow-y-auto">
-                <ResultsList results={results} onResultClick={handleResultClick} />
-              </div>
-            </div>
-          </div>
-          
-          {/* List-only view (mobile) */}
-          <div className={`${view === 'list' ? 'block' : 'hidden'} lg:hidden`}>
-            <div className="bg-gray-50 p-4 rounded-lg shadow-sm h-[500px] overflow-y-auto">
-              <ResultsList results={results} onResultClick={handleResultClick} />
-            </div>
+          <div className="bg-gray-50 p-4 rounded-lg shadow-sm h-[500px] overflow-y-auto">
+            <ResultsList results={results} onResultClick={handleResultClick} />
           </div>
         </div>
       </div>
