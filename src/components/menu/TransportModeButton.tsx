@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import type { TransportMode } from '@/data/transportModes';
+import { cn } from '@/lib/utils';
 
 interface TransportModeButtonProps {
   mode: TransportMode;
@@ -16,8 +17,11 @@ export const TransportModeButton: React.FC<TransportModeButtonProps> = ({
 }) => {
   return (
     <Button 
-      variant={isSelected ? 'default' : 'outline'} 
-      className="flex-shrink-0"
+      variant="outline" 
+      className={cn(
+        "flex-shrink-0 whitespace-nowrap rounded-full px-3 py-1 h-auto flex items-center gap-1",
+        isSelected ? "bg-primary text-white" : "bg-white text-black"
+      )}
       onClick={onClick}
     >
       {mode.icon}
