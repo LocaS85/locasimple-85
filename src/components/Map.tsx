@@ -28,8 +28,7 @@ const Map = ({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
-  const routesRef = useRef<mapboxgl.Map[]>([]);
-  const circleRef = useRef<any>(null);
+  const routesRef = useRef<string[]>([]);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   
   // Token Mapbox intégré directement
@@ -55,21 +54,24 @@ const Map = ({
         }
       };
 
+      const sourceId = `route-${color}`;
+      const layerId = `route-${color}`;
+
       // Si la source existe déjà, mettre à jour les données
-      if (map.current.getSource(`route-${color}`)) {
-        const source = map.current.getSource(`route-${color}`) as mapboxgl.GeoJSONSource;
+      if (map.current.getSource(sourceId)) {
+        const source = map.current.getSource(sourceId) as mapboxgl.GeoJSONSource;
         source.setData(geojson as any);
       } else {
         // Sinon, ajouter une nouvelle source et une nouvelle couche
-        map.current.addSource(`route-${color}`, {
+        map.current.addSource(sourceId, {
           type: 'geojson',
           data: geojson as any
         });
 
         map.current.addLayer({
-          id: `route-${color}`,
+          id: layerId,
           type: 'line',
-          source: `route-${color}`,
+          source: sourceId,
           layout: {
             'line-join': 'round',
             'line-cap': 'round'
@@ -80,6 +82,9 @@ const Map = ({
             'line-opacity': 0.75
           }
         });
+
+        // Ajouter l'ID de la couche à routesRef pour le nettoyage
+        routesRef.current.push(layerId);
       }
     } catch (error) {
       console.error('Error adding route:', error);
@@ -100,7 +105,7 @@ const Map = ({
 
   // Dessiner le cercle de rayon
   const drawRadiusCircle = () => {
-    if (!map.current) return;
+    if (!map.current || !map.current.isStyleLoaded()) return;
 
     // Supprimer l'ancien cercle s'il existe
     if (map.current.getSource('radius-circle')) {
@@ -118,16 +123,6 @@ const Map = ({
       // Créer un cercle avec turf.js
       const radiusInMeters = getRadiusInMeters();
       
-      // Créer un point central
-      const point = {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: center
-        },
-        properties: {}
-      };
-      
       // Ajouter le cercle comme une source GeoJSON
       map.current.addSource('radius-circle', {
         type: 'geojson',
@@ -138,7 +133,8 @@ const Map = ({
             coordinates: center
           },
           properties: {
-            radius: radiusInMeters
+            radius: radiusInMeters,
+            lat: center[1]
           }
         }
       });
@@ -171,23 +167,6 @@ const Map = ({
           'circle-pitch-alignment': 'map'
         }
       });
-      
-      // Mettre à jour les propriétés de la source
-      if (map.current.getSource('radius-circle')) {
-        const source = map.current.getSource('radius-circle') as mapboxgl.GeoJSONSource;
-        const data = {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: center
-          },
-          properties: {
-            radius: radiusInMeters,
-            lat: center[1]
-          }
-        };
-        source.setData(data as any);
-      }
     } else {
       // Pour la durée, on utiliserait idealement une API isochrone
       // Cette partie serait implémentée avec une API comme l'API Isochrone de Mapbox
@@ -219,7 +198,8 @@ const Map = ({
             coordinates: center
           },
           properties: {
-            radius: estimatedRadius
+            radius: estimatedRadius,
+            lat: center[1]
           }
         }
       });
@@ -252,23 +232,6 @@ const Map = ({
           'circle-pitch-alignment': 'map'
         }
       });
-      
-      // Mettre à jour les propriétés de la source
-      if (map.current.getSource('radius-circle')) {
-        const source = map.current.getSource('radius-circle') as mapboxgl.GeoJSONSource;
-        const data = {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: center
-          },
-          properties: {
-            radius: estimatedRadius,
-            lat: center[1]
-          }
-        };
-        source.setData(data as any);
-      }
     }
   };
 
@@ -286,35 +249,51 @@ const Map = ({
         zoom: 13,
       });
 
-      map.current.addControl(
-        new mapboxgl.NavigationControl(),
-        'top-right'
-      );
-
-      setIsMapInitialized(true);
+      map.current.on('load', () => {
+        setIsMapInitialized(true);
+        
+        // Ajouter les contrôles une fois la carte chargée
+        map.current?.addControl(
+          new mapboxgl.NavigationControl(),
+          'top-right'
+        );
+        
+        // Dessiner le cercle et mettre à jour les marqueurs une fois la carte chargée
+        drawRadiusCircle();
+        updateMarkersAndRoutes();
+      });
     } catch (error) {
       console.error('Error initializing map:', error);
     }
-  }, [mapContainer, center, isMapInitialized]);
+  }, [mapContainer, center]);
 
-  // Effectuer le dessin du rayon
+  // Effectuer le dessin du rayon quand les paramètres changent
   useEffect(() => {
     if (!map.current || !isMapInitialized) return;
-    drawRadiusCircle();
+    
+    // Attendre que le style soit chargé avant de dessiner le cercle
+    if (map.current.isStyleLoaded()) {
+      drawRadiusCircle();
+    } else {
+      map.current.once('style.load', () => {
+        drawRadiusCircle();
+      });
+    }
   }, [radius, radiusUnit, radiusType, duration, timeUnit, transportMode, center, isMapInitialized]);
 
-  useEffect(() => {
+  // Fonction pour mettre à jour les marqueurs et les routes
+  const updateMarkersAndRoutes = () => {
     if (!map.current || !isMapInitialized) return;
 
-    // Clear existing markers and routes
+    // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
     
     // Clean up existing routes
-    routesRef.current.forEach((routeId: any) => {
+    routesRef.current.forEach((routeId) => {
       if (map.current?.getLayer(routeId)) {
         map.current.removeLayer(routeId);
-        map.current.removeSource(routeId);
+        map.current.removeSource(routeId.replace('route-', 'source-'));
       }
     });
     routesRef.current = [];
@@ -324,7 +303,7 @@ const Map = ({
       const el = document.createElement('div');
       el.className = 'marker';
       el.innerHTML = `<div class="bg-white rounded-full p-2 shadow-lg">
-        <span class="font-bold text-${result.color}">${index + 1}</span>
+        <span class="font-bold text-${result.color}-500">${index + 1}</span>
       </div>`;
       el.style.width = '30px';
       el.style.height = '30px';
@@ -346,14 +325,13 @@ const Map = ({
       const marker = new mapboxgl.Marker(el)
         .setLngLat([result.longitude, result.latitude])
         .setPopup(popup)
-        .addTo(map.current);
+        .addTo(map.current!);
 
       markersRef.current.push(marker);
 
       // Add route from center to this result
-      const routeId = `route-${result.color}-${index}`;
-      addRoute(center, [result.longitude, result.latitude], result.color);
-      routesRef.current.push(routeId as any);
+      const routeColor = getColorForResult(result.color);
+      addRoute(center, [result.longitude, result.latitude], routeColor);
     });
 
     // Fit bounds to show all markers if there are any
@@ -365,7 +343,35 @@ const Map = ({
       });
       map.current.fitBounds(bounds, { padding: 50 });
     }
+  };
 
+  // Convertir le nom de couleur en valeur hexadécimale
+  const getColorForResult = (color: string): string => {
+    const colorMap: Record<string, string> = {
+      'primary': '#2563eb',
+      'red': '#ef4444',
+      'green': '#10b981',
+      'blue': '#3b82f6',
+      'orange': '#f97316',
+      'purple': '#8b5cf6',
+      'pink': '#ec4899'
+    };
+    
+    return colorMap[color] || '#3b82f6';
+  };
+
+  // Mettre à jour les marqueurs et routes quand les résultats changent
+  useEffect(() => {
+    if (!map.current || !isMapInitialized) return;
+    
+    // Attendre que le style soit chargé avant de mettre à jour les marqueurs
+    if (map.current.isStyleLoaded()) {
+      updateMarkersAndRoutes();
+    } else {
+      map.current.once('style.load', () => {
+        updateMarkersAndRoutes();
+      });
+    }
   }, [results, isMapInitialized, center, transportMode]);
 
   // Cleanup
