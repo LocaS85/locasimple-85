@@ -105,6 +105,15 @@ export const translations: Record<string, Record<string, string>> = {
     general_november: 'November',
     general_december: 'December',
     
+    // Navbar
+    home: 'Home',
+    about: 'About',
+    register: 'Register',
+    login: 'Login',
+    plan: 'Plan',
+    saved: 'Saved',
+    settings: 'Settings',
+    
     // Search page
     search_title: 'Search',
     search_placeholder: 'Search for places nearby...',
@@ -232,6 +241,15 @@ export const translations: Record<string, Record<string, string>> = {
     general_october: 'Octobre',
     general_november: 'Novembre',
     general_december: 'Décembre',
+    
+    // Navbar
+    home: 'Accueil',
+    about: 'À propos',
+    register: 'Inscription',
+    login: 'Connexion',
+    plan: 'Plan',
+    saved: 'Enregistré',
+    settings: 'Paramètres',
     
     // Search page
     search_title: 'Recherche',

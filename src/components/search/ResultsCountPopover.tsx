@@ -28,7 +28,7 @@ export const ResultsCountPopover: React.FC<ResultsCountPopoverProps> = ({
           <ArrowRight className="h-4 w-4 ml-2" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-full p-0 bg-white">
         <div className="grid grid-cols-5 gap-1 p-2">
           {Array.from({ length: 10 }, (_, i) => (
             <Button 

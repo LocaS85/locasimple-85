@@ -36,7 +36,7 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
           <Clock className="h-4 w-4 ml-2" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0">
+      <PopoverContent className="w-64 p-0 bg-white">
         <div className="p-2">
           <h3 className="font-bold mb-2">{t('minutes')}</h3>
           <div className="grid grid-cols-3 gap-1 mb-4">

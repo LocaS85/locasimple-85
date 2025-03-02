@@ -53,7 +53,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0">
+      <PopoverContent className="w-64 p-0 bg-white">
         <div className="p-2">
           <h3 className="font-bold mb-2">Mètres</h3>
           <div className="grid grid-cols-3 gap-1 mb-4">
