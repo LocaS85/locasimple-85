@@ -2,10 +2,9 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { TabsContent, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
+import { TimeUnitSelector } from './TimeUnitSelector';
+import { DurationSlider } from './DurationSlider';
 
 interface DurationSelectorProps {
   duration: number;
@@ -23,10 +22,6 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
   onTimeUnitChange
 }) => {
   const { t } = useLanguage();
-
-  const handleDurationChange = (value: number[]) => {
-    onDurationChange(value[0]);
-  };
 
   if (radiusType !== 'duration') {
     return (
@@ -55,37 +50,13 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
           <h3 className="text-sm font-medium">
             {t('max_duration')}: {duration} {timeUnit === 'minutes' ? 'min' : 'h'}
           </h3>
-          <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              variant={timeUnit === 'minutes' ? 'default' : 'outline'} 
-              onClick={() => onTimeUnitChange('minutes')}
-              className={cn("px-2 py-1 h-7 text-white", timeUnit === 'minutes' ? "bg-secondary hover:bg-secondary/90" : "")}
-            >
-              {t('minutes')}
-            </Button>
-            <Button 
-              size="sm" 
-              variant={timeUnit === 'hours' ? 'default' : 'outline'} 
-              onClick={() => onTimeUnitChange('hours')}
-              className={cn("px-2 py-1 h-7 text-white", timeUnit === 'hours' ? "bg-accent hover:bg-accent/90" : "")}
-            >
-              {t('hours')}
-            </Button>
-          </div>
+          <TimeUnitSelector timeUnit={timeUnit} onTimeUnitChange={onTimeUnitChange} />
         </div>
-        <Slider
-          value={[duration]}
-          min={timeUnit === 'minutes' ? 5 : 1}
-          max={timeUnit === 'minutes' ? 60 : 5}
-          step={timeUnit === 'minutes' ? 5 : 1}
-          onValueChange={handleDurationChange}
+        <DurationSlider 
+          duration={duration} 
+          timeUnit={timeUnit} 
+          onDurationChange={onDurationChange} 
         />
-        <div className="flex justify-between text-xs text-gray-500">
-          <span>{timeUnit === 'minutes' ? '5 min' : '1 h'}</span>
-          <span>{timeUnit === 'minutes' ? '30 min' : '3 h'}</span>
-          <span>{timeUnit === 'minutes' ? '60 min' : '5 h'}</span>
-        </div>
       </TabsContent>
     </>
   );
