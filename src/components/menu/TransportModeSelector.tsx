@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { transportModes } from '@/data/transportModes';
+// Update import with correct path to transportModes.tsx
+import { TransportMode, transportModes } from '@/data/transportModes';
 import { TransportModeButton } from './TransportModeButton';
 
 interface TransportModeSelectorProps {
