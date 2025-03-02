@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'react-router-dom';
@@ -153,11 +154,14 @@ const Search = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-3 h-[400px] mb-6">
+      {/* Map moved above filters */}
+      <div className="mb-6">
+        <div className="h-[400px]">
           <Map results={results} center={userLocation} />
         </div>
-        
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-sm">
           <h2 className="font-semibold text-lg mb-4">{t('filters')}</h2>
           
