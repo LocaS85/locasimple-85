@@ -7,13 +7,29 @@ import type { Result } from './ResultsList';
 interface MapProps {
   results: Result[];
   center: [number, number];
+  radius?: number;
+  radiusUnit?: 'km' | 'miles';
+  radiusType?: 'distance' | 'duration';
+  duration?: number;
+  timeUnit?: 'minutes' | 'hours';
+  transportMode?: string;
 }
 
-const Map = ({ results, center }: MapProps) => {
+const Map = ({ 
+  results, 
+  center, 
+  radius = 5, 
+  radiusUnit = 'km', 
+  radiusType = 'distance',
+  duration = 15,
+  timeUnit = 'minutes',
+  transportMode = 'driving'
+}: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const routesRef = useRef<mapboxgl.Map[]>([]);
+  const circleRef = useRef<any>(null);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   
   // Token Mapbox intégré directement
@@ -24,7 +40,7 @@ const Map = ({ results, center }: MapProps) => {
 
     try {
       const query = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxToken}`
+        `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxToken}`
       );
       const json = await query.json();
       const data = json.routes[0];
@@ -70,6 +86,193 @@ const Map = ({ results, center }: MapProps) => {
     }
   };
 
+  // Convertir km en mètres pour le rayon
+  const getRadiusInMeters = () => {
+    const radiusValue = radius;
+    // Convertir en mètres
+    if (radiusUnit === 'km') {
+      return radiusValue * 1000;
+    } else {
+      // Miles en mètres (1 mile = 1609.34 mètres)
+      return radiusValue * 1609.34;
+    }
+  };
+
+  // Dessiner le cercle de rayon
+  const drawRadiusCircle = () => {
+    if (!map.current) return;
+
+    // Supprimer l'ancien cercle s'il existe
+    if (map.current.getSource('radius-circle')) {
+      if (map.current.getLayer('radius-circle-fill')) {
+        map.current.removeLayer('radius-circle-fill');
+      }
+      if (map.current.getLayer('radius-circle-outline')) {
+        map.current.removeLayer('radius-circle-outline');
+      }
+      map.current.removeSource('radius-circle');
+    }
+
+    // Si type distance, afficher un cercle normal
+    if (radiusType === 'distance') {
+      // Créer un cercle avec turf.js
+      const radiusInMeters = getRadiusInMeters();
+      
+      // Créer un point central
+      const point = {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: center
+        },
+        properties: {}
+      };
+      
+      // Ajouter le cercle comme une source GeoJSON
+      map.current.addSource('radius-circle', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: center
+          },
+          properties: {
+            radius: radiusInMeters
+          }
+        }
+      });
+      
+      // Ajouter la couche pour le cercle
+      map.current.addLayer({
+        id: 'radius-circle-outline',
+        type: 'circle',
+        source: 'radius-circle',
+        paint: {
+          'circle-radius': ['/', ['get', 'radius'], ['cos', ['*', ['get', 'lat'], 0.0174532925]]],
+          'circle-opacity': 0,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#2563eb',
+          'circle-stroke-opacity': 0.8,
+          'circle-pitch-scale': 'map',
+          'circle-pitch-alignment': 'map'
+        }
+      });
+      
+      map.current.addLayer({
+        id: 'radius-circle-fill',
+        type: 'circle',
+        source: 'radius-circle',
+        paint: {
+          'circle-radius': ['/', ['get', 'radius'], ['cos', ['*', ['get', 'lat'], 0.0174532925]]],
+          'circle-color': '#2563eb',
+          'circle-opacity': 0.1,
+          'circle-pitch-scale': 'map',
+          'circle-pitch-alignment': 'map'
+        }
+      });
+      
+      // Mettre à jour les propriétés de la source
+      if (map.current.getSource('radius-circle')) {
+        const source = map.current.getSource('radius-circle') as mapboxgl.GeoJSONSource;
+        const data = {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: center
+          },
+          properties: {
+            radius: radiusInMeters,
+            lat: center[1]
+          }
+        };
+        source.setData(data as any);
+      }
+    } else {
+      // Pour la durée, on utiliserait idealement une API isochrone
+      // Cette partie serait implémentée avec une API comme l'API Isochrone de Mapbox
+      // Pour l'instant, on montre un cercle simplifié avec une couleur différente
+      
+      // Créer un cercle approximatif basé sur la durée
+      // Cette approximation est très simplifiée, en réalité ça dépendrait du réseau routier
+      let estimatedRadius;
+      
+      if (timeUnit === 'minutes') {
+        // Estimation très simplifiée: 1 minute ~ 1km en voiture urbaine
+        estimatedRadius = (transportMode === 'driving' ? 1000 : 
+                          transportMode === 'cycling' ? 300 : 
+                          transportMode === 'walking' ? 80 : 800) * duration;
+      } else {
+        // Pour les heures, multiplier par 60
+        estimatedRadius = (transportMode === 'driving' ? 60000 : 
+                          transportMode === 'cycling' ? 18000 : 
+                          transportMode === 'walking' ? 4800 : 48000) * duration;
+      }
+      
+      // Ajouter le cercle comme une source GeoJSON
+      map.current.addSource('radius-circle', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: center
+          },
+          properties: {
+            radius: estimatedRadius
+          }
+        }
+      });
+      
+      // Ajouter la couche pour le cercle avec une couleur différente pour la durée
+      map.current.addLayer({
+        id: 'radius-circle-outline',
+        type: 'circle',
+        source: 'radius-circle',
+        paint: {
+          'circle-radius': ['/', ['get', 'radius'], ['cos', ['*', ['get', 'lat'], 0.0174532925]]],
+          'circle-opacity': 0,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#f97316', // Orange pour la durée
+          'circle-stroke-opacity': 0.8,
+          'circle-stroke-dasharray': [2, 2], // Ligne pointillée pour la durée
+          'circle-pitch-scale': 'map',
+          'circle-pitch-alignment': 'map'
+        }
+      });
+      
+      map.current.addLayer({
+        id: 'radius-circle-fill',
+        type: 'circle',
+        source: 'radius-circle',
+        paint: {
+          'circle-radius': ['/', ['get', 'radius'], ['cos', ['*', ['get', 'lat'], 0.0174532925]]],
+          'circle-color': '#f97316', // Orange pour la durée
+          'circle-opacity': 0.1,
+          'circle-pitch-scale': 'map',
+          'circle-pitch-alignment': 'map'
+        }
+      });
+      
+      // Mettre à jour les propriétés de la source
+      if (map.current.getSource('radius-circle')) {
+        const source = map.current.getSource('radius-circle') as mapboxgl.GeoJSONSource;
+        const data = {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: center
+          },
+          properties: {
+            radius: estimatedRadius,
+            lat: center[1]
+          }
+        };
+        source.setData(data as any);
+      }
+    }
+  };
+
   // Initialiser la carte automatiquement au chargement du composant
   useEffect(() => {
     if (!mapContainer.current || isMapInitialized) return;
@@ -94,6 +297,12 @@ const Map = ({ results, center }: MapProps) => {
       console.error('Error initializing map:', error);
     }
   }, [mapContainer, center, isMapInitialized]);
+
+  // Effectuer le dessin du rayon
+  useEffect(() => {
+    if (!map.current || !isMapInitialized) return;
+    drawRadiusCircle();
+  }, [radius, radiusUnit, radiusType, duration, timeUnit, transportMode, center, isMapInitialized]);
 
   useEffect(() => {
     if (!map.current || !isMapInitialized) return;
@@ -147,7 +356,7 @@ const Map = ({ results, center }: MapProps) => {
       map.current.fitBounds(bounds, { padding: 50 });
     }
 
-  }, [results, isMapInitialized, center]);
+  }, [results, isMapInitialized, center, transportMode]);
 
   // Cleanup
   useEffect(() => {

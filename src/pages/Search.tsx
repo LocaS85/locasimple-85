@@ -4,14 +4,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { MapPin, Search as SearchIcon, List, MapIcon, Plus, Minus } from 'lucide-react';
+import { SearchIcon, List, MapIcon } from 'lucide-react';
 import Map from '@/components/Map';
 import ResultsList from '@/components/ResultsList';
+import InteractiveMenu from '@/components/InteractiveMenu';
 import type { Result } from '@/components/ResultsList';
 
 const Search = () => {
@@ -24,13 +20,18 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
+  const [radius, setRadius] = useState(5);
+  const [radiusUnit, setRadiusUnit] = useState<'km' | 'miles'>('km');
+  const [duration, setDuration] = useState(15);
+  const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes');
+  const [resultsCount, setResultsCount] = useState(5);
+  const [transportMode, setTransportMode] = useState('driving');
+  const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
   
-  const form = useForm({
-    defaultValues: {
-      category: 'all',
-      sortBy: 'distance',
-      radius: '5',
-    },
+  const [filters, setFilters] = useState({
+    category: 'all',
+    sortBy: 'distance',
+    radius: '5',
   });
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const Search = () => {
   const handleSearch = async (query: string) => {
     setLoading(true);
     try {
-      const mockResults = generateMockResults(query, userLocation, form.getValues());
+      const mockResults = generateMockResults(query, userLocation, filters, resultsCount);
       setResults(mockResults);
     } catch (error) {
       console.error('Error searching:', error);
@@ -70,10 +71,10 @@ const Search = () => {
   const generateMockResults = (
     query: string, 
     location: [number, number], 
-    filters: { category: string; sortBy: string; radius: string }
+    filters: { category: string; sortBy: string; radius: string },
+    count: number
   ): Result[] => {
     const radius = parseInt(filters.radius);
-    const count = Math.floor(Math.random() * 10) + 5;
     
     const colors = ['primary', 'secondary', 'success', 'accent', 'highlight'];
     
@@ -131,9 +132,34 @@ const Search = () => {
     setSelectedResult(result);
   };
 
-  const handleSubmit = form.handleSubmit((data) => {
-    handleSearch(searchQuery);
-  });
+  const handleFilterChange = (newFilters: {
+    radius: number;
+    unit: 'km' | 'miles';
+    duration: number;
+    timeUnit: 'minutes' | 'hours';
+    resultsCount: number;
+    transportMode: string;
+    radiusType: 'distance' | 'duration';
+  }) => {
+    setRadius(newFilters.radius);
+    setRadiusUnit(newFilters.unit);
+    setDuration(newFilters.duration);
+    setTimeUnit(newFilters.timeUnit);
+    setResultsCount(newFilters.resultsCount);
+    setTransportMode(newFilters.transportMode);
+    setRadiusType(newFilters.radiusType);
+    
+    // Mettre à jour les filtres pour la recherche
+    setFilters({
+      ...filters,
+      radius: newFilters.radius.toString(),
+    });
+    
+    // Relancer la recherche avec les nouveaux paramètres
+    if (searchQuery) {
+      handleSearch(searchQuery);
+    }
+  };
 
   return (
     <div className="container mx-auto py-6 px-4 md:px-6">
@@ -154,126 +180,36 @@ const Search = () => {
         </Button>
       </div>
       
-      {/* Map moved above filters */}
-      <div className="mb-6">
-        <div className="h-[400px]">
-          <Map results={results} center={userLocation} />
+      {/* Map area */}
+      <div className="mb-0">
+        <div className="h-[400px] rounded-lg overflow-hidden">
+          <Map 
+            results={results} 
+            center={userLocation} 
+            radius={radius}
+            radiusUnit={radiusUnit}
+            radiusType={radiusType}
+            duration={duration}
+            timeUnit={timeUnit}
+            transportMode={transportMode}
+          />
         </div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Interactive Menu */}
+      <div className="mb-6">
+        <InteractiveMenu onFilterChange={handleFilterChange} />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-sm">
-          <h2 className="font-semibold text-lg mb-4">{t('filters')}</h2>
-          
-          <Form {...form}>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('category')}</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t('select_category')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="all">{t('all_categories')}</SelectItem>
-                        <SelectItem value="restaurant">{t('restaurants')}</SelectItem>
-                        <SelectItem value="cafe">{t('cafes')}</SelectItem>
-                        <SelectItem value="store">{t('stores')}</SelectItem>
-                        <SelectItem value="service">{t('services')}</SelectItem>
-                        <SelectItem value="entertainment">{t('entertainment')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="radius"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('radius')} (km)</FormLabel>
-                    <div className="flex items-center space-x-2">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="icon"
-                        onClick={() => {
-                          const currentValue = parseInt(field.value);
-                          if (currentValue > 1) {
-                            field.onChange((currentValue - 1).toString());
-                          }
-                        }}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <FormControl>
-                        <Input {...field} type="number" min="1" max="50" />
-                      </FormControl>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="icon"
-                        onClick={() => {
-                          const currentValue = parseInt(field.value);
-                          if (currentValue < 50) {
-                            field.onChange((currentValue + 1).toString());
-                          }
-                        }}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="sortBy"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>{t('sort_by')}</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="distance" id="distance" />
-                          <FormLabel htmlFor="distance" className="font-normal cursor-pointer">
-                            {t('distance')}
-                          </FormLabel>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="rating" id="rating" />
-                          <FormLabel htmlFor="rating" className="font-normal cursor-pointer">
-                            {t('rating')}
-                          </FormLabel>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <Button type="submit" className="w-full">
-                {t('apply_filters')}
-              </Button>
-            </form>
-          </Form>
+          <h2 className="font-semibold text-lg mb-4">{t('results')}</h2>
+          <div className="bg-gray-50 p-4 rounded-lg h-[500px] overflow-y-auto">
+            <ResultsList results={results} onResultClick={handleResultClick} />
+          </div>
         </div>
         
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-3 space-y-4">
           <div className="flex justify-center lg:hidden mb-4 bg-white rounded-lg shadow-sm p-2">
             <div className="inline-flex rounded-md shadow-sm">
               <Button
@@ -303,10 +239,40 @@ const Search = () => {
                 <span>{results.length} {t('results_found')}</span>
               )}
             </h2>
-          </div>
-          
-          <div className="bg-gray-50 p-4 rounded-lg shadow-sm h-[500px] overflow-y-auto">
-            <ResultsList results={results} onResultClick={handleResultClick} />
+            
+            {selectedResult && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-medium text-lg">{selectedResult.name}</h3>
+                <p className="text-gray-600">{selectedResult.address}</p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-gray-500">{t('distance')}:</span> 
+                    <span className="font-medium ml-1">{selectedResult.distance.toFixed(1)} km</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">{t('duration')}:</span> 
+                    <span className="font-medium ml-1">{selectedResult.duration} min</span>
+                  </div>
+                  {selectedResult.rating && (
+                    <div>
+                      <span className="text-gray-500">{t('rating')}:</span> 
+                      <span className="font-medium ml-1">{selectedResult.rating}/5</span>
+                    </div>
+                  )}
+                  {selectedResult.openingHours && (
+                    <div>
+                      <span className="text-gray-500">{t('opening_hours')}:</span> 
+                      <span className="font-medium ml-1">{selectedResult.openingHours}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <Button variant="outline" size="sm">
+                    {t('get_directions')}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
