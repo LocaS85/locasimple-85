@@ -101,7 +101,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
               end={[result.longitude, result.latitude]}
               color={getColorForResult(result.color)}
               transportMode={transportMode}
-              mapboxToken={process.env.MAPBOX_TOKEN || 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw'}
+              mapboxToken="pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw"
             />
           )}
         </React.Fragment>

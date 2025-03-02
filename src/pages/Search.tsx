@@ -4,12 +4,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { SearchInput } from '@/components/search/SearchInput';
 import { LocationButton } from '@/components/search/LocationButton';
 import { CategoriesScroller } from '@/components/search/CategoriesScroller';
-import { ResultsCountPopover } from '@/components/search/ResultsCountPopover';
-import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
-import { DurationFilter } from '@/components/search/DurationFilter';
-import { DistanceFilter } from '@/components/search/DistanceFilter';
 import { SelectedFilters } from '@/components/search/SelectedFilters';
 import { SearchFooter } from '@/components/search/SearchFooter';
+import { FiltersSection } from '@/components/search/FiltersSection';
 import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
 
@@ -161,37 +158,19 @@ const Search = () => {
         </div>
       </div>
       
-      {/* Additional filters */}
-      <div className="px-4 py-3 flex flex-col gap-3">
-        <ResultsCountPopover 
-          resultsCount={resultsCount}
-          onResultsCountChange={setResultsCount}
-        />
-        
-        <div className="w-full border-2 border-black rounded-full bg-white text-black">
-          <TransportModeSelector 
-            transportMode={transportMode} 
-            onTransportModeChange={setTransportMode} 
-          />
-        </div>
-        
-        <div className="flex justify-between gap-4">
-          <div className="w-1/2">
-            <DurationFilter 
-              selectedDuration={selectedDuration}
-              onDurationChange={setSelectedDuration}
-            />
-          </div>
-          <div className="w-1/2">
-            <DistanceFilter 
-              selectedDistance={selectedDistance}
-              distanceUnit={distanceUnit}
-              onDistanceChange={setSelectedDistance}
-              onDistanceUnitChange={setDistanceUnit}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Filters section - now extracted to a separate component */}
+      <FiltersSection 
+        resultsCount={resultsCount}
+        onResultsCountChange={setResultsCount}
+        transportMode={transportMode}
+        onTransportModeChange={setTransportMode}
+        selectedDuration={selectedDuration}
+        onDurationChange={setSelectedDuration}
+        selectedDistance={selectedDistance}
+        distanceUnit={distanceUnit}
+        onDistanceChange={setSelectedDistance}
+        onDistanceUnitChange={setDistanceUnit}
+      />
       
       {/* Display selected filters */}
       <SelectedFilters 
