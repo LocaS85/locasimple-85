@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -300,7 +299,7 @@ const Search = () => {
         <div className="flex justify-between gap-4">
           <Popover>
             <PopoverTrigger asChild>
-              <Button className="w-1/2 rounded-full border-2 border-black bg-white text-black hover:bg-gray-100 justify-between">
+              <Button className="w-1/2 rounded-full border-2 border-black bg-gray-100 text-black hover:bg-gray-200 justify-between">
                 <span>{t('duration')}</span>
                 <Clock className="h-4 w-4 ml-2" />
               </Button>
@@ -347,7 +346,7 @@ const Search = () => {
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button className="w-1/2 rounded-full border-2 border-black bg-white text-black hover:bg-gray-100 justify-between">
+              <Button className="w-1/2 rounded-full border-2 border-black bg-gray-100 text-black hover:bg-gray-200 justify-between">
                 <span>{t('distance')}</span>
                 <div className="flex items-center">
                   <Tabs 
