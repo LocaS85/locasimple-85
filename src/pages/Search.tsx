@@ -145,7 +145,7 @@ const Search = () => {
       {/* Categories section */}
       <CategoriesScroller />
       
-      {/* Map section */}
+      {/* Map section - now placed above filters */}
       <div className="px-4 py-3">
         <div className="rounded-lg overflow-hidden aspect-video">
           <Map 

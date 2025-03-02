@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
+import RouteLayer from './RouteLayer';
 import type { Result } from '../ResultsList';
 
 interface MapMarkersProps {
@@ -108,8 +109,5 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     </>
   );
 };
-
-// Import at the top to avoid circular dependency
-import RouteLayer from './RouteLayer';
 
 export default MapMarkers;
