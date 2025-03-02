@@ -44,7 +44,7 @@ const ResultsList = ({ results, onResultClick, selectedResultId }: ResultsListPr
             }`}
           >
             <div className="flex items-start space-x-3">
-              <div className={`p-2 rounded-full bg-${result.color}-500/10`}>
+              <div className={`p-2 rounded-full bg-${result.color}-500\/10`}>
                 <MapPin className={`w-5 h-5 text-${result.color}-500`} />
               </div>
               <div className="flex-1">

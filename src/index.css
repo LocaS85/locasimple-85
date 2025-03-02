@@ -62,31 +62,31 @@
   }
   
   /* Background colors for markers */
-  .bg-primary/10 {
+  .bg-primary\/10 {
     background-color: rgba(37, 99, 235, 0.1);
   }
   
-  .bg-red-500/10 {
+  .bg-red-500\/10 {
     background-color: rgba(239, 68, 68, 0.1);
   }
   
-  .bg-green-500/10 {
+  .bg-green-500\/10 {
     background-color: rgba(16, 185, 129, 0.1);
   }
   
-  .bg-blue-500/10 {
+  .bg-blue-500\/10 {
     background-color: rgba(59, 130, 246, 0.1);
   }
   
-  .bg-orange-500/10 {
+  .bg-orange-500\/10 {
     background-color: rgba(249, 115, 22, 0.1);
   }
   
-  .bg-purple-500/10 {
+  .bg-purple-500\/10 {
     background-color: rgba(139, 92, 246, 0.1);
   }
   
-  .bg-pink-500/10 {
+  .bg-pink-500\/10 {
     background-color: rgba(236, 72, 153, 0.1);
   }
   
