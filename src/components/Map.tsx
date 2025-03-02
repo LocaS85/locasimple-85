@@ -235,7 +235,7 @@ const Map = ({
           'circle-stroke-width': 2,
           'circle-stroke-color': '#f97316', // Orange pour la durée
           'circle-stroke-opacity': 0.8,
-          'circle-stroke-dasharray': [2, 2], // Ligne pointillée pour la durée
+          // Removed the unsupported 'circle-stroke-dasharray' property
           'circle-pitch-scale': 'map',
           'circle-pitch-alignment': 'map'
         }
