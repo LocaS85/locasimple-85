@@ -76,7 +76,7 @@ const Search = () => {
   ): Result[] => {
     const radius = parseInt(filters.radius);
     
-    const colors = ['primary', 'secondary', 'success', 'accent', 'highlight'];
+    const colors = ['primary', 'red', 'green', 'blue', 'orange', 'purple', 'pink', 'indigo', 'yellow', 'teal'];
     
     const results: Result[] = Array.from({ length: count }, (_, i) => {
       const randomAngle = Math.random() * Math.PI * 2;
@@ -182,7 +182,7 @@ const Search = () => {
       
       {/* Map area */}
       <div className="mb-0">
-        <div className="h-[400px] rounded-lg overflow-hidden">
+        <div className="h-[400px] rounded-lg overflow-hidden shadow-lg border border-gray-200">
           <Map 
             results={results} 
             center={userLocation} 
@@ -205,7 +205,11 @@ const Search = () => {
         <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-sm">
           <h2 className="font-semibold text-lg mb-4">{t('results')}</h2>
           <div className="bg-gray-50 p-4 rounded-lg h-[500px] overflow-y-auto">
-            <ResultsList results={results} onResultClick={handleResultClick} />
+            <ResultsList 
+              results={results} 
+              onResultClick={handleResultClick} 
+              selectedResultId={selectedResult?.id}
+            />
           </div>
         </div>
         

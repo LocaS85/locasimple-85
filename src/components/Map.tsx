@@ -232,10 +232,9 @@ const Map = ({
         paint: {
           'circle-radius': ['/', ['get', 'radius'], ['cos', ['*', ['get', 'lat'], 0.0174532925]]],
           'circle-opacity': 0,
-          'circle-stroke-width': 2,
+          'circle-stroke-width': 2.5,
           'circle-stroke-color': '#f97316', // Orange pour la durée
           'circle-stroke-opacity': 0.8,
-          // Removed the unsupported 'circle-stroke-dasharray' property
           'circle-pitch-scale': 'map',
           'circle-pitch-alignment': 'map'
         }
@@ -248,7 +247,7 @@ const Map = ({
         paint: {
           'circle-radius': ['/', ['get', 'radius'], ['cos', ['*', ['get', 'lat'], 0.0174532925]]],
           'circle-color': '#f97316', // Orange pour la durée
-          'circle-opacity': 0.1,
+          'circle-opacity': 0.15,
           'circle-pitch-scale': 'map',
           'circle-pitch-alignment': 'map'
         }
@@ -310,10 +309,12 @@ const Map = ({
     // Clear existing markers and routes
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
-    routesRef.current.forEach((route: any) => {
-      if (map.current?.getLayer(route)) {
-        map.current.removeLayer(route);
-        map.current.removeSource(route);
+    
+    // Clean up existing routes
+    routesRef.current.forEach((routeId: any) => {
+      if (map.current?.getLayer(routeId)) {
+        map.current.removeLayer(routeId);
+        map.current.removeSource(routeId);
       }
     });
     routesRef.current = [];
@@ -323,27 +324,36 @@ const Map = ({
       const el = document.createElement('div');
       el.className = 'marker';
       el.innerHTML = `<div class="bg-white rounded-full p-2 shadow-lg">
-        <span class="font-bold">${index + 1}</span>
+        <span class="font-bold text-${result.color}">${index + 1}</span>
       </div>`;
       el.style.width = '30px';
       el.style.height = '30px';
+      
+      // Add popup with details
+      const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
+        .setHTML(`
+          <div class="p-2">
+            <h3 class="font-bold text-sm">${result.name}</h3>
+            <p class="text-xs text-gray-500">${result.address}</p>
+            <div class="flex items-center gap-2 mt-1 text-xs">
+              <span>${result.distance.toFixed(1)} km</span>
+              <span>·</span>
+              <span>${result.duration} min</span>
+            </div>
+          </div>
+        `);
 
       const marker = new mapboxgl.Marker(el)
         .setLngLat([result.longitude, result.latitude])
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`
-              <h3 class="font-bold">${result.name}</h3>
-              <p>${result.address}</p>
-              <p class="text-sm text-gray-500">${result.distance.toFixed(1)} km - ${result.duration} min</p>
-            `)
-        )
+        .setPopup(popup)
         .addTo(map.current);
 
       markersRef.current.push(marker);
 
       // Add route from center to this result
+      const routeId = `route-${result.color}-${index}`;
       addRoute(center, [result.longitude, result.latitude], result.color);
+      routesRef.current.push(routeId as any);
     });
 
     // Fit bounds to show all markers if there are any
