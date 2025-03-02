@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { ChevronUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CategoriesSelector } from './menu/CategoriesSelector';
-import { RadiusSelector } from './menu/RadiusSelector';
-import { DurationSelector } from './menu/DurationSelector';
-import { ResultsCountSelector } from './menu/ResultsCountSelector';
-import { TransportModeSelector } from './menu/TransportModeSelector';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Settings, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { RadiusSelector } from '@/components/menu/RadiusSelector';
+import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
+import { ResultsCountSelector } from '@/components/menu/ResultsCountSelector';
+import { CategoriesSelector } from '@/components/menu/CategoriesSelector';
 
 interface InteractiveMenuProps {
   onFilterChange: (filters: {
@@ -21,134 +21,96 @@ interface InteractiveMenuProps {
 }
 
 const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [radius, setRadius] = useState(5);
   const [unit, setUnit] = useState<'km' | 'miles'>('km');
   const [duration, setDuration] = useState(15);
   const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes');
+  const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
   const [resultsCount, setResultsCount] = useState(5);
   const [transportMode, setTransportMode] = useState('driving');
-  const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
 
-  const handleToggleMenu = () => {
+  const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const triggerFilterChange = (changedValues: Partial<{
-    radius: number;
-    unit: 'km' | 'miles';
-    duration: number;
-    timeUnit: 'minutes' | 'hours';
-    resultsCount: number;
-    transportMode: string;
-    radiusType: 'distance' | 'duration';
-  }> = {}) => {
+  const handleFiltersChange = () => {
     onFilterChange({
-      radius: changedValues.radius !== undefined ? changedValues.radius : radius,
-      unit: changedValues.unit || unit,
-      duration: changedValues.duration !== undefined ? changedValues.duration : duration,
-      timeUnit: changedValues.timeUnit || timeUnit,
-      resultsCount: changedValues.resultsCount !== undefined ? changedValues.resultsCount : resultsCount,
-      transportMode: changedValues.transportMode || transportMode,
-      radiusType: changedValues.radiusType || radiusType,
+      radius,
+      unit,
+      duration,
+      timeUnit,
+      resultsCount,
+      transportMode,
+      radiusType,
     });
-  };
-
-  const handleRadiusChange = (newRadius: number) => {
-    setRadius(newRadius);
-    triggerFilterChange({ radius: newRadius });
-  };
-
-  const handleUnitChange = (newUnit: 'km' | 'miles') => {
-    setUnit(newUnit);
-    triggerFilterChange({ unit: newUnit });
-  };
-
-  const handleDurationChange = (newDuration: number) => {
-    setDuration(newDuration);
-    triggerFilterChange({ duration: newDuration });
-  };
-
-  const handleTimeUnitChange = (newTimeUnit: 'minutes' | 'hours') => {
-    setTimeUnit(newTimeUnit);
-    triggerFilterChange({ timeUnit: newTimeUnit });
-  };
-
-  const handleResultsCountChange = (newCount: number) => {
-    setResultsCount(newCount);
-    triggerFilterChange({ resultsCount: newCount });
-  };
-
-  const handleTransportModeChange = (newMode: string) => {
-    setTransportMode(newMode);
-    triggerFilterChange({ transportMode: newMode });
-  };
-
-  const handleRadiusTypeChange = (newType: 'distance' | 'duration') => {
-    setRadiusType(newType);
-    triggerFilterChange({ radiusType: newType });
+    setIsOpen(false);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg transition-all duration-300 transform relative">
-      <div 
-        className="flex justify-center items-center py-2 cursor-pointer hover:bg-gray-50 rounded-t-lg"
-        onClick={handleToggleMenu}
-      >
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
+    <div className="relative z-10">
+      <div className="flex justify-end mb-2">
+        <Button 
+          onClick={toggleMenu}
+          variant="outline"
+          className="flex items-center gap-2"
         >
-          <ChevronUp className="h-6 w-6 text-primary" />
-        </motion.div>
+          <Settings className="h-4 w-4" />
+          <span>Filtres</span>
+        </Button>
       </div>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute right-0 w-full md:w-96 bg-white p-6 rounded-lg shadow-lg"
           >
-            {/* Categories Selector */}
-            <CategoriesSelector />
-            
-            {/* Radius/Duration Selector */}
-            <div className="px-4 py-4 border-t">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Filtres</h2>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={toggleMenu}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              <CategoriesSelector />
+              
               <RadiusSelector 
                 radius={radius}
                 unit={unit}
                 radiusType={radiusType}
-                onRadiusChange={handleRadiusChange}
-                onUnitChange={handleUnitChange}
-                onRadiusTypeChange={handleRadiusTypeChange}
-              />
-              
-              <DurationSelector 
                 duration={duration}
                 timeUnit={timeUnit}
-                radiusType={radiusType}
-                onDurationChange={handleDurationChange}
-                onTimeUnitChange={handleTimeUnitChange}
+                onRadiusChange={setRadius}
+                onUnitChange={setUnit}
+                onRadiusTypeChange={setRadiusType}
+                onDurationChange={setDuration}
+                onTimeUnitChange={setTimeUnit}
               />
-            </div>
-            
-            {/* Number of results */}
-            <div className="px-4 py-4 border-t">
-              <ResultsCountSelector 
-                resultsCount={resultsCount}
-                onResultsCountChange={handleResultsCountChange}
-              />
-            </div>
-            
-            {/* Transport modes */}
-            <div className="px-4 py-4 border-t">
+              
               <TransportModeSelector 
                 transportMode={transportMode}
-                onTransportModeChange={handleTransportModeChange}
+                onTransportModeChange={setTransportMode}
               />
+              
+              <ResultsCountSelector 
+                resultsCount={resultsCount}
+                onResultsCountChange={setResultsCount}
+              />
+              
+              <Button 
+                onClick={handleFiltersChange}
+                className="w-full"
+              >
+                Appliquer les filtres
+              </Button>
             </div>
           </motion.div>
         )}

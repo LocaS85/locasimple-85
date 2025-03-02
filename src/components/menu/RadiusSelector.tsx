@@ -2,27 +2,35 @@
 import React from 'react';
 import { Compass } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Slider } from '@/components/ui/slider';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RadiusUnitSelector } from './RadiusUnitSelector';
 import { RadiusSlider } from './RadiusSlider';
+import { DurationSelector } from './DurationSelector';
 
 interface RadiusSelectorProps {
   radius: number;
   unit: 'km' | 'miles';
   radiusType: 'distance' | 'duration';
+  duration: number;
+  timeUnit: 'minutes' | 'hours';
   onRadiusChange: (value: number) => void;
   onUnitChange: (unit: 'km' | 'miles') => void;
   onRadiusTypeChange: (type: 'distance' | 'duration') => void;
+  onDurationChange: (value: number) => void;
+  onTimeUnitChange: (unit: 'minutes' | 'hours') => void;
 }
 
 export const RadiusSelector: React.FC<RadiusSelectorProps> = ({
   radius,
   unit,
   radiusType,
+  duration,
+  timeUnit,
   onRadiusChange,
   onUnitChange,
-  onRadiusTypeChange
+  onRadiusTypeChange,
+  onDurationChange,
+  onTimeUnitChange
 }) => {
   const { t } = useLanguage();
 
@@ -41,7 +49,13 @@ export const RadiusSelector: React.FC<RadiusSelectorProps> = ({
           <Compass className="h-4 w-4" />
           {t('distance')}
         </TabsTrigger>
-        {/* The Duration TabsTrigger is now in the DurationSelector component */}
+        <DurationSelector 
+          duration={duration}
+          timeUnit={timeUnit}
+          radiusType={radiusType}
+          onDurationChange={onDurationChange}
+          onTimeUnitChange={onTimeUnitChange}
+        />
       </TabsList>
       
       <TabsContent value="distance" className="space-y-4">
