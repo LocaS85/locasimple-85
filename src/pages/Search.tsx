@@ -10,6 +10,8 @@ import { DurationFilter } from '@/components/search/DurationFilter';
 import { DistanceFilter } from '@/components/search/DistanceFilter';
 import { SelectedFilters } from '@/components/search/SelectedFilters';
 import { SearchFooter } from '@/components/search/SearchFooter';
+import Map from '@/components/Map';
+import type { Result } from '@/components/ResultsList';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -22,6 +24,7 @@ const Search = () => {
   const [resultsCount, setResultsCount] = useState(5);
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   const [loading, setLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState<Result[]>([]);
   
   const handleMicClick = () => {
     setIsRecording(!isRecording);
@@ -40,6 +43,48 @@ const Search = () => {
     // Simulate search
     setTimeout(() => {
       setLoading(false);
+      // Simuler des résultats de recherche
+      const mockResults: Result[] = [
+        {
+          id: '1',
+          name: 'Café Paris',
+          address: '123 rue de Paris',
+          distance: 0.8,
+          duration: 12,
+          category: 'restaurant',
+          color: 'blue',
+          latitude: 48.8566 + 0.01,
+          longitude: 2.3522 + 0.01,
+          rating: 4.5,
+          openingHours: 'Ouvert jusqu\'à 22h'
+        },
+        {
+          id: '2',
+          name: 'Supermarché Express',
+          address: '45 avenue Victor Hugo',
+          distance: 1.2,
+          duration: 18,
+          category: 'shopping',
+          color: 'green',
+          latitude: 48.8566 - 0.008,
+          longitude: 2.3522 + 0.015,
+          rating: 3.8,
+          openingHours: 'Ouvert 24/7'
+        },
+        {
+          id: '3',
+          name: 'Parc Central',
+          address: 'Place de la République',
+          distance: 2.5,
+          duration: 25,
+          category: 'loisirs',
+          color: 'red',
+          latitude: 48.8566 + 0.02,
+          longitude: 2.3522 - 0.01,
+          rating: 4.2
+        }
+      ];
+      setSearchResults(mockResults);
     }, 1000);
   };
 
@@ -69,6 +114,9 @@ const Search = () => {
         }
       );
     }
+    
+    // Effectuer une recherche initiale
+    handleSearch('');
   }, []);
 
   return (
@@ -84,7 +132,10 @@ const Search = () => {
           <SearchInput 
             searchQuery={searchQuery}
             isRecording={isRecording}
-            onSearchChange={setSearchQuery}
+            onSearchChange={(query) => {
+              setSearchQuery(query);
+              handleSearch(query);
+            }}
             onMicClick={handleMicClick}
           />
         </div>
@@ -93,6 +144,22 @@ const Search = () => {
       
       {/* Categories section */}
       <CategoriesScroller />
+      
+      {/* Map section */}
+      <div className="px-4 py-3">
+        <div className="rounded-lg overflow-hidden aspect-video">
+          <Map 
+            results={searchResults} 
+            center={userLocation}
+            radius={selectedDistance || 5}
+            radiusUnit={distanceUnit}
+            radiusType={selectedDuration ? 'duration' : 'distance'}
+            duration={selectedDuration || 15}
+            timeUnit="minutes"
+            transportMode={transportMode}
+          />
+        </div>
+      </div>
       
       {/* Additional filters */}
       <div className="px-4 py-3 flex flex-col gap-3">
@@ -134,13 +201,6 @@ const Search = () => {
         transportMode={transportMode}
         resultsCount={resultsCount}
       />
-      
-      {/* Map placeholder */}
-      <div className="px-4 py-3">
-        <div className="bg-gray-200 rounded-lg aspect-video flex items-center justify-center">
-          <p className="text-gray-600">Carte en chargement...</p>
-        </div>
-      </div>
       
       {/* Footer navigation */}
       <SearchFooter />
