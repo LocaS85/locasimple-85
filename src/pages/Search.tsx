@@ -149,13 +149,13 @@ const Search = () => {
     setTransportMode(newFilters.transportMode);
     setRadiusType(newFilters.radiusType);
     
-    // Mettre à jour les filtres pour la recherche
+    // Update filters for search
     setFilters({
       ...filters,
       radius: newFilters.radius.toString(),
     });
     
-    // Relancer la recherche avec les nouveaux paramètres
+    // Relaunch search with new parameters
     if (searchQuery) {
       handleSearch(searchQuery);
     }

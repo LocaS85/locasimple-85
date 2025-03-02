@@ -40,7 +40,7 @@ export const RadiusSelector: React.FC<RadiusSelectorProps> = ({
       <TabsList className="w-full mb-4 grid grid-cols-2">
         <TabsTrigger 
           value="distance" 
-          className="flex gap-1 items-center bg-primary text-white data-[state=active]:bg-primary"
+          className="flex gap-1 items-center text-white data-[state=active]:bg-primary"
         >
           <Compass className="h-4 w-4" />
           {t('distance')}
@@ -56,7 +56,7 @@ export const RadiusSelector: React.FC<RadiusSelectorProps> = ({
               size="sm" 
               variant={unit === 'km' ? 'default' : 'outline'} 
               onClick={() => onUnitChange('km')}
-              className={cn("px-2 py-1 h-7", unit === 'km' ? "bg-primary" : "")}
+              className={cn("px-2 py-1 h-7 text-white", unit === 'km' ? "bg-primary hover:bg-primary/90" : "")}
             >
               KM
             </Button>
@@ -64,7 +64,7 @@ export const RadiusSelector: React.FC<RadiusSelectorProps> = ({
               size="sm" 
               variant={unit === 'miles' ? 'default' : 'outline'} 
               onClick={() => onUnitChange('miles')}
-              className={cn("px-2 py-1 h-7", unit === 'miles' ? "bg-accent" : "")}
+              className={cn("px-2 py-1 h-7 text-white", unit === 'miles' ? "bg-accent hover:bg-accent/90" : "")}
             >
               {t('miles')}
             </Button>

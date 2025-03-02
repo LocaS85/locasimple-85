@@ -32,7 +32,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
     return (
       <TabsTrigger 
         value="duration" 
-        className="flex gap-1 items-center bg-secondary text-white data-[state=active]:bg-secondary"
+        className="flex gap-1 items-center text-white data-[state=active]:bg-secondary"
       >
         <Clock className="h-4 w-4" />
         Durée
@@ -44,7 +44,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
     <>
       <TabsTrigger 
         value="duration" 
-        className="flex gap-1 items-center bg-secondary text-white data-[state=active]:bg-secondary"
+        className="flex gap-1 items-center text-white data-[state=active]:bg-secondary"
       >
         <Clock className="h-4 w-4" />
         Durée
@@ -60,7 +60,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
               size="sm" 
               variant={timeUnit === 'minutes' ? 'default' : 'outline'} 
               onClick={() => onTimeUnitChange('minutes')}
-              className={cn("px-2 py-1 h-7", timeUnit === 'minutes' ? "bg-secondary" : "")}
+              className={cn("px-2 py-1 h-7 text-white", timeUnit === 'minutes' ? "bg-secondary hover:bg-secondary/90" : "")}
             >
               {t('minutes')}
             </Button>
@@ -68,7 +68,7 @@ export const DurationSelector: React.FC<DurationSelectorProps> = ({
               size="sm" 
               variant={timeUnit === 'hours' ? 'default' : 'outline'} 
               onClick={() => onTimeUnitChange('hours')}
-              className={cn("px-2 py-1 h-7", timeUnit === 'hours' ? "bg-accent" : "")}
+              className={cn("px-2 py-1 h-7 text-white", timeUnit === 'hours' ? "bg-accent hover:bg-accent/90" : "")}
             >
               {t('hours')}
             </Button>
