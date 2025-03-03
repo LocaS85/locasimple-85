@@ -12,6 +12,12 @@ interface MapProps {
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
   transportMode?: string;
+  searchQuery?: string;
+  onSearchChange?: (value: string) => void;
+  isRecording?: boolean;
+  onMicClick?: () => void;
+  onLocationClick?: () => void;
+  isLocationActive?: boolean;
 }
 
 const Map = ({ 
@@ -22,7 +28,13 @@ const Map = ({
   radiusType = 'distance',
   duration = 15,
   timeUnit = 'minutes',
-  transportMode = 'driving'
+  transportMode = 'driving',
+  searchQuery = '',
+  onSearchChange = () => {},
+  isRecording = false,
+  onMicClick = () => {},
+  onLocationClick = () => {},
+  isLocationActive = false
 }: MapProps) => {
   return (
     <MapContainer
@@ -34,6 +46,12 @@ const Map = ({
       duration={duration}
       timeUnit={timeUnit}
       transportMode={transportMode}
+      searchQuery={searchQuery}
+      onSearchChange={onSearchChange}
+      isRecording={isRecording}
+      onMicClick={onMicClick}
+      onLocationClick={onLocationClick}
+      isLocationActive={isLocationActive}
     />
   );
 };

@@ -178,6 +178,15 @@ const Search = () => {
             duration={selectedDuration || 15}
             timeUnit="minutes"
             transportMode={transportMode}
+            searchQuery={searchQuery}
+            onSearchChange={(query) => {
+              setSearchQuery(query);
+              handleSearch(query);
+            }}
+            isRecording={isRecording}
+            onMicClick={handleMicClick}
+            onLocationClick={handleLocationClick}
+            isLocationActive={isLocationActive}
           />
         </div>
       </div>
@@ -220,24 +229,6 @@ const Search = () => {
         
         {menuOpen && (
           <div className="overflow-y-auto max-h-[calc(60vh-4rem)] pb-16">
-            <div className="px-4 py-3 flex flex-col gap-2 sm:flex-row sm:justify-between">
-              <div className="w-full sm:w-1/2">
-                <SearchInput 
-                  searchQuery={searchQuery}
-                  isRecording={isRecording}
-                  onSearchChange={(query) => {
-                    setSearchQuery(query);
-                    handleSearch(query);
-                  }}
-                  onMicClick={handleMicClick}
-                />
-              </div>
-              <LocationButton 
-                onLocationClick={handleLocationClick}
-                isLocationActive={isLocationActive}
-              />
-            </div>
-            
             <CategoriesScroller />
             
             <FiltersSection 
