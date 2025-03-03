@@ -1,11 +1,9 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import RadiusCircle from './RadiusCircle';
 import MapMarkers from './MapMarkers';
 import { SearchInput } from '../search/SearchInput';
-import { LocationButton } from '../search/LocationButton';
 import type { Result } from '../ResultsList';
 import { MAPBOX_TOKEN } from '@/config/environment';
 
@@ -46,7 +44,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   
-  // Initialize map automatically when component loads
   useEffect(() => {
     if (!mapContainer.current || isMapInitialized) return;
 
@@ -63,7 +60,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
       map.current.on('load', () => {
         setIsMapInitialized(true);
         
-        // Add controls once the map is loaded
         map.current?.addControl(
           new mapboxgl.NavigationControl(),
           'top-right'
@@ -74,7 +70,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }
   }, [mapContainer, center, isMapInitialized]);
 
-  // Cleanup
   useEffect(() => {
     return () => {
       map.current?.remove();
@@ -85,20 +80,15 @@ const MapContainer: React.FC<MapContainerProps> = ({
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" />
       
-      {/* Search bar and location button overlay at top center */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col gap-2 w-11/12 max-w-md">
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
         <SearchInput
           searchQuery={searchQuery}
           isRecording={isRecording}
+          isLocationActive={isLocationActive}
           onSearchChange={onSearchChange}
           onMicClick={onMicClick}
+          onLocationClick={onLocationClick}
         />
-        <div className="flex justify-center">
-          <LocationButton 
-            onLocationClick={onLocationClick}
-            isLocationActive={isLocationActive}
-          />
-        </div>
       </div>
       
       {isMapInitialized && map.current && (
