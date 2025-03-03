@@ -186,7 +186,7 @@ const Search = () => {
         <div className="flex flex-col items-center">
           <div className="w-12 h-1.5 bg-gray-300 rounded-full my-2.5 cursor-grab"></div>
           <div className="flex justify-between items-center px-4 py-2 w-full border-b">
-            <h2 className="text-lg font-bold">{t('search_filters')}</h2>
+            <h2 className="text-lg font-bold">LocaSimple</h2>
             <Button 
               variant="ghost" 
               size="sm" 
