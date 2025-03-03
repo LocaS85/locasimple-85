@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Result } from '@/components/ResultsList';
 import { SearchControls } from '@/components/search/SearchControls';
 import { SearchMenu } from '@/components/search/SearchMenu';
+import { generateFilteredMockResults } from '@/data/mockSearchResults';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -37,50 +37,20 @@ const Search = () => {
   const handleSearch = (query: string) => {
     setLoading(true);
     console.log(`Searching for: ${query}`);
-    // Simulate search
+    // Use our mock data generator instead of inline mock results
     setTimeout(() => {
       setLoading(false);
-      // Simuler des résultats de recherche
-      const mockResults: Result[] = [
+      const mockResults = generateFilteredMockResults(
+        query,
+        userLocation,
         {
-          id: '1',
-          name: 'Café Paris',
-          address: '123 rue de Paris',
-          distance: 0.8,
-          duration: 12,
-          category: 'restaurant',
-          color: 'blue',
-          latitude: 48.8566 + 0.01,
-          longitude: 2.3522 + 0.01,
-          rating: 4.5,
-          openingHours: 'Ouvert jusqu\'à 22h'
+          radius: selectedDistance || 5,
+          radiusUnit: distanceUnit,
+          duration: selectedDuration || 15,
+          transportMode
         },
-        {
-          id: '2',
-          name: 'Supermarché Express',
-          address: '45 avenue Victor Hugo',
-          distance: 1.2,
-          duration: 18,
-          category: 'shopping',
-          color: 'green',
-          latitude: 48.8566 - 0.008,
-          longitude: 2.3522 + 0.015,
-          rating: 3.8,
-          openingHours: 'Ouvert 24/7'
-        },
-        {
-          id: '3',
-          name: 'Parc Central',
-          address: 'Place de la République',
-          distance: 2.5,
-          duration: 25,
-          category: 'loisirs',
-          color: 'red',
-          latitude: 48.8566 + 0.02,
-          longitude: 2.3522 - 0.01,
-          rating: 4.2
-        }
-      ];
+        resultsCount
+      );
       setSearchResults(mockResults);
     }, 1000);
   };
@@ -152,7 +122,9 @@ const Search = () => {
       );
     }
     
-    handleSearch('');
+    // Use the mock data generator here too
+    const initialResults = generateFilteredMockResults('', userLocation, {}, resultsCount);
+    setSearchResults(initialResults);
   }, []);
 
   return (
