@@ -1,15 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { SearchInput } from '@/components/search/SearchInput';
-import { LocationButton } from '@/components/search/LocationButton';
-import { CategoriesScroller } from '@/components/search/CategoriesScroller';
-import { SelectedFilters } from '@/components/search/SelectedFilters';
-import { SearchFooter } from '@/components/search/SearchFooter';
-import { FiltersSection } from '@/components/search/FiltersSection';
-import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
-import { ChevronUp, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { SearchControls } from '@/components/search/SearchControls';
+import { SearchMenu } from '@/components/search/SearchMenu';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -168,96 +162,41 @@ const Search = () => {
       </div>
       
       <div className="flex-grow relative" onClick={handleMapInteraction}>
-        <div className="absolute inset-0">
-          <Map 
-            results={searchResults} 
-            center={userLocation}
-            radius={selectedDistance || 5}
-            radiusUnit={distanceUnit}
-            radiusType={selectedDuration ? 'duration' : 'distance'}
-            duration={selectedDuration || 15}
-            timeUnit="minutes"
-            transportMode={transportMode}
-            searchQuery={searchQuery}
-            onSearchChange={(query) => {
-              setSearchQuery(query);
-              handleSearch(query);
-            }}
-            isRecording={isRecording}
-            onMicClick={handleMicClick}
-            onLocationClick={handleLocationClick}
-            isLocationActive={isLocationActive}
-          />
-        </div>
+        <SearchControls
+          searchResults={searchResults}
+          userLocation={userLocation}
+          selectedDistance={selectedDistance}
+          selectedDuration={selectedDuration}
+          distanceUnit={distanceUnit}
+          transportMode={transportMode}
+          searchQuery={searchQuery}
+          isRecording={isRecording}
+          isLocationActive={isLocationActive}
+          onSearchChange={setSearchQuery}
+          onMicClick={handleMicClick}
+          onLocationClick={handleLocationClick}
+          handleSearch={handleSearch}
+        />
       </div>
       
-      <div 
-        ref={menuRef}
-        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-all duration-300 z-20 ${
-          menuOpen ? 'h-[60vh]' : 'h-auto'
-        }`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full my-2.5 cursor-grab"></div>
-          <div className="flex justify-between items-center px-4 py-2 w-full border-b">
-            <h2 className="text-lg font-bold">LocaSimple</h2>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label={menuOpen ? "Réduire le menu" : "Développer le menu"}
-            >
-              {menuOpen ? <ChevronDown /> : <ChevronUp />}
-            </Button>
-          </div>
-        </div>
-        
-        {!menuOpen && (
-          <div className="px-4 py-2">
-            <SelectedFilters 
-              selectedDuration={selectedDuration}
-              selectedDistance={selectedDistance}
-              distanceUnit={distanceUnit}
-              transportMode={transportMode}
-              resultsCount={resultsCount}
-            />
-          </div>
-        )}
-        
-        {menuOpen && (
-          <div className="overflow-y-auto max-h-[calc(60vh-4rem)] pb-16">
-            <CategoriesScroller />
-            
-            <FiltersSection 
-              resultsCount={resultsCount}
-              onResultsCountChange={setResultsCount}
-              transportMode={transportMode}
-              onTransportModeChange={setTransportMode}
-              selectedDuration={selectedDuration}
-              onDurationChange={setSelectedDuration}
-              selectedDistance={selectedDistance}
-              distanceUnit={distanceUnit}
-              onDistanceChange={setSelectedDistance}
-              onDistanceUnitChange={setDistanceUnit}
-            />
-            
-            <SelectedFilters 
-              selectedDuration={selectedDuration}
-              selectedDistance={selectedDistance}
-              distanceUnit={distanceUnit}
-              transportMode={transportMode}
-              resultsCount={resultsCount}
-            />
-          </div>
-        )}
-        
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
-          <SearchFooter />
-        </div>
-      </div>
+      <SearchMenu 
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        menuRef={menuRef}
+        handleTouchStart={handleTouchStart}
+        handleTouchMove={handleTouchMove}
+        handleTouchEnd={handleTouchEnd}
+        selectedDuration={selectedDuration}
+        selectedDistance={selectedDistance}
+        distanceUnit={distanceUnit}
+        transportMode={transportMode}
+        resultsCount={resultsCount}
+        onResultsCountChange={setResultsCount}
+        onTransportModeChange={setTransportMode}
+        onDurationChange={setSelectedDuration}
+        onDistanceChange={setSelectedDistance}
+        onDistanceUnitChange={setDistanceUnit}
+      />
     </div>
   );
 };
