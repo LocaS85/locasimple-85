@@ -9,6 +9,8 @@ import { SearchFooter } from '@/components/search/SearchFooter';
 import { FiltersSection } from '@/components/search/FiltersSection';
 import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -22,6 +24,7 @@ const Search = () => {
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Result[]>([]);
+  const [menuOpen, setMenuOpen] = useState(true);
   
   const handleMicClick = () => {
     setIsRecording(!isRecording);
@@ -117,34 +120,15 @@ const Search = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Header with title */}
-      <div className="bg-black text-white p-4 flex justify-center items-center">
+    <div className="flex flex-col h-screen bg-white">
+      {/* Header with title - fixed at top */}
+      <div className="bg-black text-white p-4 flex justify-center items-center z-10">
         <h1 className="text-xl font-bold">{t('search_title')}</h1>
       </div>
       
-      {/* Search and location section */}
-      <div className="px-4 py-3 flex flex-col gap-2 sm:flex-row sm:justify-between">
-        <div className="w-full sm:w-1/2">
-          <SearchInput 
-            searchQuery={searchQuery}
-            isRecording={isRecording}
-            onSearchChange={(query) => {
-              setSearchQuery(query);
-              handleSearch(query);
-            }}
-            onMicClick={handleMicClick}
-          />
-        </div>
-        <LocationButton onLocationClick={handleLocationClick} />
-      </div>
-      
-      {/* Categories section */}
-      <CategoriesScroller />
-      
-      {/* Map section - now placed above filters */}
-      <div className="px-4 py-3">
-        <div className="rounded-lg overflow-hidden aspect-video">
+      {/* Map section - takes up most of the screen */}
+      <div className="flex-grow relative">
+        <div className="absolute inset-0">
           <Map 
             results={searchResults} 
             center={userLocation}
@@ -158,31 +142,77 @@ const Search = () => {
         </div>
       </div>
       
-      {/* Filters section - now extracted to a separate component */}
-      <FiltersSection 
-        resultsCount={resultsCount}
-        onResultsCountChange={setResultsCount}
-        transportMode={transportMode}
-        onTransportModeChange={setTransportMode}
-        selectedDuration={selectedDuration}
-        onDurationChange={setSelectedDuration}
-        selectedDistance={selectedDistance}
-        distanceUnit={distanceUnit}
-        onDistanceChange={setSelectedDistance}
-        onDistanceUnitChange={setDistanceUnit}
-      />
-      
-      {/* Display selected filters */}
-      <SelectedFilters 
-        selectedDuration={selectedDuration}
-        selectedDistance={selectedDistance}
-        distanceUnit={distanceUnit}
-        transportMode={transportMode}
-        resultsCount={resultsCount}
-      />
-      
-      {/* Footer navigation */}
-      <SearchFooter />
+      {/* Sliding menu at bottom */}
+      <div 
+        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-all duration-300 z-20 ${
+          menuOpen ? 'h-[60vh]' : 'h-16'
+        }`}
+      >
+        {/* Menu header with toggle button */}
+        <div className="flex justify-between items-center px-4 py-3 border-b">
+          <h2 className="text-lg font-bold">{t('search_filters')}</h2>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Réduire le menu" : "Développer le menu"}
+          >
+            {menuOpen ? <ChevronDown /> : <ChevronUp />}
+          </Button>
+        </div>
+        
+        {/* Menu content - only visible when menu is open */}
+        {menuOpen && (
+          <div className="overflow-y-auto max-h-[calc(60vh-4rem)] pb-16">
+            {/* Search and location section */}
+            <div className="px-4 py-3 flex flex-col gap-2 sm:flex-row sm:justify-between">
+              <div className="w-full sm:w-1/2">
+                <SearchInput 
+                  searchQuery={searchQuery}
+                  isRecording={isRecording}
+                  onSearchChange={(query) => {
+                    setSearchQuery(query);
+                    handleSearch(query);
+                  }}
+                  onMicClick={handleMicClick}
+                />
+              </div>
+              <LocationButton onLocationClick={handleLocationClick} />
+            </div>
+            
+            {/* Categories section */}
+            <CategoriesScroller />
+            
+            {/* Filters section */}
+            <FiltersSection 
+              resultsCount={resultsCount}
+              onResultsCountChange={setResultsCount}
+              transportMode={transportMode}
+              onTransportModeChange={setTransportMode}
+              selectedDuration={selectedDuration}
+              onDurationChange={setSelectedDuration}
+              selectedDistance={selectedDistance}
+              distanceUnit={distanceUnit}
+              onDistanceChange={setSelectedDistance}
+              onDistanceUnitChange={setDistanceUnit}
+            />
+            
+            {/* Display selected filters */}
+            <SelectedFilters 
+              selectedDuration={selectedDuration}
+              selectedDistance={selectedDistance}
+              distanceUnit={distanceUnit}
+              transportMode={transportMode}
+              resultsCount={resultsCount}
+            />
+          </div>
+        )}
+        
+        {/* Footer navigation - always visible at bottom of menu */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+          <SearchFooter />
+        </div>
+      </div>
     </div>
   );
 };
