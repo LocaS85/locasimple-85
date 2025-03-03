@@ -3,12 +3,28 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { mockCategories } from '@/data/mockCategories';
+import { cn } from '@/lib/utils';
 
 export const CategoriesScroller: React.FC = () => {
   const categoriesRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Couleurs pour chaque catégorie
+  const categoryColors: Record<string, string> = {
+    restaurants: 'bg-red-500 hover:bg-red-600',
+    bars: 'bg-blue-500 hover:bg-blue-600',
+    cafes: 'bg-orange-500 hover:bg-orange-600',
+    shopping: 'bg-green-500 hover:bg-green-600',
+    hotels: 'bg-purple-500 hover:bg-purple-600',
+    entertainment: 'bg-pink-500 hover:bg-pink-600',
+    health: 'bg-emerald-500 hover:bg-emerald-600',
+    services: 'bg-cyan-500 hover:bg-cyan-600',
+    education: 'bg-amber-500 hover:bg-amber-600',
+    transport: 'bg-indigo-500 hover:bg-indigo-600',
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!categoriesRef.current) return;
@@ -43,6 +59,10 @@ export const CategoriesScroller: React.FC = () => {
     setIsDragging(false);
   };
 
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+  };
+
   return (
     <div className="px-4 py-3">
       <div className="mb-2 flex justify-center">
@@ -69,15 +89,24 @@ export const CategoriesScroller: React.FC = () => {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleDragEnd}
         >
-          {mockCategories.map((category) => (
-            <Button 
-              key={category.id} 
-              className="rounded-full border-2 border-black bg-white text-black hover:bg-gray-100 whitespace-nowrap px-4 py-1 h-auto flex-shrink-0"
-            >
-              {category.icon}
-              <span className="ml-1">{category.name}</span>
-            </Button>
-          ))}
+          {mockCategories.map((category) => {
+            const isSelected = category.id === selectedCategory;
+            const colorClass = categoryColors[category.id] || 'bg-gray-500 hover:bg-gray-600';
+            
+            return (
+              <Button 
+                key={category.id} 
+                className={cn(
+                  "rounded-full border-2 whitespace-nowrap px-4 py-1 h-auto flex-shrink-0 text-white",
+                  isSelected ? colorClass : "bg-white text-black hover:bg-gray-100 border-black"
+                )}
+                onClick={() => handleCategoryClick(category.id)}
+              >
+                {category.icon}
+                <span className="ml-1">{category.name}</span>
+              </Button>
+            );
+          })}
         </div>
         
         <ArrowRight className="h-6 w-6 ml-2 text-gray-400" />

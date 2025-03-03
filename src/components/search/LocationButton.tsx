@@ -19,7 +19,7 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
       onClick={onLocationClick}
     >
       <MapPin className="mr-2 h-4 w-4" />
-      {t('my_position') || 'Ma position'}
+      Ma position
     </Button>
   );
 };
