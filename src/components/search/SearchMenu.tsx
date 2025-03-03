@@ -18,6 +18,8 @@ interface SearchMenuProps {
   distanceUnit: 'km' | 'miles';
   transportMode: string;
   resultsCount: number;
+  selectedCategory: string | null;
+  onCategorySelect: (categoryId: string | null) => void;
   onResultsCountChange: (count: number) => void;
   onTransportModeChange: (mode: string) => void;
   onDurationChange: (duration: number) => void;
@@ -37,6 +39,8 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   distanceUnit,
   transportMode,
   resultsCount,
+  selectedCategory,
+  onCategorySelect,
   onResultsCountChange,
   onTransportModeChange,
   onDurationChange,
@@ -66,13 +70,17 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
             distanceUnit={distanceUnit}
             transportMode={transportMode}
             resultsCount={resultsCount}
+            selectedCategory={selectedCategory}
           />
         </div>
       )}
       
       {menuOpen && (
         <div className="overflow-y-auto max-h-[calc(60vh-4rem)] pb-16">
-          <CategoriesScroller />
+          <CategoriesScroller 
+            selectedCategory={selectedCategory}
+            onCategorySelect={onCategorySelect}
+          />
           
           <FiltersSection 
             resultsCount={resultsCount}
@@ -93,6 +101,7 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
             distanceUnit={distanceUnit}
             transportMode={transportMode}
             resultsCount={resultsCount}
+            selectedCategory={selectedCategory}
           />
         </div>
       )}

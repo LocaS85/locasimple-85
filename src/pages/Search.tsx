@@ -4,6 +4,9 @@ import type { Result } from '@/components/ResultsList';
 import { SearchControls } from '@/components/search/SearchControls';
 import { SearchMenu } from '@/components/search/SearchMenu';
 import { generateFilteredMockResults } from '@/data/mockSearchResults';
+import { toast } from 'sonner';
+import { Search as SearchIcon, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -21,6 +24,7 @@ const Search = () => {
   const [menuOpen, setMenuOpen] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [startY, setStartY] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   
   const handleMicClick = () => {
@@ -34,16 +38,19 @@ const Search = () => {
     }
   };
   
-  const handleSearch = (query: string) => {
+  const handleSearch = (query: string = searchQuery) => {
     setLoading(true);
     console.log(`Searching for: ${query}`);
-    // Use our mock data generator instead of inline mock results
+    console.log(`Filters: Category: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Duration: ${selectedDuration}min, Transport: ${transportMode}`);
+    
+    // Use our mock data generator
     setTimeout(() => {
       setLoading(false);
       const mockResults = generateFilteredMockResults(
         query,
         userLocation,
         {
+          category: selectedCategory || undefined,
           radius: selectedDistance || 5,
           radiusUnit: distanceUnit,
           duration: selectedDuration || 15,
@@ -52,6 +59,7 @@ const Search = () => {
         resultsCount
       );
       setSearchResults(mockResults);
+      toast.success(`${mockResults.length} résultats trouvés`);
     }, 1000);
   };
 
@@ -75,6 +83,10 @@ const Search = () => {
         );
       }
     }
+  };
+
+  const handleCategorySelect = (categoryId: string | null) => {
+    setSelectedCategory(categoryId);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -122,7 +134,7 @@ const Search = () => {
       );
     }
     
-    // Use the mock data generator here too
+    // Use the mock data generator for initial results
     const initialResults = generateFilteredMockResults('', userLocation, {}, resultsCount);
     setSearchResults(initialResults);
   }, []);
@@ -149,6 +161,20 @@ const Search = () => {
           onLocationClick={handleLocationClick}
           handleSearch={handleSearch}
         />
+        
+        <div className="absolute bottom-24 right-4 z-10">
+          <Button
+            onClick={() => handleSearch()}
+            className="rounded-full h-14 w-14 bg-primary text-white shadow-lg"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : (
+              <SearchIcon className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
       </div>
       
       <SearchMenu 
@@ -168,6 +194,8 @@ const Search = () => {
         onDurationChange={setSelectedDuration}
         onDistanceChange={setSelectedDistance}
         onDistanceUnitChange={setDistanceUnit}
+        selectedCategory={selectedCategory}
+        onCategorySelect={handleCategorySelect}
       />
     </div>
   );

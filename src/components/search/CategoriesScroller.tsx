@@ -5,12 +5,19 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { mockCategories } from '@/data/mockCategories';
 import { cn } from '@/lib/utils';
 
-export const CategoriesScroller: React.FC = () => {
+interface CategoriesScrollerProps {
+  selectedCategory: string | null;
+  onCategorySelect: (categoryId: string | null) => void;
+}
+
+export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({ 
+  selectedCategory, 
+  onCategorySelect 
+}) => {
   const categoriesRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Couleurs pour chaque catégorie
   const categoryColors: Record<string, string> = {
@@ -60,7 +67,7 @@ export const CategoriesScroller: React.FC = () => {
   };
 
   const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+    onCategorySelect(categoryId === selectedCategory ? null : categoryId);
   };
 
   return (

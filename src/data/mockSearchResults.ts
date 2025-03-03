@@ -10,7 +10,7 @@ export const generateMockResults = (query: string = '', count: number = 3): Resu
       address: '123 rue de Paris',
       distance: 0.8,
       duration: 12,
-      category: 'restaurant',
+      category: 'restaurants',
       color: 'blue',
       latitude: 48.8566 + 0.01,
       longitude: 2.3522 + 0.01,
@@ -61,11 +61,29 @@ export const generateFilteredMockResults = (
   // Generate random results within the specified radius
   const radius = filters.radius || 5;
   const colors = ['blue', 'green', 'red', 'orange', 'purple', 'pink', 'indigo', 'yellow', 'teal'];
-  const categories = ['restaurant', 'shopping', 'loisirs', 'services', 'santé', 'éducation'];
+  const categoryMap: Record<string, string[]> = {
+    'restaurants': ['Restaurant', 'Bistro', 'Café', 'Brasserie'],
+    'bars': ['Bar', 'Pub', 'Lounge', 'Club'],
+    'cafes': ['Café', 'Salon de thé', 'Coffee Shop'],
+    'shopping': ['Boutique', 'Centre commercial', 'Magasin'],
+    'hotels': ['Hôtel', 'Auberge', 'Pension'],
+    'entertainment': ['Cinéma', 'Théâtre', 'Musée', 'Galerie'],
+    'health': ['Pharmacie', 'Clinique', 'Cabinet médical'],
+    'services': ['Banque', 'Poste', 'Coiffeur', 'Pressing'],
+    'education': ['École', 'Université', 'Bibliothèque'],
+    'transport': ['Gare', 'Station', 'Arrêt de bus']
+  };
+  const categories = Object.keys(categoryMap);
   
-  const results: Result[] = [];
+  let results: Result[] = [];
+  let actualCount = count;
   
-  for (let i = 0; i < count; i++) {
+  // If a category filter is applied, we need to generate more items to ensure we have enough after filtering
+  if (filters.category) {
+    actualCount = Math.min(count * 3, 15); // Generate more but cap at 15 to avoid performance issues
+  }
+  
+  for (let i = 0; i < actualCount; i++) {
     // Generate a random point within the radius
     const randomAngle = Math.random() * Math.PI * 2;
     const randomDistance = Math.random() * radius * 0.01; // Convert to rough coordinates
@@ -79,18 +97,17 @@ export const generateFilteredMockResults = (
       Math.pow((latitude - location[1]) * 111, 2)
     );
     
+    // Select a random category or use the one from filters
     const category = filters.category || categories[Math.floor(Math.random() * categories.length)];
-    const queryPrefix = query ? `${query} ` : '';
-    const nameOptions = [
-      `${queryPrefix}Lieu ${i + 1}`,
-      `${queryPrefix}Commerce ${i + 1}`,
-      `${queryPrefix}Restaurant ${i + 1}`,
-      `${queryPrefix}Boutique ${i + 1}`
-    ];
+    
+    // Generate a name based on the category
+    const placeTypes = categoryMap[category] || ['Lieu'];
+    const placeType = placeTypes[Math.floor(Math.random() * placeTypes.length)];
+    const name = query ? `${query} ${placeType} ${i + 1}` : `${placeType} ${i + 1}`;
     
     results.push({
       id: `result-${i}`,
-      name: nameOptions[Math.floor(Math.random() * nameOptions.length)],
+      name,
       address: `${Math.floor(Math.random() * 100) + 1} rue ${query || 'Principale'}, Paris`,
       distance: parseFloat(distance.toFixed(1)),
       duration: Math.floor(distance * (filters.transportMode === 'walking' ? 12 : 3)),
@@ -101,6 +118,13 @@ export const generateFilteredMockResults = (
       rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // Rating between 3.0 and 5.0
       openingHours: Math.random() > 0.3 ? 'Ouvert maintenant' : 'Fermé'
     });
+  }
+  
+  // If a category filter is applied, filter the results
+  if (filters.category) {
+    results = results.filter(result => result.category === filters.category);
+    // Make sure we don't return more than requested
+    results = results.slice(0, count);
   }
   
   // Sort by distance

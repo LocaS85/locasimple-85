@@ -2,6 +2,7 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { transportModes } from '@/data/transportModes';
+import { mockCategories } from '@/data/mockCategories';
 
 interface SelectedFiltersProps {
   selectedDuration: number | null;
@@ -9,6 +10,7 @@ interface SelectedFiltersProps {
   distanceUnit: 'km' | 'miles';
   transportMode: string;
   resultsCount: number;
+  selectedCategory: string | null;
 }
 
 export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
@@ -16,7 +18,8 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
   selectedDistance,
   distanceUnit,
   transportMode,
-  resultsCount
+  resultsCount,
+  selectedCategory
 }) => {
   const { t } = useLanguage();
 
@@ -47,9 +50,19 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
     return transportModes.find(mode => mode.id === transportMode)?.name || 'Voiture';
   };
 
+  const getCategoryName = () => {
+    return mockCategories.find(cat => cat.id === selectedCategory)?.name || '';
+  };
+
   return (
     <div className="px-0 py-1">
       <div className="flex flex-wrap gap-2 items-center justify-center">
+        {selectedCategory && (
+          <div className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm flex items-center">
+            <span className="font-medium">{getCategoryName()}</span>
+          </div>
+        )}
+        
         {selectedDuration && (
           <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center">
             <span className="font-medium">{formatDuration(selectedDuration)}</span>
