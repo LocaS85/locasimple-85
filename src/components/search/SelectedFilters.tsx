@@ -29,28 +29,25 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
   };
 
   return (
-    <div className="px-4 py-3">
-      <div className="bg-gray-100 rounded-lg p-3">
-        <h3 className="font-bold mb-2">Vos critères de recherche :</h3>
-        <div className="flex flex-wrap gap-2">
-          {selectedDuration && (
-            <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
-              {formatDuration(selectedDuration)}
-            </div>
-          )}
-          {selectedDistance && (
-            <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-              {distanceUnit === 'km' ? 
-                (selectedDistance < 1 ? `${selectedDistance * 1000} m` : `${selectedDistance} km`) : 
-                `${(selectedDistance * 0.621371).toFixed(1)} mi`}
-            </div>
-          )}
-          <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm">
-            {transportModes.find(mode => mode.id === transportMode)?.name || 'Voiture'}
+    <div className="px-0 py-1">
+      <div className="flex flex-wrap gap-2 items-center justify-center">
+        {selectedDuration && (
+          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+            {formatDuration(selectedDuration)}
           </div>
-          <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm">
-            Résultats: {resultsCount}
+        )}
+        {selectedDistance && (
+          <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+            {distanceUnit === 'km' ? 
+              (selectedDistance < 1 ? `${selectedDistance * 1000} m` : `${selectedDistance} km`) : 
+              `${(selectedDistance * 0.621371).toFixed(1)} mi`}
           </div>
+        )}
+        <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm">
+          {transportModes.find(mode => mode.id === transportMode)?.name || 'Voiture'}
+        </div>
+        <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm">
+          {resultsCount} résultats
         </div>
       </div>
     </div>

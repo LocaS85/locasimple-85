@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SearchInput } from '@/components/search/SearchInput';
 import { LocationButton } from '@/components/search/LocationButton';
@@ -25,6 +25,9 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Result[]>([]);
   const [menuOpen, setMenuOpen] = useState(true);
+  const [dragging, setDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const menuRef = useRef<HTMLDivElement>(null);
   
   const handleMicClick = () => {
     setIsRecording(!isRecording);
@@ -103,6 +106,43 @@ const Search = () => {
     }
   };
 
+  // Gestion du glissement pour le menu
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (menuRef.current) {
+      setDragging(true);
+      setStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!dragging || !menuRef.current) return;
+    
+    const currentY = e.touches[0].clientY;
+    const diff = startY - currentY;
+    
+    // Si on glisse vers le haut, on ouvre le menu
+    // Si on glisse vers le bas, on ferme le menu
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && !menuOpen) {
+        setMenuOpen(true);
+      } else if (diff < 0 && menuOpen) {
+        setMenuOpen(false);
+      }
+      setDragging(false);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setDragging(false);
+  };
+
+  // Fermer le menu si l'utilisateur interagit avec la carte
+  const handleMapInteraction = () => {
+    if (menuOpen) {
+      setMenuOpen(false);
+    }
+  };
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -127,7 +167,7 @@ const Search = () => {
       </div>
       
       {/* Map section - takes up most of the screen */}
-      <div className="flex-grow relative">
+      <div className="flex-grow relative" onClick={handleMapInteraction}>
         <div className="absolute inset-0">
           <Map 
             results={searchResults} 
@@ -144,24 +184,44 @@ const Search = () => {
       
       {/* Sliding menu at bottom */}
       <div 
+        ref={menuRef}
         className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-all duration-300 z-20 ${
-          menuOpen ? 'h-[60vh]' : 'h-16'
+          menuOpen ? 'h-[60vh]' : 'h-auto'
         }`}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        {/* Menu header with toggle button */}
-        <div className="flex justify-between items-center px-4 py-3 border-b">
-          <h2 className="text-lg font-bold">{t('search_filters')}</h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Réduire le menu" : "Développer le menu"}
-          >
-            {menuOpen ? <ChevronDown /> : <ChevronUp />}
-          </Button>
+        {/* Menu header with toggle button and drag indicator */}
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-1 bg-gray-300 rounded-full my-2 cursor-grab"></div>
+          <div className="flex justify-between items-center px-4 py-2 w-full border-b">
+            <h2 className="text-lg font-bold">{t('search_filters')}</h2>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? "Réduire le menu" : "Développer le menu"}
+            >
+              {menuOpen ? <ChevronDown /> : <ChevronUp />}
+            </Button>
+          </div>
         </div>
         
-        {/* Menu content - only visible when menu is open */}
+        {/* Menu compact state - only visible when menu is closed */}
+        {!menuOpen && (
+          <div className="px-4 py-2">
+            <SelectedFilters 
+              selectedDuration={selectedDuration}
+              selectedDistance={selectedDistance}
+              distanceUnit={distanceUnit}
+              transportMode={transportMode}
+              resultsCount={resultsCount}
+            />
+          </div>
+        )}
+        
+        {/* Menu expanded state - only visible when menu is open */}
         {menuOpen && (
           <div className="overflow-y-auto max-h-[calc(60vh-4rem)] pb-16">
             {/* Search and location section */}
