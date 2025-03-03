@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { SearchInput } from '@/components/search/SearchInput';
@@ -106,7 +105,6 @@ const Search = () => {
     }
   };
 
-  // Gestion du glissement pour le menu
   const handleTouchStart = (e: React.TouchEvent) => {
     if (menuRef.current) {
       setDragging(true);
@@ -120,9 +118,7 @@ const Search = () => {
     const currentY = e.touches[0].clientY;
     const diff = startY - currentY;
     
-    // Si on glisse vers le haut, on ouvre le menu
-    // Si on glisse vers le bas, on ferme le menu
-    if (Math.abs(diff) > 50) {
+    if (Math.abs(diff) > 30) {
       if (diff > 0 && !menuOpen) {
         setMenuOpen(true);
       } else if (diff < 0 && menuOpen) {
@@ -136,7 +132,6 @@ const Search = () => {
     setDragging(false);
   };
 
-  // Fermer le menu si l'utilisateur interagit avec la carte
   const handleMapInteraction = () => {
     if (menuOpen) {
       setMenuOpen(false);
@@ -155,18 +150,15 @@ const Search = () => {
       );
     }
     
-    // Effectuer une recherche initiale
     handleSearch('');
   }, []);
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Header with title - fixed at top */}
       <div className="bg-black text-white p-4 flex justify-center items-center z-10">
         <h1 className="text-xl font-bold">{t('search_title')}</h1>
       </div>
       
-      {/* Map section - takes up most of the screen */}
       <div className="flex-grow relative" onClick={handleMapInteraction}>
         <div className="absolute inset-0">
           <Map 
@@ -182,7 +174,6 @@ const Search = () => {
         </div>
       </div>
       
-      {/* Sliding menu at bottom */}
       <div 
         ref={menuRef}
         className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-all duration-300 z-20 ${
@@ -192,9 +183,8 @@ const Search = () => {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Menu header with toggle button and drag indicator */}
         <div className="flex flex-col items-center">
-          <div className="w-10 h-1 bg-gray-300 rounded-full my-2 cursor-grab"></div>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full my-2.5 cursor-grab"></div>
           <div className="flex justify-between items-center px-4 py-2 w-full border-b">
             <h2 className="text-lg font-bold">{t('search_filters')}</h2>
             <Button 
@@ -208,7 +198,6 @@ const Search = () => {
           </div>
         </div>
         
-        {/* Menu compact state - only visible when menu is closed */}
         {!menuOpen && (
           <div className="px-4 py-2">
             <SelectedFilters 
@@ -221,10 +210,8 @@ const Search = () => {
           </div>
         )}
         
-        {/* Menu expanded state - only visible when menu is open */}
         {menuOpen && (
           <div className="overflow-y-auto max-h-[calc(60vh-4rem)] pb-16">
-            {/* Search and location section */}
             <div className="px-4 py-3 flex flex-col gap-2 sm:flex-row sm:justify-between">
               <div className="w-full sm:w-1/2">
                 <SearchInput 
@@ -240,10 +227,8 @@ const Search = () => {
               <LocationButton onLocationClick={handleLocationClick} />
             </div>
             
-            {/* Categories section */}
             <CategoriesScroller />
             
-            {/* Filters section */}
             <FiltersSection 
               resultsCount={resultsCount}
               onResultsCountChange={setResultsCount}
@@ -257,7 +242,6 @@ const Search = () => {
               onDistanceUnitChange={setDistanceUnit}
             />
             
-            {/* Display selected filters */}
             <SelectedFilters 
               selectedDuration={selectedDuration}
               selectedDistance={selectedDistance}
@@ -268,7 +252,6 @@ const Search = () => {
           </div>
         )}
         
-        {/* Footer navigation - always visible at bottom of menu */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
           <SearchFooter />
         </div>
