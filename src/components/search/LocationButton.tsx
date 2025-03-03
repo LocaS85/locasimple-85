@@ -17,7 +17,7 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
   
   return (
     <Button 
-      className={`w-full sm:w-auto rounded-full border-2 
+      className={`rounded-full border-2 px-4 py-2 shadow-md
       ${isLocationActive 
         ? "border-primary bg-primary text-white hover:bg-primary/90" 
         : "border-black bg-white text-black hover:bg-gray-100"

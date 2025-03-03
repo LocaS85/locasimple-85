@@ -1,6 +1,5 @@
-
 import React from 'react';
-import Map from '@/components/Map';
+import MapContainer from '../map/MapContainer';
 import InteractiveMenu from '@/components/InteractiveMenu';
 import type { Result } from '@/components/ResultsList';
 
@@ -22,9 +21,15 @@ interface MapSectionProps {
     transportMode: string;
     radiusType: 'distance' | 'duration';
   }) => void;
+  searchQuery?: string;
+  onSearchChange?: (value: string) => void;
+  isRecording?: boolean;
+  onMicClick?: () => void;
+  onLocationClick?: () => void;
+  isLocationActive?: boolean;
 }
 
-const MapSection: React.FC<MapSectionProps> = ({
+export const MapSection: React.FC<MapSectionProps> = ({
   results,
   userLocation,
   radius,
@@ -33,23 +38,32 @@ const MapSection: React.FC<MapSectionProps> = ({
   duration,
   timeUnit,
   transportMode,
-  onFilterChange
+  onFilterChange,
+  searchQuery = '',
+  onSearchChange = () => {},
+  isRecording = false,
+  onMicClick = () => {},
+  onLocationClick = () => {},
+  isLocationActive = false
 }) => {
   return (
-    <div className="mb-6">
-      <div className="h-[400px] rounded-lg overflow-hidden shadow-lg border border-gray-200 mb-6">
-        <Map 
-          results={results} 
-          center={userLocation} 
-          radius={radius}
-          radiusUnit={radiusUnit}
-          radiusType={radiusType}
-          duration={duration}
-          timeUnit={timeUnit}
-          transportMode={transportMode}
-        />
-      </div>
-      
+    <div className="w-full h-full">
+      <MapContainer
+        results={results}
+        center={userLocation}
+        radius={radius}
+        radiusUnit={radiusUnit}
+        radiusType={radiusType}
+        duration={duration}
+        timeUnit={timeUnit}
+        transportMode={transportMode}
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+        isRecording={isRecording}
+        onMicClick={onMicClick}
+        onLocationClick={onLocationClick}
+        isLocationActive={isLocationActive}
+      />
       <InteractiveMenu onFilterChange={onFilterChange} />
     </div>
   );
