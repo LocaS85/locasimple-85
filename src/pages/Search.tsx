@@ -21,6 +21,7 @@ const Search = () => {
   const [transportMode, setTransportMode] = useState('driving');
   const [resultsCount, setResultsCount] = useState(5);
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
+  const [isLocationActive, setIsLocationActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Result[]>([]);
   const [menuOpen, setMenuOpen] = useState(true);
@@ -91,17 +92,24 @@ const Search = () => {
   };
 
   const handleLocationClick = () => {
-    // Get user's location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation([position.coords.longitude, position.coords.latitude]);
-          console.log("Location updated:", position.coords);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
-      );
+    setIsLocationActive(prevState => !prevState);
+    
+    if (!isLocationActive) {
+      if (navigator.geolocation) {
+        setLoading(true);
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setUserLocation([position.coords.longitude, position.coords.latitude]);
+            console.log("Location updated:", position.coords);
+            setLoading(false);
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            setLoading(false);
+            setIsLocationActive(false);
+          }
+        );
+      }
     }
   };
 
@@ -224,7 +232,10 @@ const Search = () => {
                   onMicClick={handleMicClick}
                 />
               </div>
-              <LocationButton onLocationClick={handleLocationClick} />
+              <LocationButton 
+                onLocationClick={handleLocationClick}
+                isLocationActive={isLocationActive}
+              />
             </div>
             
             <CategoriesScroller />
