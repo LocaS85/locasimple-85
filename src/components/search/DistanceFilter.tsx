@@ -37,7 +37,13 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="w-full rounded-full border-2 border-black bg-gray-100 text-black hover:bg-gray-200 justify-between">
+        <Button 
+          className={`w-full rounded-full border-2 ${
+            selectedDistance 
+              ? "border-primary bg-primary text-white hover:bg-primary/90" 
+              : "border-black bg-gray-100 text-black hover:bg-gray-200"
+          } justify-between`}
+        >
           <span>{t('distance')}</span>
           <div className="flex items-center">
             <Tabs 
