@@ -1,12 +1,15 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Result } from '@/components/ResultsList';
 import { SearchControls } from '@/components/search/SearchControls';
 import { SearchMenu } from '@/components/search/SearchMenu';
+import { SearchButton } from '@/components/search/SearchButton';
 import { generateFilteredMockResults } from '@/data/mockSearchResults';
-import { toast } from 'sonner';
-import { Search as SearchIcon, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { SearchLocation } from '@/components/search/SearchLocation';
+import { SearchHandler } from '@/components/search/SearchHandler';
+import { SearchMenuHandler } from '@/components/search/SearchMenuHandler';
+import { VoiceRecorder } from '@/components/search/VoiceRecorder';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -27,100 +30,50 @@ const Search = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   
-  const handleMicClick = () => {
-    setIsRecording(!isRecording);
-    if (!isRecording) {
-      console.log("Démarrage de l'enregistrement...");
-      // Code pour démarrer l'enregistrement
-    } else {
-      console.log("Arrêt de l'enregistrement...");
-      // Code pour arrêter l'enregistrement
-    }
-  };
+  // Voice recording handler
+  const { handleMicClick } = VoiceRecorder({
+    isRecording,
+    setIsRecording
+  });
   
-  const handleSearch = (query: string = searchQuery) => {
-    setLoading(true);
-    console.log(`Searching for: ${query}`);
-    console.log(`Filters: Category: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Duration: ${selectedDuration}min, Transport: ${transportMode}`);
-    
-    // Use our mock data generator
-    setTimeout(() => {
-      setLoading(false);
-      const mockResults = generateFilteredMockResults(
-        query,
-        userLocation,
-        {
-          category: selectedCategory || undefined,
-          radius: selectedDistance || 5,
-          radiusUnit: distanceUnit,
-          duration: selectedDuration || 15,
-          transportMode
-        },
-        resultsCount
-      );
-      setSearchResults(mockResults);
-      toast.success(`${mockResults.length} résultats trouvés`);
-    }, 1000);
-  };
-
-  const handleLocationClick = () => {
-    setIsLocationActive(prevState => !prevState);
-    
-    if (!isLocationActive) {
-      if (navigator.geolocation) {
-        setLoading(true);
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setUserLocation([position.coords.longitude, position.coords.latitude]);
-            console.log("Location updated:", position.coords);
-            setLoading(false);
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-            setLoading(false);
-            setIsLocationActive(false);
-          }
-        );
-      }
-    }
-  };
-
-  const handleCategorySelect = (categoryId: string | null) => {
-    setSelectedCategory(categoryId);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (menuRef.current) {
-      setDragging(true);
-      setStartY(e.touches[0].clientY);
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!dragging || !menuRef.current) return;
-    
-    const currentY = e.touches[0].clientY;
-    const diff = startY - currentY;
-    
-    if (Math.abs(diff) > 30) {
-      if (diff > 0 && !menuOpen) {
-        setMenuOpen(true);
-      } else if (diff < 0 && menuOpen) {
-        setMenuOpen(false);
-      }
-      setDragging(false);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setDragging(false);
-  };
-
-  const handleMapInteraction = () => {
-    if (menuOpen) {
-      setMenuOpen(false);
-    }
-  };
+  // Location handler
+  const { handleLocationClick } = SearchLocation({
+    isLocationActive,
+    loading,
+    setLoading,
+    setIsLocationActive,
+    setUserLocation
+  });
+  
+  // Search handler
+  const { handleSearch } = SearchHandler({
+    searchQuery,
+    selectedCategory,
+    selectedDistance,
+    selectedDuration,
+    distanceUnit,
+    transportMode,
+    userLocation,
+    resultsCount,
+    setLoading,
+    setSearchResults
+  });
+  
+  // Menu touch handler
+  const { 
+    handleTouchStart, 
+    handleTouchMove, 
+    handleTouchEnd, 
+    handleMapInteraction 
+  } = SearchMenuHandler({
+    menuRef,
+    menuOpen,
+    setMenuOpen,
+    setDragging,
+    setStartY,
+    dragging,
+    startY
+  });
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -162,19 +115,10 @@ const Search = () => {
           handleSearch={handleSearch}
         />
         
-        <div className="absolute bottom-24 right-4 z-10">
-          <Button
-            onClick={() => handleSearch()}
-            className="rounded-full h-14 w-14 bg-primary text-white shadow-lg"
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              <SearchIcon className="h-6 w-6" />
-            )}
-          </Button>
-        </div>
+        <SearchButton 
+          loading={loading}
+          onClick={() => handleSearch()}
+        />
       </div>
       
       <SearchMenu 
@@ -195,7 +139,7 @@ const Search = () => {
         onDistanceChange={setSelectedDistance}
         onDistanceUnitChange={setDistanceUnit}
         selectedCategory={selectedCategory}
-        onCategorySelect={handleCategorySelect}
+        onCategorySelect={setSelectedCategory}
       />
     </div>
   );

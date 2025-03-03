@@ -1,0 +1,59 @@
+
+import React from 'react';
+import { toast } from 'sonner';
+import { generateFilteredMockResults } from '@/data/mockSearchResults';
+
+interface SearchHandlerProps {
+  searchQuery: string;
+  selectedCategory: string | null;
+  selectedDistance: number | null;
+  selectedDuration: number | null;
+  distanceUnit: 'km' | 'miles';
+  transportMode: string;
+  userLocation: [number, number];
+  resultsCount: number;
+  setLoading: (loading: boolean) => void;
+  setSearchResults: (results: any[]) => void;
+}
+
+export const SearchHandler: React.FC<SearchHandlerProps> = ({
+  searchQuery,
+  selectedCategory,
+  selectedDistance,
+  selectedDuration,
+  distanceUnit,
+  transportMode,
+  userLocation,
+  resultsCount,
+  setLoading,
+  setSearchResults,
+}) => {
+  const handleSearch = (query: string = searchQuery) => {
+    setLoading(true);
+    console.log(`Searching for: ${query}`);
+    console.log(`Filters: Category: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Duration: ${selectedDuration}min, Transport: ${transportMode}`);
+    
+    // Use our mock data generator
+    setTimeout(() => {
+      setLoading(false);
+      const mockResults = generateFilteredMockResults(
+        query,
+        userLocation,
+        {
+          category: selectedCategory || undefined,
+          radius: selectedDistance || 5,
+          radiusUnit: distanceUnit,
+          duration: selectedDuration || 15,
+          transportMode
+        },
+        resultsCount
+      );
+      setSearchResults(mockResults);
+      toast.success(`${mockResults.length} résultats trouvés`);
+    }, 1000);
+  };
+
+  return { handleSearch };
+};
+
+export default SearchHandler;
