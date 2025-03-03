@@ -36,6 +36,7 @@ const Map = ({
   onLocationClick = () => {},
   isLocationActive = false
 }: MapProps) => {
+  // Pass all props directly to MapContainer
   return (
     <MapContainer
       results={results}
