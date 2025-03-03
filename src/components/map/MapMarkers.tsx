@@ -20,6 +20,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   onMarkersReady 
 }) => {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const mapboxToken = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw';
 
   // Convert color name to hex value
   const getColorForResult = (color: string): string => {
@@ -101,7 +102,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
               end={[result.longitude, result.latitude]}
               color={getColorForResult(result.color)}
               transportMode={transportMode}
-              mapboxToken="pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw"
+              mapboxToken={mapboxToken}
             />
           )}
         </React.Fragment>
