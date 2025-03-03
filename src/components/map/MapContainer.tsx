@@ -80,7 +80,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" />
       
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-11/12 max-w-md">
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-auto">
         <SearchInput
           searchQuery={searchQuery}
           isRecording={isRecording}
