@@ -1,10 +1,10 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import RadiusCircle from './RadiusCircle';
 import MapMarkers from './MapMarkers';
 import type { Result } from '../ResultsList';
+import { MAPBOX_TOKEN } from '@/config/environment';
 
 interface MapContainerProps {
   results: Result[];
@@ -31,15 +31,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   
-  // Embedded Mapbox token
-  const mapboxToken = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw';
-
   // Initialize map automatically when component loads
   useEffect(() => {
     if (!mapContainer.current || isMapInitialized) return;
 
     try {
-      mapboxgl.accessToken = mapboxToken;
+      mapboxgl.accessToken = MAPBOX_TOKEN;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,

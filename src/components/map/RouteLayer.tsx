@@ -1,5 +1,7 @@
+
 import React, { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { MAPBOX_TOKEN } from '@/config/environment';
 
 interface RouteLayerProps {
   map: mapboxgl.Map | null;
@@ -7,7 +9,7 @@ interface RouteLayerProps {
   end: [number, number];
   color: string;
   transportMode: string;
-  mapboxToken: string;
+  mapboxToken?: string;
 }
 
 const RouteLayer: React.FC<RouteLayerProps> = ({ 
@@ -16,7 +18,7 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
   end, 
   color, 
   transportMode,
-  mapboxToken
+  mapboxToken = MAPBOX_TOKEN
 }) => {
   useEffect(() => {
     const addRoute = async () => {
