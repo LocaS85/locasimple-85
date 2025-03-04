@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Result } from '@/components/ResultsList';
@@ -32,12 +31,11 @@ const Search = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showRoutes, setShowRoutes] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [selectedResultId, setSelectedResultId] = useState<string | undefined>();
   const menuRef = useRef<HTMLDivElement>(null);
   
-  // Voice recording handler
   const { handleMicClick } = useVoiceRecorder(isRecording, setIsRecording);
   
-  // Location handler
   const { handleLocationClick, searchAddress } = useSearchLocation(
     isLocationActive,
     loading,
@@ -46,7 +44,6 @@ const Search = () => {
     setUserLocation
   );
   
-  // Search handler
   const { handleSearch } = useSearchHandler({
     searchQuery,
     selectedCategory,
@@ -63,12 +60,10 @@ const Search = () => {
     setSearchPerformed
   });
   
-  // Handle search input changes (could be address or establishment search)
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
   };
   
-  // Menu touch handler
   const { 
     handleTouchStart, 
     handleTouchMove, 
@@ -84,21 +79,27 @@ const Search = () => {
     startY
   });
 
-  // Handle search for places or address
   const handleSearchPress = async () => {
-    // First check if the searchQuery might be an address
     if (searchQuery.trim() && !searchPerformed) {
       setLoading(true);
       await searchAddress(searchQuery);
       setLoading(false);
     }
     
-    // Then perform the search with current location
+    setSelectedResultId(undefined);
+    
     handleSearch();
+  };
+  
+  const handleResultClick = (result: Result) => {
+    setSelectedResultId(prev => prev === result.id ? undefined : result.id);
+    
+    if (menuOpen) {
+      setMenuOpen(false);
+    }
   };
 
   useEffect(() => {
-    // Initial location setup
     if (navigator.geolocation) {
       navigator.permissions && navigator.permissions.query({name: 'geolocation'})
         .then(permission => {
@@ -107,6 +108,7 @@ const Search = () => {
             navigator.geolocation.getCurrentPosition(
               (position) => {
                 setUserLocation([position.coords.longitude, position.coords.latitude]);
+                setIsLocationActive(true);
               },
               (error) => {
                 console.error('Error getting location:', error);
@@ -118,7 +120,6 @@ const Search = () => {
             toast.error('Accès à la géolocalisation refusé. Veuillez l\'activer dans vos paramètres');
           }
           
-          // Listen for permission changes
           permission.addEventListener('change', () => {
             if (permission.state === 'granted') {
               toast.success('Accès à la géolocalisation accordé');
@@ -133,7 +134,6 @@ const Search = () => {
         });
     }
     
-    // Use the mock data generator for initial results
     const initialResults = generateFilteredMockResults('', userLocation, {}, resultsCount);
     setSearchResults(initialResults);
   }, []);
@@ -161,6 +161,8 @@ const Search = () => {
           onLocationClick={handleLocationClick}
           handleSearch={handleSearchPress}
           showRoutes={showRoutes}
+          selectedResultId={selectedResultId}
+          onResultClick={handleResultClick}
         />
         
         <LocationButton 
@@ -194,6 +196,9 @@ const Search = () => {
         onDistanceUnitChange={setDistanceUnit}
         selectedCategory={selectedCategory}
         onCategorySelect={setSelectedCategory}
+        searchResults={searchResults}
+        selectedResultId={selectedResultId}
+        onResultClick={handleResultClick}
       />
     </div>
   );

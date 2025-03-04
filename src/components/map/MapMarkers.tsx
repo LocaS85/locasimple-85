@@ -12,6 +12,8 @@ interface MapMarkersProps {
   transportMode: string;
   onMarkersReady?: () => void;
   showRoutes?: boolean;
+  selectedResultId?: string;
+  onResultClick?: (result: Result) => void;
 }
 
 const MapMarkers: React.FC<MapMarkersProps> = ({ 
@@ -20,9 +22,12 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   center,
   transportMode,
   onMarkersReady,
-  showRoutes = false
+  showRoutes = false,
+  selectedResultId,
+  onResultClick
 }) => {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const popupsRef = useRef<mapboxgl.Popup[]>([]);
 
   // Convert color name to hex value
   const getColorForResult = (color: string): string => {
@@ -42,40 +47,70 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   useEffect(() => {
     if (!map || !map.isStyleLoaded()) return;
 
-    // Clear existing markers
+    // Clear existing markers and popups
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
+    popupsRef.current.forEach(popup => popup.remove());
+    popupsRef.current = [];
 
     // Add new markers
     results.forEach((result, index) => {
+      const isSelected = result.id === selectedResultId;
+      
+      // Create marker element
       const el = document.createElement('div');
-      el.className = 'marker';
-      el.innerHTML = `<div class="bg-white rounded-full p-2 shadow-lg">
-        <span class="font-bold text-${result.color}-500">${index + 1}</span>
+      el.className = 'marker cursor-pointer';
+      el.innerHTML = `<div class="bg-white rounded-full p-1.5 shadow-lg border-2 ${isSelected ? `border-${result.color}-500` : 'border-white'} transition-all hover:scale-110">
+        <div class="rounded-full w-6 h-6 flex items-center justify-center bg-${result.color}-500 text-white font-bold">
+          ${index + 1}
+        </div>
       </div>`;
-      el.style.width = '30px';
-      el.style.height = '30px';
+      el.style.width = '36px';
+      el.style.height = '36px';
+      el.style.transform = isSelected ? 'scale(1.2)' : 'scale(1)';
       
       // Add popup with details
-      const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
-        .setHTML(`
-          <div class="p-2">
-            <h3 class="font-bold text-sm">${result.name}</h3>
-            <p class="text-xs text-gray-500">${result.address}</p>
-            <div class="flex items-center gap-2 mt-1 text-xs">
-              <span>${result.distance.toFixed(1)} km</span>
-              <span>·</span>
-              <span>${result.duration} min</span>
-            </div>
+      const popup = new mapboxgl.Popup({ 
+        offset: 25, 
+        closeButton: false,
+        className: isSelected ? 'active-popup' : ''
+      })
+      .setHTML(`
+        <div class="p-2 max-w-64">
+          <h3 class="font-bold text-sm">${result.name}</h3>
+          <p class="text-xs text-gray-500">${result.address}</p>
+          <div class="flex items-center gap-2 mt-1 text-xs">
+            <span>${result.distance.toFixed(1)} km</span>
+            <span>·</span>
+            <span>${result.duration} min</span>
           </div>
-        `);
+          ${result.openingHours ? `<div class="text-xs mt-1 text-gray-500">${result.openingHours}</div>` : ''}
+          ${result.rating ? `<div class="flex items-center gap-1 mt-1">
+            <span class="text-amber-400">★</span>
+            <span class="text-xs">${result.rating}</span>
+          </div>` : ''}
+        </div>
+      `);
 
       const marker = new mapboxgl.Marker(el)
         .setLngLat([result.longitude, result.latitude])
         .setPopup(popup)
         .addTo(map);
+      
+      // Show popup for selected result
+      if (isSelected) {
+        popup.addTo(map);
+      }
+      
+      // Add click event
+      el.addEventListener('click', () => {
+        if (onResultClick) {
+          onResultClick(result);
+        }
+      });
 
       markersRef.current.push(marker);
+      popupsRef.current.push(popup);
     });
 
     // Fit bounds to show all markers if there are any
@@ -91,11 +126,16 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     if (onMarkersReady) {
       onMarkersReady();
     }
-  }, [map, results, center, onMarkersReady]);
+  }, [map, results, center, onMarkersReady, selectedResultId, onResultClick]);
+
+  // Route display for selected result or all results
+  const routesToShow = selectedResultId 
+    ? results.filter(r => r.id === selectedResultId)
+    : (showRoutes ? results : []);
 
   return (
     <>
-      {showRoutes && results.map((result, index) => (
+      {routesToShow.map((result) => (
         <React.Fragment key={result.id}>
           {map && map.isStyleLoaded() && (
             <RouteLayer

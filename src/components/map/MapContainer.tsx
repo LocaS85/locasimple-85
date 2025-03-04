@@ -26,6 +26,8 @@ interface MapContainerProps {
   loading?: boolean;
   showRoutes?: boolean;
   onSearch?: () => void;
+  selectedResultId?: string;
+  onResultClick?: (result: Result) => void;
 }
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
@@ -45,7 +47,9 @@ const MapContainer: React.FC<MapContainerProps> = ({
   isLocationActive = false,
   loading = false,
   showRoutes = false,
-  onSearch = () => {}
+  onSearch = () => {},
+  selectedResultId,
+  onResultClick
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -160,8 +164,17 @@ const MapContainer: React.FC<MapContainerProps> = ({
             center={center}
             transportMode={transportMode}
             showRoutes={showRoutes}
+            selectedResultId={selectedResultId}
+            onResultClick={onResultClick}
           />
         </>
+      )}
+      
+      {/* Results Counter */}
+      {results.length > 0 && (
+        <div className="absolute bottom-4 left-4 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-medium">
+          {results.length} résultats trouvés
+        </div>
       )}
     </div>
   );

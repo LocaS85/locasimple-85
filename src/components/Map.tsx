@@ -21,6 +21,8 @@ interface MapProps {
   loading?: boolean;
   showRoutes?: boolean;
   onSearch?: () => void;
+  selectedResultId?: string;
+  onResultClick?: (result: Result) => void;
 }
 
 const Map = ({ 
@@ -40,7 +42,9 @@ const Map = ({
   isLocationActive = false,
   loading = false,
   showRoutes = false,
-  onSearch = () => {}
+  onSearch = () => {},
+  selectedResultId,
+  onResultClick = () => {}
 }: MapProps) => {
   // Pass all props directly to MapContainer
   return (
@@ -62,6 +66,8 @@ const Map = ({
       loading={loading}
       showRoutes={showRoutes}
       onSearch={onSearch}
+      selectedResultId={selectedResultId}
+      onResultClick={onResultClick}
     />
   );
 };

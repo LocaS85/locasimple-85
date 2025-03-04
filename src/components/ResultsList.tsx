@@ -39,13 +39,13 @@ const ResultsList = ({ results, onResultClick, selectedResultId }: ResultsListPr
             onClick={() => onResultClick(result)}
             className={`p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border-l-4 ${
               selectedResultId === result.id 
-                ? `border-${result.color}-500 shadow-md` 
+                ? `border-${result.color}-500 shadow-md bg-${result.color}-50` 
                 : `border-transparent`
             }`}
           >
             <div className="flex items-start space-x-3">
-              <div className={`p-2 rounded-full bg-${result.color}-500\/10`}>
-                <MapPin className={`w-5 h-5 text-${result.color}-500`} />
+              <div className={`p-2 rounded-full bg-${result.color}-500${selectedResultId === result.id ? '' : '/10'}`}>
+                <MapPin className={`w-5 h-5 ${selectedResultId === result.id ? 'text-white' : `text-${result.color}-500`}`} />
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-gray-900">{result.name}</h3>

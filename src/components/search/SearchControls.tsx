@@ -19,6 +19,8 @@ interface SearchControlsProps {
   onLocationClick: () => void;
   handleSearch: (query?: string) => void;
   showRoutes?: boolean;
+  selectedResultId?: string;
+  onResultClick?: (result: Result) => void;
 }
 
 export const SearchControls: React.FC<SearchControlsProps> = ({
@@ -37,6 +39,8 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
   onLocationClick,
   handleSearch,
   showRoutes = false,
+  selectedResultId,
+  onResultClick
 }) => {
   return (
     <div className="absolute inset-0">
@@ -58,6 +62,8 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
         loading={loading}
         showRoutes={showRoutes}
         onSearch={() => handleSearch()}
+        selectedResultId={selectedResultId}
+        onResultClick={onResultClick}
       />
     </div>
   );
