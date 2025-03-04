@@ -23,9 +23,9 @@ export const ResultsCountPopover: React.FC<ResultsCountPopoverProps> = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="w-full rounded-full border-2 border-black bg-white text-black hover:bg-gray-100 justify-between">
+        <Button className="w-full rounded-full border border-black bg-white text-black hover:bg-gray-50 justify-between text-xs h-7 px-3">
           <span>{t('results_count')}</span>
-          <ArrowRight className="h-4 w-4 ml-2" />
+          <ArrowRight className="h-3 w-3 ml-1" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 bg-white">
@@ -34,7 +34,7 @@ export const ResultsCountPopover: React.FC<ResultsCountPopoverProps> = ({
             <Button 
               key={`nbr-${i+1}`} 
               variant="outline"
-              className="h-10 w-10"
+              className="h-8 w-8 text-xs"
               onClick={() => onResultsCountChange(i+1)}
             >
               {i+1}

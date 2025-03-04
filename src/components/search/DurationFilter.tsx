@@ -32,13 +32,13 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
     <Popover>
       <PopoverTrigger asChild>
         <Button 
-          className={`w-full rounded-full border text-xs h-8 px-2 ${
+          className={`w-full rounded-full border text-xs h-7 px-2 ${
             selectedDuration 
               ? "border-primary bg-primary text-white hover:bg-primary/90" 
-              : "border-black bg-gray-100 text-black hover:bg-gray-200"
+              : "border-black bg-gray-50 text-black hover:bg-gray-100"
           } justify-between`}
         >
-          <span>{t('duration')}</span>
+          <span className="text-xs">{t('duration')}</span>
           <Clock className="h-3 w-3 ml-1" />
         </Button>
       </PopoverTrigger>
@@ -50,7 +50,7 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
               <Button 
                 key={`min-${min}`} 
                 variant={selectedDuration === min ? "default" : "outline"}
-                className="text-xs py-0 h-7"
+                className="text-xs py-0 h-6"
                 onClick={() => onDurationChange(min)}
               >
                 {min} min
@@ -63,7 +63,7 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
               <Button 
                 key={`hour-${hour}`} 
                 variant={selectedDuration === hour * 60 ? "default" : "outline"}
-                className="text-xs py-0 h-7"
+                className="text-xs py-0 h-6"
                 onClick={() => onDurationChange(hour * 60)}
               >
                 {hour} h

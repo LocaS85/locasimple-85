@@ -38,22 +38,22 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
     <Popover>
       <PopoverTrigger asChild>
         <Button 
-          className={`w-full rounded-full border text-xs h-8 px-2 ${
+          className={`w-full rounded-full border text-xs h-7 px-2 ${
             selectedDistance 
               ? "border-primary bg-primary text-white hover:bg-primary/90" 
-              : "border-black bg-gray-100 text-black hover:bg-gray-200"
+              : "border-black bg-gray-50 text-black hover:bg-gray-100"
           } justify-between`}
         >
-          <span>{t('distance')}</span>
+          <span className="text-xs">{t('distance')}</span>
           <div className="flex items-center">
             <Tabs 
               value={distanceUnit} 
               onValueChange={(value) => onDistanceUnitChange(value as 'km' | 'miles')} 
               className="ml-1"
             >
-              <TabsList className="h-5 px-1">
-                <TabsTrigger value="km" className="px-1 text-xs h-4">km</TabsTrigger>
-                <TabsTrigger value="miles" className="px-1 text-xs h-4">mi</TabsTrigger>
+              <TabsList className="h-4 px-0.5">
+                <TabsTrigger value="km" className="px-1 text-[10px] h-3">km</TabsTrigger>
+                <TabsTrigger value="miles" className="px-1 text-[10px] h-3">mi</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -67,7 +67,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
               <Button 
                 key={`meter-${meter}`} 
                 variant={selectedDistance === meter / 1000 ? "default" : "outline"}
-                className="text-xs py-0 h-7"
+                className="text-xs py-0 h-6"
                 onClick={() => onDistanceChange(meter / 1000)}
               >
                 {meter} m
@@ -80,7 +80,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
               <Button 
                 key={`km-${km}`} 
                 variant={selectedDistance === km ? "default" : "outline"}
-                className="text-xs py-0 h-7"
+                className="text-xs py-0 h-6"
                 onClick={() => onDistanceChange(km)}
               >
                 {distanceUnit === 'km' ? `${km} km` : `${(km * 0.621371).toFixed(1)} mi`}

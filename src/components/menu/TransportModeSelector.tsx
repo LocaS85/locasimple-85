@@ -13,7 +13,7 @@ export const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
   onTransportModeChange
 }) => {
   return (
-    <div className="flex gap-2 overflow-x-auto p-2 scrollbar-hide">
+    <div className="flex gap-1 overflow-x-auto p-1 scrollbar-hide">
       {transportModes.map((mode) => (
         <TransportModeButton 
           key={mode.id}

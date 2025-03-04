@@ -31,7 +31,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   onDistanceUnitChange
 }) => {
   return (
-    <div className="px-3 py-2 flex flex-col gap-2">
+    <div className="px-2 py-1 flex flex-col gap-1.5">
       <ResultsCountPopover 
         resultsCount={resultsCount}
         onResultsCountChange={onResultsCountChange}
@@ -44,7 +44,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
         />
       </div>
       
-      <div className="flex justify-between gap-2">
+      <div className="flex justify-between gap-1.5">
         <div className="w-1/2">
           <DurationFilter 
             selectedDuration={selectedDuration}
