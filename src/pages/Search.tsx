@@ -6,10 +6,10 @@ import { SearchControls } from '@/components/search/SearchControls';
 import { SearchMenu } from '@/components/search/SearchMenu';
 import { SearchButton } from '@/components/search/SearchButton';
 import { generateFilteredMockResults } from '@/data/mockSearchResults';
-import { SearchLocation } from '@/components/search/SearchLocation';
-import { SearchHandler } from '@/components/search/SearchHandler';
-import { SearchMenuHandler } from '@/components/search/SearchMenuHandler';
-import { VoiceRecorder } from '@/components/search/VoiceRecorder';
+import { useSearchLocation } from '@/components/search/SearchLocation';
+import { useSearchHandler } from '@/components/search/SearchHandler';
+import { useSearchMenuHandler } from '@/components/search/SearchMenuHandler';
+import { useVoiceRecorder } from '@/components/search/VoiceRecorder';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -31,22 +31,19 @@ const Search = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   
   // Voice recording handler
-  const { handleMicClick } = VoiceRecorder({
-    isRecording,
-    setIsRecording
-  });
+  const { handleMicClick } = useVoiceRecorder(isRecording, setIsRecording);
   
   // Location handler
-  const { handleLocationClick } = SearchLocation({
+  const { handleLocationClick } = useSearchLocation(
     isLocationActive,
     loading,
     setLoading,
     setIsLocationActive,
     setUserLocation
-  });
+  );
   
   // Search handler
-  const { handleSearch } = SearchHandler({
+  const { handleSearch } = useSearchHandler({
     searchQuery,
     selectedCategory,
     selectedDistance,
@@ -65,7 +62,7 @@ const Search = () => {
     handleTouchMove, 
     handleTouchEnd, 
     handleMapInteraction 
-  } = SearchMenuHandler({
+  } = useSearchMenuHandler({
     menuRef,
     menuOpen,
     setMenuOpen,

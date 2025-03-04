@@ -11,7 +11,16 @@ interface SearchMenuHandlerProps {
   startY: number;
 }
 
-export const SearchMenuHandler: React.FC<SearchMenuHandlerProps> = ({
+export const SearchMenuHandler: React.FC<SearchMenuHandlerProps> = (props) => {
+  return (
+    <React.Fragment>
+      {/* This is a utility component that only provides functionality */}
+    </React.Fragment>
+  );
+};
+
+// Export the handler separately
+export const useSearchMenuHandler = ({
   menuRef,
   menuOpen,
   setMenuOpen,
@@ -19,7 +28,7 @@ export const SearchMenuHandler: React.FC<SearchMenuHandlerProps> = ({
   setStartY,
   dragging,
   startY,
-}) => {
+}: SearchMenuHandlerProps) => {
   const handleTouchStart = (e: React.TouchEvent) => {
     if (menuRef.current) {
       setDragging(true);

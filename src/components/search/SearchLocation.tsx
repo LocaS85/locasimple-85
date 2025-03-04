@@ -18,8 +18,23 @@ export const SearchLocation: React.FC<SearchLocationProps> = ({
   setIsLocationActive,
   setUserLocation,
 }) => {
+  return (
+    <React.Fragment>
+      {/* This is a utility component that only provides functionality */}
+    </React.Fragment>
+  );
+};
+
+// Export the handler separately
+export const useSearchLocation = (
+  isLocationActive: boolean, 
+  loading: boolean, 
+  setLoading: (loading: boolean) => void,
+  setIsLocationActive: (active: boolean) => void,
+  setUserLocation: (location: [number, number]) => void
+) => {
   const handleLocationClick = () => {
-    setIsLocationActive(prevState => !prevState);
+    setIsLocationActive(!isLocationActive);
     
     if (!isLocationActive) {
       if (navigator.geolocation) {

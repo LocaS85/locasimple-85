@@ -16,7 +16,16 @@ interface SearchHandlerProps {
   setSearchResults: (results: any[]) => void;
 }
 
-export const SearchHandler: React.FC<SearchHandlerProps> = ({
+export const SearchHandler: React.FC<SearchHandlerProps> = (props) => {
+  return (
+    <React.Fragment>
+      {/* This is a utility component that only provides functionality */}
+    </React.Fragment>
+  );
+};
+
+// Export the handler separately
+export const useSearchHandler = ({
   searchQuery,
   selectedCategory,
   selectedDistance,
@@ -27,7 +36,7 @@ export const SearchHandler: React.FC<SearchHandlerProps> = ({
   resultsCount,
   setLoading,
   setSearchResults,
-}) => {
+}: SearchHandlerProps) => {
   const handleSearch = (query: string = searchQuery) => {
     setLoading(true);
     console.log(`Searching for: ${query}`);
