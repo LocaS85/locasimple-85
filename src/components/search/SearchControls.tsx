@@ -17,7 +17,8 @@ interface SearchControlsProps {
   onSearchChange: (query: string) => void;
   onMicClick: () => void;
   onLocationClick: () => void;
-  handleSearch: (query: string) => void;
+  handleSearch: (query?: string) => void;
+  showRoutes?: boolean;
 }
 
 export const SearchControls: React.FC<SearchControlsProps> = ({
@@ -35,12 +36,8 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
   onMicClick,
   onLocationClick,
   handleSearch,
+  showRoutes = false,
 }) => {
-  const handleSearchChange = (query: string) => {
-    onSearchChange(query);
-    handleSearch(query);
-  };
-
   return (
     <div className="absolute inset-0">
       <Map 
@@ -53,12 +50,14 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
         timeUnit="minutes"
         transportMode={transportMode}
         searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
+        onSearchChange={onSearchChange}
         isRecording={isRecording}
         onMicClick={onMicClick}
         onLocationClick={onLocationClick}
         isLocationActive={isLocationActive}
         loading={loading}
+        showRoutes={showRoutes}
+        onSearch={() => handleSearch()}
       />
     </div>
   );

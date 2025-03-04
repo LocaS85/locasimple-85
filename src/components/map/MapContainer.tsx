@@ -24,6 +24,8 @@ interface MapContainerProps {
   onLocationClick?: () => void;
   isLocationActive?: boolean;
   loading?: boolean;
+  showRoutes?: boolean;
+  onSearch?: () => void;
 }
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
@@ -41,7 +43,9 @@ const MapContainer: React.FC<MapContainerProps> = ({
   onMicClick = () => {},
   onLocationClick = () => {},
   isLocationActive = false,
-  loading = false
+  loading = false,
+  showRoutes = false,
+  onSearch = () => {}
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -133,6 +137,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
           onSearchChange={onSearchChange}
           onMicClick={onMicClick}
           onLocationClick={onLocationClick}
+          onSearch={onSearch}
         />
       </div>
       
@@ -154,6 +159,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             results={results}
             center={center}
             transportMode={transportMode}
+            showRoutes={showRoutes}
           />
         </>
       )}

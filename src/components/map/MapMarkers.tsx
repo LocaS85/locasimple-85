@@ -11,6 +11,7 @@ interface MapMarkersProps {
   center: [number, number];
   transportMode: string;
   onMarkersReady?: () => void;
+  showRoutes?: boolean;
 }
 
 const MapMarkers: React.FC<MapMarkersProps> = ({ 
@@ -18,7 +19,8 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   results, 
   center,
   transportMode,
-  onMarkersReady 
+  onMarkersReady,
+  showRoutes = false
 }) => {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
@@ -93,7 +95,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
 
   return (
     <>
-      {results.map((result, index) => (
+      {showRoutes && results.map((result, index) => (
         <React.Fragment key={result.id}>
           {map && map.isStyleLoaded() && (
             <RouteLayer
@@ -103,6 +105,9 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
               color={getColorForResult(result.color)}
               transportMode={transportMode}
               mapboxToken={MAPBOX_TOKEN}
+              placeName={result.name}
+              showDistance={true}
+              showDuration={true}
             />
           )}
         </React.Fragment>

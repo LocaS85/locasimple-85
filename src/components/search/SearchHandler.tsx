@@ -14,6 +14,9 @@ interface SearchHandlerProps {
   resultsCount: number;
   setLoading: (loading: boolean) => void;
   setSearchResults: (results: any[]) => void;
+  showRoutes?: boolean;
+  setShowRoutes?: (show: boolean) => void;
+  setSearchPerformed?: (performed: boolean) => void;
 }
 
 export const SearchHandler: React.FC<SearchHandlerProps> = (props) => {
@@ -36,11 +39,19 @@ export const useSearchHandler = ({
   resultsCount,
   setLoading,
   setSearchResults,
+  showRoutes = false,
+  setShowRoutes = () => {},
+  setSearchPerformed = () => {}
 }: SearchHandlerProps) => {
   const handleSearch = (query: string = searchQuery) => {
     setLoading(true);
     console.log(`Searching for: ${query}`);
     console.log(`Filters: Category: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Duration: ${selectedDuration}min, Transport: ${transportMode}`);
+    console.log(`User location: ${userLocation}`);
+    
+    // Enable route display when search is performed
+    setShowRoutes(true);
+    setSearchPerformed(true);
     
     // Use our mock data generator
     setTimeout(() => {

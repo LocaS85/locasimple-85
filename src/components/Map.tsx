@@ -19,6 +19,8 @@ interface MapProps {
   onLocationClick?: () => void;
   isLocationActive?: boolean;
   loading?: boolean;
+  showRoutes?: boolean;
+  onSearch?: () => void;
 }
 
 const Map = ({ 
@@ -36,7 +38,9 @@ const Map = ({
   onMicClick = () => {},
   onLocationClick = () => {},
   isLocationActive = false,
-  loading = false
+  loading = false,
+  showRoutes = false,
+  onSearch = () => {}
 }: MapProps) => {
   // Pass all props directly to MapContainer
   return (
@@ -56,6 +60,8 @@ const Map = ({
       onLocationClick={onLocationClick}
       isLocationActive={isLocationActive}
       loading={loading}
+      showRoutes={showRoutes}
+      onSearch={onSearch}
     />
   );
 };

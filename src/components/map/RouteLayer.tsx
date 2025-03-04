@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { MAPBOX_TOKEN } from '@/config/environment';
 
@@ -10,6 +10,9 @@ interface RouteLayerProps {
   color: string;
   transportMode: string;
   mapboxToken?: string;
+  placeName?: string;
+  showDistance?: boolean;
+  showDuration?: boolean;
 }
 
 const RouteLayer: React.FC<RouteLayerProps> = ({ 
@@ -18,8 +21,13 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
   end, 
   color, 
   transportMode,
-  mapboxToken = MAPBOX_TOKEN
+  mapboxToken = MAPBOX_TOKEN,
+  placeName,
+  showDistance = true,
+  showDuration = true
 }) => {
+  const [routeInfo, setRouteInfo] = useState<{distance?: number; duration?: number}>({});
+
   useEffect(() => {
     const addRoute = async () => {
       if (!map || !mapboxToken) return;
@@ -31,6 +39,12 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
         const json = await query.json();
         const data = json.routes[0];
         const route = data.geometry.coordinates;
+        
+        // Store route information
+        setRouteInfo({
+          distance: data.distance / 1000, // Convert to km
+          duration: Math.round(data.duration / 60) // Convert to minutes
+        });
 
         const geojson = {
           type: 'Feature',
@@ -70,13 +84,63 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
             }
           });
         }
+        
+        // Add a popup for the route information if placeName is provided
+        if (placeName) {
+          const midIndex = Math.floor(route.length / 2);
+          const midpoint = route[midIndex];
+          
+          const popupContent = document.createElement('div');
+          popupContent.className = 'text-xs p-1';
+          
+          let popupHtml = `<strong>${placeName}</strong>`;
+          if (showDistance && routeInfo.distance) {
+            popupHtml += `<br>${routeInfo.distance.toFixed(1)} km`;
+          }
+          if (showDuration && routeInfo.duration) {
+            popupHtml += `<br>${routeInfo.duration} min`;
+          }
+          
+          popupContent.innerHTML = popupHtml;
+          
+          // Remove existing popup if any
+          const popupId = `popup-${color}`;
+          if (document.getElementById(popupId)) {
+            document.getElementById(popupId)?.remove();
+          }
+          
+          // Create a popup for route info
+          const popup = new mapboxgl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+            className: 'route-popup',
+            offset: 6
+          })
+          .setLngLat(midpoint)
+          .setDOMContent(popupContent)
+          .addTo(map);
+          
+          // Set id for future reference
+          const popupElement = popup.getElement();
+          popupElement.id = popupId;
+        }
       } catch (error) {
         console.error('Error adding route:', error);
       }
     };
 
     addRoute();
-  }, [map, start, end, color, transportMode, mapboxToken]);
+    
+    return () => {
+      // Clean up popups when component unmounts
+      if (map) {
+        const popupId = `popup-${color}`;
+        if (document.getElementById(popupId)) {
+          document.getElementById(popupId)?.remove();
+        }
+      }
+    };
+  }, [map, start, end, color, transportMode, mapboxToken, placeName, showDistance, showDuration]);
 
   return null;
 };

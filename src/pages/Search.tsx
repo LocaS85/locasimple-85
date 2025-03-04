@@ -30,13 +30,15 @@ const Search = () => {
   const [dragging, setDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showRoutes, setShowRoutes] = useState(false);
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   
   // Voice recording handler
   const { handleMicClick } = useVoiceRecorder(isRecording, setIsRecording);
   
   // Location handler
-  const { handleLocationClick } = useSearchLocation(
+  const { handleLocationClick, searchAddress } = useSearchLocation(
     isLocationActive,
     loading,
     setLoading,
@@ -55,8 +57,16 @@ const Search = () => {
     userLocation,
     resultsCount,
     setLoading,
-    setSearchResults
+    setSearchResults,
+    showRoutes,
+    setShowRoutes,
+    setSearchPerformed
   });
+  
+  // Handle search input changes (could be address or establishment search)
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
   
   // Menu touch handler
   const { 
@@ -73,6 +83,19 @@ const Search = () => {
     dragging,
     startY
   });
+
+  // Handle search for places or address
+  const handleSearchPress = async () => {
+    // First check if the searchQuery might be an address
+    if (searchQuery.trim() && !searchPerformed) {
+      setLoading(true);
+      await searchAddress(searchQuery);
+      setLoading(false);
+    }
+    
+    // Then perform the search with current location
+    handleSearch();
+  };
 
   useEffect(() => {
     // Initial location setup
@@ -133,10 +156,11 @@ const Search = () => {
           isRecording={isRecording}
           isLocationActive={isLocationActive}
           loading={loading}
-          onSearchChange={setSearchQuery}
+          onSearchChange={handleSearchChange}
           onMicClick={handleMicClick}
           onLocationClick={handleLocationClick}
-          handleSearch={handleSearch}
+          handleSearch={handleSearchPress}
+          showRoutes={showRoutes}
         />
         
         <LocationButton 
@@ -147,7 +171,7 @@ const Search = () => {
         
         <SearchButton 
           loading={loading}
-          onClick={() => handleSearch()}
+          onClick={handleSearchPress}
         />
       </div>
       
