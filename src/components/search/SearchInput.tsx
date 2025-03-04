@@ -12,6 +12,7 @@ interface SearchInputProps {
   onSearchChange: (value: string) => void;
   onMicClick: () => void;
   onLocationClick?: () => void;
+  onSearch?: () => void;
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
@@ -21,8 +22,15 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   loading = false,
   onSearchChange,
   onMicClick,
-  onLocationClick = () => {}
+  onLocationClick = () => {},
+  onSearch = () => {}
 }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSearch();
+    }
+  };
+
   return (
     <div className="relative w-full max-w-md mx-auto">
       <div className="relative flex items-center w-full bg-white rounded-full border-2 border-black shadow-sm overflow-hidden">
@@ -31,6 +39,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           placeholder="Recherche"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="w-full border-0 rounded-l-full h-12 text-base pl-4 focus-visible:ring-0 focus-visible:ring-offset-0" 
         />
         <div className="flex items-center h-full">
