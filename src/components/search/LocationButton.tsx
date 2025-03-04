@@ -11,11 +11,12 @@ interface LocationButtonProps {
 
 export const LocationButton: React.FC<LocationButtonProps> = ({ loading, isLocationActive, onClick }) => {
   return (
-    <div className="absolute bottom-16 left-3 z-10">
+    <div className="absolute bottom-14 left-3 z-10">
       <Button
         onClick={onClick}
-        className={`rounded-full h-10 w-10 ${isLocationActive ? 'bg-secondary' : 'bg-primary'} text-white shadow-lg transition-colors`}
+        className={`rounded-full h-9 w-9 ${isLocationActive ? 'bg-secondary' : 'bg-primary'} text-white shadow-lg transition-colors`}
         disabled={loading}
+        aria-label="Ma position"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />

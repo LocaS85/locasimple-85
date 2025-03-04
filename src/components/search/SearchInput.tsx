@@ -2,12 +2,13 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinCheck } from 'lucide-react';
+import { Mic, MapPin, MapPinCheck, Loader2 } from 'lucide-react';
 
 interface SearchInputProps {
   searchQuery: string;
   isRecording: boolean;
   isLocationActive?: boolean;
+  loading?: boolean;
   onSearchChange: (value: string) => void;
   onMicClick: () => void;
   onLocationClick?: () => void;
@@ -17,6 +18,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   searchQuery,
   isRecording,
   isLocationActive = false,
+  loading = false,
   onSearchChange,
   onMicClick,
   onLocationClick = () => {}
@@ -47,9 +49,12 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               : "bg-transparent text-black hover:bg-gray-100"}`}
             aria-pressed={isLocationActive}
             aria-label="Utiliser ma position"
+            disabled={loading}
             variant="ghost"
           >
-            {isLocationActive ? (
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : isLocationActive ? (
               <MapPinCheck className="h-5 w-5" />
             ) : (
               <MapPin className="h-5 w-5" />

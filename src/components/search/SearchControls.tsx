@@ -13,6 +13,7 @@ interface SearchControlsProps {
   searchQuery: string;
   isRecording: boolean;
   isLocationActive: boolean;
+  loading: boolean;
   onSearchChange: (query: string) => void;
   onMicClick: () => void;
   onLocationClick: () => void;
@@ -29,6 +30,7 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
   searchQuery,
   isRecording,
   isLocationActive,
+  loading,
   onSearchChange,
   onMicClick,
   onLocationClick,
@@ -56,6 +58,7 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
         onMicClick={onMicClick}
         onLocationClick={onLocationClick}
         isLocationActive={isLocationActive}
+        loading={loading}
       />
     </div>
   );
