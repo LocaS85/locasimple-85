@@ -31,20 +31,20 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   onDistanceUnitChange
 }) => {
   return (
-    <div className="px-4 py-3 flex flex-col gap-3">
+    <div className="px-3 py-2 flex flex-col gap-2">
       <ResultsCountPopover 
         resultsCount={resultsCount}
         onResultsCountChange={onResultsCountChange}
       />
       
-      <div className="w-full border-2 border-black rounded-full bg-white text-black">
+      <div className="w-full border border-black rounded-full bg-white text-black">
         <TransportModeSelector 
           transportMode={transportMode} 
           onTransportModeChange={onTransportModeChange} 
         />
       </div>
       
-      <div className="flex justify-between gap-4">
+      <div className="flex justify-between gap-2">
         <div className="w-1/2">
           <DurationFilter 
             selectedDuration={selectedDuration}

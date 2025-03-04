@@ -32,38 +32,38 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
     <Popover>
       <PopoverTrigger asChild>
         <Button 
-          className={`w-full rounded-full border-2 ${
+          className={`w-full rounded-full border text-xs h-8 px-2 ${
             selectedDuration 
               ? "border-primary bg-primary text-white hover:bg-primary/90" 
               : "border-black bg-gray-100 text-black hover:bg-gray-200"
           } justify-between`}
         >
           <span>{t('duration')}</span>
-          <Clock className="h-4 w-4 ml-2" />
+          <Clock className="h-3 w-3 ml-1" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0 bg-white">
+      <PopoverContent className="w-60 p-0 bg-white">
         <div className="p-2">
-          <h3 className="font-bold mb-2">{t('minutes')}</h3>
-          <div className="grid grid-cols-3 gap-1 mb-4">
+          <h3 className="font-bold mb-1 text-sm">{t('minutes')}</h3>
+          <div className="grid grid-cols-3 gap-1 mb-3">
             {generateMinutesDurations().map((min) => (
               <Button 
                 key={`min-${min}`} 
                 variant={selectedDuration === min ? "default" : "outline"}
-                className="text-sm"
+                className="text-xs py-0 h-7"
                 onClick={() => onDurationChange(min)}
               >
                 {min} min
               </Button>
             ))}
           </div>
-          <h3 className="font-bold mb-2">{t('hours')}</h3>
+          <h3 className="font-bold mb-1 text-sm">{t('hours')}</h3>
           <div className="grid grid-cols-5 gap-1">
             {generateHoursDurations().map((hour) => (
               <Button 
                 key={`hour-${hour}`} 
                 variant={selectedDuration === hour * 60 ? "default" : "outline"}
-                className="text-sm"
+                className="text-xs py-0 h-7"
                 onClick={() => onDurationChange(hour * 60)}
               >
                 {hour} h
