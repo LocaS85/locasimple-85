@@ -3,6 +3,7 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { transportModes } from '@/data/transportModes';
 import { mockCategories } from '@/data/mockCategories';
+import { Clock, MapPin, Navigation, Gauge, Users } from 'lucide-react';
 
 interface SelectedFiltersProps {
   selectedDuration: number | null;
@@ -58,28 +59,33 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
     <div className="px-0 py-1">
       <div className="flex flex-wrap gap-2 items-center justify-center">
         {selectedCategory && (
-          <div className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm flex items-center">
+          <div className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
+            <MapPin className="w-3 h-3" />
             <span className="font-medium">{getCategoryName()}</span>
           </div>
         )}
         
         {selectedDuration && (
-          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center">
+          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
+            <Clock className="w-3 h-3" />
             <span className="font-medium">{formatDuration(selectedDuration)}</span>
           </div>
         )}
         
         {selectedDistance && (
-          <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm flex items-center">
+          <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
+            <Navigation className="w-3 h-3" />
             <span className="font-medium">{formatDistance()}</span>
           </div>
         )}
         
-        <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm flex items-center">
+        <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
+          <Gauge className="w-3 h-3" />
           <span className="font-medium">{getTransportModeName()}</span>
         </div>
         
-        <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm flex items-center">
+        <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
+          <Users className="w-3 h-3" />
           <span className="font-medium">{resultsCount} {resultsCount > 1 ? 'résultats' : 'résultat'}</span>
         </div>
       </div>

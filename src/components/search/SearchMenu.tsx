@@ -5,6 +5,9 @@ import { FiltersSection } from '@/components/search/FiltersSection';
 import { SelectedFilters } from '@/components/search/SelectedFilters';
 import { SearchFooter } from '@/components/search/SearchFooter';
 import { MenuToggleHeader } from '@/components/search/MenuToggleHeader';
+import ResultsList, { Result } from '@/components/ResultsList';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 
 interface SearchMenuProps {
   menuOpen: boolean;
@@ -25,6 +28,10 @@ interface SearchMenuProps {
   onDurationChange: (duration: number) => void;
   onDistanceChange: (distance: number) => void;
   onDistanceUnitChange: (unit: 'km' | 'miles') => void;
+  searchResults: Result[];
+  selectedResultId?: string;
+  onResultClick: (result: Result) => void;
+  onSearch?: () => void;
 }
 
 export const SearchMenu: React.FC<SearchMenuProps> = ({
@@ -45,7 +52,11 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   onTransportModeChange,
   onDurationChange,
   onDistanceChange,
-  onDistanceUnitChange
+  onDistanceUnitChange,
+  searchResults,
+  selectedResultId,
+  onResultClick,
+  onSearch
 }) => {
   return (
     <div 
@@ -103,6 +114,29 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
             resultsCount={resultsCount}
             selectedCategory={selectedCategory}
           />
+          
+          {/* Add Search Button */}
+          <div className="mt-4 px-4">
+            <Button 
+              onClick={onSearch}
+              className="w-full bg-primary text-white font-medium rounded-full py-2 flex items-center justify-center gap-2"
+            >
+              <Search className="w-5 h-5" />
+              Rechercher
+            </Button>
+          </div>
+          
+          {/* Results list */}
+          {searchResults && searchResults.length > 0 && (
+            <div className="mt-4 px-4">
+              <h3 className="font-semibold text-lg mb-2">Résultats</h3>
+              <ResultsList 
+                results={searchResults} 
+                onResultClick={onResultClick} 
+                selectedResultId={selectedResultId}
+              />
+            </div>
+          )}
         </div>
       )}
       

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, Navigation, Clock, Star, Clock2 } from 'lucide-react';
+import { MapPin, Navigation, Clock, Star, Clock2, Tag } from 'lucide-react';
 
 export interface Result {
   id: string;
@@ -48,7 +48,13 @@ const ResultsList = ({ results, onResultClick, selectedResultId }: ResultsListPr
                 <MapPin className={`w-5 h-5 ${selectedResultId === result.id ? 'text-white' : `text-${result.color}-500`}`} />
               </div>
               <div className="flex-1">
-                <h3 className="font-medium text-gray-900">{result.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-gray-900">{result.name}</h3>
+                  <div className="flex items-center gap-1 bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full text-xs">
+                    <Tag className="w-3 h-3" />
+                    <span>{result.category}</span>
+                  </div>
+                </div>
                 <p className="text-sm text-gray-500">{result.address}</p>
                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
@@ -70,6 +76,11 @@ const ResultsList = ({ results, onResultClick, selectedResultId }: ResultsListPr
                   <div className="mt-1 text-xs text-gray-500 flex items-center gap-1">
                     <Clock2 className="w-3 h-3" />
                     <span>{result.openingHours}</span>
+                  </div>
+                )}
+                {result.description && (
+                  <div className="mt-1 text-xs text-gray-600">
+                    {result.description}
                   </div>
                 )}
               </div>

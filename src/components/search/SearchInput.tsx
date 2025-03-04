@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinCheck, Loader2 } from 'lucide-react';
+import { Mic, MapPin, MapPinCheck, Loader2, Search } from 'lucide-react';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -67,6 +67,17 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               <MapPinCheck className="h-5 w-5" />
             ) : (
               <MapPin className="h-5 w-5" />
+            )}
+          </Button>
+          <Button
+            onClick={onSearch}
+            className="h-full rounded-r-full px-4 bg-primary text-white"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Search className="h-5 w-5" />
             )}
           </Button>
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Result } from '@/components/ResultsList';
@@ -199,6 +200,7 @@ const Search = () => {
         searchResults={searchResults}
         selectedResultId={selectedResultId}
         onResultClick={handleResultClick}
+        onSearch={handleSearchPress}
       />
     </div>
   );
