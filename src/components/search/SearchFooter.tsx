@@ -8,14 +8,14 @@ export const SearchFooter: React.FC = () => {
   
   return (
     <div className="mt-auto">
-      <div className="bg-black text-white grid grid-cols-3 text-center p-1">
-        <Button variant="ghost" className="text-white hover:text-gray-300 text-xs py-0.5 h-6">
+      <div className="bg-black text-white grid grid-cols-3 text-center p-0.5">
+        <Button variant="ghost" className="text-white hover:text-gray-300 text-xs py-0 h-5">
           {t('plan')}
         </Button>
-        <Button variant="ghost" className="text-white hover:text-gray-300 text-xs py-0.5 h-6">
+        <Button variant="ghost" className="text-white hover:text-gray-300 text-xs py-0 h-5">
           {t('saved')}
         </Button>
-        <Button variant="ghost" className="text-white hover:text-gray-300 text-xs py-0.5 h-6">
+        <Button variant="ghost" className="text-white hover:text-gray-300 text-xs py-0 h-5">
           {t('settings')}
         </Button>
       </div>

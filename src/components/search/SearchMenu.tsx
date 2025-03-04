@@ -51,7 +51,7 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
     <div 
       ref={menuRef}
       className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-all duration-300 z-20 ${
-        menuOpen ? 'h-[55vh]' : 'h-auto'
+        menuOpen ? 'h-[50vh]' : 'h-auto'
       }`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -63,7 +63,7 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
       />
       
       {!menuOpen && (
-        <div className="px-3 py-1">
+        <div className="px-2 py-0.5">
           <SelectedFilters 
             selectedDuration={selectedDuration}
             selectedDistance={selectedDistance}
@@ -76,7 +76,7 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
       )}
       
       {menuOpen && (
-        <div className="overflow-y-auto max-h-[calc(55vh-3rem)] pb-12">
+        <div className="overflow-y-auto max-h-[calc(50vh-2.5rem)] pb-8">
           <CategoriesScroller 
             selectedCategory={selectedCategory}
             onCategorySelect={onCategorySelect}
