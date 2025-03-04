@@ -11,6 +11,7 @@ import { useSearchLocation } from '@/components/search/SearchLocation';
 import { useSearchHandler } from '@/components/search/SearchHandler';
 import { useSearchMenuHandler } from '@/components/search/SearchMenuHandler';
 import { useVoiceRecorder } from '@/components/search/VoiceRecorder';
+import { toast } from 'sonner';
 
 const Search = () => {
   const { t } = useLanguage();
@@ -74,15 +75,39 @@ const Search = () => {
   });
 
   useEffect(() => {
+    // Initial location setup
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation([position.coords.longitude, position.coords.latitude]);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
-      );
+      navigator.permissions && navigator.permissions.query({name: 'geolocation'})
+        .then(permission => {
+          if (permission.state === 'granted') {
+            toast.info('Accès à la géolocalisation accordé');
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                setUserLocation([position.coords.longitude, position.coords.latitude]);
+              },
+              (error) => {
+                console.error('Error getting location:', error);
+              }
+            );
+          } else if (permission.state === 'prompt') {
+            toast.info('Cliquez sur "Ma position" pour activer la géolocalisation');
+          } else if (permission.state === 'denied') {
+            toast.error('Accès à la géolocalisation refusé. Veuillez l\'activer dans vos paramètres');
+          }
+          
+          // Listen for permission changes
+          permission.addEventListener('change', () => {
+            if (permission.state === 'granted') {
+              toast.success('Accès à la géolocalisation accordé');
+            } else if (permission.state === 'denied') {
+              toast.error('Accès à la géolocalisation refusé');
+              setIsLocationActive(false);
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error checking geolocation permission:', error);
+        });
     }
     
     // Use the mock data generator for initial results
@@ -107,6 +132,7 @@ const Search = () => {
           searchQuery={searchQuery}
           isRecording={isRecording}
           isLocationActive={isLocationActive}
+          loading={loading}
           onSearchChange={setSearchQuery}
           onMicClick={handleMicClick}
           onLocationClick={handleLocationClick}

@@ -36,79 +36,109 @@ export const useSearchLocation = (
   setUserLocation: (location: [number, number]) => void
 ) => {
   const handleLocationClick = () => {
-    setIsLocationActive(!isLocationActive);
+    // If location is already active, toggle it off
+    if (isLocationActive) {
+      setIsLocationActive(false);
+      return;
+    }
     
-    if (!isLocationActive) {
-      setLoading(true);
-      
-      // Try to use Mapbox geolocate control first for better accuracy
-      if (mapboxgl.supported() && MAPBOX_TOKEN) {
-        try {
-          // Create a temporary map container for the geolocate control
-          const tempContainer = document.createElement('div');
-          tempContainer.style.display = 'none';
-          document.body.appendChild(tempContainer);
-          
-          const tempMap = new mapboxgl.Map({
-            container: tempContainer,
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [0, 0],
-            zoom: 1,
-            accessToken: MAPBOX_TOKEN
-          });
-          
-          const geolocate = new mapboxgl.GeolocateControl({
-            positionOptions: {
-              enableHighAccuracy: true
-            },
-            trackUserLocation: false
-          });
-          
-          tempMap.addControl(geolocate);
-          
-          tempMap.on('load', () => {
-            geolocate.trigger();
-          });
-          
-          // Listen for position updates
-          geolocate.on('geolocate', (position: GeolocationPosition) => {
-            const { longitude, latitude } = position.coords;
-            setUserLocation([longitude, latitude]);
-            console.log("Mapbox location updated:", position.coords);
-            setLoading(false);
-            
-            // Clean up
-            tempMap.remove();
-            document.body.removeChild(tempContainer);
-          });
-          
-          // Handle errors
-          geolocate.on('error', (error: any) => {
-            console.error('Mapbox geolocation error:', error);
-            // Fall back to browser geolocation
-            useBrowserGeolocation();
-          });
-          
+    // Check for geolocation permissions first
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'denied') {
+          toast.error('Accès à la géolocalisation refusé. Veuillez l\'activer dans vos paramètres de navigateur.');
           return;
-        } catch (error) {
-          console.error('Error with Mapbox geolocation:', error);
+        }
+        
+        // Proceed with geolocation
+        activateGeolocation();
+      }).catch(error => {
+        console.error('Error checking geolocation permission:', error);
+        // Try geolocation anyway in case permissions API isn't available
+        activateGeolocation();
+      });
+    } else {
+      // Permissions API not available, proceed with geolocation directly
+      activateGeolocation();
+    }
+  };
+  
+  const activateGeolocation = () => {
+    setIsLocationActive(true);
+    setLoading(true);
+    
+    // Try to use Mapbox geolocate control first for better accuracy
+    if (mapboxgl.supported() && MAPBOX_TOKEN) {
+      try {
+        // Create a temporary map container for the geolocate control
+        const tempContainer = document.createElement('div');
+        tempContainer.style.display = 'none';
+        document.body.appendChild(tempContainer);
+        
+        const tempMap = new mapboxgl.Map({
+          container: tempContainer,
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [0, 0],
+          zoom: 1,
+          accessToken: MAPBOX_TOKEN
+        });
+        
+        const geolocate = new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true
+          },
+          trackUserLocation: false
+        });
+        
+        tempMap.addControl(geolocate);
+        
+        tempMap.on('load', () => {
+          toast.info('Recherche de votre position...');
+          geolocate.trigger();
+        });
+        
+        // Listen for position updates
+        geolocate.on('geolocate', (position: GeolocationPosition) => {
+          const { longitude, latitude } = position.coords;
+          setUserLocation([longitude, latitude]);
+          console.log("Mapbox location updated:", position.coords);
+          setLoading(false);
+          toast.success('Position trouvée');
+          
+          // Clean up
+          tempMap.remove();
+          document.body.removeChild(tempContainer);
+        });
+        
+        // Handle errors
+        geolocate.on('error', (error: any) => {
+          console.error('Mapbox geolocation error:', error);
           // Fall back to browser geolocation
           useBrowserGeolocation();
-        }
-      } else {
+        });
+        
+        return;
+      } catch (error) {
+        console.error('Error with Mapbox geolocation:', error);
         // Fall back to browser geolocation
         useBrowserGeolocation();
       }
+    } else {
+      // Fall back to browser geolocation
+      useBrowserGeolocation();
     }
   };
   
   const useBrowserGeolocation = () => {
     if (navigator.geolocation) {
+      toast.info('Autorisation de géolocalisation requise');
+      
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation([position.coords.longitude, position.coords.latitude]);
           console.log("Browser location updated:", position.coords);
           setLoading(false);
+          toast.success('Position trouvée');
         },
         (error) => {
           console.error('Error getting location:', error);
