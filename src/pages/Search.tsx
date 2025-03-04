@@ -5,6 +5,7 @@ import type { Result } from '@/components/ResultsList';
 import { SearchControls } from '@/components/search/SearchControls';
 import { SearchMenu } from '@/components/search/SearchMenu';
 import { SearchButton } from '@/components/search/SearchButton';
+import { LocationButton } from '@/components/search/LocationButton';
 import { generateFilteredMockResults } from '@/data/mockSearchResults';
 import { useSearchLocation } from '@/components/search/SearchLocation';
 import { useSearchHandler } from '@/components/search/SearchHandler';
@@ -110,6 +111,12 @@ const Search = () => {
           onMicClick={handleMicClick}
           onLocationClick={handleLocationClick}
           handleSearch={handleSearch}
+        />
+        
+        <LocationButton 
+          loading={loading}
+          isLocationActive={isLocationActive}
+          onClick={handleLocationClick}
         />
         
         <SearchButton 

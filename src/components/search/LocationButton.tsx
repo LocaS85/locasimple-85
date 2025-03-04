@@ -1,36 +1,30 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, MapPinCheck } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { MapPin, Loader2 } from 'lucide-react';
 
 interface LocationButtonProps {
-  onLocationClick: () => void;
+  loading: boolean;
   isLocationActive: boolean;
+  onClick: () => void;
 }
 
-export const LocationButton: React.FC<LocationButtonProps> = ({
-  onLocationClick,
-  isLocationActive
-}) => {
-  const { t } = useLanguage();
-  
+export const LocationButton: React.FC<LocationButtonProps> = ({ loading, isLocationActive, onClick }) => {
   return (
-    <Button 
-      className={`rounded-full border-2 px-4 py-2 shadow-md
-      ${isLocationActive 
-        ? "border-primary bg-primary text-white hover:bg-primary/90" 
-        : "border-black bg-white text-black hover:bg-gray-100"
-      }`}
-      onClick={onLocationClick}
-      aria-pressed={isLocationActive}
-    >
-      {isLocationActive ? (
-        <MapPinCheck className="mr-2 h-4 w-4" />
-      ) : (
-        <MapPin className="mr-2 h-4 w-4" />
-      )}
-      Ma position
-    </Button>
+    <div className="absolute bottom-24 left-4 z-10">
+      <Button
+        onClick={onClick}
+        className={`rounded-full h-14 w-14 ${isLocationActive ? 'bg-secondary' : 'bg-primary'} text-white shadow-lg`}
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="h-6 w-6 animate-spin" />
+        ) : (
+          <MapPin className="h-6 w-6" />
+        )}
+      </Button>
+    </div>
   );
 };
+
+export default LocationButton;
