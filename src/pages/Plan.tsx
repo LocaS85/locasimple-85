@@ -10,65 +10,65 @@ const Plan = () => {
 
   const plans = [
     {
-      name: t('freePlan'),
+      name: "Gratuit",
       price: "0€",
-      description: t('forFreeUsers') || "Parfait pour découvrir l'application",
+      description: "Parfait pour découvrir l'application",
       features: [
-        t('freeFeature1') || "3 recherches par jour",
-        t('freeFeature2') || "Rayon de recherche jusqu'à 5 km",
-        t('freeFeature3') || "Filtre par distance uniquement",
-        t('freeFeature4') || "Max 3 résultats par recherche",
-        t('freeFeature5') || "Accès aux catégories de base",
-        t('freeFeature6') || "Itinéraires simples",
+        "3 recherches par jour",
+        "Rayon de recherche jusqu'à 5 km",
+        "Filtre par distance uniquement",
+        "Max 3 résultats par recherche",
+        "Accès aux catégories de base",
+        "Itinéraires simples",
       ],
       limitations: [
-        t('freeLimitation1') || "Pas de filtres par durée",
-        t('freeLimitation2') || "Pas d'itinéraires optimisés",
-        t('freeLimitation3') || "Nombre limité de favoris",
+        "Pas de filtres par durée",
+        "Pas d'itinéraires optimisés",
+        "Nombre limité de favoris",
       ],
-      buttonText: t('startFree'),
+      buttonText: "Commencer gratuitement",
       popular: false,
       link: "/register",
     },
     {
-      name: t('premium'),
+      name: "Premium",
       price: "9,99€/mois",
-      description: t('forRegularUsers'),
+      description: "Pour les utilisateurs réguliers",
       features: [
-        t('premiumFeature1') || "Recherches illimitées",
-        t('premiumFeature2') || "Rayon de recherche jusqu'à 25 km",
-        t('premiumFeature3') || "Filtres avancés (durée et distance)",
-        t('premiumFeature4') || "Jusqu'à 10 résultats par recherche",
-        t('premiumFeature5') || "Toutes les catégories disponibles",
-        t('premiumFeature6') || "Itinéraires optimisés",
-        t('premiumFeature7') || "Favoris illimités",
-        t('premiumFeature8') || "Pas de publicités",
+        "Recherches illimitées",
+        "Rayon de recherche jusqu'à 25 km",
+        "Filtres avancés (durée et distance)",
+        "Jusqu'à 10 résultats par recherche",
+        "Toutes les catégories disponibles",
+        "Itinéraires optimisés",
+        "Favoris illimités",
+        "Pas de publicités",
       ],
       limitations: [
-        t('premiumLimitation1') || "Pas d'analyses détaillées",
-        t('premiumLimitation2') || "Support standard",
+        "Pas d'analyses détaillées",
+        "Support standard",
       ],
-      buttonText: t('try14Days'),
+      buttonText: "Essayer 14 jours",
       popular: true,
       link: "/payment?plan=premium",
     },
     {
-      name: t('pro'),
+      name: "Pro",
       price: "19,99€/mois",
-      description: t('forProfessionals'),
+      description: "Pour les professionnels",
       features: [
-        t('proFeature1') || "Toutes les fonctionnalités Premium",
-        t('proFeature2') || "Rayon de recherche illimité",
-        t('proFeature3') || "Filtres personnalisables",
-        t('proFeature4') || "Résultats illimités par recherche",
-        t('proFeature5') || "API d'accès pour intégration",
-        t('proFeature6') || "Support prioritaire",
-        t('proFeature7') || "Analyses détaillées",
-        t('proFeature8') || "Itinéraires multi-stops avancés",
-        t('proFeature9') || "Personnalisation avancée",
+        "Toutes les fonctionnalités Premium",
+        "Rayon de recherche illimité",
+        "Filtres personnalisables",
+        "Résultats illimités par recherche",
+        "API d'accès pour intégration",
+        "Support prioritaire",
+        "Analyses détaillées",
+        "Itinéraires multi-stops avancés",
+        "Personnalisation avancée",
       ],
       limitations: [],
-      buttonText: t('contactUs'),
+      buttonText: "Nous contacter",
       popular: false,
       link: "/payment?plan=pro",
     },
@@ -80,10 +80,10 @@ const Plan = () => {
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold mb-4 flex items-center justify-center">
             <Map className="mr-2 h-8 w-8" />
-            {t('ourPlans')}
+            Nos Plans
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            {t('choosePlanDesc')}
+            Choisissez le plan qui correspond le mieux à vos besoins
           </p>
         </div>
 
@@ -97,7 +97,7 @@ const Plan = () => {
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0 bg-primary text-white px-4 py-1 text-sm font-medium rounded-bl-lg">
-                  {t('popular')}
+                  Populaire
                 </div>
               )}
               <div className="p-8">
@@ -106,7 +106,7 @@ const Plan = () => {
                 <p className="text-gray-600 mb-6">{plan.description}</p>
                 
                 <div className="mb-6">
-                  <h4 className="font-semibold text-lg mb-2">{t('features')}</h4>
+                  <h4 className="font-semibold text-lg mb-2">Fonctionnalités</h4>
                   <div className="space-y-3">
                     {plan.features.map((feature, idx) => (
                       <div key={idx} className="flex items-center">
@@ -119,7 +119,7 @@ const Plan = () => {
                 
                 {plan.limitations.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="font-semibold text-lg mb-2">{t('limitations')}</h4>
+                    <h4 className="font-semibold text-lg mb-2">Limitations</h4>
                     <div className="space-y-3">
                       {plan.limitations.map((limitation, idx) => (
                         <div key={idx} className="flex items-center">
@@ -149,54 +149,54 @@ const Plan = () => {
         
         <div className="mt-16 space-y-8">
           <div className="bg-white rounded-lg shadow-md p-8 max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-center">{t('filtersComparison')}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center">Comparaison des filtres</h2>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b">
-                    <th className="pb-4 pr-6">{t('feature')}</th>
-                    <th className="pb-4 px-4 text-center">{t('freePlan')}</th>
-                    <th className="pb-4 px-4 text-center">{t('premium')}</th>
-                    <th className="pb-4 px-4 text-center">{t('pro')}</th>
+                    <th className="pb-4 pr-6">Fonctionnalité</th>
+                    <th className="pb-4 px-4 text-center">Gratuit</th>
+                    <th className="pb-4 px-4 text-center">Premium</th>
+                    <th className="pb-4 px-4 text-center">Pro</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b">
-                    <td className="py-3 pr-6 font-medium">{t('searchRadius')}</td>
-                    <td className="py-3 px-4 text-center">{t('upTo5km')}</td>
-                    <td className="py-3 px-4 text-center">{t('upTo25km')}</td>
-                    <td className="py-3 px-4 text-center">{t('unlimited')}</td>
+                    <td className="py-3 pr-6 font-medium">Rayon de recherche</td>
+                    <td className="py-3 px-4 text-center">Jusqu'à 5 km</td>
+                    <td className="py-3 px-4 text-center">Jusqu'à 25 km</td>
+                    <td className="py-3 px-4 text-center">Illimité</td>
                   </tr>
                   <tr className="border-b">
-                    <td className="py-3 pr-6 font-medium">{t('distanceFilter')}</td>
-                    <td className="py-3 px-4 text-center">{t('basic')}</td>
-                    <td className="py-3 px-4 text-center">{t('advanced')}</td>
-                    <td className="py-3 px-4 text-center">{t('customizable')}</td>
+                    <td className="py-3 pr-6 font-medium">Filtre par distance</td>
+                    <td className="py-3 px-4 text-center">Basique</td>
+                    <td className="py-3 px-4 text-center">Avancé</td>
+                    <td className="py-3 px-4 text-center">Personnalisable</td>
                   </tr>
                   <tr className="border-b">
-                    <td className="py-3 pr-6 font-medium">{t('durationFilter')}</td>
-                    <td className="py-3 px-4 text-center">{t('no')}</td>
-                    <td className="py-3 px-4 text-center">{t('upTo2Hours')}</td>
-                    <td className="py-3 px-4 text-center">{t('unlimited')}</td>
+                    <td className="py-3 pr-6 font-medium">Filtre par durée</td>
+                    <td className="py-3 px-4 text-center">Non</td>
+                    <td className="py-3 px-4 text-center">Jusqu'à 2 heures</td>
+                    <td className="py-3 px-4 text-center">Illimité</td>
                   </tr>
                   <tr className="border-b">
-                    <td className="py-3 pr-6 font-medium">{t('resultsNumber')}</td>
-                    <td className="py-3 px-4 text-center">{t('max3')}</td>
-                    <td className="py-3 px-4 text-center">{t('max10')}</td>
-                    <td className="py-3 px-4 text-center">{t('unlimited')}</td>
+                    <td className="py-3 pr-6 font-medium">Nombre de résultats</td>
+                    <td className="py-3 px-4 text-center">Max 3</td>
+                    <td className="py-3 px-4 text-center">Max 10</td>
+                    <td className="py-3 px-4 text-center">Illimité</td>
                   </tr>
                   <tr className="border-b">
-                    <td className="py-3 pr-6 font-medium">{t('multiCriteriaFilters')}</td>
-                    <td className="py-3 px-4 text-center">{t('no')}</td>
-                    <td className="py-3 px-4 text-center">{t('basic')}</td>
-                    <td className="py-3 px-4 text-center">{t('advanced')}</td>
+                    <td className="py-3 pr-6 font-medium">Filtres multi-critères</td>
+                    <td className="py-3 px-4 text-center">Non</td>
+                    <td className="py-3 px-4 text-center">Basique</td>
+                    <td className="py-3 px-4 text-center">Avancé</td>
                   </tr>
                   <tr>
-                    <td className="py-3 pr-6 font-medium">{t('transportModes')}</td>
-                    <td className="py-3 px-4 text-center">{t('modes2')}</td>
-                    <td className="py-3 px-4 text-center">{t('allModes')}</td>
-                    <td className="py-3 px-4 text-center">{t('allModesPlus')}</td>
+                    <td className="py-3 pr-6 font-medium">Modes de transport</td>
+                    <td className="py-3 px-4 text-center">2 modes</td>
+                    <td className="py-3 px-4 text-center">Tous les modes</td>
+                    <td className="py-3 px-4 text-center">Tous les modes+</td>
                   </tr>
                 </tbody>
               </table>
@@ -204,9 +204,9 @@ const Plan = () => {
           </div>
           
           <div className="text-center">
-            <p className="text-gray-600 mb-4">{t('questionsAboutPlans')}</p>
+            <p className="text-gray-600 mb-4">Des questions sur nos plans ?</p>
             <Button asChild variant="outline">
-              <Link to="/contact">{t('contactTeam')}</Link>
+              <Link to="/contact">Contacter notre équipe</Link>
             </Button>
           </div>
         </div>
