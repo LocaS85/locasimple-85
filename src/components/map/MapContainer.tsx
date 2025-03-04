@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -173,7 +172,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       {/* Results Counter */}
       {results.length > 0 && (
         <div className="absolute bottom-4 left-4 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-medium">
-          {results.length} résultats trouvés
+          {results.length} résultat{results.length > 1 ? 's' : ''} trouvé{results.length > 1 ? 's' : ''}
         </div>
       )}
     </div>

@@ -55,8 +55,34 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
     return mockCategories.find(cat => cat.id === selectedCategory)?.name || '';
   };
 
+  const getFilterSummary = () => {
+    const parts = [];
+    
+    if (selectedCategory) {
+      parts.push(getCategoryName());
+    }
+    
+    if (selectedDuration) {
+      parts.push(`${formatDuration(selectedDuration)} en ${getTransportModeName().toLowerCase()}`);
+    } else if (selectedDistance) {
+      parts.push(`${formatDistance()} en ${getTransportModeName().toLowerCase()}`);
+    }
+    
+    if (parts.length === 0) return '';
+    
+    return parts.join(' · ');
+  };
+
   return (
-    <div className="px-0 py-1">
+    <div className="px-2 py-2">
+      {getFilterSummary() && (
+        <div className="mb-2 text-center font-medium text-sm">
+          <span className="bg-black/5 px-3 py-1 rounded-full">
+            {getFilterSummary()}
+          </span>
+        </div>
+      )}
+      
       <div className="flex flex-wrap gap-2 items-center justify-center">
         {selectedCategory && (
           <div className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">

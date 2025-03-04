@@ -31,12 +31,16 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     }
   };
 
+  const placeholderText = isLocationActive 
+    ? "Rechercher autour de ma position..." 
+    : "Rechercher un lieu...";
+
   return (
     <div className="relative w-full max-w-md mx-auto">
       <div className="relative flex items-center w-full bg-white rounded-full border-2 border-black shadow-sm overflow-hidden">
         <Input 
           type="text" 
-          placeholder="Recherche"
+          placeholder={placeholderText}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={handleKeyDown}

@@ -45,31 +45,44 @@ export const useSearchHandler = ({
 }: SearchHandlerProps) => {
   const handleSearch = (query: string = searchQuery) => {
     setLoading(true);
-    console.log(`Searching for: ${query}`);
-    console.log(`Filters: Category: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Duration: ${selectedDuration}min, Transport: ${transportMode}`);
-    console.log(`User location: ${userLocation}`);
+    console.log(`Recherche pour: ${query}`);
+    console.log(`Filtres: Catégorie: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Durée: ${selectedDuration}min, Transport: ${transportMode}`);
+    console.log(`Position: ${userLocation}`);
     
     // Enable route display when search is performed
     setShowRoutes(true);
     setSearchPerformed(true);
     
-    // Use our mock data generator
+    // Use our mock data generator with all filters
     setTimeout(() => {
-      setLoading(false);
-      const mockResults = generateFilteredMockResults(
-        query,
-        userLocation,
-        {
-          category: selectedCategory || undefined,
-          radius: selectedDistance || 5,
-          radiusUnit: distanceUnit,
-          duration: selectedDuration || 15,
-          transportMode
-        },
-        resultsCount
-      );
-      setSearchResults(mockResults);
-      toast.success(`${mockResults.length} résultats trouvés`);
+      try {
+        const mockResults = generateFilteredMockResults(
+          query,
+          userLocation,
+          {
+            category: selectedCategory || undefined,
+            radius: selectedDistance,
+            radiusUnit: distanceUnit,
+            duration: selectedDuration,
+            transportMode
+          },
+          resultsCount
+        );
+        
+        setSearchResults(mockResults);
+        
+        if (mockResults.length === 0) {
+          toast.info('Aucun résultat ne correspond à vos critères. Essayez d\'ajuster vos filtres.');
+        } else {
+          toast.success(`${mockResults.length} résultat${mockResults.length > 1 ? 's' : ''} trouvé${mockResults.length > 1 ? 's' : ''}`);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la recherche:', error);
+        toast.error('Une erreur s\'est produite lors de la recherche');
+        setSearchResults([]);
+      } finally {
+        setLoading(false);
+      }
     }, 1000);
   };
 

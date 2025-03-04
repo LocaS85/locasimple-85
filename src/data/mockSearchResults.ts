@@ -60,6 +60,7 @@ export const generateFilteredMockResults = (
 ): Result[] => {
   // Generate random results within the specified radius
   const radius = filters.radius || 5;
+  const maxDuration = filters.duration || 30;
   const colors = ['blue', 'green', 'red', 'orange', 'purple', 'pink', 'indigo', 'yellow', 'teal'];
   const categoryMap: Record<string, string[]> = {
     'restaurants': ['Restaurant', 'Bistro', 'Café', 'Brasserie'],
@@ -76,12 +77,12 @@ export const generateFilteredMockResults = (
   const categories = Object.keys(categoryMap);
   
   let results: Result[] = [];
-  let actualCount = count;
+  let actualCount = count * 2; // Generate more to have enough after filtering
   
-  // If a category filter is applied, we need to generate more items to ensure we have enough after filtering
-  if (filters.category) {
-    actualCount = Math.min(count * 3, 15); // Generate more but cap at 15 to avoid performance issues
-  }
+  // Determine travel speed based on transport mode (km per minute)
+  const speedFactor = filters.transportMode === 'walking' ? 0.08 : 
+                      filters.transportMode === 'cycling' ? 0.25 : 
+                      filters.transportMode === 'transit' ? 0.5 : 0.8; // driving
   
   for (let i = 0; i < actualCount; i++) {
     // Generate a random point within the radius
@@ -97,20 +98,30 @@ export const generateFilteredMockResults = (
       Math.pow((latitude - location[1]) * 111, 2)
     );
     
+    // Calculate duration based on transport mode
+    const duration = Math.floor(distance / speedFactor);
+    
     // Select a random category or use the one from filters
     const category = filters.category || categories[Math.floor(Math.random() * categories.length)];
     
     // Generate a name based on the category
     const placeTypes = categoryMap[category] || ['Lieu'];
     const placeType = placeTypes[Math.floor(Math.random() * placeTypes.length)];
-    const name = query ? `${query} ${placeType} ${i + 1}` : `${placeType} ${i + 1}`;
+    
+    // Use query as part of the name if provided
+    let name = '';
+    if (query) {
+      name = `${placeType} ${query} ${i + 1}`;
+    } else {
+      name = `${placeType} ${i + 1}`;
+    }
     
     results.push({
       id: `result-${i}`,
       name,
-      address: `${Math.floor(Math.random() * 100) + 1} rue ${query || 'Principale'}, Paris`,
+      address: `${Math.floor(Math.random() * 100) + 1} rue ${category.charAt(0).toUpperCase() + category.slice(1)}, Paris`,
       distance: parseFloat(distance.toFixed(1)),
-      duration: Math.floor(distance * (filters.transportMode === 'walking' ? 12 : 3)),
+      duration,
       category,
       color: colors[i % colors.length],
       latitude,
@@ -120,15 +131,31 @@ export const generateFilteredMockResults = (
     });
   }
   
-  // If a category filter is applied, filter the results
-  if (filters.category) {
-    results = results.filter(result => result.category === filters.category);
-    // Make sure we don't return more than requested
-    results = results.slice(0, count);
-  }
+  // Apply all filters
+  results = results.filter(result => {
+    // Apply category filter if specified
+    if (filters.category && result.category !== filters.category) {
+      return false;
+    }
+    
+    // Apply radius filter
+    if (filters.radius && result.distance > filters.radius) {
+      return false;
+    }
+    
+    // Apply duration filter
+    if (filters.duration && result.duration > filters.duration) {
+      return false;
+    }
+    
+    return true;
+  });
   
   // Sort by distance
   results.sort((a, b) => a.distance - b.distance);
+  
+  // Make sure we don't return more than requested
+  results = results.slice(0, count);
   
   return results;
 };

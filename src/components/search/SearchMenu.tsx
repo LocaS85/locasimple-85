@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CategoriesScroller } from '@/components/search/CategoriesScroller';
 import { FiltersSection } from '@/components/search/FiltersSection';
@@ -134,6 +133,10 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
                 results={searchResults} 
                 onResultClick={onResultClick} 
                 selectedResultId={selectedResultId}
+                selectedCategory={selectedCategory}
+                selectedDuration={selectedDuration}
+                selectedDistance={selectedDistance}
+                transportMode={transportMode}
               />
             </div>
           )}
