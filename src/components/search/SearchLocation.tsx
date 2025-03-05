@@ -1,9 +1,7 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
-import mapboxgl from 'mapbox-gl';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { useAddressSearch } from '@/hooks/useAddressSearch';
 
 interface SearchLocationProps {
   isLocationActive: boolean;
@@ -35,6 +33,18 @@ export const useSearchLocation = (
   setIsLocationActive: (active: boolean) => void,
   setUserLocation: (location: [number, number]) => void
 ) => {
+  const { activateGeolocation } = useGeolocation({
+    setLoading,
+    setIsLocationActive,
+    setUserLocation
+  });
+  
+  const { searchAddress } = useAddressSearch({
+    setLoading,
+    setIsLocationActive,
+    setUserLocation
+  });
+
   const handleLocationClick = () => {
     // If location is already active, toggle it off
     if (isLocationActive) {
@@ -60,141 +70,6 @@ export const useSearchLocation = (
     } else {
       // Permissions API not available, proceed with geolocation directly
       activateGeolocation();
-    }
-  };
-  
-  const activateGeolocation = () => {
-    setIsLocationActive(true);
-    setLoading(true);
-    
-    // Try to use Mapbox geolocate control first for better accuracy
-    if (mapboxgl.supported() && MAPBOX_TOKEN) {
-      try {
-        // Create a temporary map container for the geolocate control
-        const tempContainer = document.createElement('div');
-        tempContainer.style.display = 'none';
-        document.body.appendChild(tempContainer);
-        
-        const tempMap = new mapboxgl.Map({
-          container: tempContainer,
-          style: 'mapbox://styles/mapbox/streets-v11',
-          center: [0, 0],
-          zoom: 1,
-          accessToken: MAPBOX_TOKEN
-        });
-        
-        const geolocate = new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true
-          },
-          trackUserLocation: false
-        });
-        
-        tempMap.addControl(geolocate);
-        
-        tempMap.on('load', () => {
-          toast.info('Recherche de votre position...');
-          geolocate.trigger();
-        });
-        
-        // Listen for position updates
-        geolocate.on('geolocate', (position: GeolocationPosition) => {
-          const { longitude, latitude } = position.coords;
-          setUserLocation([longitude, latitude]);
-          console.log("Mapbox location updated:", position.coords);
-          setLoading(false);
-          toast.success('Position trouvée');
-          
-          // Clean up
-          tempMap.remove();
-          document.body.removeChild(tempContainer);
-        });
-        
-        // Handle errors
-        geolocate.on('error', (error: any) => {
-          console.error('Mapbox geolocation error:', error);
-          // Fall back to browser geolocation
-          useBrowserGeolocation();
-        });
-        
-        return;
-      } catch (error) {
-        console.error('Error with Mapbox geolocation:', error);
-        // Fall back to browser geolocation
-        useBrowserGeolocation();
-      }
-    } else {
-      // Fall back to browser geolocation
-      useBrowserGeolocation();
-    }
-  };
-  
-  const useBrowserGeolocation = () => {
-    if (navigator.geolocation) {
-      toast.info('Autorisation de géolocalisation requise');
-      
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation([position.coords.longitude, position.coords.latitude]);
-          console.log("Browser location updated:", position.coords);
-          setLoading(false);
-          toast.success('Position trouvée');
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          setLoading(false);
-          setIsLocationActive(false);
-          
-          // Show appropriate error message based on error code
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              toast.error('Accès à la localisation refusé');
-              break;
-            case error.POSITION_UNAVAILABLE:
-              toast.error('Position non disponible');
-              break;
-            case error.TIMEOUT:
-              toast.error('Délai de localisation dépassé');
-              break;
-            default:
-              toast.error('Erreur de localisation');
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      setLoading(false);
-      setIsLocationActive(false);
-      toast.error('La géolocalisation n\'est pas prise en charge par votre navigateur');
-    }
-  };
-
-  // New function to search for an address and convert to coordinates
-  const searchAddress = async (address: string) => {
-    if (!address.trim() || !MAPBOX_TOKEN) return;
-    
-    setLoading(true);
-    try {
-      const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${MAPBOX_TOKEN}&limit=1`);
-      const data = await response.json();
-      
-      if (data.features && data.features.length > 0) {
-        const [longitude, latitude] = data.features[0].center;
-        setUserLocation([longitude, latitude]);
-        setIsLocationActive(true);
-        toast.success('Adresse trouvée');
-      } else {
-        toast.error('Adresse non trouvée');
-      }
-    } catch (error) {
-      console.error('Error searching address:', error);
-      toast.error('Erreur lors de la recherche d\'adresse');
-    } finally {
-      setLoading(false);
     }
   };
 
