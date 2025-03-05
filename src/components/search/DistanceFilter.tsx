@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { Navigation } from 'lucide-react';
 
 interface DistanceFilterProps {
   selectedDistance: number | null;
@@ -42,7 +43,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
 
   // Format distance for display
   const formatSelectedDistance = () => {
-    if (!selectedDistance) return t('distance');
+    if (!selectedDistance) return "";
     
     if (selectedDistance < 1) {
       // Convert to meters
@@ -66,8 +67,12 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
               : "border-black bg-gray-50 text-black hover:bg-gray-100"
           } justify-between`}
         >
-          <span className="text-xs">{formatSelectedDistance()}</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs">{t('distance')}:</span>
+            <span className="text-xs font-medium">{formatSelectedDistance() || "-"}</span>
+          </div>
           <div className="flex items-center">
+            <Navigation className="h-3 w-3 mr-1" />
             <Tabs 
               value={distanceUnit} 
               onValueChange={(value) => onDistanceUnitChange(value as 'km' | 'miles')} 

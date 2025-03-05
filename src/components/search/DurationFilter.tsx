@@ -42,7 +42,7 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
 
   // Format duration for display
   const formatSelectedDuration = () => {
-    if (!selectedDuration) return t('duration');
+    if (!selectedDuration) return "";
     
     if (selectedDuration < 60) {
       return `${selectedDuration} min`;
@@ -64,7 +64,10 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
         <Button 
           className={`w-full rounded-full border text-xs h-7 px-2 ${getButtonColor()} justify-between`}
         >
-          <span className="text-xs">{formatSelectedDuration()}</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs">{t('duration')}:</span>
+            <span className="text-xs font-medium">{formatSelectedDuration() || "-"}</span>
+          </div>
           <Clock className="h-3 w-3 ml-1" />
         </Button>
       </PopoverTrigger>
