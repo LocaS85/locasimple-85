@@ -33,6 +33,7 @@ export const useMapInitialization = ({
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   const map = useRef<mapboxgl.Map | null>(null);
   const initializingRef = useRef(false);
+  const navigationControlRef = useRef<mapboxgl.NavigationControl | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -56,6 +57,8 @@ export const useMapInitialization = ({
         return;
       }
       
+      console.log('Initializing map with token:', MAPBOX_TOKEN);
+      
       // Initialiser la carte avec des paramètres de base
       map.current = new mapboxgl.Map({
         container: container.current,
@@ -73,14 +76,16 @@ export const useMapInitialization = ({
           setIsMapInitialized(true);
           initializingRef.current = false;
           
-          // Ajouter les contrôles de navigation
-          // Fix: Create an instance of NavigationControl before adding it
+          // Create a NavigationControl instance and store it in ref
+          navigationControlRef.current = new mapboxgl.NavigationControl({
+            showCompass: true,
+            showZoom: true,
+            visualizePitch: true
+          });
+          
+          // Add the navigation control to the map
           map.current.addControl(
-            new mapboxgl.NavigationControl({
-              showCompass: true,
-              showZoom: true,
-              visualizePitch: true
-            }),
+            navigationControlRef.current,
             'top-right'
           );
           
@@ -116,6 +121,7 @@ export const useMapInitialization = ({
         }
         map.current = null;
       }
+      navigationControlRef.current = null;
       initializingRef.current = false;
     };
   }, [container, center, isMapInitialized, mapStyle]);
@@ -149,9 +155,25 @@ export const useMapInitialization = ({
       map.current.once('style.load', () => {
         if (map.current) {
           // Réajouter les contrôles si nécessaire après changement de style
-          if (!map.current.hasControl(new mapboxgl.NavigationControl())) {
+          if (navigationControlRef.current) {
+            // First check if we need to remove existing control
+            try {
+              map.current.removeControl(navigationControlRef.current);
+            } catch (e) {
+              // It's fine if this fails, it might not be attached yet
+              console.log("Navigation control couldn't be removed, may not be attached");
+            }
+            
+            // Add fresh navigation control
             map.current.addControl(
-              new mapboxgl.NavigationControl(),
+              navigationControlRef.current,
+              'top-right'
+            );
+          } else {
+            // Create a new one if needed
+            navigationControlRef.current = new mapboxgl.NavigationControl();
+            map.current.addControl(
+              navigationControlRef.current,
               'top-right'
             );
           }

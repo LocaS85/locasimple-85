@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import RouteLayer from './RouteLayer';
 import type { Result } from '../ResultsList';
 import { MAPBOX_TOKEN } from '@/config/environment';
+import { toast } from 'sonner';
 
 interface MapMarkersProps {
   map: mapboxgl.Map | null;
@@ -45,28 +46,44 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     return colorMap[color] || '#3b82f6';
   };
   
-  // Vérifier quand la carte est réellement prête à recevoir des marqueurs
+  // Check when the map is actually ready to receive markers
   useEffect(() => {
     if (!map) return;
     
     const checkMapReady = () => {
       if (map.isStyleLoaded() && map.getContainer()) {
+        console.log("Map is ready for markers");
         setMapReady(true);
       } else {
+        console.log("Map not ready yet, waiting...");
         setTimeout(checkMapReady, 100);
       }
     };
     
-    map.on('load', checkMapReady);
+    const handleStyleLoad = () => {
+      console.log("Style loaded event triggered");
+      checkMapReady();
+    };
+    
+    map.on('load', handleStyleLoad);
+    map.on('style.load', handleStyleLoad);
+    
+    // Initial check
     checkMapReady();
     
     return () => {
-      map.off('load', checkMapReady);
+      map.off('load', handleStyleLoad);
+      map.off('style.load', handleStyleLoad);
     };
   }, [map]);
   
   useEffect(() => {
-    if (!map || !mapReady) return;
+    if (!map || !mapReady) {
+      console.log("Map not ready for markers yet");
+      return;
+    }
+
+    console.log(`Adding ${results.length} markers to map`);
 
     // Clear existing markers and popups
     markersRef.current.forEach(marker => marker.remove());
@@ -91,13 +108,8 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
         el.style.height = '36px';
         el.style.transform = isSelected ? 'scale(1.2)' : 'scale(1)';
         
-        // Add popup with details
-        const popup = new mapboxgl.Popup({ 
-          offset: 25, 
-          closeButton: false,
-          className: isSelected ? 'active-popup' : ''
-        })
-        .setHTML(`
+        // Create popup content
+        const popupContent = `
           <div class="p-2 max-w-64">
             <h3 class="font-bold text-sm">${result.name}</h3>
             <p class="text-xs text-gray-500">${result.address}</p>
@@ -112,33 +124,47 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
               <span class="text-xs">${result.rating}</span>
             </div>` : ''}
           </div>
-        `);
+        `;
 
+        // Create popup but don't add it yet
+        const popup = new mapboxgl.Popup({ 
+          offset: 25, 
+          closeButton: false,
+          className: isSelected ? 'active-popup' : ''
+        })
+        .setHTML(popupContent);
+
+        // Create and add marker
         const marker = new mapboxgl.Marker(el)
           .setLngLat([result.longitude, result.latitude])
-          .setPopup(popup)
           .addTo(map);
+          
+        // Store popup in marker so we can access it later
+        marker.setPopup(popup);
         
-        // Ne pas ajouter le popup automatiquement - c'était la source du problème
-        // Afficher le popup uniquement lors du clic
+        // Add click event to marker to show popup
         el.addEventListener('click', (e) => {
           e.stopPropagation();
           
-          // Fermer tous les autres popups
-          popupsRef.current.forEach(p => p.remove());
-          
-          // Sécurité supplémentaire pour vérifier que la carte est accessible
-          if (map && map.getContainer()) {
-            try {
-              // Utiliser une approche plus sûre pour montrer le popup
+          try {
+            // Hide all other popups
+            markersRef.current.forEach(m => {
+              if (m !== marker && m.getPopup().isOpen()) {
+                m.getPopup().remove();
+              }
+            });
+            
+            // Toggle this popup
+            if (!marker.getPopup().isOpen()) {
               marker.togglePopup();
-            } catch (error) {
-              console.error("Error showing popup:", error);
             }
-          }
-          
-          if (onResultClick) {
-            onResultClick(result);
+            
+            // Call the result click handler
+            if (onResultClick) {
+              onResultClick(result);
+            }
+          } catch (error) {
+            console.error("Error handling marker click:", error);
           }
         });
 
@@ -152,6 +178,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     // Fit bounds to show all markers if there are any
     if (results.length > 0) {
       try {
+        console.log("Fitting bounds to show all markers");
         const bounds = new mapboxgl.LngLatBounds();
         bounds.extend(center);
         results.forEach(result => {
@@ -165,6 +192,23 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
 
     if (onMarkersReady) {
       onMarkersReady();
+    }
+    
+    // Show popup for the selected result
+    if (selectedResultId) {
+      const selectedMarker = markersRef.current.find((_, i) => 
+        results[i].id === selectedResultId
+      );
+      
+      if (selectedMarker && !selectedMarker.getPopup().isOpen()) {
+        try {
+          setTimeout(() => {
+            selectedMarker.togglePopup();
+          }, 300);
+        } catch (error) {
+          console.error("Error showing popup for selected result:", error);
+        }
+      }
     }
   }, [map, mapReady, results, center, onMarkersReady, selectedResultId, onResultClick]);
 
