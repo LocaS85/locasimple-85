@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Layers } from 'lucide-react';
+import { Layers, Map as MapIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { mockCategories } from '@/data/mockCategories';
 import MapStyleSelector, { MapStyle } from './MapStyleSelector';
@@ -28,14 +28,13 @@ const MapControls: React.FC<MapControlsProps> = ({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            size="sm"
-            className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3 w-[120px]"
+            size="icon"
+            className="bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center h-10 w-10 rounded-sm border-gray-300"
           >
             {selectedCategory ? 
               mockCategories.find(c => c.id === selectedCategory)?.icon : 
-              <Layers className="h-4 w-4" />
+              <Layers className="h-5 w-5" />
             }
-            <span>Catégorie</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-2" align="end">
@@ -63,11 +62,19 @@ const MapControls: React.FC<MapControlsProps> = ({
         </PopoverContent>
       </Popover>
       
-      {/* Map Style Selector */}
-      <MapStyleSelector 
-        onStyleChange={onStyleChange}
-        currentStyle={mapStyle}
-      />
+      {/* Map Style Button */}
+      <Button
+        variant="outline"
+        size="icon"
+        className="bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center h-10 w-10 rounded-sm border-gray-300"
+        onClick={() => {
+          const nextStyle = mapStyle === 'streets' ? 'satellite' :
+                           mapStyle === 'satellite' ? 'terrain' : 'streets';
+          onStyleChange(nextStyle);
+        }}
+      >
+        <MapIcon className="h-5 w-5" />
+      </Button>
     </div>
   );
 };

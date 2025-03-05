@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Map, Layers, Mountain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,11 +33,10 @@ export const MapStyleSelector: React.FC<MapStyleSelectorProps> = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3 w-[120px]"
+          size="icon"
+          className="bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center h-10 w-10 rounded-sm border-gray-300"
         >
           {currentStyleObj.icon}
-          <span>{currentStyleObj.name}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { SearchInput } from '../search/SearchInput';
 import type { Result } from '../ResultsList';

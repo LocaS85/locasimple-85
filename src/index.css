@@ -161,3 +161,8 @@
 .mapboxgl-ctrl-top-right .mapboxgl-ctrl-group {
   height: 95px;
 }
+
+/* Custom style for square buttons */
+.rounded-sm {
+  border-radius: 2px !important;
+}
