@@ -207,17 +207,18 @@ const MapContainer: React.FC<MapContainerProps> = ({
         />
       </div>
       
-      {/* Category Button */}
-      <div className="absolute top-20 right-24 z-10">
+      {/* Control buttons - stacked vertically */}
+      <div className="absolute top-20 right-4 z-10 flex flex-col gap-2">
+        {/* Category Button */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3"
+              className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3 w-[120px]"
             >
               <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">Catégorie</span>
+              <span>Catégorie</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 p-2" align="end">
@@ -244,13 +245,13 @@ const MapContainer: React.FC<MapContainerProps> = ({
             </div>
           </PopoverContent>
         </Popover>
+        
+        {/* Map Style Selector - now below the category button */}
+        <MapStyleSelector 
+          onStyleChange={handleStyleChange}
+          currentStyle={mapStyle}
+        />
       </div>
-      
-      {/* Map Style Selector */}
-      <MapStyleSelector 
-        onStyleChange={handleStyleChange}
-        currentStyle={mapStyle}
-      />
       
       {isMapInitialized && map.current && (
         <>

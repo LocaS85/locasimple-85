@@ -29,32 +29,30 @@ export const MapStyleSelector: React.FC<MapStyleSelectorProps> = ({
   const currentStyleObj = MAP_STYLES.find(style => style.id === currentStyle) || MAP_STYLES[0];
 
   return (
-    <div className="absolute top-20 right-4 z-10">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3 w-[120px]"
+        >
+          {currentStyleObj.icon}
+          <span>{currentStyleObj.name}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {MAP_STYLES.map((style) => (
+          <DropdownMenuItem
+            key={style.id}
+            onClick={() => onStyleChange(style.id as MapStyle)}
+            className="flex items-center gap-2"
           >
-            {currentStyleObj.icon}
-            <span className="hidden sm:inline">{currentStyleObj.name}</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {MAP_STYLES.map((style) => (
-            <DropdownMenuItem
-              key={style.id}
-              onClick={() => onStyleChange(style.id as MapStyle)}
-              className="flex items-center gap-2"
-            >
-              {style.icon}
-              <span>{style.name}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            {style.icon}
+            <span>{style.name}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
