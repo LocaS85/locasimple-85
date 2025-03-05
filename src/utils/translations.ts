@@ -1,4 +1,3 @@
-
 export const translations = {
   'fr': {
     // Navigation
@@ -89,5 +88,50 @@ export const translations = {
     'cancel': 'Cancel',
     'confirmDelete': 'Yes, Delete My Account',
     'accountDeleted': 'Your account has been successfully deleted'
+  },
+  'de': {
+    // Navigation
+    'back': 'Zurück',
+    'backToHome': 'Zurück zur Startseite',
+    'search': 'Suchen',
+    
+    // Profile
+    'myProfile': 'Mein Profil',
+    'updatePersonalInfo': 'Aktualisieren Sie Ihre persönlichen Informationen',
+    'profile': 'Profil',
+    'favorites': 'Favoriten',
+    'history': 'Verlauf',
+    'personalInfo': 'Persönliche Informationen',
+    'firstName': 'Vorname',
+    'lastName': 'Nachname',
+    'email': 'E-Mail',
+    'phone': 'Telefon',
+    'postalAddress': 'Postanschrift',
+    'postalCode': 'Postleitzahl',
+    'city': 'Stadt',
+    'saveChanges': 'Änderungen speichern',
+    'changesSaved': 'Änderungen erfolgreich gespeichert',
+    
+    // Favorites
+    'favoritesDescription': 'Ihre Lieblingsorte',
+    'noFavorites': 'Keine Favoriten',
+    'noFavoritesDescription': 'Sie haben noch keine Favoriten hinzugefügt',
+    'searchPlaces': 'Orte suchen',
+    
+    // History
+    'searchHistory': 'Suchverlauf',
+    'searchHistoryDescription': 'Ihre letzten Suchen',
+    'daysAgo': 'Vor',
+    'day': 'Tag',
+    'days': 'Tagen',
+    
+    // Danger Zone
+    'dangerZone': 'Gefahrenzone',
+    'deleteAccount': 'Mein Konto löschen',
+    'deleteConfirmTitle': 'Sind Sie sicher?',
+    'deleteConfirmDescription': 'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto und alle zugehörigen Daten dauerhaft löschen.',
+    'cancel': 'Abbrechen',
+    'confirmDelete': 'Ja, mein Konto löschen',
+    'accountDeleted': 'Ihr Konto wurde erfolgreich gelöscht'
   }
 };
