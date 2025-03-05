@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -6,6 +7,7 @@ import MapMarkers from './MapMarkers';
 import { SearchInput } from '../search/SearchInput';
 import type { Result } from '../ResultsList';
 import { MAPBOX_TOKEN } from '@/config/environment';
+import MapStyleSelector, { MapStyle } from './MapStyleSelector';
 
 interface MapContainerProps {
   results: Result[];
@@ -28,6 +30,13 @@ interface MapContainerProps {
   selectedResultId?: string;
   onResultClick?: (result: Result) => void;
 }
+
+// Map style URLs for Mapbox
+const MAP_STYLE_URLS = {
+  streets: 'mapbox://styles/mapbox/streets-v12',
+  satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
+  terrain: 'mapbox://styles/mapbox/outdoors-v12'
+};
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
   results, 
@@ -54,6 +63,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const centerMarker = useRef<mapboxgl.Marker | null>(null);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
+  const [mapStyle, setMapStyle] = useState<MapStyle>('streets');
   
   useEffect(() => {
     if (!mapContainer.current || isMapInitialized) return;
@@ -63,7 +73,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
+        style: MAP_STYLE_URLS[mapStyle],
         center: center,
         zoom: 13,
       });
@@ -79,7 +89,13 @@ const MapContainer: React.FC<MapContainerProps> = ({
     } catch (error) {
       console.error('Error initializing map:', error);
     }
-  }, [mapContainer, center, isMapInitialized]);
+  }, [mapContainer, center, isMapInitialized, mapStyle]);
+
+  // Update map style when it changes
+  useEffect(() => {
+    if (!map.current || !isMapInitialized) return;
+    map.current.setStyle(MAP_STYLE_URLS[mapStyle]);
+  }, [mapStyle, isMapInitialized]);
 
   // Update center when coordinates change
   useEffect(() => {
@@ -120,6 +136,11 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }
   }, [center, isMapInitialized, isLocationActive]);
 
+  // Handle map style change
+  const handleStyleChange = (newStyle: MapStyle) => {
+    setMapStyle(newStyle);
+  };
+
   useEffect(() => {
     return () => {
       map.current?.remove();
@@ -143,6 +164,12 @@ const MapContainer: React.FC<MapContainerProps> = ({
           onSearch={onSearch}
         />
       </div>
+      
+      {/* Map Style Selector */}
+      <MapStyleSelector 
+        onStyleChange={handleStyleChange}
+        currentStyle={mapStyle}
+      />
       
       {isMapInitialized && map.current && (
         <>
@@ -171,7 +198,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
       
       {/* Results Counter */}
       {results.length > 0 && (
-        <div className="absolute bottom-4 left-4 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-medium">
+        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md text-sm font-medium">
           {results.length} résultat{results.length > 1 ? 's' : ''} trouvé{results.length > 1 ? 's' : ''}
         </div>
       )}
