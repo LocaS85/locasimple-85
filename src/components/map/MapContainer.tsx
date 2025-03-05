@@ -132,6 +132,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         onStyleChange={handleStyleChange}
         selectedCategory={selectedCategory}
         onCategorySelect={onCategorySelect}
+        map={map} // Pass the map instance to MapControls
       />
       
       {isMapInitialized && map && (

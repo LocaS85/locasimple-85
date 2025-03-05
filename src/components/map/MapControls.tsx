@@ -6,20 +6,44 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { mockCategories } from '@/data/mockCategories';
 import { cn } from '@/lib/utils';
 import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
+import mapboxgl from 'mapbox-gl';
 
 interface MapControlsProps {
   mapStyle: string;
   onStyleChange: (style: string) => void;
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
+  map: mapboxgl.Map | null; // Add map instance prop
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
   mapStyle,
   onStyleChange,
   selectedCategory,
-  onCategorySelect
+  onCategorySelect,
+  map
 }) => {
+  // Function to handle zoom in
+  const handleZoomIn = () => {
+    if (map) {
+      map.zoomIn();
+    }
+  };
+
+  // Function to handle zoom out
+  const handleZoomOut = () => {
+    if (map) {
+      map.zoomOut();
+    }
+  };
+
+  // Function to reset bearing to north
+  const handleResetNorth = () => {
+    if (map) {
+      map.resetNorth();
+    }
+  };
+
   return (
     <div className="absolute top-10 right-0 z-10 flex flex-col mr-4">
       {/* Custom Map Control Group */}
@@ -29,11 +53,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           variant="outline"
           size="icon"
           className="map-ctrl-btn"
-          onClick={() => {
-            // Find the mapbox zoom in button and click it
-            const zoomInBtn = document.querySelector('.mapboxgl-ctrl-zoom-in') as HTMLButtonElement;
-            if (zoomInBtn) zoomInBtn.click();
-          }}
+          onClick={handleZoomIn}
         >
           <Plus className="h-4 w-4" />
         </Button>
@@ -43,11 +63,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           variant="outline"
           size="icon"
           className="map-ctrl-btn"
-          onClick={() => {
-            // Find the mapbox zoom out button and click it
-            const zoomOutBtn = document.querySelector('.mapboxgl-ctrl-zoom-out') as HTMLButtonElement;
-            if (zoomOutBtn) zoomOutBtn.click();
-          }}
+          onClick={handleZoomOut}
         >
           <Minus className="h-4 w-4" />
         </Button>
@@ -57,11 +73,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           variant="outline"
           size="icon"
           className="map-ctrl-btn"
-          onClick={() => {
-            // Find the mapbox compass button and click it
-            const compassBtn = document.querySelector('.mapboxgl-ctrl-compass') as HTMLButtonElement;
-            if (compassBtn) compassBtn.click();
-          }}
+          onClick={handleResetNorth}
         >
           <svg viewBox="0 0 20 20" className="h-4 w-4">
             <polygon points="6,9 10,1 14,9" />
