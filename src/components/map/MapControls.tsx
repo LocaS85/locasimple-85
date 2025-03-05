@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { mockCategories } from '@/data/mockCategories';
 import MapStyleSelector, { MapStyle } from './MapStyleSelector';
@@ -31,7 +31,10 @@ const MapControls: React.FC<MapControlsProps> = ({
             size="sm"
             className="bg-white/90 backdrop-blur-sm shadow-md flex items-center gap-2 h-9 px-3 w-[120px]"
           >
-            <MapPin className="h-4 w-4" />
+            {selectedCategory ? 
+              mockCategories.find(c => c.id === selectedCategory)?.icon : 
+              <Layers className="h-4 w-4" />
+            }
             <span>Catégorie</span>
           </Button>
         </PopoverTrigger>
@@ -51,8 +54,8 @@ const MapControls: React.FC<MapControlsProps> = ({
                   )}
                   onClick={() => onCategorySelect(category.id === selectedCategory ? null : category.id)}
                 >
-                  <MapPin className="h-3 w-3 mr-1" />
-                  <span>{category.name}</span>
+                  {category.icon}
+                  <span className="ml-1">{category.name}</span>
                 </Button>
               );
             })}

@@ -31,7 +31,19 @@ export const CategoriesFilter: React.FC<CategoriesFilterProps> = ({
               : "border-black bg-white text-black hover:bg-gray-50"
           } justify-between`}
         >
-          <span>{selectedCategory ? mockCategories.find(c => c.id === selectedCategory)?.name : t('categories')}</span>
+          <div className="flex items-center gap-1">
+            {selectedCategory ? (
+              <>
+                {mockCategories.find(c => c.id === selectedCategory)?.icon}
+                <span>{mockCategories.find(c => c.id === selectedCategory)?.name}</span>
+              </>
+            ) : (
+              <>
+                <Layers className="h-4 w-4" />
+                <span>{t('categories')}</span>
+              </>
+            )}
+          </div>
           <ArrowRight className="h-3 w-3 ml-1" />
         </Button>
       </PopoverTrigger>
