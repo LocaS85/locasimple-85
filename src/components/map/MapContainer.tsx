@@ -8,6 +8,7 @@ import { MapStyle } from './MapStyleSelector';
 import MapControls from './MapControls';
 import MapResults from './MapResults';
 import useMapInitialization from '@/hooks/useMapInitialization';
+import useMarkerManagement from '@/hooks/useMarkerManagement';
 
 interface MapContainerProps {
   results: Result[];
@@ -70,11 +71,23 @@ const MapContainer: React.FC<MapContainerProps> = ({
     center,
     mapStyle
   });
+  
+  // Use custom hook for marker management
+  const { 
+    centerMarker,
+    updateMarkerPosition
+  } = useMarkerManagement({
+    map,
+    center,
+    isMapInitialized,
+    isLocationActive
+  });
 
-  // Update map center when coordinates change
+  // Update map center and marker when coordinates change
   useEffect(() => {
-    updateMapCenter(center, isLocationActive);
-  }, [center, isLocationActive, updateMapCenter]);
+    updateMapCenter(center);
+    updateMarkerPosition(center, isLocationActive);
+  }, [center, isLocationActive, updateMapCenter, updateMarkerPosition]);
 
   // Handle map style change
   const handleStyleChange = (newStyle: MapStyle) => {

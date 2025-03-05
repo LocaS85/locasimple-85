@@ -20,8 +20,7 @@ interface UseMapInitializationOptions {
 interface UseMapInitializationResult {
   map: mapboxgl.Map | null;
   isMapInitialized: boolean;
-  centerMarker: mapboxgl.Marker | null;
-  updateMapCenter: (center: [number, number], isLocationActive: boolean) => void;
+  updateMapCenter: (center: [number, number]) => void;
   updateMapStyle: (newStyle: MapStyle) => void;
 }
 
@@ -32,7 +31,6 @@ export const useMapInitialization = ({
 }: UseMapInitializationOptions): UseMapInitializationResult => {
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   const map = useRef<mapboxgl.Map | null>(null);
-  const centerMarker = useRef<mapboxgl.Marker | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -63,18 +61,11 @@ export const useMapInitialization = ({
     // Cleanup
     return () => {
       map.current?.remove();
-      centerMarker.current?.remove();
     };
   }, [container, center, isMapInitialized, mapStyle]);
 
-  // Update map style
-  const updateMapStyle = (newStyle: MapStyle) => {
-    if (!map.current || !isMapInitialized) return;
-    map.current.setStyle(MAP_STYLE_URLS[newStyle]);
-  };
-
-  // Update map center and marker
-  const updateMapCenter = (newCenter: [number, number], isLocationActive: boolean) => {
+  // Update map center
+  const updateMapCenter = (newCenter: [number, number]) => {
     if (!map.current || !isMapInitialized) return;
     
     // Update map center
@@ -85,37 +76,17 @@ export const useMapInitialization = ({
       curve: 1,
       essential: true
     });
-    
-    // Add or update center marker if location is active
-    if (isLocationActive) {
-      if (centerMarker.current) {
-        centerMarker.current.setLngLat(newCenter);
-      } else {
-        // Create a custom marker element
-        const markerEl = document.createElement('div');
-        markerEl.className = 'center-marker';
-        markerEl.innerHTML = `
-          <div class="relative">
-            <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
-            <div class="absolute -inset-2 bg-blue-500 rounded-full opacity-30 animate-ping"></div>
-          </div>
-        `;
-        
-        centerMarker.current = new mapboxgl.Marker(markerEl)
-          .setLngLat(newCenter)
-          .addTo(map.current);
-      }
-    } else if (centerMarker.current) {
-      // Remove center marker if location is not active
-      centerMarker.current.remove();
-      centerMarker.current = null;
-    }
+  };
+
+  // Update map style
+  const updateMapStyle = (newStyle: MapStyle) => {
+    if (!map.current || !isMapInitialized) return;
+    map.current.setStyle(MAP_STYLE_URLS[newStyle]);
   };
 
   return {
     map: map.current,
     isMapInitialized,
-    centerMarker: centerMarker.current,
     updateMapCenter,
     updateMapStyle
   };
