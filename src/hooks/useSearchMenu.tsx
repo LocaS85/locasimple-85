@@ -40,6 +40,11 @@ export const useSearchMenu = () => {
     }
   };
 
+  // Ajout d'une fonction pour basculer l'état du menu quand on clique sur la barre
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return {
     menuOpen,
     setMenuOpen,
@@ -51,7 +56,8 @@ export const useSearchMenu = () => {
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
-    handleMapInteraction
+    handleMapInteraction,
+    toggleMenu
   };
 };
 
