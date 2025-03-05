@@ -151,3 +151,9 @@
 .mapboxgl-canvas {
   outline: none;
 }
+
+/* Ensure controls don't overlap */
+.mapboxgl-ctrl-bottom-right {
+  bottom: 100px !important;
+}
+
