@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { Result } from './ResultsList';
 import MapContainer from './map/MapContainer';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapProps {
   results: Result[];
@@ -53,10 +54,12 @@ const Map = ({
   onCategorySelect = () => {}
 }: MapProps) => {
   // Verify that we have a Mapbox token
-  React.useEffect(() => {
+  useEffect(() => {
     if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
       toast.error('Mapbox token manquant. Veuillez configurer votre token dans le fichier .env.');
       console.error('Mapbox token is missing or empty');
+    } else {
+      console.log('Map component initialized with Mapbox token');
     }
   }, []);
 

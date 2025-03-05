@@ -12,10 +12,10 @@ export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ||
 
 // Verify and log Mapbox token status
 if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
-  console.warn('MAPBOX_TOKEN is missing. Map functionality may not work properly.');
-  console.warn('Please set the VITE_MAPBOX_TOKEN environment variable in a .env file');
+  console.error('MAPBOX_TOKEN is missing. Map functionality will not work properly.');
+  console.error('Please set the VITE_MAPBOX_TOKEN environment variable in a .env file');
 } else {
-  console.log('MAPBOX_TOKEN is configured');
+  console.log('MAPBOX_TOKEN is configured:', MAPBOX_TOKEN.substring(0, 10) + '...');
 }
 
 // Supabase configuration (if used)

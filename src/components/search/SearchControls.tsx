@@ -46,6 +46,15 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
   selectedCategory,
   onCategorySelect
 }) => {
+  // Log for debugging
+  React.useEffect(() => {
+    console.log('SearchControls rendered with:', {
+      resultsCount: searchResults.length,
+      userLocation,
+      isLocationActive
+    });
+  }, [searchResults, userLocation, isLocationActive]);
+
   return (
     <div className="absolute inset-0">
       <Map 

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import type { MapStyle } from '@/components/map/MapStyleSelector';
@@ -38,7 +38,7 @@ export const useMapInitialization = ({
 
   // Initialize map
   useEffect(() => {
-    if (!container.current || isMapInitialized || initializingRef.current || initializationAttempted) return;
+    if (!container.current || initializingRef.current || (map.current && isMapInitialized)) return;
 
     try {
       // Verify token
@@ -50,6 +50,7 @@ export const useMapInitialization = ({
       }
       
       initializingRef.current = true;
+      console.log('Setting Mapbox access token...');
       mapboxgl.accessToken = MAPBOX_TOKEN;
       
       // Verify container
@@ -60,22 +61,31 @@ export const useMapInitialization = ({
         return;
       }
       
-      console.log('Initializing map with token:', MAPBOX_TOKEN);
+      console.log('Initializing map with center:', center);
       
       // Initialize map with basic parameters
-      map.current = new mapboxgl.Map({
-        container: container.current,
-        style: MAP_STYLE_URLS[mapStyle],
-        center: center,
-        zoom: 13,
-        trackResize: true,
-        attributionControl: false,
-        preserveDrawingBuffer: true
-      });
+      try {
+        map.current = new mapboxgl.Map({
+          container: container.current,
+          style: MAP_STYLE_URLS[mapStyle],
+          center: center,
+          zoom: 13,
+          trackResize: true,
+          attributionControl: false,
+          preserveDrawingBuffer: true
+        });
+      } catch (error) {
+        console.error('Error creating Mapbox map:', error);
+        toast.error('Erreur lors de la création de la carte');
+        initializingRef.current = false;
+        setInitializationAttempted(true);
+        return;
+      }
 
       // Wait for style load before considering map initialized
       map.current.on('style.load', () => {
         if (map.current && map.current.getContainer()) {
+          console.log('Map style loaded successfully');
           setIsMapInitialized(true);
           initializingRef.current = false;
           setInitializationAttempted(true);
@@ -128,11 +138,11 @@ export const useMapInitialization = ({
       navigationControlRef.current = null;
       initializingRef.current = false;
     };
-  }, [container, center, isMapInitialized, mapStyle, initializationAttempted]);
+  }, [container, center, mapStyle]);
 
   // Function to update map center
-  const updateMapCenter = (newCenter: [number, number]) => {
-    if (!map.current || !isMapInitialized || !map.current.getContainer()) return;
+  const updateMapCenter = useCallback((newCenter: [number, number]) => {
+    if (!map.current || !isMapInitialized) return;
     
     try {
       // Update map center with smooth animation
@@ -146,11 +156,11 @@ export const useMapInitialization = ({
     } catch (error) {
       console.error('Error updating map center:', error);
     }
-  };
+  }, [isMapInitialized]);
 
   // Function to update map style
-  const updateMapStyle = (newStyle: MapStyle) => {
-    if (!map.current || !isMapInitialized || !map.current.getContainer()) return;
+  const updateMapStyle = useCallback((newStyle: MapStyle) => {
+    if (!map.current || !isMapInitialized) return;
     
     try {
       // Update map style
@@ -186,7 +196,7 @@ export const useMapInitialization = ({
       console.error('Error updating map style:', error);
       toast.error('Erreur lors du changement de style de carte');
     }
-  };
+  }, [isMapInitialized]);
 
   return {
     map: map.current,
