@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { SearchInput } from '../search/SearchInput';
 import type { Result } from '../ResultsList';
@@ -71,7 +72,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
   } = useMapInitialization({
     container: mapContainer,
     center,
-    mapStyle
+    mapStyle,
+    disableNavControls: true // Disable Mapbox built-in nav controls
   });
   
   // Use custom hook for marker management

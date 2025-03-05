@@ -16,6 +16,7 @@ interface UseMapInitializationOptions {
   container: React.RefObject<HTMLDivElement>;
   center: [number, number];
   mapStyle: MapStyle;
+  disableNavControls?: boolean;
 }
 
 interface UseMapInitializationResult {
@@ -28,7 +29,8 @@ interface UseMapInitializationResult {
 export const useMapInitialization = ({
   container,
   center,
-  mapStyle
+  mapStyle,
+  disableNavControls = false
 }: UseMapInitializationOptions): UseMapInitializationResult => {
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -90,17 +92,22 @@ export const useMapInitialization = ({
           initializingRef.current = false;
           setInitializationAttempted(true);
           
-          // Create NavigationControl instance
-          const navControl = new mapboxgl.NavigationControl({
-            showCompass: true,
-            showZoom: true,
-            visualizePitch: true
-          });
+          // Only add navigation controls if not disabled
+          if (!disableNavControls) {
+            // Create NavigationControl instance
+            const navControl = new mapboxgl.NavigationControl({
+              showCompass: true,
+              showZoom: true,
+              visualizePitch: true
+            });
+            
+            navigationControlRef.current = navControl;
+            
+            // Add controls to map
+            map.current.addControl(navControl, 'top-right');
+          }
           
-          navigationControlRef.current = navControl;
-          
-          // Add controls to map
-          map.current.addControl(navControl, 'top-right');
+          // Always add attribution control
           map.current.addControl(
             new mapboxgl.AttributionControl({ compact: true }),
             'bottom-right'
@@ -138,7 +145,7 @@ export const useMapInitialization = ({
       navigationControlRef.current = null;
       initializingRef.current = false;
     };
-  }, [container, center, mapStyle]);
+  }, [container, center, mapStyle, disableNavControls]);
 
   // Function to update map center
   const updateMapCenter = useCallback((newCenter: [number, number]) => {
@@ -169,26 +176,32 @@ export const useMapInitialization = ({
       // Re-attach style.load event handler
       map.current.once('style.load', () => {
         if (map.current && map.current.getContainer()) {
-          // Add new controls after style change
+          // Add new controls after style change only if not disabled
+          if (!disableNavControls) {
+            try {
+              // Create new controls
+              const navControl = new mapboxgl.NavigationControl({
+                showCompass: true,
+                showZoom: true,
+                visualizePitch: true
+              });
+              
+              // Add to map
+              map.current.addControl(navControl, 'top-right');
+              navigationControlRef.current = navControl;
+            } catch (error) {
+              console.error('Error adding controls after style change:', error);
+            }
+          }
+          
+          // Always add attribution control after style change
           try {
-            // Create new controls
-            const navControl = new mapboxgl.NavigationControl({
-              showCompass: true,
-              showZoom: true,
-              visualizePitch: true
-            });
-            
-            // Add to map
-            map.current.addControl(navControl, 'top-right');
-            navigationControlRef.current = navControl;
-            
-            // Add attribution control
             map.current.addControl(
               new mapboxgl.AttributionControl({ compact: true }),
               'bottom-right'
             );
           } catch (error) {
-            console.error('Error adding controls after style change:', error);
+            console.error('Error adding attribution control after style change:', error);
           }
         }
       });
@@ -196,7 +209,7 @@ export const useMapInitialization = ({
       console.error('Error updating map style:', error);
       toast.error('Erreur lors du changement de style de carte');
     }
-  }, [isMapInitialized]);
+  }, [isMapInitialized, disableNavControls]);
 
   return {
     map: map.current,

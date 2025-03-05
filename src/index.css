@@ -1,3 +1,4 @@
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -141,9 +142,11 @@
   color: #6b7280;
 }
 
-/* Standard placement for Mapbox zoom controls */
+/* Hide the actual Mapbox zoom controls (since we're using our own) */
 .mapboxgl-ctrl-top-right {
-  top: 10px !important;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Make sure map canvas is visible */
@@ -158,7 +161,8 @@
 
 /* Custom controls styling to match Mapbox controls */
 .map-custom-controls {
-  margin: 10px 10px 0 0;
+  margin: 0 !important;
+  width: 30px;
 }
 
 /* Match the Mapbox control button style */

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Layers, Map as MapIcon } from 'lucide-react';
+import { Layers, Map as MapIcon, Plus, Minus } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { mockCategories } from '@/data/mockCategories';
 import { cn } from '@/lib/utils';
@@ -21,8 +21,59 @@ const MapControls: React.FC<MapControlsProps> = ({
   onCategorySelect
 }) => {
   return (
-    <div className="absolute top-0 right-0 z-10 flex flex-col">
-      {/* We add a custom control group to match Mapbox's style */}
+    <div className="absolute top-10 right-0 z-10 flex flex-col mr-4">
+      {/* Custom Map Control Group */}
+      <div className="mapboxgl-ctrl mapboxgl-ctrl-group map-custom-controls">
+        {/* Zoom in button */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="map-ctrl-btn"
+          onClick={() => {
+            // Find the mapbox zoom in button and click it
+            const zoomInBtn = document.querySelector('.mapboxgl-ctrl-zoom-in') as HTMLButtonElement;
+            if (zoomInBtn) zoomInBtn.click();
+          }}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+        
+        {/* Zoom out button */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="map-ctrl-btn"
+          onClick={() => {
+            // Find the mapbox zoom out button and click it
+            const zoomOutBtn = document.querySelector('.mapboxgl-ctrl-zoom-out') as HTMLButtonElement;
+            if (zoomOutBtn) zoomOutBtn.click();
+          }}
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        
+        {/* Compass button */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="map-ctrl-btn"
+          onClick={() => {
+            // Find the mapbox compass button and click it
+            const compassBtn = document.querySelector('.mapboxgl-ctrl-compass') as HTMLButtonElement;
+            if (compassBtn) compassBtn.click();
+          }}
+        >
+          <svg viewBox="0 0 20 20" className="h-4 w-4">
+            <polygon points="6,9 10,1 14,9" />
+            <polygon points="6,11 10,19 14,11" />
+          </svg>
+        </Button>
+      </div>
+      
+      {/* Gap between control groups */}
+      <div className="h-4"></div>
+      
+      {/* Categories and Map Style Controls */}
       <div className="mapboxgl-ctrl mapboxgl-ctrl-group map-custom-controls">
         {/* Category Button */}
         <Popover>
