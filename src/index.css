@@ -152,8 +152,12 @@
   outline: none;
 }
 
+/* Position custom controls below zoom controls */
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl-group {
+  margin-bottom: 10px;
+}
+
 /* Ensure controls don't overlap */
 .mapboxgl-ctrl-bottom-right {
   bottom: 100px !important;
 }
-
