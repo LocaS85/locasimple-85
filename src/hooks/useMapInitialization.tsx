@@ -74,6 +74,7 @@ export const useMapInitialization = ({
           initializingRef.current = false;
           
           // Ajouter les contrôles de navigation
+          // Fix: Create an instance of NavigationControl before adding it
           map.current.addControl(
             new mapboxgl.NavigationControl({
               showCompass: true,
@@ -148,7 +149,7 @@ export const useMapInitialization = ({
       map.current.once('style.load', () => {
         if (map.current) {
           // Réajouter les contrôles si nécessaire après changement de style
-          if (!map.current.hasControl(mapboxgl.NavigationControl)) {
+          if (!map.current.hasControl(new mapboxgl.NavigationControl())) {
             map.current.addControl(
               new mapboxgl.NavigationControl(),
               'top-right'
