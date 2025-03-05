@@ -4,13 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Layers, Map as MapIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { mockCategories } from '@/data/mockCategories';
-import MapStyleSelector, { MapStyle } from './MapStyleSelector';
 import { cn } from '@/lib/utils';
 import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
 
 interface MapControlsProps {
-  mapStyle: MapStyle;
-  onStyleChange: (style: MapStyle) => void;
+  mapStyle: string;
+  onStyleChange: (style: string) => void;
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
 }
@@ -22,14 +21,14 @@ const MapControls: React.FC<MapControlsProps> = ({
   onCategorySelect
 }) => {
   return (
-    <div className="absolute top-0 right-0 z-10 pt-[110px] pr-4 flex flex-col gap-2">
+    <div className="absolute top-0 right-0 z-10 pt-[110px] pr-4 flex flex-col gap-4">
       {/* Category Button */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             size="icon"
-            className="bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center h-10 w-10 rounded-sm border-gray-300"
+            className="map-control-button"
           >
             {selectedCategory ? 
               mockCategories.find(c => c.id === selectedCategory)?.icon : 
@@ -66,7 +65,7 @@ const MapControls: React.FC<MapControlsProps> = ({
       <Button
         variant="outline"
         size="icon"
-        className="bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center h-10 w-10 rounded-sm border-gray-300"
+        className="map-control-button"
         onClick={() => {
           const nextStyle = mapStyle === 'streets' ? 'satellite' :
                            mapStyle === 'satellite' ? 'terrain' : 'streets';
