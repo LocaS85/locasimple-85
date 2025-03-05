@@ -56,22 +56,39 @@ export const useMapInitialization = ({
         return;
       }
       
+      // Initialiser la carte avec des paramètres de base
       map.current = new mapboxgl.Map({
         container: container.current,
         style: MAP_STYLE_URLS[mapStyle],
         center: center,
         zoom: 13,
+        trackResize: true,
+        attributionControl: false, // Désactiver le contrôle d'attribution par défaut
+        preserveDrawingBuffer: true // Nécessaire pour des captures d'écran de la carte
       });
 
-      // Attendre que la carte soit chargée avant d'ajouter des contrôles
-      map.current.on('load', () => {
+      // Attendre que le style soit chargé avant de considérer la carte comme initialisée
+      map.current.on('style.load', () => {
         if (map.current) {
           setIsMapInitialized(true);
           initializingRef.current = false;
           
+          // Ajouter les contrôles de navigation
           map.current.addControl(
-            new mapboxgl.NavigationControl(),
+            new mapboxgl.NavigationControl({
+              showCompass: true,
+              showZoom: true,
+              visualizePitch: true
+            }),
             'top-right'
+          );
+          
+          // Ajouter le contrôle d'attribution dans un coin plus discret
+          map.current.addControl(
+            new mapboxgl.AttributionControl({
+              compact: true
+            }),
+            'bottom-right'
           );
         }
       });
@@ -79,6 +96,7 @@ export const useMapInitialization = ({
       // Gérer les erreurs de chargement
       map.current.on('error', (e) => {
         console.error('Map error:', e);
+        toast.error('Erreur de chargement de la carte');
         initializingRef.current = false;
       });
     } catch (error) {
@@ -90,19 +108,23 @@ export const useMapInitialization = ({
     // Cleanup
     return () => {
       if (map.current) {
-        map.current.remove();
+        try {
+          map.current.remove();
+        } catch (error) {
+          console.error('Error removing map:', error);
+        }
         map.current = null;
       }
       initializingRef.current = false;
     };
   }, [container, center, isMapInitialized, mapStyle]);
 
-  // Update map center
+  // Update map center with safety check
   const updateMapCenter = (newCenter: [number, number]) => {
     if (!map.current || !isMapInitialized) return;
     
     try {
-      // Update map center
+      // Update map center with smooth animation
       map.current.flyTo({
         center: newCenter,
         zoom: map.current.getZoom(),
@@ -115,14 +137,28 @@ export const useMapInitialization = ({
     }
   };
 
-  // Update map style
+  // Update map style with safety check
   const updateMapStyle = (newStyle: MapStyle) => {
     if (!map.current || !isMapInitialized) return;
     
     try {
       map.current.setStyle(MAP_STYLE_URLS[newStyle]);
+      
+      // Re-attacher l'événement style.load pour gérer les attributions après changement de style
+      map.current.once('style.load', () => {
+        if (map.current) {
+          // Réajouter les contrôles si nécessaire après changement de style
+          if (!map.current.hasControl(mapboxgl.NavigationControl)) {
+            map.current.addControl(
+              new mapboxgl.NavigationControl(),
+              'top-right'
+            );
+          }
+        }
+      });
     } catch (error) {
       console.error('Error updating map style:', error);
+      toast.error('Erreur lors du changement de style de carte');
     }
   };
 

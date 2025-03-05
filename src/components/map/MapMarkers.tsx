@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import RouteLayer from './RouteLayer';
 import type { Result } from '../ResultsList';
@@ -28,6 +28,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
 }) => {
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const popupsRef = useRef<mapboxgl.Popup[]>([]);
+  const [mapReady, setMapReady] = useState(false);
 
   // Convert color name to hex value
   const getColorForResult = (color: string): string => {
@@ -44,8 +45,28 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     return colorMap[color] || '#3b82f6';
   };
   
+  // Vérifier quand la carte est réellement prête à recevoir des marqueurs
   useEffect(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map) return;
+    
+    const checkMapReady = () => {
+      if (map.isStyleLoaded() && map.getContainer()) {
+        setMapReady(true);
+      } else {
+        setTimeout(checkMapReady, 100);
+      }
+    };
+    
+    map.on('load', checkMapReady);
+    checkMapReady();
+    
+    return () => {
+      map.off('load', checkMapReady);
+    };
+  }, [map]);
+  
+  useEffect(() => {
+    if (!map || !mapReady) return;
 
     // Clear existing markers and popups
     markersRef.current.forEach(marker => marker.remove());
@@ -55,87 +76,97 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
 
     // Add new markers
     results.forEach((result, index) => {
-      const isSelected = result.id === selectedResultId;
-      
-      // Create marker element
-      const el = document.createElement('div');
-      el.className = 'marker cursor-pointer';
-      el.innerHTML = `<div class="bg-white rounded-full p-1.5 shadow-lg border-2 ${isSelected ? `border-${result.color}-500` : 'border-white'} transition-all hover:scale-110">
-        <div class="rounded-full w-6 h-6 flex items-center justify-center bg-${result.color}-500 text-white font-bold">
-          ${index + 1}
-        </div>
-      </div>`;
-      el.style.width = '36px';
-      el.style.height = '36px';
-      el.style.transform = isSelected ? 'scale(1.2)' : 'scale(1)';
-      
-      // Add popup with details
-      const popup = new mapboxgl.Popup({ 
-        offset: 25, 
-        closeButton: false,
-        className: isSelected ? 'active-popup' : ''
-      })
-      .setHTML(`
-        <div class="p-2 max-w-64">
-          <h3 class="font-bold text-sm">${result.name}</h3>
-          <p class="text-xs text-gray-500">${result.address}</p>
-          <div class="flex items-center gap-2 mt-1 text-xs">
-            <span>${result.distance.toFixed(1)} km</span>
-            <span>·</span>
-            <span>${result.duration} min</span>
+      try {
+        const isSelected = result.id === selectedResultId;
+        
+        // Create marker element
+        const el = document.createElement('div');
+        el.className = 'marker cursor-pointer';
+        el.innerHTML = `<div class="bg-white rounded-full p-1.5 shadow-lg border-2 ${isSelected ? `border-${result.color}-500` : 'border-white'} transition-all hover:scale-110">
+          <div class="rounded-full w-6 h-6 flex items-center justify-center bg-${result.color}-500 text-white font-bold">
+            ${index + 1}
           </div>
-          ${result.openingHours ? `<div class="text-xs mt-1 text-gray-500">${result.openingHours}</div>` : ''}
-          ${result.rating ? `<div class="flex items-center gap-1 mt-1">
-            <span class="text-amber-400">★</span>
-            <span class="text-xs">${result.rating}</span>
-          </div>` : ''}
-        </div>
-      `);
-
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([result.longitude, result.latitude])
-        .setPopup(popup)
-        .addTo(map);
-      
-      // Ne pas afficher automatiquement les popups lors de l'initialisation
-      // Correction: popup.addTo() cause l'erreur d'appendChild
-      // if (isSelected) {
-      //   popup.addTo(map);
-      // }
-      
-      // Afficher le popup uniquement lors du clic
-      el.addEventListener('click', () => {
-        // Fermer tous les autres popups
-        popupsRef.current.forEach(p => p.remove());
+        </div>`;
+        el.style.width = '36px';
+        el.style.height = '36px';
+        el.style.transform = isSelected ? 'scale(1.2)' : 'scale(1)';
         
-        // Afficher le popup pour ce marqueur uniquement
-        if (map.getContainer()) {
-          popup.addTo(map);
-        }
-        
-        if (onResultClick) {
-          onResultClick(result);
-        }
-      });
+        // Add popup with details
+        const popup = new mapboxgl.Popup({ 
+          offset: 25, 
+          closeButton: false,
+          className: isSelected ? 'active-popup' : ''
+        })
+        .setHTML(`
+          <div class="p-2 max-w-64">
+            <h3 class="font-bold text-sm">${result.name}</h3>
+            <p class="text-xs text-gray-500">${result.address}</p>
+            <div class="flex items-center gap-2 mt-1 text-xs">
+              <span>${result.distance.toFixed(1)} km</span>
+              <span>·</span>
+              <span>${result.duration} min</span>
+            </div>
+            ${result.openingHours ? `<div class="text-xs mt-1 text-gray-500">${result.openingHours}</div>` : ''}
+            ${result.rating ? `<div class="flex items-center gap-1 mt-1">
+              <span class="text-amber-400">★</span>
+              <span class="text-xs">${result.rating}</span>
+            </div>` : ''}
+          </div>
+        `);
 
-      markersRef.current.push(marker);
-      popupsRef.current.push(popup);
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([result.longitude, result.latitude])
+          .setPopup(popup)
+          .addTo(map);
+        
+        // Ne pas ajouter le popup automatiquement - c'était la source du problème
+        // Afficher le popup uniquement lors du clic
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          
+          // Fermer tous les autres popups
+          popupsRef.current.forEach(p => p.remove());
+          
+          // Sécurité supplémentaire pour vérifier que la carte est accessible
+          if (map && map.getContainer()) {
+            try {
+              // Utiliser une approche plus sûre pour montrer le popup
+              marker.togglePopup();
+            } catch (error) {
+              console.error("Error showing popup:", error);
+            }
+          }
+          
+          if (onResultClick) {
+            onResultClick(result);
+          }
+        });
+
+        markersRef.current.push(marker);
+        popupsRef.current.push(popup);
+      } catch (error) {
+        console.error("Error adding marker:", error);
+      }
     });
 
     // Fit bounds to show all markers if there are any
     if (results.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      bounds.extend(center);
-      results.forEach(result => {
-        bounds.extend([result.longitude, result.latitude]);
-      });
-      map.fitBounds(bounds, { padding: 50 });
+      try {
+        const bounds = new mapboxgl.LngLatBounds();
+        bounds.extend(center);
+        results.forEach(result => {
+          bounds.extend([result.longitude, result.latitude]);
+        });
+        map.fitBounds(bounds, { padding: 50 });
+      } catch (error) {
+        console.error("Error fitting bounds:", error);
+      }
     }
 
     if (onMarkersReady) {
       onMarkersReady();
     }
-  }, [map, results, center, onMarkersReady, selectedResultId, onResultClick]);
+  }, [map, mapReady, results, center, onMarkersReady, selectedResultId, onResultClick]);
 
   // Route display for selected result or all results
   const routesToShow = selectedResultId 
@@ -144,9 +175,9 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
 
   return (
     <>
-      {routesToShow.map((result) => (
+      {mapReady && routesToShow.map((result) => (
         <React.Fragment key={result.id}>
-          {map && map.isStyleLoaded() && (
+          {map && (
             <RouteLayer
               map={map}
               start={center}

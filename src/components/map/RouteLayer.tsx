@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { MAPBOX_TOKEN } from '@/config/environment';
 
@@ -27,16 +27,69 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
   showDuration = true
 }) => {
   const [routeInfo, setRouteInfo] = useState<{distance?: number; duration?: number}>({});
+  const popupRef = useRef<mapboxgl.Popup | null>(null);
+  const sourceId = `route-${color}`;
+  const layerId = `route-${color}`;
+  
+  useEffect(() => {
+    // Cleanup function to remove layers, sources and popups
+    return () => {
+      if (!map) return;
+      
+      try {
+        // Remove layers and sources
+        if (map.getLayer(layerId)) {
+          map.removeLayer(layerId);
+        }
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+        
+        // Remove popup
+        if (popupRef.current) {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
+      } catch (error) {
+        console.error("Error during route cleanup:", error);
+      }
+    };
+  }, [map, sourceId, layerId]);
 
   useEffect(() => {
     const addRoute = async () => {
-      if (!map || !mapboxToken) return;
+      if (!map || !mapboxToken || !map.isStyleLoaded() || !map.getContainer()) return;
 
       try {
+        // Remove existing route if it exists
+        if (map.getLayer(layerId)) {
+          map.removeLayer(layerId);
+        }
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+        
+        // Remove existing popup
+        if (popupRef.current) {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
+
         const query = await fetch(
           `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxToken}`
         );
+        
+        if (!query.ok) {
+          throw new Error(`API request failed with status ${query.status}`);
+        }
+        
         const json = await query.json();
+        
+        if (!json.routes || json.routes.length === 0) {
+          console.warn("No routes found in API response");
+          return;
+        }
+        
         const data = json.routes[0];
         const route = data.geometry.coordinates;
         
@@ -55,38 +108,29 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
           }
         };
 
-        const sourceId = `route-${color}`;
-        const layerId = `route-${color}`;
+        // Add a new source and layer
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: geojson as any
+        });
 
-        // If the source already exists, update the data
-        if (map.getSource(sourceId)) {
-          const source = map.getSource(sourceId) as mapboxgl.GeoJSONSource;
-          source.setData(geojson as any);
-        } else {
-          // Otherwise, add a new source and layer
-          map.addSource(sourceId, {
-            type: 'geojson',
-            data: geojson as any
-          });
-
-          map.addLayer({
-            id: layerId,
-            type: 'line',
-            source: sourceId,
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            paint: {
-              'line-color': color,
-              'line-width': 4,
-              'line-opacity': 0.75
-            }
-          });
-        }
+        map.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': color,
+            'line-width': 4,
+            'line-opacity': 0.75
+          }
+        });
         
         // Add a popup for the route information if placeName is provided
-        if (placeName) {
+        if (placeName && route.length > 0) {
           const midIndex = Math.floor(route.length / 2);
           const midpoint = route[midIndex];
           
@@ -103,44 +147,46 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
           
           popupContent.innerHTML = popupHtml;
           
-          // Remove existing popup if any
-          const popupId = `popup-${color}`;
-          if (document.getElementById(popupId)) {
-            document.getElementById(popupId)?.remove();
-          }
-          
-          // Create a popup for route info
-          const popup = new mapboxgl.Popup({
+          // Create a popup for route info - mais ne l'ajoute pas à la carte immédiatement
+          // pour éviter le problème d'appendChild
+          popupRef.current = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false,
             className: 'route-popup',
             offset: 6
           })
           .setLngLat(midpoint)
-          .setDOMContent(popupContent)
-          .addTo(map);
+          .setDOMContent(popupContent);
           
-          // Set id for future reference
-          const popupElement = popup.getElement();
-          popupElement.id = popupId;
+          // Ajouter le popup à la carte seulement si le conteneur est prêt
+          setTimeout(() => {
+            try {
+              if (map && map.getContainer() && popupRef.current) {
+                popupRef.current.addTo(map);
+              }
+            } catch (error) {
+              console.error("Error adding popup to map:", error);
+            }
+          }, 300);
         }
       } catch (error) {
         console.error('Error adding route:', error);
       }
     };
 
-    addRoute();
+    // Attendre que la carte soit complètement chargée avant d'ajouter l'itinéraire
+    if (map && map.isStyleLoaded()) {
+      addRoute();
+    } else if (map) {
+      map.once('load', addRoute);
+    }
     
     return () => {
-      // Clean up popups when component unmounts
       if (map) {
-        const popupId = `popup-${color}`;
-        if (document.getElementById(popupId)) {
-          document.getElementById(popupId)?.remove();
-        }
+        map.off('load', addRoute);
       }
     };
-  }, [map, start, end, color, transportMode, mapboxToken, placeName, showDistance, showDuration]);
+  }, [map, start, end, color, transportMode, mapboxToken, placeName, showDistance, showDuration, sourceId, layerId]);
 
   return null;
 };
