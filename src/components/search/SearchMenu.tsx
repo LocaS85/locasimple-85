@@ -1,5 +1,5 @@
+
 import React from 'react';
-import { CategoriesScroller } from '@/components/search/CategoriesScroller';
 import { FiltersSection } from '@/components/search/FiltersSection';
 import { SelectedFilters } from '@/components/search/SelectedFilters';
 import { SearchFooter } from '@/components/search/SearchFooter';
@@ -87,11 +87,6 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
       
       {menuOpen && (
         <div className="overflow-y-auto max-h-[calc(50vh-2.5rem)] pb-8">
-          <CategoriesScroller 
-            selectedCategory={selectedCategory}
-            onCategorySelect={onCategorySelect}
-          />
-          
           <FiltersSection 
             resultsCount={resultsCount}
             onResultsCountChange={onResultsCountChange}

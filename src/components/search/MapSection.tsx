@@ -1,56 +1,60 @@
+
 import React from 'react';
-import MapContainer from '../map/MapContainer';
-import InteractiveMenu from '@/components/InteractiveMenu';
+import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
 
 interface MapSectionProps {
   results: Result[];
-  userLocation: [number, number];
+  center: [number, number];
   radius: number;
   radiusUnit: 'km' | 'miles';
   radiusType: 'distance' | 'duration';
   duration: number;
   timeUnit: 'minutes' | 'hours';
   transportMode: string;
-  onFilterChange: (filters: {
-    radius: number;
-    unit: 'km' | 'miles';
-    duration: number;
-    timeUnit: 'minutes' | 'hours';
-    resultsCount: number;
-    transportMode: string;
-    radiusType: 'distance' | 'duration';
-  }) => void;
-  searchQuery?: string;
-  onSearchChange?: (value: string) => void;
-  isRecording?: boolean;
-  onMicClick?: () => void;
-  onLocationClick?: () => void;
-  isLocationActive?: boolean;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  isRecording: boolean;
+  onMicClick: () => void;
+  onLocationClick: () => void;
+  isLocationActive: boolean;
+  loading: boolean;
+  showRoutes: boolean;
+  onSearch: () => void;
+  selectedResultId?: string;
+  onResultClick: (result: Result) => void;
+  selectedCategory: string | null;
+  onCategorySelect: (categoryId: string | null) => void;
 }
 
 export const MapSection: React.FC<MapSectionProps> = ({
   results,
-  userLocation,
+  center,
   radius,
   radiusUnit,
   radiusType,
   duration,
   timeUnit,
   transportMode,
-  onFilterChange,
-  searchQuery = '',
-  onSearchChange = () => {},
-  isRecording = false,
-  onMicClick = () => {},
-  onLocationClick = () => {},
-  isLocationActive = false
+  searchQuery,
+  onSearchChange,
+  isRecording,
+  onMicClick,
+  onLocationClick,
+  isLocationActive,
+  loading,
+  showRoutes,
+  onSearch,
+  selectedResultId,
+  onResultClick,
+  selectedCategory,
+  onCategorySelect
 }) => {
   return (
     <div className="w-full h-full">
       <MapContainer
         results={results}
-        center={userLocation}
+        center={center}
         radius={radius}
         radiusUnit={radiusUnit}
         radiusType={radiusType}
@@ -63,10 +67,14 @@ export const MapSection: React.FC<MapSectionProps> = ({
         onMicClick={onMicClick}
         onLocationClick={onLocationClick}
         isLocationActive={isLocationActive}
+        loading={loading}
+        showRoutes={showRoutes}
+        onSearch={onSearch}
+        selectedResultId={selectedResultId}
+        onResultClick={onResultClick}
+        selectedCategory={selectedCategory}
+        onCategorySelect={onCategorySelect}
       />
-      <InteractiveMenu onFilterChange={onFilterChange} />
     </div>
   );
 };
-
-export default MapSection;
