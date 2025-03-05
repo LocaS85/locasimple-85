@@ -25,10 +25,31 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useState, useEffect } from "react";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState("profile");
+  
+  // Form state for profile
+  const [profile, setProfile] = useState({
+    firstName: "John",
+    lastName: "Doe",
+    email: "john@exemple.com",
+    phone: "+33 6 12 34 56 78",
+    address: "123 rue de la Paix",
+    postalCode: "75000",
+    city: "Paris"
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setProfile(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
   
   const handleDeleteAccount = () => {
     toast.success(t('accountDeleted') || "Votre compte a été supprimé avec succès");
@@ -42,6 +63,15 @@ const Profile = () => {
   const handleNavigation = (path: string) => {
     navigate(path);
   };
+
+  // Check if we're coming from another route and should show a specific tab
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab && ['profile', 'favorites', 'history'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, []);
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -64,7 +94,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">{t('profile')}</TabsTrigger>
           <TabsTrigger value="favorites">{t('favorites')}</TabsTrigger>
@@ -82,34 +112,63 @@ const Profile = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstname">{t('firstName')}</Label>
-                  <Input id="firstname" placeholder="John" />
+                  <Label htmlFor="firstName">{t('firstName')}</Label>
+                  <Input 
+                    id="firstName" 
+                    value={profile.firstName} 
+                    onChange={handleInputChange} 
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="name">{t('lastName')}</Label>
-                  <Input id="name" placeholder="Doe" />
+                  <Label htmlFor="lastName">{t('lastName')}</Label>
+                  <Input 
+                    id="lastName" 
+                    value={profile.lastName} 
+                    onChange={handleInputChange} 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t('email')}</Label>
-                <Input id="email" type="email" placeholder="john@exemple.com" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={profile.email} 
+                  onChange={handleInputChange} 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">{t('phone')}</Label>
-                <Input id="phone" placeholder="+33 6 12 34 56 78" />
+                <Input 
+                  id="phone" 
+                  value={profile.phone} 
+                  onChange={handleInputChange} 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="address">{t('postalAddress')}</Label>
-                <Input id="address" placeholder="123 rue de la Paix" />
+                <Input 
+                  id="address" 
+                  value={profile.address} 
+                  onChange={handleInputChange} 
+                />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="postal-code">{t('postalCode')}</Label>
-                  <Input id="postal-code" placeholder="75000" />
+                  <Label htmlFor="postalCode">{t('postalCode')}</Label>
+                  <Input 
+                    id="postalCode" 
+                    value={profile.postalCode} 
+                    onChange={handleInputChange} 
+                  />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="city">{t('city')}</Label>
-                  <Input id="city" placeholder="Paris" />
+                  <Input 
+                    id="city" 
+                    value={profile.city} 
+                    onChange={handleInputChange} 
+                  />
                 </div>
               </div>
               <Button onClick={handleSaveChanges}>{t('saveChanges')}</Button>
