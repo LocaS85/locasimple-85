@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, MapPin, Clock, Heart, ArrowLeft, Home, Search } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +37,10 @@ const Profile = () => {
 
   const handleSaveChanges = () => {
     toast.success(t('changesSaved') || "Modifications enregistrées avec succès");
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
   };
 
   return (
@@ -111,18 +115,14 @@ const Profile = () => {
               <Button onClick={handleSaveChanges}>{t('saveChanges')}</Button>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
-                <Link to="/">
-                  <Button variant="outline" className="w-full">
-                    <Home className="mr-2 h-4 w-4" />
-                    {t('backToHome')}
-                  </Button>
-                </Link>
-                <Link to="/search">
-                  <Button variant="outline" className="w-full">
-                    <Search className="mr-2 h-4 w-4" />
-                    {t('search')}
-                  </Button>
-                </Link>
+                <Button variant="outline" className="w-full" onClick={() => handleNavigation("/")}>
+                  <Home className="mr-2 h-4 w-4" />
+                  {t('backToHome')}
+                </Button>
+                <Button variant="outline" className="w-full" onClick={() => handleNavigation("/search")}>
+                  <Search className="mr-2 h-4 w-4" />
+                  {t('search')}
+                </Button>
               </div>
 
               <div className="pt-6 border-t mt-6">
@@ -164,20 +164,18 @@ const Profile = () => {
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <Link to={`/place/${i}`} key={i}>
-                    <div className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="h-12 w-12 bg-gray-200 rounded-md flex items-center justify-center">
-                        <MapPin className="text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium">{`Restaurant Exemple ${i}`}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {`${123 + i} rue de la Paix, Paris`}
-                        </p>
-                      </div>
-                      <Heart className="text-red-500 h-5 w-5" />
+                  <div key={i} className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleNavigation(`/place/${i}`)}>
+                    <div className="h-12 w-12 bg-gray-200 rounded-md flex items-center justify-center">
+                      <MapPin className="text-primary" />
                     </div>
-                  </Link>
+                    <div className="flex-1">
+                      <h3 className="font-medium">{`Restaurant Exemple ${i}`}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {`${123 + i} rue de la Paix, Paris`}
+                      </p>
+                    </div>
+                    <Heart className="text-red-500 h-5 w-5" />
+                  </div>
                 ))}
                 
                 {[1, 2, 3].length === 0 && (
@@ -185,11 +183,9 @@ const Profile = () => {
                     <Heart className="h-12 w-12 mx-auto text-gray-300 mb-4" />
                     <h3 className="text-xl font-medium mb-2">{t('noFavorites')}</h3>
                     <p className="text-gray-500 mb-4">{t('noFavoritesDescription')}</p>
-                    <Button asChild>
-                      <Link to="/search">
-                        <Search className="mr-2 h-4 w-4" />
-                        {t('searchPlaces')}
-                      </Link>
+                    <Button onClick={() => handleNavigation("/search")}>
+                      <Search className="mr-2 h-4 w-4" />
+                      {t('searchPlaces')}
                     </Button>
                   </div>
                 )}
@@ -215,11 +211,9 @@ const Profile = () => {
                       <h3 className="font-medium">{`Recherche: ${i === 1 ? 'Restaurants à Paris' : i === 2 ? 'Hôtels à Lyon' : i === 3 ? 'Cafés à Marseille' : 'Musées à Toulouse'}`}</h3>
                       <p className="text-sm text-muted-foreground">{t('daysAgo')} {i} {i > 1 ? t('days') : t('day')}</p>
                     </div>
-                    <Link to="/search" className="ml-auto">
-                      <Button variant="ghost" size="sm">
-                        <Search className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    <Button variant="ghost" size="sm" className="ml-auto" onClick={() => handleNavigation("/search")}>
+                      <Search className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
