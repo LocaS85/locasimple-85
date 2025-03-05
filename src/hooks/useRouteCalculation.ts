@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 interface RouteInfo {
   distance?: number;
   duration?: number;
+  steps?: any[];
 }
 
 export const useRouteCalculation = (
@@ -35,7 +36,7 @@ export const useRouteCalculation = (
 
       // Fetch route from Mapbox Directions API
       const query = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${MAPBOX_TOKEN}`
+        `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&overview=full&language=fr&access_token=${MAPBOX_TOKEN}`
       );
       
       if (!query.ok) {
@@ -55,7 +56,8 @@ export const useRouteCalculation = (
       // Store route information
       setRouteInfo({
         distance: data.distance / 1000, // Convert to km
-        duration: Math.round(data.duration / 60) // Convert to minutes
+        duration: Math.round(data.duration / 60), // Convert to minutes
+        steps: data.legs?.[0]?.steps || []
       });
 
       // Create GeoJSON for the route
@@ -88,6 +90,63 @@ export const useRouteCalculation = (
           'line-opacity': 0.75
         }
       });
+
+      // Add route animation
+      let step = 0;
+      const animationSpeed = 50; // Points per frame
+      
+      // Create a point that moves along the route
+      if (!map.getLayer(`${layerId}-moving-point`)) {
+        // Add moving point only if it doesn't exist yet
+        map.addSource(`${sourceId}-point`, {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: route[0]
+            }
+          }
+        });
+
+        map.addLayer({
+          id: `${layerId}-moving-point`,
+          source: `${sourceId}-point`,
+          type: 'circle',
+          paint: {
+            'circle-radius': 5,
+            'circle-color': color,
+            'circle-opacity': 0.8,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#fff'
+          }
+        });
+
+        // Animate the point
+        const animate = () => {
+          if (!map.getSource(`${sourceId}-point`) || step >= route.length - 1) {
+            return;
+          }
+          
+          step = Math.min(step + animationSpeed, route.length - 1);
+          
+          map.getSource(`${sourceId}-point`).setData({
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: route[step]
+            }
+          });
+          
+          if (step < route.length - 1) {
+            requestAnimationFrame(animate);
+          }
+        };
+        
+        animate();
+      }
 
       return route;
     } catch (error) {

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinCheck, Loader2 } from 'lucide-react';
+import { Mic, MapPin, MapPinCheck, Loader2, Search } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 
@@ -57,7 +57,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   // Fetch suggestions from Mapbox
   useEffect(() => {
     const fetchSuggestions = async () => {
-      if (!searchQuery || searchQuery.length < 3 || !MAPBOX_TOKEN) return;
+      if (!searchQuery || searchQuery.length < 2 || !MAPBOX_TOKEN) return;
 
       try {
         // Use proximity to prioritize results near user location
@@ -66,7 +66,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           : '';
 
         const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&limit=5${proximityParam}&types=place,address,poi`
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&limit=5${proximityParam}&types=place,address,poi&language=fr`
         );
 
         if (!response.ok) throw new Error('Failed to fetch suggestions');
@@ -97,11 +97,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   const handleSuggestionClick = (suggestion: AddressSuggestion) => {
     onSearchChange(suggestion.place_name);
     setShowSuggestions(false);
-    inputRef.current?.focus();
+    setTimeout(() => {
+      onSearch();
+    }, 100);
   };
 
   const placeholderText = isLocationActive 
-    ? "Rechercher autour de ma position..." 
+    ? "Rechercher un lieu autour de ma position (ex: IKEA)..." 
     : "Rechercher un lieu...";
 
   return (
@@ -114,7 +116,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => setShowSuggestions(searchQuery.length >= 3 && suggestions.length > 0)}
+          onFocus={() => setShowSuggestions(searchQuery.length >= 2 && suggestions.length > 0)}
           className="w-full border-0 rounded-l-full h-12 text-base pl-4 bg-transparent text-black focus-visible:ring-0 focus-visible:ring-offset-0" 
         />
         <div className="flex items-center h-full">
@@ -128,7 +130,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           </Button>
           <Button 
             onClick={onLocationClick}
-            className={`h-full rounded-r-full px-4 ${isLocationActive 
+            className={`h-full px-2 ${isLocationActive 
               ? "bg-secondary/60 text-white hover:bg-secondary/80" 
               : "bg-transparent text-black hover:bg-gray-100/30"}`}
             aria-pressed={isLocationActive}
@@ -142,6 +144,18 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               <MapPinCheck className="h-5 w-5" />
             ) : (
               <MapPin className="h-5 w-5" />
+            )}
+          </Button>
+          <Button
+            onClick={onSearch}
+            className="h-full rounded-r-full px-4 bg-primary/80 text-white hover:bg-primary/90"
+            disabled={loading || !searchQuery.trim()}
+            aria-label="Rechercher"
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Search className="h-5 w-5" />
             )}
           </Button>
         </div>

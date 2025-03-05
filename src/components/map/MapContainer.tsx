@@ -108,6 +108,24 @@ const MapContainer: React.FC<MapContainerProps> = ({
     toast.success(`Style de carte changé en ${newStyle}`);
   };
 
+  // Handle search result marker click
+  const handleMarkerClick = (result: Result) => {
+    if (onResultClick) {
+      onResultClick(result);
+    }
+    
+    // Fly to the selected result with animation
+    if (map && isMapInitialized) {
+      map.flyTo({
+        center: [result.longitude, result.latitude],
+        zoom: 15,
+        speed: 1.2,
+        curve: 1.42,
+        essential: true
+      });
+    }
+  };
+
   return (
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" style={{ backgroundColor: '#e9eef2' }} />
@@ -155,7 +173,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             transportMode={transportMode}
             showRoutes={showRoutes}
             selectedResultId={selectedResultId}
-            onResultClick={onResultClick}
+            onResultClick={handleMarkerClick}
           />
         </>
       )}

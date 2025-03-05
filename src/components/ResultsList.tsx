@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { MapPin, Navigation, Clock, Star, Clock2, Tag } from 'lucide-react';
+import { MapPin, Navigation, Clock, Star, Clock2, Tag, Route, Share2, Phone } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export interface Result {
   id: string;
@@ -15,6 +16,8 @@ export interface Result {
   description?: string;
   rating?: number;
   openingHours?: string;
+  phone?: string;
+  website?: string;
 }
 
 interface ResultsListProps {
@@ -51,6 +54,38 @@ const ResultsList = ({
     const hours = Math.floor(duration / 60);
     const mins = duration % 60;
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+  };
+  
+  // Ouvrir dans Google Maps pour navigation
+  const openInGoogleMaps = (result: Result, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${result.latitude},${result.longitude}&travelmode=${transportMode === 'driving' ? 'driving' : transportMode === 'walking' ? 'walking' : 'transit'}`;
+    window.open(url, '_blank');
+  };
+  
+  // Partager la position
+  const shareLocation = (result: Result, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: result.name,
+        text: `Découvrez ${result.name} - ${result.address}`,
+        url: `https://www.google.com/maps?q=${result.latitude},${result.longitude}`
+      }).catch(err => {
+        console.error('Erreur lors du partage:', err);
+      });
+    } else {
+      // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+      const url = `https://www.google.com/maps?q=${result.latitude},${result.longitude}`;
+      navigator.clipboard.writeText(url);
+      alert('Lien copié dans le presse-papier !');
+    }
+  };
+  
+  // Appeler le numéro de téléphone
+  const callPhone = (phone: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(`tel:${phone}`, '_self');
   };
 
   return (
@@ -131,6 +166,43 @@ const ResultsList = ({
                   {result.description && (
                     <div className="mt-1 text-xs text-gray-600">
                       {result.description}
+                    </div>
+                  )}
+                  
+                  {/* Actions buttons */}
+                  {isSelected && (
+                    <div className="mt-3 flex items-center gap-2 pt-2 border-t border-gray-100">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="text-xs h-8 rounded-full"
+                        onClick={(e) => openInGoogleMaps(result, e)}
+                      >
+                        <Route className="h-3.5 w-3.5 mr-1" />
+                        Itinéraire
+                      </Button>
+                      
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="text-xs h-8 rounded-full"
+                        onClick={(e) => shareLocation(result, e)}
+                      >
+                        <Share2 className="h-3.5 w-3.5 mr-1" />
+                        Partager
+                      </Button>
+                      
+                      {result.phone && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="text-xs h-8 rounded-full text-green-600"
+                          onClick={(e) => callPhone(result.phone!, e)}
+                        >
+                          <Phone className="h-3.5 w-3.5 mr-1" />
+                          Appeler
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>

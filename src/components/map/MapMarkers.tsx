@@ -61,7 +61,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   }, [map]);
   
   // Use custom hooks for marker and bounds management
-  useMapMarkers({
+  const { markers, popups } = useMapMarkers({
     map,
     results,
     mapReady,
