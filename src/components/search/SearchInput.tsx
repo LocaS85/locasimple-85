@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinCheck, Loader2, Search } from 'lucide-react';
+import { Mic, MapPin, MapPinCheck, Loader2 } from 'lucide-react';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -37,14 +37,14 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="relative flex items-center w-full bg-white rounded-full border-2 border-black shadow-sm overflow-hidden">
+      <div className="relative flex items-center w-full bg-white/30 backdrop-blur-sm rounded-full border-2 border-black/50 shadow-sm overflow-hidden">
         <Input 
           type="text" 
           placeholder={placeholderText}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="w-full border-0 rounded-l-full h-12 text-base pl-4 focus-visible:ring-0 focus-visible:ring-offset-0" 
+          className="w-full border-0 rounded-l-full h-12 text-base pl-4 bg-transparent text-black focus-visible:ring-0 focus-visible:ring-offset-0" 
         />
         <div className="flex items-center h-full">
           <Button 
@@ -57,9 +57,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           </Button>
           <Button 
             onClick={onLocationClick}
-            className={`h-full rounded-none px-4 ${isLocationActive 
-              ? "bg-secondary text-white hover:bg-secondary/90" 
-              : "bg-transparent text-black hover:bg-gray-100"}`}
+            className={`h-full rounded-r-full px-4 ${isLocationActive 
+              ? "bg-secondary/60 text-white hover:bg-secondary/80" 
+              : "bg-transparent text-black hover:bg-gray-100/30"}`}
             aria-pressed={isLocationActive}
             aria-label="Utiliser ma position"
             disabled={loading}
@@ -71,17 +71,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               <MapPinCheck className="h-5 w-5" />
             ) : (
               <MapPin className="h-5 w-5" />
-            )}
-          </Button>
-          <Button
-            onClick={onSearch}
-            className="h-full rounded-r-full px-4 bg-primary text-white"
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Search className="h-5 w-5" />
             )}
           </Button>
         </div>

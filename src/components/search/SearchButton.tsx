@@ -13,7 +13,7 @@ export const SearchButton: React.FC<SearchButtonProps> = ({ loading, onClick }) 
     <div className="absolute bottom-24 right-4 z-10">
       <Button
         onClick={onClick}
-        className="rounded-full h-14 w-14 bg-primary text-white shadow-lg"
+        className="rounded-full h-14 w-14 bg-primary/70 backdrop-blur-sm text-white shadow-lg"
         disabled={loading}
       >
         {loading ? (
