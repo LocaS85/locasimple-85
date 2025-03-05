@@ -40,6 +40,20 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
     return unit === 'km' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-purple-500 text-white hover:bg-purple-600';
   };
 
+  // Format distance for display
+  const formatSelectedDistance = () => {
+    if (!selectedDistance) return t('distance');
+    
+    if (selectedDistance < 1) {
+      // Convert to meters
+      return `${selectedDistance * 1000} m`;
+    } else if (distanceUnit === 'km') {
+      return `${selectedDistance} km`;
+    } else {
+      return `${(selectedDistance * 0.621371).toFixed(1)} mi`;
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -52,7 +66,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
               : "border-black bg-gray-50 text-black hover:bg-gray-100"
           } justify-between`}
         >
-          <span className="text-xs">{t('distance')}</span>
+          <span className="text-xs">{formatSelectedDistance()}</span>
           <div className="flex items-center">
             <Tabs 
               value={distanceUnit} 

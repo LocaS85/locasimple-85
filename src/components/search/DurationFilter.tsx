@@ -28,6 +28,24 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
     return Array.from({ length: 10 }, (_, i) => i + 1);
   };
 
+  // Format duration for display
+  const formatSelectedDuration = () => {
+    if (!selectedDuration) return t('duration');
+    
+    if (selectedDuration < 60) {
+      return `${selectedDuration} min`;
+    } else {
+      const hours = Math.floor(selectedDuration / 60);
+      const minutes = selectedDuration % 60;
+      
+      if (minutes === 0) {
+        return `${hours} h`;
+      } else {
+        return `${hours} h ${minutes} min`;
+      }
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -38,7 +56,7 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
               : "border-black bg-gray-50 text-black hover:bg-gray-100"
           } justify-between`}
         >
-          <span className="text-xs">{t('duration')}</span>
+          <span className="text-xs">{formatSelectedDuration()}</span>
           <Clock className="h-3 w-3 ml-1" />
         </Button>
       </PopoverTrigger>
