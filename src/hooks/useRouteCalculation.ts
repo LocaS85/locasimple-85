@@ -125,20 +125,24 @@ export const useRouteCalculation = (
 
         // Animate the point
         const animate = () => {
-          if (!map.getSource(`${sourceId}-point`) || step >= route.length - 1) {
+          if (step >= route.length - 1) {
             return;
           }
           
           step = Math.min(step + animationSpeed, route.length - 1);
           
-          map.getSource(`${sourceId}-point`).setData({
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: route[step]
-            }
-          });
+          // Fix the TypeScript error by correctly casting the source to GeoJSONSource
+          const pointSource = map.getSource(`${sourceId}-point`) as mapboxgl.GeoJSONSource;
+          if (pointSource && pointSource.setData) {
+            pointSource.setData({
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'Point',
+                coordinates: route[step]
+              }
+            });
+          }
           
           if (step < route.length - 1) {
             requestAnimationFrame(animate);
