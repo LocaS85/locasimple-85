@@ -34,16 +34,18 @@ export const useMapInitialization = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const initializingRef = useRef(false);
   const navigationControlRef = useRef<mapboxgl.NavigationControl | null>(null);
+  const [initializationAttempted, setInitializationAttempted] = useState(false);
 
   // Initialize map
   useEffect(() => {
-    if (!container.current || isMapInitialized || initializingRef.current) return;
+    if (!container.current || isMapInitialized || initializingRef.current || initializationAttempted) return;
 
     try {
       // Verify token
-      if (!MAPBOX_TOKEN) {
-        console.warn('Mapbox token is missing');
-        toast.error('Configuration de la carte manquante, contactez l\'administrateur');
+      if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+        console.error('Mapbox token is missing or empty');
+        toast.error('Token Mapbox manquant. Vérifiez votre fichier .env');
+        setInitializationAttempted(true);
         return;
       }
       
@@ -54,6 +56,7 @@ export const useMapInitialization = ({
       if (!container.current) {
         console.error('Map container not available');
         initializingRef.current = false;
+        setInitializationAttempted(true);
         return;
       }
       
@@ -75,6 +78,7 @@ export const useMapInitialization = ({
         if (map.current && map.current.getContainer()) {
           setIsMapInitialized(true);
           initializingRef.current = false;
+          setInitializationAttempted(true);
           
           // Create NavigationControl instance
           const navControl = new mapboxgl.NavigationControl({
@@ -91,6 +95,9 @@ export const useMapInitialization = ({
             new mapboxgl.AttributionControl({ compact: true }),
             'bottom-right'
           );
+
+          console.log('Map initialized successfully');
+          toast.success('Carte chargée avec succès');
         }
       });
       
@@ -99,10 +106,12 @@ export const useMapInitialization = ({
         console.error('Map error:', e);
         toast.error('Erreur de chargement de la carte');
         initializingRef.current = false;
+        setInitializationAttempted(true);
       });
     } catch (error) {
       console.error('Error initializing map:', error);
       initializingRef.current = false;
+      setInitializationAttempted(true);
       toast.error('Erreur lors de l\'initialisation de la carte');
     }
 
@@ -119,7 +128,7 @@ export const useMapInitialization = ({
       navigationControlRef.current = null;
       initializingRef.current = false;
     };
-  }, [container, center, isMapInitialized, mapStyle]);
+  }, [container, center, isMapInitialized, mapStyle, initializationAttempted]);
 
   // Function to update map center
   const updateMapCenter = (newCenter: [number, number]) => {

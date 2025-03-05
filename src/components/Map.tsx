@@ -2,6 +2,8 @@
 import React from 'react';
 import type { Result } from './ResultsList';
 import MapContainer from './map/MapContainer';
+import { MAPBOX_TOKEN } from '@/config/environment';
+import { toast } from 'sonner';
 
 interface MapProps {
   results: Result[];
@@ -50,6 +52,14 @@ const Map = ({
   selectedCategory,
   onCategorySelect = () => {}
 }: MapProps) => {
+  // Verify that we have a Mapbox token
+  React.useEffect(() => {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+      toast.error('Mapbox token manquant. Veuillez configurer votre token dans le fichier .env.');
+      console.error('Mapbox token is missing or empty');
+    }
+  }, []);
+
   return (
     <div className="w-full h-full">
       <MapContainer

@@ -1,3 +1,4 @@
+
 /**
  * Environment variables configuration
  * 
@@ -8,6 +9,14 @@
 // Mapbox configuration
 export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 
   'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw';
+
+// Verify and log Mapbox token status
+if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+  console.warn('MAPBOX_TOKEN is missing. Map functionality may not work properly.');
+  console.warn('Please set the VITE_MAPBOX_TOKEN environment variable in a .env file');
+} else {
+  console.log('MAPBOX_TOKEN is configured');
+}
 
 // Supabase configuration (if used)
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
