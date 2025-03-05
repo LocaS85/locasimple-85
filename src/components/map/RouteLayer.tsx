@@ -29,14 +29,14 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
 }) => {
   const [routeInfo, setRouteInfo] = useState<{distance?: number; duration?: number}>({});
   const popupRef = useRef<mapboxgl.Popup | null>(null);
-  const sourceId = `route-${color}`;
-  const layerId = `route-${color}`;
+  const sourceId = `route-${color.replace('#', '')}`;
+  const layerId = `route-${color.replace('#', '')}`;
   const routeLoadedRef = useRef(false);
   
+  // Cleanup function to remove layers, sources and popups
   useEffect(() => {
-    // Cleanup function to remove layers, sources and popups
     return () => {
-      if (!map) return;
+      if (!map || !map.getContainer()) return;
       
       try {
         // Remove layers and sources
@@ -58,57 +58,76 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
     };
   }, [map, sourceId, layerId]);
 
+  // Add route when map and coordinates are ready
   useEffect(() => {
-    // Wait for map to load before adding route
-    const checkMapAndAddRoute = () => {
-      if (!map) return;
+    let isMounted = true;
+    
+    const checkMapAndAddRoute = async () => {
+      if (!map || !isMounted) return;
       
-      if (map.isStyleLoaded()) {
-        addRoute();
-      } else {
-        // If style is not loaded yet, wait and retry
-        map.once('load', addRoute);
+      try {
+        if (map.isStyleLoaded()) {
+          await addRoute();
+        } else {
+          // If style is not loaded yet, wait and retry
+          const onStyleLoad = async () => {
+            if (isMounted) {
+              await addRoute();
+            }
+          };
+          
+          map.once('load', onStyleLoad);
+          return () => {
+            map.off('load', onStyleLoad);
+          };
+        }
+      } catch (error) {
+        console.error("Error checking map and adding route:", error);
       }
     };
     
     checkMapAndAddRoute();
     
     return () => {
-      if (map) {
-        map.off('load', addRoute);
-      }
+      isMounted = false;
     };
   }, [map, start, end, color, transportMode, mapboxToken, placeName]);
 
+  // Function to add the route to the map
   const addRoute = async () => {
-    if (!map || !mapboxToken || !map.getContainer()) {
-      console.log("Map not ready for route addition");
+    if (!map || !mapboxToken) {
+      console.log("Map or token not available for route addition");
+      return;
+    }
+    
+    // Check that the map still has a valid container
+    if (!map.getContainer()) {
+      console.log("Map container no longer available");
       return;
     }
     
     console.log("Adding route from", start, "to", end);
 
     try {
-      // Remove existing route if it exists
+      // Remove existing route and popup
       if (map.getLayer(layerId)) {
         map.removeLayer(layerId);
       }
       if (map.getSource(sourceId)) {
         map.removeSource(sourceId);
       }
-      
-      // Remove existing popup
       if (popupRef.current) {
         popupRef.current.remove();
         popupRef.current = null;
       }
 
-      if (!map.isStyleLoaded()) {
-        console.log("Map style not loaded yet, waiting...");
-        map.once('load', addRoute);
+      // Final check if map is still valid and style is loaded
+      if (!map.isStyleLoaded() || !map.getContainer()) {
+        console.log("Map not ready or container lost, cancelling route addition");
         return;
       }
 
+      // Fetch route from Mapbox Directions API
       const query = await fetch(
         `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxToken}`
       );
@@ -135,6 +154,7 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
         duration: Math.round(data.duration / 60) // Convert to minutes
       });
 
+      // Create GeoJSON for the route
       const geojson = {
         type: 'Feature',
         properties: {},
@@ -144,13 +164,13 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
         }
       };
 
-      // Check if the map is still valid
+      // Final container check before adding to map
       if (!map.getContainer()) {
-        console.log("Map container no longer available");
+        console.log("Map container lost before adding route");
         return;
       }
 
-      // Add a new source and layer
+      // Add source and layer to map
       map.addSource(sourceId, {
         type: 'geojson',
         data: geojson as any
@@ -173,11 +193,12 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
       
       routeLoadedRef.current = true;
       
-      // Add a popup for the route information if placeName is provided
-      if (placeName && route.length > 0) {
+      // Add popup for route information if needed
+      if (placeName && route.length > 0 && map.getContainer()) {
         const midIndex = Math.floor(route.length / 2);
         const midpoint = route[midIndex];
         
+        // Create popup content
         const popupContent = document.createElement('div');
         popupContent.className = 'text-xs p-1';
         
@@ -191,8 +212,8 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
         
         popupContent.innerHTML = popupHtml;
         
-        // Create a popup but don't add it to the map right away
-        popupRef.current = new mapboxgl.Popup({
+        // Create a new popup
+        const newPopup = new mapboxgl.Popup({
           closeButton: false,
           closeOnClick: false,
           className: 'route-popup',
@@ -201,14 +222,16 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
         .setLngLat(midpoint)
         .setDOMContent(popupContent);
         
-        // Add the popup to the map after a short delay
+        // Store and add with delay
+        popupRef.current = newPopup;
+        
         setTimeout(() => {
-          try {
-            if (map && map.getContainer() && popupRef.current) {
+          if (map && map.getContainer() && popupRef.current) {
+            try {
               popupRef.current.addTo(map);
+            } catch (error) {
+              console.error("Error adding popup to map:", error);
             }
-          } catch (error) {
-            console.error("Error adding popup to map:", error);
           }
         }, 300);
       }

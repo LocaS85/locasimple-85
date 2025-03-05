@@ -30,26 +30,18 @@ export const useMarkerManagement = ({
       return;
     }
     
-    // Check that the map has a valid container
+    // Make sure map has valid container
     if (!map.getContainer()) {
-      console.warn("Map container not accessible yet, waiting for marker initialization");
-      
-      const checkContainer = () => {
-        if (map && map.getContainer()) {
-          setupMarker();
-        } else {
-          setTimeout(checkContainer, 100);
-        }
-      };
-      
-      checkContainer();
+      console.warn("Map container not accessible for marker initialization");
       return;
     }
     
-    setupMarker();
+    let isMounted = true;
     
-    function setupMarker() {
+    const setupMarker = () => {
       try {
+        if (!isMounted || !map.getContainer()) return;
+        
         if (isLocationActive) {
           if (centerMarker.current) {
             console.log("Updating existing center marker position to", center);
@@ -66,11 +58,16 @@ export const useMarkerManagement = ({
               </div>
             `;
             
-            centerMarker.current = new mapboxgl.Marker(markerEl)
-              .setLngLat(center)
-              .addTo(map);
-            
-            setIsMarkerReady(true);
+            // Create and add marker
+            const newMarker = new mapboxgl.Marker(markerEl)
+              .setLngLat(center);
+              
+            // Only add to map if it's still valid
+            if (map.getContainer()) {
+              newMarker.addTo(map);
+              centerMarker.current = newMarker;
+              setIsMarkerReady(true);
+            }
           }
         } else if (centerMarker.current) {
           console.log("Removing center marker as location is not active");
@@ -81,12 +78,19 @@ export const useMarkerManagement = ({
         }
       } catch (error) {
         console.error("Error setting up map marker:", error);
+        if (centerMarker.current) {
+          centerMarker.current.remove();
+        }
         centerMarker.current = null;
         setIsMarkerReady(false);
       }
-    }
+    };
+    
+    // Initial setup
+    setupMarker();
     
     return () => {
+      isMounted = false;
       if (centerMarker.current) {
         try {
           centerMarker.current.remove();
@@ -99,7 +103,7 @@ export const useMarkerManagement = ({
     };
   }, [map, center, isMapInitialized, isLocationActive]);
 
-  // Update marker position with safety checks
+  // Function to update marker position with safety checks
   const updateMarkerPosition = (newCenter: [number, number], isActive: boolean) => {
     if (!map || !isMapInitialized) {
       console.log("Map not ready for marker position update");
@@ -128,11 +132,15 @@ export const useMarkerManagement = ({
             </div>
           `;
           
-          centerMarker.current = new mapboxgl.Marker(markerEl)
-            .setLngLat(newCenter)
-            .addTo(map);
-          
-          setIsMarkerReady(true);
+          // Create and add marker if map is still valid
+          if (map.getContainer()) {
+            const newMarker = new mapboxgl.Marker(markerEl)
+              .setLngLat(newCenter)
+              .addTo(map);
+              
+            centerMarker.current = newMarker;
+            setIsMarkerReady(true);
+          }
         }
       } else if (centerMarker.current) {
         console.log("Removing marker as location is not active");

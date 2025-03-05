@@ -40,7 +40,7 @@ export const useMapInitialization = ({
     if (!container.current || isMapInitialized || initializingRef.current) return;
 
     try {
-      // Vérifier que le token est bien défini
+      // Verify token
       if (!MAPBOX_TOKEN) {
         console.warn('Mapbox token is missing');
         toast.error('Configuration de la carte manquante, contactez l\'administrateur');
@@ -50,7 +50,7 @@ export const useMapInitialization = ({
       initializingRef.current = true;
       mapboxgl.accessToken = MAPBOX_TOKEN;
       
-      // Vérifier que le conteneur est disponible
+      // Verify container
       if (!container.current) {
         console.error('Map container not available');
         initializingRef.current = false;
@@ -59,47 +59,42 @@ export const useMapInitialization = ({
       
       console.log('Initializing map with token:', MAPBOX_TOKEN);
       
-      // Initialiser la carte avec des paramètres de base
+      // Initialize map with basic parameters
       map.current = new mapboxgl.Map({
         container: container.current,
         style: MAP_STYLE_URLS[mapStyle],
         center: center,
         zoom: 13,
         trackResize: true,
-        attributionControl: false, // Désactiver le contrôle d'attribution par défaut
-        preserveDrawingBuffer: true // Nécessaire pour des captures d'écran de la carte
+        attributionControl: false,
+        preserveDrawingBuffer: true
       });
 
-      // Attendre que le style soit chargé avant de considérer la carte comme initialisée
+      // Wait for style load before considering map initialized
       map.current.on('style.load', () => {
-        if (map.current) {
+        if (map.current && map.current.getContainer()) {
           setIsMapInitialized(true);
           initializingRef.current = false;
           
-          // Create a NavigationControl instance and store it in ref
-          navigationControlRef.current = new mapboxgl.NavigationControl({
+          // Create NavigationControl instance
+          const navControl = new mapboxgl.NavigationControl({
             showCompass: true,
             showZoom: true,
             visualizePitch: true
           });
           
-          // Add the navigation control to the map
-          map.current.addControl(
-            navigationControlRef.current,
-            'top-right'
-          );
+          navigationControlRef.current = navControl;
           
-          // Ajouter le contrôle d'attribution dans un coin plus discret
+          // Add controls to map
+          map.current.addControl(navControl, 'top-right');
           map.current.addControl(
-            new mapboxgl.AttributionControl({
-              compact: true
-            }),
+            new mapboxgl.AttributionControl({ compact: true }),
             'bottom-right'
           );
         }
       });
       
-      // Gérer les erreurs de chargement
+      // Handle map load errors
       map.current.on('error', (e) => {
         console.error('Map error:', e);
         toast.error('Erreur de chargement de la carte');
@@ -111,9 +106,9 @@ export const useMapInitialization = ({
       toast.error('Erreur lors de l\'initialisation de la carte');
     }
 
-    // Cleanup
+    // Cleanup function
     return () => {
-      if (map.current) {
+      if (map.current && map.current.getContainer()) {
         try {
           map.current.remove();
         } catch (error) {
@@ -126,9 +121,9 @@ export const useMapInitialization = ({
     };
   }, [container, center, isMapInitialized, mapStyle]);
 
-  // Update map center with safety check
+  // Function to update map center
   const updateMapCenter = (newCenter: [number, number]) => {
-    if (!map.current || !isMapInitialized) return;
+    if (!map.current || !isMapInitialized || !map.current.getContainer()) return;
     
     try {
       // Update map center with smooth animation
@@ -144,38 +139,37 @@ export const useMapInitialization = ({
     }
   };
 
-  // Update map style with safety check
+  // Function to update map style
   const updateMapStyle = (newStyle: MapStyle) => {
-    if (!map.current || !isMapInitialized) return;
+    if (!map.current || !isMapInitialized || !map.current.getContainer()) return;
     
     try {
+      // Update map style
       map.current.setStyle(MAP_STYLE_URLS[newStyle]);
       
-      // Re-attacher l'événement style.load pour gérer les attributions après changement de style
+      // Re-attach style.load event handler
       map.current.once('style.load', () => {
-        if (map.current) {
-          // Réajouter les contrôles si nécessaire après changement de style
-          if (navigationControlRef.current) {
-            // First check if we need to remove existing control
-            try {
-              map.current.removeControl(navigationControlRef.current);
-            } catch (e) {
-              // It's fine if this fails, it might not be attached yet
-              console.log("Navigation control couldn't be removed, may not be attached");
-            }
+        if (map.current && map.current.getContainer()) {
+          // Add new controls after style change
+          try {
+            // Create new controls
+            const navControl = new mapboxgl.NavigationControl({
+              showCompass: true,
+              showZoom: true,
+              visualizePitch: true
+            });
             
-            // Add fresh navigation control
+            // Add to map
+            map.current.addControl(navControl, 'top-right');
+            navigationControlRef.current = navControl;
+            
+            // Add attribution control
             map.current.addControl(
-              navigationControlRef.current,
-              'top-right'
+              new mapboxgl.AttributionControl({ compact: true }),
+              'bottom-right'
             );
-          } else {
-            // Create a new one if needed
-            navigationControlRef.current = new mapboxgl.NavigationControl();
-            map.current.addControl(
-              navigationControlRef.current,
-              'top-right'
-            );
+          } catch (error) {
+            console.error('Error adding controls after style change:', error);
           }
         }
       });

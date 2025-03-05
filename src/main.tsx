@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
-// Import Mapbox CSS to fix styling issues
+// Import Mapbox CSS
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

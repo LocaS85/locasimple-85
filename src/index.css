@@ -4,7 +4,7 @@
 @import 'tailwindcss/utilities';
 
 @layer utilities {
-  /* Masquer les barres de défilement */
+  /* Hide scrollbars */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -26,10 +26,19 @@
     justify-content: center;
     cursor: pointer;
     transition: transform 0.2s;
+    z-index: 1;
   }
   
   .marker:hover {
     transform: scale(1.1);
+  }
+  
+  /* Center marker styling */
+  .center-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
   }
   
   /* Custom colors for different result types */
@@ -125,9 +134,20 @@
   padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 3;
 }
 
 .mapboxgl-popup-close-button {
   font-size: 16px;
   color: #6b7280;
+}
+
+/* Control positioning fixes */
+.mapboxgl-ctrl-top-right {
+  top: 70px !important;
+}
+
+/* Make sure map canvas is visible */
+.mapboxgl-canvas {
+  outline: none;
 }
