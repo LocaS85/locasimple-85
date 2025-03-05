@@ -1,7 +1,4 @@
-
 import React from 'react';
-import { toast } from 'sonner';
-import { generateFilteredMockResults } from '@/data/mockSearchResults';
 
 interface SearchHandlerProps {
   searchQuery: string;
@@ -22,12 +19,12 @@ interface SearchHandlerProps {
 export const SearchHandler: React.FC<SearchHandlerProps> = (props) => {
   return (
     <React.Fragment>
-      {/* This is a utility component that only provides functionality */}
+      {/* This component is deprecated and its functionality has been moved to useSearchOperations */}
     </React.Fragment>
   );
 };
 
-// Export the handler separately
+// This export is kept for backward compatibility
 export const useSearchHandler = ({
   searchQuery,
   selectedCategory,
@@ -43,47 +40,11 @@ export const useSearchHandler = ({
   setShowRoutes = () => {},
   setSearchPerformed = () => {}
 }: SearchHandlerProps) => {
+  console.warn('useSearchHandler is deprecated. Use useSearchOperations instead.');
+  
   const handleSearch = (query: string = searchQuery) => {
-    setLoading(true);
-    console.log(`Recherche pour: ${query}`);
-    console.log(`Filtres: Catégorie: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Durée: ${selectedDuration}min, Transport: ${transportMode}`);
-    console.log(`Position: ${userLocation}`);
-    
-    // Enable route display when search is performed
-    setShowRoutes(true);
-    setSearchPerformed(true);
-    
-    // Use our mock data generator with all filters
-    setTimeout(() => {
-      try {
-        const mockResults = generateFilteredMockResults(
-          query,
-          userLocation,
-          {
-            category: selectedCategory || undefined,
-            radius: selectedDistance,
-            radiusUnit: distanceUnit,
-            duration: selectedDuration,
-            transportMode
-          },
-          resultsCount
-        );
-        
-        setSearchResults(mockResults);
-        
-        if (mockResults.length === 0) {
-          toast.info('Aucun résultat ne correspond à vos critères. Essayez d\'ajuster vos filtres.');
-        } else {
-          toast.success(`${mockResults.length} résultat${mockResults.length > 1 ? 's' : ''} trouvé${mockResults.length > 1 ? 's' : ''}`);
-        }
-      } catch (error) {
-        console.error('Erreur lors de la recherche:', error);
-        toast.error('Une erreur s\'est produite lors de la recherche');
-        setSearchResults([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 1000);
+    console.warn('This function is deprecated. Use useSearchOperations instead.');
+    // Functionality moved to useSearchOperations
   };
 
   return { handleSearch };

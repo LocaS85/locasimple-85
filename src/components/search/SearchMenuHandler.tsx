@@ -14,12 +14,12 @@ interface SearchMenuHandlerProps {
 export const SearchMenuHandler: React.FC<SearchMenuHandlerProps> = (props) => {
   return (
     <React.Fragment>
-      {/* This is a utility component that only provides functionality */}
+      {/* This component is deprecated and its functionality has been moved to useSearchMenu */}
     </React.Fragment>
   );
 };
 
-// Export the handler separately
+// This export is kept for backward compatibility
 export const useSearchMenuHandler = ({
   menuRef,
   menuOpen,
@@ -29,40 +29,15 @@ export const useSearchMenuHandler = ({
   dragging,
   startY,
 }: SearchMenuHandlerProps) => {
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (menuRef.current) {
-      setDragging(true);
-      setStartY(e.touches[0].clientY);
-    }
+  console.warn('useSearchMenuHandler is deprecated. Use useSearchMenu instead.');
+  
+  // All functionality has been moved to useSearchMenu
+  return { 
+    handleTouchStart: () => {},
+    handleTouchMove: () => {},
+    handleTouchEnd: () => {},
+    handleMapInteraction: () => {}
   };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!dragging || !menuRef.current) return;
-    
-    const currentY = e.touches[0].clientY;
-    const diff = startY - currentY;
-    
-    if (Math.abs(diff) > 30) {
-      if (diff > 0 && !menuOpen) {
-        setMenuOpen(true);
-      } else if (diff < 0 && menuOpen) {
-        setMenuOpen(false);
-      }
-      setDragging(false);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setDragging(false);
-  };
-
-  const handleMapInteraction = () => {
-    if (menuOpen) {
-      setMenuOpen(false);
-    }
-  };
-
-  return { handleTouchStart, handleTouchMove, handleTouchEnd, handleMapInteraction };
 };
 
 export default SearchMenuHandler;
