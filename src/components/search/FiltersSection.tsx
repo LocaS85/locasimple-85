@@ -4,6 +4,7 @@ import { ResultsCountPopover } from './ResultsCountPopover';
 import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
 import { DurationFilter } from './DurationFilter';
 import { DistanceFilter } from './DistanceFilter';
+import { CategoriesFilter } from './CategoriesFilter';
 
 interface FiltersSectionProps {
   resultsCount: number;
@@ -16,6 +17,8 @@ interface FiltersSectionProps {
   distanceUnit: 'km' | 'miles';
   onDistanceChange: (distance: number) => void;
   onDistanceUnitChange: (unit: 'km' | 'miles') => void;
+  selectedCategory: string | null;
+  onCategorySelect: (categoryId: string | null) => void;
 }
 
 export const FiltersSection: React.FC<FiltersSectionProps> = ({
@@ -28,10 +31,17 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   selectedDistance,
   distanceUnit,
   onDistanceChange,
-  onDistanceUnitChange
+  onDistanceUnitChange,
+  selectedCategory,
+  onCategorySelect
 }) => {
   return (
     <div className="px-2 py-1 flex flex-col gap-1.5">
+      <CategoriesFilter
+        selectedCategory={selectedCategory}
+        onCategorySelect={onCategorySelect}
+      />
+      
       <ResultsCountPopover 
         resultsCount={resultsCount}
         onResultsCountChange={onResultsCountChange}

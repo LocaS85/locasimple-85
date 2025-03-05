@@ -98,6 +98,8 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
             distanceUnit={distanceUnit}
             onDistanceChange={onDistanceChange}
             onDistanceUnitChange={onDistanceUnitChange}
+            selectedCategory={selectedCategory}
+            onCategorySelect={onCategorySelect}
           />
           
           <SelectedFilters 
