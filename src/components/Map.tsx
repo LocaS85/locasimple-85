@@ -23,6 +23,8 @@ interface MapProps {
   onSearch?: () => void;
   selectedResultId?: string;
   onResultClick?: (result: Result) => void;
+  selectedCategory?: string | null;
+  onCategorySelect?: (categoryId: string | null) => void;
 }
 
 const Map = ({ 
@@ -44,31 +46,36 @@ const Map = ({
   showRoutes = false,
   onSearch = () => {},
   selectedResultId,
-  onResultClick = () => {}
+  onResultClick = () => {},
+  selectedCategory,
+  onCategorySelect = () => {}
 }: MapProps) => {
-  // Pass all props directly to MapContainer
   return (
-    <MapContainer
-      results={results}
-      center={center}
-      radius={radius}
-      radiusUnit={radiusUnit}
-      radiusType={radiusType}
-      duration={duration}
-      timeUnit={timeUnit}
-      transportMode={transportMode}
-      searchQuery={searchQuery}
-      onSearchChange={onSearchChange}
-      isRecording={isRecording}
-      onMicClick={onMicClick}
-      onLocationClick={onLocationClick}
-      isLocationActive={isLocationActive}
-      loading={loading}
-      showRoutes={showRoutes}
-      onSearch={onSearch}
-      selectedResultId={selectedResultId}
-      onResultClick={onResultClick}
-    />
+    <div className="w-full h-full">
+      <MapContainer
+        results={results}
+        center={center}
+        radius={radius}
+        radiusUnit={radiusUnit}
+        radiusType={radiusType}
+        duration={duration}
+        timeUnit={timeUnit}
+        transportMode={transportMode}
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+        isRecording={isRecording}
+        onMicClick={onMicClick}
+        onLocationClick={onLocationClick}
+        isLocationActive={isLocationActive}
+        loading={loading}
+        showRoutes={showRoutes}
+        onSearch={onSearch}
+        selectedResultId={selectedResultId}
+        onResultClick={onResultClick}
+        selectedCategory={selectedCategory}
+        onCategorySelect={onCategorySelect}
+      />
+    </div>
   );
 };
 

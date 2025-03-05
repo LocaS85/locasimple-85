@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
-import { SearchControls } from '@/components/search/SearchControls';
-import { SearchMenu } from '@/components/search/SearchMenu';
-import { SearchButton } from '@/components/search/SearchButton';
-import { LocationButton } from '@/components/search/LocationButton';
-import { useSearchLocation } from '@/components/search/SearchLocation';
+import React from 'react';
+import { SearchControls } from './SearchControls';
+import { SearchMenu } from './SearchMenu';
+import { SearchButton } from './SearchButton';
+import { LocationButton } from './LocationButton';
+import { useSearchLocation } from './SearchLocation';
 import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useSearchState } from '@/hooks/useSearchState';
 import { useSearchMenu } from '@/hooks/useSearchMenu';
@@ -12,9 +12,8 @@ import { useResultSelection } from '@/hooks/useResultSelection';
 import { useSearchOperations } from '@/hooks/useSearchOperations';
 
 export const SearchContainer = () => {
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = React.useState(false);
   
-  // Initialize all hooks
   const searchState = useSearchState();
   const searchMenu = useSearchMenu();
   const resultSelection = useResultSelection();
@@ -39,8 +38,8 @@ export const SearchContainer = () => {
   });
 
   return (
-    <>
-      <div onClick={searchMenu.handleMapInteraction}>
+    <div className="relative h-full">
+      <div className="absolute inset-0" onClick={searchMenu.handleMapInteraction}>
         <SearchControls
           searchResults={searchState.searchResults}
           userLocation={searchState.userLocation}
@@ -59,19 +58,21 @@ export const SearchContainer = () => {
           showRoutes={searchState.showRoutes}
           selectedResultId={resultSelection.selectedResultId}
           onResultClick={resultSelection.handleResultClick}
-        />
-        
-        <LocationButton 
-          loading={searchState.loading}
-          isLocationActive={searchState.isLocationActive}
-          onClick={handleLocationClick}
-        />
-        
-        <SearchButton 
-          loading={searchState.loading}
-          onClick={handleSearchPress}
+          selectedCategory={searchState.selectedCategory}
+          onCategorySelect={searchState.setSelectedCategory}
         />
       </div>
+      
+      <LocationButton 
+        loading={searchState.loading}
+        isLocationActive={searchState.isLocationActive}
+        onClick={handleLocationClick}
+      />
+      
+      <SearchButton 
+        loading={searchState.loading}
+        onClick={handleSearchPress}
+      />
       
       <SearchMenu 
         menuOpen={searchMenu.menuOpen}
@@ -97,7 +98,7 @@ export const SearchContainer = () => {
         onResultClick={resultSelection.handleResultClick}
         onSearch={handleSearchPress}
       />
-    </>
+    </div>
   );
 };
 
