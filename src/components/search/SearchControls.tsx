@@ -79,6 +79,7 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
         onResultClick={onResultClick}
         selectedCategory={selectedCategory}
         onCategorySelect={onCategorySelect}
+        userLocation={userLocation}
       />
     </div>
   );

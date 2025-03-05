@@ -28,6 +28,7 @@ interface MapProps {
   onResultClick?: (result: Result) => void;
   selectedCategory?: string | null;
   onCategorySelect?: (categoryId: string | null) => void;
+  userLocation?: [number, number];
 }
 
 const Map = ({ 
@@ -51,7 +52,8 @@ const Map = ({
   selectedResultId,
   onResultClick = () => {},
   selectedCategory,
-  onCategorySelect = () => {}
+  onCategorySelect = () => {},
+  userLocation
 }: MapProps) => {
   // Verify that we have a Mapbox token
   useEffect(() => {
@@ -87,6 +89,7 @@ const Map = ({
         onResultClick={onResultClick}
         selectedCategory={selectedCategory}
         onCategorySelect={onCategorySelect}
+        userLocation={userLocation}
       />
     </div>
   );

@@ -33,6 +33,7 @@ interface MapContainerProps {
   onResultClick?: (result: Result) => void;
   selectedCategory?: string | null;
   onCategorySelect?: (categoryId: string | null) => void;
+  userLocation?: [number, number];
 }
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
@@ -56,7 +57,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
   selectedResultId,
   onResultClick,
   selectedCategory = null,
-  onCategorySelect = () => {}
+  onCategorySelect = () => {},
+  userLocation
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const [mapStyle, setMapStyle] = useState<MapStyle>('streets');
@@ -119,6 +121,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
           onMicClick={onMicClick}
           onLocationClick={onLocationClick}
           onSearch={onSearch}
+          userLocation={userLocation}
         />
       </div>
       
