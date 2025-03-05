@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/popover';
 import { Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 interface DurationFilterProps {
   selectedDuration: number | null;
@@ -26,6 +27,17 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
   
   const generateHoursDurations = () => {
     return Array.from({ length: 10 }, (_, i) => i + 1);
+  };
+
+  // Helper to determine if the selected duration is in minutes (< 60) or hours
+  const isMinutesDuration = selectedDuration !== null && selectedDuration < 60;
+
+  // Get active button color based on whether it's minutes or hours
+  const getButtonColor = () => {
+    if (!selectedDuration) return "border-black bg-gray-50 text-black hover:bg-gray-100";
+    return isMinutesDuration
+      ? "border-orange-500 bg-orange-500 text-white hover:bg-orange-600"
+      : "border-green-500 bg-green-500 text-white hover:bg-green-600";
   };
 
   // Format duration for display
@@ -50,11 +62,7 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
     <Popover>
       <PopoverTrigger asChild>
         <Button 
-          className={`w-full rounded-full border text-xs h-7 px-2 ${
-            selectedDuration 
-              ? "border-primary bg-primary text-white hover:bg-primary/90" 
-              : "border-black bg-gray-50 text-black hover:bg-gray-100"
-          } justify-between`}
+          className={`w-full rounded-full border text-xs h-7 px-2 ${getButtonColor()} justify-between`}
         >
           <span className="text-xs">{formatSelectedDuration()}</span>
           <Clock className="h-3 w-3 ml-1" />
@@ -67,8 +75,12 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
             {generateMinutesDurations().map((min) => (
               <Button 
                 key={`min-${min}`} 
-                variant={selectedDuration === min ? "default" : "outline"}
-                className="text-xs py-0 h-6"
+                className={cn(
+                  "text-xs py-0 h-6",
+                  selectedDuration === min 
+                    ? "bg-orange-500 text-white border-orange-500 hover:bg-orange-600" 
+                    : "bg-white text-black border border-gray-200 hover:bg-gray-100"
+                )}
                 onClick={() => onDurationChange(min)}
               >
                 {min} min
@@ -80,8 +92,12 @@ export const DurationFilter: React.FC<DurationFilterProps> = ({
             {generateHoursDurations().map((hour) => (
               <Button 
                 key={`hour-${hour}`} 
-                variant={selectedDuration === hour * 60 ? "default" : "outline"}
-                className="text-xs py-0 h-6"
+                className={cn(
+                  "text-xs py-0 h-6",
+                  selectedDuration === hour * 60 
+                    ? "bg-green-500 text-white border-green-500 hover:bg-green-600" 
+                    : "bg-white text-black border border-gray-200 hover:bg-gray-100"
+                )}
                 onClick={() => onDurationChange(hour * 60)}
               >
                 {hour} h
