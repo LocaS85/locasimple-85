@@ -22,7 +22,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   onCategorySelect
 }) => {
   return (
-    <div className="absolute top-28 right-4 z-10 flex flex-col gap-2">
+    <div className="absolute top-0 right-0 z-10 pt-[110px] pr-4 flex flex-col gap-2">
       {/* Category Button */}
       <Popover>
         <PopoverTrigger asChild>

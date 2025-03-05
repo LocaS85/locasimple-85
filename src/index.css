@@ -142,9 +142,9 @@
   color: #6b7280;
 }
 
-/* Control positioning fixes */
+/* Standard placement for Mapbox zoom controls */
 .mapboxgl-ctrl-top-right {
-  top: 70px !important;
+  top: 10px !important;
 }
 
 /* Make sure map canvas is visible */
@@ -152,12 +152,12 @@
   outline: none;
 }
 
-/* Position custom controls below zoom controls */
-.mapboxgl-ctrl-top-right .mapboxgl-ctrl-group {
-  margin-bottom: 10px;
-}
-
 /* Ensure controls don't overlap */
 .mapboxgl-ctrl-bottom-right {
   bottom: 100px !important;
+}
+
+/* Define height for Mapbox zoom controls to position our custom controls correctly */
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl-group {
+  height: 95px;
 }
