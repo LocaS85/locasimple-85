@@ -97,13 +97,22 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
         .setPopup(popup)
         .addTo(map);
       
-      // Show popup for selected result
-      if (isSelected) {
-        popup.addTo(map);
-      }
+      // Ne pas afficher automatiquement les popups lors de l'initialisation
+      // Correction: popup.addTo() cause l'erreur d'appendChild
+      // if (isSelected) {
+      //   popup.addTo(map);
+      // }
       
-      // Add click event
+      // Afficher le popup uniquement lors du clic
       el.addEventListener('click', () => {
+        // Fermer tous les autres popups
+        popupsRef.current.forEach(p => p.remove());
+        
+        // Afficher le popup pour ce marqueur uniquement
+        if (map.getContainer()) {
+          popup.addTo(map);
+        }
+        
         if (onResultClick) {
           onResultClick(result);
         }
