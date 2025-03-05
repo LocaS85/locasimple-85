@@ -115,11 +115,19 @@ const Profile = () => {
               <Button onClick={handleSaveChanges}>{t('saveChanges')}</Button>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
-                <Button variant="outline" className="w-full" onClick={() => handleNavigation("/")}>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => handleNavigation("/")}
+                >
                   <Home className="mr-2 h-4 w-4" />
                   {t('backToHome')}
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => handleNavigation("/search")}>
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => handleNavigation("/search")}
+                >
                   <Search className="mr-2 h-4 w-4" />
                   {t('search')}
                 </Button>
@@ -164,7 +172,11 @@ const Profile = () => {
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleNavigation(`/place/${i}`)}>
+                  <div 
+                    key={i} 
+                    className="flex items-center space-x-4 p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" 
+                    onClick={() => handleNavigation(`/place/${i}`)}
+                  >
                     <div className="h-12 w-12 bg-gray-200 rounded-md flex items-center justify-center">
                       <MapPin className="text-primary" />
                     </div>
@@ -211,7 +223,12 @@ const Profile = () => {
                       <h3 className="font-medium">{`Recherche: ${i === 1 ? 'Restaurants à Paris' : i === 2 ? 'Hôtels à Lyon' : i === 3 ? 'Cafés à Marseille' : 'Musées à Toulouse'}`}</h3>
                       <p className="text-sm text-muted-foreground">{t('daysAgo')} {i} {i > 1 ? t('days') : t('day')}</p>
                     </div>
-                    <Button variant="ghost" size="sm" className="ml-auto" onClick={() => handleNavigation("/search")}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="ml-auto" 
+                      onClick={() => handleNavigation("/search")}
+                    >
                       <Search className="h-4 w-4" />
                     </Button>
                   </div>
