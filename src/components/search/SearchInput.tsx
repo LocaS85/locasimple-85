@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -125,7 +124,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           <Button 
             onClick={onMicClick}
             className={`${isRecording ? 'text-red-500' : 'text-gray-500'} bg-transparent hover:bg-transparent p-2 rounded-none`}
-            aria-label={t('search') || "Activer la recherche vocale"}
+            aria-label={t('voiceSearch') || "Activer la recherche vocale"}
             variant="ghost"
           >
             <Mic className="h-5 w-5" />
@@ -154,11 +153,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
             disabled={loading || !searchQuery.trim()}
             aria-label={t('search') || "Rechercher"}
           >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Search className="h-5 w-5" />
-            )}
+            <Search className="h-5 w-5" />
           </Button>
         </div>
       </div>

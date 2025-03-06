@@ -14,7 +14,7 @@ const MapResults: React.FC<MapResultsProps> = ({ results }) => {
   
   return (
     <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md text-sm font-medium">
-      {results.length} {t('resultsFound')}
+      {results.length} {results.length > 1 ? t('resultsFound') || 'résultats' : t('resultFound') || 'résultat'}
     </div>
   );
 };
