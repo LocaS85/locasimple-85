@@ -4,6 +4,7 @@ import { mockCategories } from '@/data/mockCategories';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CategoryScrollerProps {
   selectedCategory: string | null;
@@ -14,6 +15,8 @@ const CategoryScroller: React.FC<CategoryScrollerProps> = ({
   selectedCategory,
   onCategorySelect
 }) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="absolute top-20 left-0 right-0 z-10 px-4">
       <div className="bg-white/80 backdrop-blur-sm rounded-full p-1 shadow-md">
@@ -33,7 +36,7 @@ const CategoryScroller: React.FC<CategoryScrollerProps> = ({
                 onClick={() => onCategorySelect(category.id === selectedCategory ? null : category.id)}
               >
                 {category.icon}
-                <span className="ml-1">{category.name}</span>
+                <span className="ml-1">{t(category.id) || category.name}</span>
               </Button>
             );
           })}

@@ -35,7 +35,7 @@ export const CategoriesFilter: React.FC<CategoriesFilterProps> = ({
             {selectedCategory ? (
               <>
                 {mockCategories.find(c => c.id === selectedCategory)?.icon}
-                <span>{mockCategories.find(c => c.id === selectedCategory)?.name}</span>
+                <span>{t(selectedCategory) || mockCategories.find(c => c.id === selectedCategory)?.name}</span>
               </>
             ) : (
               <>
@@ -60,7 +60,7 @@ export const CategoriesFilter: React.FC<CategoriesFilterProps> = ({
               >
                 <div className="flex items-center gap-1">
                   {category.icon}
-                  <span>{category.name}</span>
+                  <span>{t(category.id) || category.name}</span>
                 </div>
               </Button>
             ))}
@@ -71,7 +71,7 @@ export const CategoriesFilter: React.FC<CategoriesFilterProps> = ({
             >
               <div className="flex items-center gap-1">
                 <Layers className="h-4 w-4" />
-                <span>Tous</span>
+                <span>{t('all') || "Tous"}</span>
               </div>
             </Button>
           </div>

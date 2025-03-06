@@ -49,9 +49,9 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
       // Convert to meters
       return `${selectedDistance * 1000} m`;
     } else if (distanceUnit === 'km') {
-      return `${selectedDistance} km`;
+      return `${selectedDistance} ${t('km')}`;
     } else {
-      return `${(selectedDistance * 0.621371).toFixed(1)} mi`;
+      return `${(selectedDistance * 0.621371).toFixed(1)} ${t('miles')}`;
     }
   };
 
@@ -86,7 +86,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
                     distanceUnit === 'km' ? "bg-blue-500 text-white" : "bg-transparent text-gray-600"
                   )}
                 >
-                  km
+                  {t('km')}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="miles" 
@@ -95,7 +95,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
                     distanceUnit === 'miles' ? "bg-purple-500 text-white" : "bg-transparent text-gray-600"
                   )}
                 >
-                  mi
+                  {t('miles')}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -140,7 +140,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
                 )}
                 onClick={() => onDistanceChange(km)}
               >
-                {distanceUnit === 'km' ? `${km} km` : `${(km * 0.621371).toFixed(1)} mi`}
+                {distanceUnit === 'km' ? `${km} ${t('km')}` : `${(km * 0.621371).toFixed(1)} ${t('miles')}`}
               </Button>
             ))}
           </div>

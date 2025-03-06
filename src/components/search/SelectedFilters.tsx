@@ -41,18 +41,20 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
     if (distanceUnit === 'km') {
       return selectedDistance < 1 ? 
         `${selectedDistance * 1000} m` : 
-        `${selectedDistance} km`;
+        `${selectedDistance} ${t('km')}`;
     } else {
-      return `${(selectedDistance * 0.621371).toFixed(1)} mi`;
+      return `${(selectedDistance * 0.621371).toFixed(1)} ${t('miles')}`;
     }
   };
 
   const getTransportModeName = () => {
-    return transportModes.find(mode => mode.id === transportMode)?.name || 'Voiture';
+    const mode = transportModes.find(mode => mode.id === transportMode);
+    return t(transportMode) || mode?.name || 'Voiture';
   };
 
   const getCategoryName = () => {
-    return mockCategories.find(cat => cat.id === selectedCategory)?.name || '';
+    const category = mockCategories.find(cat => cat.id === selectedCategory);
+    return t(selectedCategory || '') || category?.name || '';
   };
 
   const getFilterSummary = () => {
@@ -112,7 +114,7 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
         
         <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
           <Users className="w-3 h-3" />
-          <span className="font-medium">{resultsCount} {resultsCount > 1 ? 'résultats' : 'résultat'}</span>
+          <span className="font-medium">{resultsCount} {resultsCount > 1 ? t('resultsFound') : t('resultsFound')}</span>
         </div>
       </div>
     </div>

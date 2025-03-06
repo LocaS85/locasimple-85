@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Mic, MapPin, MapPinCheck, Loader2, Search } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -35,6 +36,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   onSearch = () => {},
   userLocation = [2.3522, 48.8566]
 }) => {
+  const { t, language } = useLanguage();
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -66,7 +68,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           : '';
 
         const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&limit=5${proximityParam}&types=place,address,poi&language=fr`
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&limit=5${proximityParam}&types=place,address,poi&language=${language}`
         );
 
         if (!response.ok) throw new Error('Failed to fetch suggestions');
@@ -85,7 +87,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, userLocation]);
+  }, [searchQuery, userLocation, language]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -103,8 +105,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   };
 
   const placeholderText = isLocationActive 
-    ? "Rechercher un lieu autour de ma position (ex: IKEA)..." 
-    : "Rechercher un lieu...";
+    ? t('useMyLocation') || "Rechercher un lieu autour de ma position (ex: IKEA)..." 
+    : t('searchPlaceholder') || "Rechercher un lieu...";
 
   return (
     <div className="relative w-full max-w-md mx-auto">
@@ -123,7 +125,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           <Button 
             onClick={onMicClick}
             className={`${isRecording ? 'text-red-500' : 'text-gray-500'} bg-transparent hover:bg-transparent p-2 rounded-none`}
-            aria-label="Activer la recherche vocale"
+            aria-label={t('search') || "Activer la recherche vocale"}
             variant="ghost"
           >
             <Mic className="h-5 w-5" />
@@ -134,7 +136,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               ? "bg-secondary/60 text-white hover:bg-secondary/80" 
               : "bg-transparent text-black hover:bg-gray-100/30"}`}
             aria-pressed={isLocationActive}
-            aria-label="Utiliser ma position"
+            aria-label={t('useMyLocation') || "Utiliser ma position"}
             disabled={loading}
             variant="ghost"
           >
@@ -150,7 +152,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
             onClick={onSearch}
             className="h-full rounded-r-full px-4 bg-primary/80 text-white hover:bg-primary/90"
             disabled={loading || !searchQuery.trim()}
-            aria-label="Rechercher"
+            aria-label={t('search') || "Rechercher"}
           >
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />

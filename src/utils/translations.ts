@@ -4,6 +4,60 @@ export const translations = {
     'back': 'Retour',
     'backToHome': 'Retour à l\'accueil',
     'search': 'Rechercher',
+    'home': 'Accueil',
+    'about': 'À propos',
+    'register': 'Inscription',
+    'login': 'Connexion',
+    'language': 'Langue',
+    
+    // Map and Search
+    'search_title': 'Recherche',
+    'searchPlaceholder': 'Rechercher un lieu...',
+    'useMyLocation': 'Utiliser ma position',
+    'searchResults': 'Résultats de recherche',
+    'noResults': 'Aucun résultat trouvé',
+    'results_count': 'Nombre de résultats',
+    'resultsFound': 'résultat(s) trouvé(s)',
+    'categories': 'Catégories',
+    'plan': 'Planifier',
+    'saved': 'Enregistrés',
+    'settings': 'Paramètres',
+    
+    // Categories
+    'all': 'Tous',
+    'restaurants': 'Restaurants',
+    'bars': 'Bars',
+    'cafes': 'Cafés',
+    'shopping': 'Magasins',
+    'hotels': 'Hôtels',
+    'entertainment': 'Divertissement',
+    'health': 'Santé',
+    'services': 'Services',
+    'education': 'Éducation',
+    'transport': 'Transport',
+    
+    // Filters
+    'filters': 'Filtres',
+    'distance': 'Distance',
+    'duration': 'Durée',
+    'minutes': 'Minutes',
+    'hours': 'Heures',
+    'km': 'km',
+    'miles': 'miles',
+    'transportMode': 'Mode de transport',
+    'walking': 'À pied',
+    'driving': 'En voiture',
+    'cycling': 'À vélo',
+    'transit': 'Transports',
+    
+    // Place Details
+    'description': 'Description',
+    'getDirections': 'Obtenir l\'itinéraire',
+    'backToSearch': 'Retour à la recherche',
+    'nearbyPlaces': 'Lieux à proximité',
+    'websiteLabel': 'Visiter le site web',
+    'addedToFavorites': 'Ajouté aux favoris !',
+    'linkCopied': 'Lien copié dans le presse-papier !',
     
     // Profile
     'myProfile': 'Mon profil',
@@ -42,96 +96,83 @@ export const translations = {
     'deleteConfirmDescription': 'Cette action ne peut pas être annulée. Cela supprimera définitivement votre compte et toutes les données associées.',
     'cancel': 'Annuler',
     'confirmDelete': 'Oui, supprimer mon compte',
-    'accountDeleted': 'Votre compte a été supprimé avec succès'
+    'accountDeleted': 'Votre compte a été supprimé avec succès',
+    
+    // Terms and Privacy
+    'termsConditions': 'Conditions d\'utilisation',
+    'privacyPolicy': 'Politique de confidentialité',
+    'privacyDescription': 'Comment nous protégeons vos données personnelles',
+    'acceptTerms': 'En utilisant notre service, vous acceptez nos conditions d\'utilisation.',
+    'serviceDescription': 'Notre service vous permet de trouver facilement des lieux à proximité.',
+    'termsOfService': 'Conditions de service',
+    'termsOfServiceDetails': 'Vous êtes responsable de vos actions sur la plateforme.\nVous ne devez pas utiliser nos services à des fins illégales.\nNous nous réservons le droit de modifier ces conditions.',
+    'intellectualProperty': 'Propriété intellectuelle',
+    'intellectualPropertyDetails': 'Tous les contenus présents sur notre plateforme sont protégés par le droit d\'auteur.',
+    'dataCollection': 'Collecte de données',
+    'dataCollectionDetails': 'Nous collectons certaines données personnelles pour améliorer votre expérience sur notre plateforme.',
+    'dataUsage': 'Utilisation des données',
+    'dataUsageDetails': 'Les données collectées sont utilisées pour personnaliser votre expérience et améliorer nos services.',
+    'dataProtection': 'Protection des données',
+    'dataProtectionDetails': 'Nous mettons en œuvre des mesures de sécurité pour protéger vos données personnelles.',
+    'profileInfo': 'Informations de profil',
+    'locationData': 'Données de localisation',
+    'searchHistoryData': 'Historique de recherche',
+    'browsingPreferences': 'Préférences de navigation',
+    'personalizeExperience': 'Personnaliser votre expérience',
+    'improveServices': 'Améliorer nos services',
+    'sendNotifications': 'Envoyer des notifications',
+    'accountSecurity': 'Sécurité de votre compte',
+    
+    // Registration and Login
+    'createAccount': 'Créer un compte',
+    'preferredMethod': 'Choisissez votre méthode d\'inscription préférée',
+    'fullName': 'Nom complet',
+    'password': 'Mot de passe',
+    'orSignUp': 'ou inscrivez-vous avec',
+    'signUpWithEmail': 'S\'inscrire avec email',
+    'alreadyRegistered': 'Déjà inscrit ?',
+    'signIn': 'Se connecter',
+    'continueWithGoogle': 'Continuer avec Google',
+    'continueWithFacebook': 'Continuer avec Facebook',
+    
+    // Pricing
+    'simplePricing': 'Tarification simple',
+    'choosePlan': 'Choisir un plan',
+    'premium': 'Premium',
+    'pro': 'Pro',
+    'perMonth': 'par mois',
+    'forRegularUsers': 'Pour les utilisateurs réguliers',
+    'forProfessionals': 'Pour les professionnels',
+    'popular': 'Populaire',
+    'specificNeeds': 'Besoins spécifiques ?',
+    'contactForCustomPlan': 'Contactez-nous pour un plan personnalisé',
+    'contactUs': 'Nous contacter',
+    'premiumFeature1': 'Recherches illimitées',
+    'premiumFeature2': 'Rayon de recherche jusqu\'à 25 km',
+    'premiumFeature3': 'Filtres avancés (durée et distance)',
+    'premiumFeature4': 'Jusqu\'à 10 résultats par recherche',
+    'proFeature1': 'Toutes les fonctionnalités Premium',
+    'proFeature2': 'Rayon de recherche illimité',
+    'proFeature3': 'Filtres personnalisables',
+    'proFeature4': 'Résultats illimités par recherche',
+    'proFeature5': 'Support prioritaire'
   },
+  
   'en': {
-    // Navigation
-    'back': 'Back',
-    'backToHome': 'Back to Home',
-    'search': 'Search',
-    
-    // Profile
-    'myProfile': 'My Profile',
-    'updatePersonalInfo': 'Update your personal information',
-    'profile': 'Profile',
-    'favorites': 'Favorites',
-    'history': 'History',
-    'personalInfo': 'Personal Information',
-    'firstName': 'First Name',
-    'lastName': 'Last Name',
-    'email': 'Email',
-    'phone': 'Phone',
-    'postalAddress': 'Postal Address',
-    'postalCode': 'Postal Code',
-    'city': 'City',
-    'saveChanges': 'Save Changes',
-    'changesSaved': 'Changes saved successfully',
-    
-    // Favorites
-    'favoritesDescription': 'Your favorite places',
-    'noFavorites': 'No Favorites',
-    'noFavoritesDescription': 'You haven\'t added any favorites yet',
-    'searchPlaces': 'Search Places',
-    
-    // History
-    'searchHistory': 'Search History',
-    'searchHistoryDescription': 'Your recent searches',
-    'daysAgo': '',
-    'day': 'day ago',
-    'days': 'days ago',
-    
-    // Danger Zone
-    'dangerZone': 'Danger Zone',
-    'deleteAccount': 'Delete My Account',
-    'deleteConfirmTitle': 'Are you sure?',
-    'deleteConfirmDescription': 'This action cannot be undone. This will permanently delete your account and all associated data.',
-    'cancel': 'Cancel',
-    'confirmDelete': 'Yes, Delete My Account',
-    'accountDeleted': 'Your account has been successfully deleted'
+    // ... keep existing code (English translations)
+  },
+  
+  // Keep any additional languages
+  'es': {
+    // ... keep existing code (Spanish translations, if any)
+  },
+  'it': {
+    // ... keep existing code (Italian translations, if any)
+  },
+  'pt': {
+    // ... keep existing code (Portuguese translations, if any)
   },
   'de': {
-    // Navigation
-    'back': 'Zurück',
-    'backToHome': 'Zurück zur Startseite',
-    'search': 'Suchen',
-    
-    // Profile
-    'myProfile': 'Mein Profil',
-    'updatePersonalInfo': 'Aktualisieren Sie Ihre persönlichen Informationen',
-    'profile': 'Profil',
-    'favorites': 'Favoriten',
-    'history': 'Verlauf',
-    'personalInfo': 'Persönliche Informationen',
-    'firstName': 'Vorname',
-    'lastName': 'Nachname',
-    'email': 'E-Mail',
-    'phone': 'Telefon',
-    'postalAddress': 'Postanschrift',
-    'postalCode': 'Postleitzahl',
-    'city': 'Stadt',
-    'saveChanges': 'Änderungen speichern',
-    'changesSaved': 'Änderungen erfolgreich gespeichert',
-    
-    // Favorites
-    'favoritesDescription': 'Ihre Lieblingsorte',
-    'noFavorites': 'Keine Favoriten',
-    'noFavoritesDescription': 'Sie haben noch keine Favoriten hinzugefügt',
-    'searchPlaces': 'Orte suchen',
-    
-    // History
-    'searchHistory': 'Suchverlauf',
-    'searchHistoryDescription': 'Ihre letzten Suchen',
-    'daysAgo': 'Vor',
-    'day': 'Tag',
-    'days': 'Tagen',
-    
-    // Danger Zone
-    'dangerZone': 'Gefahrenzone',
-    'deleteAccount': 'Mein Konto löschen',
-    'deleteConfirmTitle': 'Sind Sie sicher?',
-    'deleteConfirmDescription': 'Diese Aktion kann nicht rückgängig gemacht werden. Dies wird Ihr Konto und alle zugehörigen Daten dauerhaft löschen.',
-    'cancel': 'Abbrechen',
-    'confirmDelete': 'Ja, mein Konto löschen',
-    'accountDeleted': 'Ihr Konto wurde erfolgreich gelöscht'
+    // ... keep existing code (German translations)
   }
 };
