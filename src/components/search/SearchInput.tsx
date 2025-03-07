@@ -147,14 +147,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               <MapPin className="h-5 w-5" />
             )}
           </Button>
-          <Button
+          <div 
             onClick={onSearch}
-            className="h-full rounded-r-full px-4 bg-primary/80 text-white hover:bg-primary/90"
-            disabled={loading || !searchQuery.trim()}
+            className="flex items-center justify-center h-full px-4 text-black cursor-pointer"
             aria-label={t('search') || "Rechercher"}
           >
             <Search className="h-5 w-5" />
-          </Button>
+          </div>
         </div>
       </div>
 
