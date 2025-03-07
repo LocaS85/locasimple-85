@@ -5,6 +5,7 @@ import RouteLayer from './RouteLayer';
 import useMapMarkers from '@/hooks/useMapMarkers';
 import useMapBounds from '@/hooks/useMapBounds';
 import { getColorForResult } from '@/utils/mapColors';
+import { getTransportModeColor } from '@/data/transportModes';
 
 interface MapMarkersProps {
   map: mapboxgl.Map | null;
@@ -28,6 +29,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   onResultClick
 }) => {
   const [mapReady, setMapReady] = useState(false);
+  const [animating, setAnimating] = useState(false);
 
   // Check when the map is actually ready to receive markers
   useEffect(() => {
@@ -76,6 +78,34 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     mapReady,
     onMarkersReady
   });
+
+  // Animation effect when a result is selected
+  useEffect(() => {
+    if (selectedResultId && map) {
+      // Find the selected result
+      const selectedResult = results.find(r => r.id === selectedResultId);
+      if (selectedResult) {
+        setAnimating(true);
+        
+        // Zoom and fly to the selection with animation
+        map.flyTo({
+          center: [selectedResult.longitude, selectedResult.latitude],
+          zoom: 14,
+          speed: 1,
+          curve: 1.5,
+          essential: true
+        });
+        
+        // Reset animation state after transition
+        setTimeout(() => {
+          setAnimating(false);
+        }, 1500);
+      }
+    }
+  }, [selectedResultId, map, results]);
+
+  // Get transport mode color for routes
+  const transportModeColor = getTransportModeColor(transportMode);
 
   // Route display for selected result or all results
   const routesToShow = selectedResultId 

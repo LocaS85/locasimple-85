@@ -19,10 +19,17 @@ export const TransportModeButton: React.FC<TransportModeButtonProps> = ({
     <Button 
       variant="outline" 
       className={cn(
-        "flex-shrink-0 whitespace-nowrap rounded-full px-1.5 py-0 h-6 flex items-center gap-0.5 text-[10px]",
-        isSelected ? "bg-primary text-white" : "bg-white text-black"
+        "flex-shrink-0 whitespace-nowrap rounded-full px-2 py-0 h-8 flex items-center gap-1 text-xs transition-transform hover:scale-105",
+        isSelected 
+          ? `bg-[${mode.color}] text-white hover:bg-[${mode.color}]` 
+          : `bg-white text-black hover:bg-[${mode.color}]/10 hover:border-[${mode.color}]`
       )}
       onClick={onClick}
+      style={{
+        backgroundColor: isSelected ? mode.color : 'white',
+        borderColor: isSelected ? mode.color : '#e5e7eb',
+        color: isSelected ? 'white' : 'black',
+      }}
     >
       {mode.icon}
       <span>{mode.name}</span>

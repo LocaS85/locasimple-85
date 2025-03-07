@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useRouteCalculation } from '@/hooks/useRouteCalculation';
 import { useRoutePopup } from '@/hooks/useRoutePopup';
+import { getTransportModeColor } from '@/data/transportModes';
 
 interface RouteLayerProps {
   map: mapboxgl.Map | null;
@@ -24,15 +25,19 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
   showDistance = true,
   showDuration = true
 }) => {
-  const sourceId = `route-${color.replace('#', '')}`;
-  const layerId = `route-${color.replace('#', '')}`;
+  // Use the transportMode to determine the color
+  const modeColor = getTransportModeColor(transportMode);
+  const routeColor = modeColor || color;
+  
+  const sourceId = `route-${routeColor.replace('#', '')}-${transportMode}`;
+  const layerId = `route-${routeColor.replace('#', '')}-${transportMode}`;
 
   const { routeInfo, calculateRoute } = useRouteCalculation(
     map,
     transportMode,
     sourceId,
     layerId,
-    color
+    routeColor
   );
 
   const { showPopup, cleanupPopup } = useRoutePopup(
@@ -85,7 +90,7 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
         }
       }
     };
-  }, [map, start, end, color, transportMode, placeName]);
+  }, [map, start, end, transportMode, placeName]);
 
   return null;
 };
