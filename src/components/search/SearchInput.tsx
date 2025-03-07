@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinCheck, Loader2 } from 'lucide-react';
+import { Mic, MapPin, MapPinCheck, Loader2, Search } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -105,7 +106,10 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="relative flex items-center w-full bg-white/30 backdrop-blur-sm rounded-full border-2 border-black/50 shadow-sm overflow-hidden">
+      <div className="relative flex items-center w-full bg-white rounded-full shadow-md overflow-hidden">
+        <div className="flex items-center pl-4 text-gray-400">
+          <Search className="h-5 w-5" />
+        </div>
         <Input 
           ref={inputRef}
           type="text" 
@@ -114,7 +118,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => setShowSuggestions(searchQuery.length >= 2 && suggestions.length > 0)}
-          className="w-full border-0 rounded-l-full h-12 text-base pl-4 bg-transparent text-black focus-visible:ring-0 focus-visible:ring-offset-0" 
+          className="w-full border-0 h-12 text-base pl-2 bg-transparent text-black focus-visible:ring-0 focus-visible:ring-offset-0" 
         />
         <div className="flex items-center h-full">
           <Button 
@@ -127,9 +131,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           </Button>
           <Button 
             onClick={onLocationClick}
-            className={`h-full px-2 ${isLocationActive 
-              ? "bg-secondary/60 text-white hover:bg-secondary/80" 
-              : "bg-transparent text-black hover:bg-gray-100/30"}`}
+            className={`h-12 w-12 p-0 rounded-full ${isLocationActive 
+              ? "bg-primary text-white hover:bg-primary/80" 
+              : "bg-transparent text-gray-500 hover:bg-gray-100/30"}`}
             aria-pressed={isLocationActive}
             aria-label={t('useMyLocation') || "Utiliser ma position"}
             disabled={loading}

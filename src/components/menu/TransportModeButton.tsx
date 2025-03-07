@@ -19,16 +19,28 @@ export const TransportModeButton: React.FC<TransportModeButtonProps> = ({
     <Button 
       variant="outline" 
       className={cn(
-        "flex-shrink-0 whitespace-nowrap rounded-full px-2 py-0 h-8 flex items-center gap-1 text-xs transition-transform hover:scale-105",
-        isSelected 
-          ? `bg-[${mode.color}] text-white hover:bg-[${mode.color}]` 
-          : `bg-white text-black hover:bg-[${mode.color}]/10 hover:border-[${mode.color}]`
+        "flex-shrink-0 whitespace-nowrap rounded-full px-3 py-1 h-9 flex items-center gap-2 text-sm transition-all hover:scale-105",
+        isSelected ? "text-white" : "bg-white text-black hover:text-white"
       )}
       onClick={onClick}
       style={{
         backgroundColor: isSelected ? mode.color : 'white',
-        borderColor: isSelected ? mode.color : '#e5e7eb',
+        borderColor: mode.color,
         color: isSelected ? 'white' : 'black',
+        // Apply the same color on hover with lower opacity
+        '--hover-bg-color': `${mode.color}`,
+      }}
+      onMouseOver={(e) => {
+        if (!isSelected) {
+          e.currentTarget.style.backgroundColor = `${mode.color}20`;
+          e.currentTarget.style.color = mode.color;
+        }
+      }}
+      onMouseOut={(e) => {
+        if (!isSelected) {
+          e.currentTarget.style.backgroundColor = 'white';
+          e.currentTarget.style.color = 'black';
+        }
       }}
     >
       {mode.icon}
