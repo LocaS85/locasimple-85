@@ -77,6 +77,10 @@ export const useMapMarkers = ({
               <button class="text-xs text-green-500 hover:text-green-700 details-btn" data-id="${result.id}">
                 Plus d'infos
               </button>
+              <span>·</span>
+              <button class="text-xs text-purple-500 hover:text-purple-700 start-navigation-btn" data-id="${result.id}">
+                Naviguer
+              </button>
             </div>
           </div>
         `;

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Result } from '../ResultsList';
 import RouteLayer from './RouteLayer';
 import useMapMarkers from '@/hooks/useMapMarkers';
@@ -28,6 +29,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   selectedResultId,
   onResultClick
 }) => {
+  const navigate = useNavigate();
   const [mapReady, setMapReady] = useState(false);
   const [animating, setAnimating] = useState(false);
 
@@ -111,6 +113,49 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   const routesToShow = selectedResultId 
     ? results.filter(r => r.id === selectedResultId)
     : (showRoutes ? results : []);
+
+  // Handle navigation start
+  const handleStartNavigation = (result: Result) => {
+    navigate('/navigation', {
+      state: {
+        start: center,
+        end: [result.longitude, result.latitude],
+        placeName: result.name,
+        transportMode: transportMode
+      }
+    });
+  };
+
+  // Add navigation start handler to each popup
+  useEffect(() => {
+    if (!mapReady) return;
+
+    // Add event listeners to all "Start Navigation" buttons in popups
+    const addNavigationListeners = () => {
+      document.querySelectorAll('.start-navigation-btn').forEach(btn => {
+        const resultId = btn.getAttribute('data-id');
+        if (resultId) {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const result = results.find(r => r.id === resultId);
+            if (result) {
+              handleStartNavigation(result);
+            }
+          });
+        }
+      });
+    };
+
+    // Run initially and whenever popups change
+    addNavigationListeners();
+
+    // Check for new popups every second (since they're created dynamically)
+    const interval = setInterval(addNavigationListeners, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [mapReady, results, center, transportMode]);
 
   return (
     <>

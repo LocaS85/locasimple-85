@@ -21,6 +21,7 @@ import Help from "./pages/Help";
 import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
 import Search from "./pages/Search";
+import Navigation from "./pages/Navigation";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/navigation" element={<Navigation />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
