@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinCheck, Loader2, Search } from 'lucide-react';
+import { Mic, MapPin, MapPinCheck, Loader2 } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,7 +41,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Handle outside click to close suggestions
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
@@ -55,13 +54,11 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     };
   }, []);
 
-  // Fetch suggestions from Mapbox
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (!searchQuery || searchQuery.length < 2 || !MAPBOX_TOKEN) return;
 
       try {
-        // Use proximity to prioritize results near user location
         const proximityParam = userLocation
           ? `&proximity=${userLocation[0]},${userLocation[1]}`
           : '';
@@ -80,7 +77,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
       }
     };
 
-    // Debounce fetch requests
     const timer = setTimeout(() => {
       fetchSuggestions();
     }, 300);
@@ -147,17 +143,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
               <MapPin className="h-5 w-5" />
             )}
           </Button>
-          <div 
-            onClick={onSearch}
-            className="flex items-center justify-center h-full px-4 text-black cursor-pointer"
-            aria-label={t('search') || "Rechercher"}
-          >
-            <Search className="h-5 w-5" />
-          </div>
         </div>
       </div>
 
-      {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <div 
           ref={suggestionsRef}
