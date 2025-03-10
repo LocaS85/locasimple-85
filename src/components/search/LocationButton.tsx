@@ -14,7 +14,9 @@ export const LocationButton: React.FC<LocationButtonProps> = ({ loading, isLocat
     <div className="absolute bottom-24 right-4 z-10">
       <Button
         onClick={onClick}
-        className={`rounded-full h-14 w-14 ${isLocationActive ? 'bg-primary shadow-lg' : 'bg-white'} text-${isLocationActive ? 'white' : 'primary'} shadow-md transition-all hover:scale-105 border border-gray-200`}
+        className={`rounded-full h-14 w-14 shadow-md transition-all hover:scale-105 border border-gray-200 ${
+          isLocationActive ? 'bg-primary text-white' : 'bg-white text-primary'
+        }`}
         disabled={loading}
         aria-label="Ma position"
       >
