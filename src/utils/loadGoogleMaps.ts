@@ -44,3 +44,11 @@ export const initGoogleMaps = async (): Promise<void> => {
     console.error('Error initializing Google Maps:', error);
   }
 };
+
+// Function to clean up Google Maps API script
+export const cleanupGoogleMaps = (): void => {
+  const script = document.querySelector('script[src*="maps.googleapis.com/maps/api"]');
+  if (script) {
+    script.remove();
+  }
+};
