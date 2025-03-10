@@ -27,8 +27,6 @@ export const TransportModeButton: React.FC<TransportModeButtonProps> = ({
         backgroundColor: isSelected ? mode.color : 'white',
         borderColor: mode.color,
         color: isSelected ? 'white' : 'black',
-        // Apply the same color on hover with lower opacity
-        '--hover-bg-color': `${mode.color}`,
       }}
       onMouseOver={(e) => {
         if (!isSelected) {
