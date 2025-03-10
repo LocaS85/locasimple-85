@@ -23,6 +23,7 @@ import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
 import Search from "./pages/Search";
 import Navigation from "./pages/Navigation";
+import Categories from "./pages/Categories";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/plan" element={<Plan />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/categories" element={<Categories />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
               <Route path="/login" element={<Login />} />
