@@ -19,7 +19,13 @@ export const useMapboxRoutes = ({
   const [from, setFrom] = useState<[number, number] | null>(initialFrom || null);
   const [to, setTo] = useState<[number, number] | null>(initialTo || null);
   const [waypoints, setWaypoints] = useState<[number, number][]>([]);
-  const [routes, setRoutes] = useState<RouteState>({});
+  // Fix: Initialize routes with all required TransportMode keys
+  const [routes, setRoutes] = useState<Record<TransportMode, RouteResponse | null>>({
+    'driving': null,
+    'walking': null,
+    'cycling': null,
+    'driving-traffic': null
+  });
   const [activeMode, setActiveMode] = useState<TransportMode>('driving');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

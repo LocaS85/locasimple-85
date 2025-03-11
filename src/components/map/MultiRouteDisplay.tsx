@@ -60,7 +60,13 @@ const MultiRouteDisplay: React.FC<MultiRouteDisplayProps> = ({
   onSaveRoute,
   isFullScreen = false
 }) => {
-  const [selectedRouteIndices, setSelectedRouteIndices] = useState<Record<TransportMode, number>>({});
+  // Fix: Properly initialize the state with required TransportMode keys
+  const [selectedRouteIndices, setSelectedRouteIndices] = useState<Record<TransportMode, number>>({
+    'driving': 0,
+    'walking': 0,
+    'cycling': 0,
+    'driving-traffic': 0
+  });
   
   // Mode labels pour l'affichage
   const modeLabels: Record<TransportMode, string> = {
@@ -72,7 +78,12 @@ const MultiRouteDisplay: React.FC<MultiRouteDisplayProps> = ({
 
   // Sélectionner le premier itinéraire par défaut pour chaque mode
   useEffect(() => {
-    const defaultSelected: Record<TransportMode, number> = {};
+    const defaultSelected: Record<TransportMode, number> = {
+      'driving': 0,
+      'walking': 0,
+      'cycling': 0,
+      'driving-traffic': 0
+    };
     
     Object.entries(routes).forEach(([mode, response]) => {
       if (response && response.routes.length > 0) {

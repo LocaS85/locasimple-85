@@ -57,10 +57,11 @@ export const SearchContainer = () => {
     loading: routeLoading
   } = useMapboxRoutes();
   
+  // Fix: Use the correct parameter structure for useVoiceRecording
   const { handleMicClick } = useVoiceRecording({ 
     isRecording, 
     setIsRecording,
-    onTranscript: (text) => {
+    onTextResult: (text) => {  // Fixed parameter name
       setQuery(text);
       search(text);
     }
@@ -110,7 +111,7 @@ export const SearchContainer = () => {
     if (results.length > 0) {
       const formattedResults = results.map(result => ({
         id: result.id,
-        name: result.text,
+        name: result.place_name.split(',')[0], // Fixed: Use place_name instead of text
         address: result.place_name,
         distance: 0, // À calculer
         duration: 0, // À calculer
@@ -175,7 +176,7 @@ export const SearchContainer = () => {
                 // Trouver l'équivalent dans searchResults
                 const formattedResult = {
                   id: result.id,
-                  name: result.text,
+                  name: result.place_name.split(',')[0], // Fixed: Use place_name instead of text
                   address: result.place_name,
                   distance: 0,
                   duration: 0,

@@ -147,6 +147,7 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
   };
 
   const handleSuggestionClick = (suggestion: SearchResult) => {
+    // Fix: Use place_name instead of text for primary display
     setInputValue(suggestion.place_name);
     onChange(suggestion.place_name);
     setShowSuggestions(false);
@@ -212,9 +213,12 @@ const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                   {getResultIcon(suggestion)}
                 </div>
                 <div>
-                  <div className="font-medium text-sm">{suggestion.text}</div>
+                  {/* Fix: Use place_name for the primary text display */}
+                  <div className="font-medium text-sm">{suggestion.place_name.split(',')[0]}</div>
                   <div className="text-xs text-gray-500 line-clamp-1">
-                    {suggestion.place_name.replace(suggestion.text + ', ', '')}
+                    {suggestion.place_name.includes(',') ? 
+                      suggestion.place_name.substring(suggestion.place_name.indexOf(',') + 2) : 
+                      ''}
                   </div>
                 </div>
               </div>
