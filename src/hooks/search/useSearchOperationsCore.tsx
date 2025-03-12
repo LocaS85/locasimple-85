@@ -17,6 +17,7 @@ interface UseSearchOperationsCoreProps {
     selectedCategory: string | null;
     setShowRoutes: (show: boolean) => void;
     setSearchPerformed: (performed: boolean) => void;
+    searchPerformed: boolean; // Add this missing property
   };
   locationOperations: {
     searchAddress: (address: string) => Promise<void>;
