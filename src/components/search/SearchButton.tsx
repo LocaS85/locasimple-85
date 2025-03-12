@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search as SearchIcon, Loader2 } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 
 interface SearchButtonProps {
   loading: boolean;
@@ -10,16 +10,17 @@ interface SearchButtonProps {
 
 export const SearchButton: React.FC<SearchButtonProps> = ({ loading, onClick }) => {
   return (
-    <div className="absolute bottom-24 right-4 z-10">
+    <div className="absolute bottom-24 left-4 z-10">
       <Button
         onClick={onClick}
-        className="rounded-full h-14 w-14 bg-primary/70 backdrop-blur-sm text-white shadow-lg"
+        className="rounded-full h-14 w-14 shadow-lg transition-all hover:scale-105 bg-primary text-white border-2 border-white hover:bg-primary/90"
         disabled={loading}
+        aria-label="Rechercher"
       >
         {loading ? (
           <Loader2 className="h-6 w-6 animate-spin" />
         ) : (
-          <SearchIcon className="h-6 w-6" />
+          <Search className="h-6 w-6" />
         )}
       </Button>
     </div>

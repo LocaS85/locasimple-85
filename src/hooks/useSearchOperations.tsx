@@ -1,4 +1,6 @@
 
+// This component is 310 lines long, so I will only update the critical parts to fix loading errors
+
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { generateFilteredMockResults } from '@/data/mockSearchResults';
@@ -67,8 +69,14 @@ export const useSearchOperations = ({
   const handleSearchPress = async () => {
     if (searchQuery.trim() && !searchState.searchPerformed) {
       setLoading(true);
-      await locationOperations.searchAddress(searchQuery);
-      setLoading(false);
+      try {
+        await locationOperations.searchAddress(searchQuery);
+      } catch (error) {
+        console.error("Error during address search:", error);
+        toast.error("Erreur lors de la recherche d'adresse");
+      } finally {
+        setLoading(false);
+      }
     }
     
     setSelectedResultId(undefined);
@@ -103,77 +111,80 @@ export const useSearchOperations = ({
         return [];
       }
       
-      // Transformer les résultats Mapbox en format Result
-      const results: Result[] = await Promise.all(data.features.map(async (feature: any, index: number) => {
-        // Calculer la distance et la durée (avec l'API Directions si possible)
-        const coords = feature.center;
-        let distance = 0;
-        let duration = 0;
-        
-        try {
-          const directionsResponse = await fetch(
-            `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${userLocation[0]},${userLocation[1]};${coords[0]},${coords[1]}?access_token=${MAPBOX_TOKEN}`
-          );
+      // Transform results with proper error handling
+      const results: Result[] = await Promise.all(
+        data.features.map(async (feature: any, index: number) => {
+          // Default values to ensure we always return a valid Result
+          const defaultResult: Result = {
+            id: feature.id || `result-${index}`,
+            name: feature.text || feature.place_name?.split(',')[0] || 'Lieu inconnu',
+            address: feature.place_name || '',
+            distance: 0,
+            duration: 0,
+            category: 'autre',
+            color: 'blue',
+            latitude: feature.center[1],
+            longitude: feature.center[0],
+            description: feature.properties?.description || '',
+          };
           
-          if (directionsResponse.ok) {
-            const directionsData = await directionsResponse.json();
-            if (directionsData.routes && directionsData.routes.length > 0) {
-              distance = directionsData.routes[0].distance / 1000; // en km
-              duration = Math.round(directionsData.routes[0].duration / 60); // en minutes
+          try {
+            // Calculate distance and duration if possible
+            if (userLocation && feature.center) {
+              const [lon, lat] = feature.center;
+              
+              try {
+                const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${userLocation[0]},${userLocation[1]};${lon},${lat}?access_token=${MAPBOX_TOKEN}`;
+                const directionsResponse = await fetch(directionsUrl);
+                
+                if (directionsResponse.ok) {
+                  const directionsData = await directionsResponse.json();
+                  if (directionsData.routes && directionsData.routes.length > 0) {
+                    defaultResult.distance = (directionsData.routes[0].distance / 1000) || 0; // km
+                    defaultResult.duration = Math.round(directionsData.routes[0].duration / 60) || 0; // minutes
+                  }
+                }
+              } catch (directionError) {
+                console.error('Direction calculation error:', directionError);
+                // Fallback to approximate calculation
+                const R = 6371; // Earth radius in km
+                const dLat = (lat - userLocation[1]) * Math.PI / 180;
+                const dLon = (lon - userLocation[0]) * Math.PI / 180;
+                const a = 
+                  Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(userLocation[1] * Math.PI / 180) * Math.cos(lat * Math.PI / 180) * 
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                defaultResult.distance = R * c;
+                defaultResult.duration = Math.round(defaultResult.distance / 50 * 60); // Estimate based on 50 km/h
+              }
             }
-          }
-        } catch (error) {
-          console.error('Erreur lors du calcul de distance:', error);
-          // Fallback: calcul de distance approximatif
-          const R = 6371; // Rayon de la Terre en km
-          const dLat = (coords[1] - userLocation[1]) * Math.PI / 180;
-          const dLon = (coords[0] - userLocation[0]) * Math.PI / 180;
-          const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(userLocation[1] * Math.PI / 180) * Math.cos(coords[1] * Math.PI / 180) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-          distance = R * c;
-          duration = Math.round(distance / 50 * 60); // Estimation basée sur 50 km/h
-        }
-        
-        // Déterminer la catégorie en fonction des propriétés du point d'intérêt
-        let category = 'autre';
-        let color = 'blue';
-        
-        if (feature.properties && feature.properties.category) {
-          category = feature.properties.category;
-        } else if (feature.place_type && feature.place_type.length > 0) {
-          const placeType = feature.place_type[0];
-          if (placeType === 'poi') {
-            // Essayer de déduire la catégorie à partir du contexte ou du nom
-            const name = feature.text.toLowerCase();
-            if (name.includes('restaurant') || name.includes('café') || name.includes('bar')) {
-              category = 'restaurants';
-              color = 'orange';
-            } else if (name.includes('hotel') || name.includes('auberge')) {
-              category = 'hébergements';
-              color = 'purple';
-            } else if (name.includes('magasin') || name.includes('boutique') || name.includes('store')) {
-              category = 'commerces';
-              color = 'green';
+
+            // Determine category and color
+            if (feature.properties && feature.properties.category) {
+              defaultResult.category = feature.properties.category;
+            } else {
+              // Try to infer category from name
+              const name = defaultResult.name.toLowerCase();
+              if (name.includes('restaurant') || name.includes('café') || name.includes('bar')) {
+                defaultResult.category = 'restaurants';
+                defaultResult.color = 'orange';
+              } else if (name.includes('hotel') || name.includes('auberge')) {
+                defaultResult.category = 'hébergements';
+                defaultResult.color = 'purple';
+              } else if (name.includes('magasin') || name.includes('boutique') || name.includes('store')) {
+                defaultResult.category = 'commerces';
+                defaultResult.color = 'green';
+              }
             }
+            
+            return defaultResult;
+          } catch (error) {
+            console.error('Error processing search result:', error);
+            return defaultResult;
           }
-        }
-        
-        return {
-          id: feature.id,
-          name: feature.text || 'Lieu inconnu',
-          address: feature.place_name || '',
-          distance: distance,
-          duration: duration,
-          category: category,
-          color: color,
-          latitude: coords[1],
-          longitude: coords[0],
-          description: feature.properties?.description || '',
-        };
-      }));
+        })
+      );
       
       return results;
     } catch (error) {
@@ -196,32 +207,39 @@ export const useSearchOperations = ({
     setSearchPerformed(true);
     
     try {
-      // Si la recherche n'est pas vide, utiliser l'API Mapbox pour des résultats réels
-      if (searchQuery.trim()) {
-        const mapboxResults = await searchPlacesNearLocation();
+      // Handle empty search query gracefully
+      if (!searchQuery.trim()) {
+        toast.info('Veuillez saisir un terme de recherche');
+        setLoading(false);
+        return;
+      }
+
+      // Use Mapbox for real results
+      const mapboxResults = await searchPlacesNearLocation();
+      
+      if (mapboxResults) {
+        // Filter results according to selected criteria
+        const filteredResults = mapboxResults.filter(result => {
+          const matchesCategory = !selectedCategory || result.category === selectedCategory;
+          const matchesDistance = !selectedDistance || result.distance <= selectedDistance;
+          const matchesDuration = !selectedDuration || result.duration <= selectedDuration;
+          return matchesCategory && matchesDistance && matchesDuration;
+        });
         
-        if (mapboxResults) {
-          // Filtrer les résultats selon les critères sélectionnés
-          const filteredResults = mapboxResults.filter(result => {
-            const matchesCategory = !selectedCategory || result.category === selectedCategory;
-            const matchesDistance = !selectedDistance || result.distance <= selectedDistance;
-            const matchesDuration = !selectedDuration || result.duration <= selectedDuration;
-            return matchesCategory && matchesDistance && matchesDuration;
-          });
-          
-          setSearchResults(filteredResults);
-          
-          if (filteredResults.length === 0) {
-            toast.info('Aucun résultat ne correspond à vos critères. Essayez d\'ajuster vos filtres.');
-          } else {
-            toast.success(`${filteredResults.length} résultat${filteredResults.length > 1 ? 's' : ''} trouvé${filteredResults.length > 1 ? 's' : ''}`);
-          }
-          setLoading(false);
-          return;
+        setSearchResults(filteredResults);
+        
+        if (filteredResults.length === 0) {
+          toast.info('Aucun résultat ne correspond à vos critères. Essayez d\'ajuster vos filtres.');
+        } else {
+          toast.success(`${filteredResults.length} résultat${filteredResults.length > 1 ? 's' : ''} trouvé${filteredResults.length > 1 ? 's' : ''}`);
         }
+        setLoading(false);
+        return;
       }
       
-      // Fallback aux données mockées si l'API échoue ou si la recherche est vide
+      // Fallback to mock data if Mapbox fails
+      toast.info('Utilisation de données simulées (API indisponible)');
+      
       setTimeout(() => {
         try {
           const mockResults = generateFilteredMockResults(
@@ -240,12 +258,12 @@ export const useSearchOperations = ({
           setSearchResults(mockResults);
           
           if (mockResults.length === 0) {
-            toast.info('Aucun résultat ne correspond à vos critères. Essayez d\'ajuster vos filtres.');
+            toast.info('Aucun résultat ne correspond à vos critères.');
           } else {
             toast.success(`${mockResults.length} résultat${mockResults.length > 1 ? 's' : ''} trouvé${mockResults.length > 1 ? 's' : ''}`);
           }
         } catch (error) {
-          console.error('Erreur lors de la recherche avec les données mockées:', error);
+          console.error('Erreur avec les données simulées:', error);
           toast.error('Une erreur s\'est produite lors de la recherche');
           setSearchResults([]);
         } finally {
