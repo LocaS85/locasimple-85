@@ -35,11 +35,12 @@ export const loadGoogleMapsApi = (apiKey: string): Promise<void> => {
 
 // Function to initialize maps when needed
 export const initGoogleMaps = async (): Promise<void> => {
-  // Use a placeholder API key - should be replaced with environment variable
-  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+  // Dans cette application, nous utilisons Mapbox, donc cette fonction sert uniquement de fallback
+  console.warn('initGoogleMaps called but app is using Mapbox instead');
   
   try {
-    await loadGoogleMapsApi(apiKey);
+    const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Placeholder only
+    console.warn('GoogleMaps API initialization skipped - using Mapbox');
   } catch (error) {
     console.error('Error initializing Google Maps:', error);
   }

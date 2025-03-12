@@ -8,22 +8,58 @@ interface UseVoiceRecordingProps {
   onTextResult?: (text: string) => void;
 }
 
+// Définition des types pour SpeechRecognition
+interface SpeechRecognitionEvent {
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+        confidence: number;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+}
+
+// Déclaration globale pour accéder aux objets SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => SpeechRecognition;
+    webkitSpeechRecognition?: new () => SpeechRecognition;
+  }
+}
+
 export const useVoiceRecording = ({ isRecording, setIsRecording, onTextResult }: UseVoiceRecordingProps) => {
-  const recognition = useRef<any>(null);
+  const recognition = useRef<SpeechRecognition | null>(null);
   const [isRecognitionSupported, setIsRecognitionSupported] = useState(false);
 
   // Initialize speech recognition
   useEffect(() => {
     // Check if browser supports speech recognition
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-      recognition.current = new SpeechRecognition();
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognitionAPI) {
+      recognition.current = new SpeechRecognitionAPI();
       recognition.current.continuous = false;
       recognition.current.interimResults = false;
       recognition.current.lang = 'fr-FR'; // Set to French
 
       // Set up callbacks
-      recognition.current.onresult = (event: any) => {
+      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript;
         if (onTextResult) {
           onTextResult(transcript);
@@ -31,7 +67,7 @@ export const useVoiceRecording = ({ isRecording, setIsRecording, onTextResult }:
         setIsRecording(false);
       };
 
-      recognition.current.onerror = (event: any) => {
+      recognition.current.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         toast.error(`Erreur de reconnaissance vocale: ${event.error}`);
         setIsRecording(false);

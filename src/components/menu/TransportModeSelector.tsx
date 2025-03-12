@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TransportMode, transportModes } from '@/data/transportModes';
-import { Car, Bike, Walking, Bus, Shuffle } from 'lucide-react';
+import { Car, Bike, MapPin, Bus, Shuffle } from 'lucide-react';
 
 interface TransportModeSelectorProps {
   transportMode: string;
@@ -21,7 +21,7 @@ export const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
       case 'cycling':
         return <Bike className="h-4 w-4" />;
       case 'walking':
-        return <Walking className="h-4 w-4" />;
+        return <MapPin className="h-4 w-4" />; // Changed from Walking to MapPin
       case 'transit':
         return <Bus className="h-4 w-4" />;
       default:
