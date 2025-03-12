@@ -1,6 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import supabase from "../supabaseClient"; // Import the Supabase client
+import { useNavigate } from "react-router-dom";
+import supabase from "../supabaseClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 interface User {
@@ -10,54 +13,100 @@ interface User {
 }
 
 const Admin = () => {
-  const [users, setUsers] = useState<User[]>([]); // Store users
-  const [loading, setLoading] = useState(true); // Manage loading state
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newUser, setNewUser] = useState({ name: "", email: "" });
 
-  // Function to fetch users from Supabase
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
+
   const fetchUsers = async () => {
     setLoading(true);
-    setError(null);
-    
     try {
       const { data, error } = await supabase.from("users").select("*");
-      
-      if (error) {
-        throw error;
-      }
-      
+      if (error) throw error;
       setUsers(data || []);
-      console.log("Users fetched successfully:", data);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      setError("Failed to load users. Please try again later.");
-      toast.error("Failed to load users");
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Erreur lors de la récupération des utilisateurs");
     } finally {
       setLoading(false);
     }
   };
 
-  // Load users on component mount
+  const handleAddUser = async () => {
+    try {
+      const { name, email } = newUser;
+      if (!name || !email) {
+        toast.error("Veuillez remplir tous les champs");
+        return;
+      }
+
+      const { error } = await supabase.from("users").insert([{ name, email }]);
+      if (error) throw error;
+
+      toast.success("Utilisateur ajouté avec succès");
+      setNewUser({ name: "", email: "" });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Erreur lors de l'ajout de l'utilisateur");
+    }
+  };
+
+  const handleDeleteUser = async (id: number) => {
+    try {
+      const { error } = await supabase.from("users").delete().eq("id", id);
+      if (error) throw error;
+
+      toast.success("Utilisateur supprimé avec succès");
+      fetchUsers();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Erreur lors de la suppression de l'utilisateur");
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  // Handle adding a new user
-  const handleAddUser = () => {
-    toast.info("This functionality will be implemented soon");
-  };
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-2xl font-bold mb-4">Administration</h1>
 
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h2 className="text-lg font-semibold mb-4">Ajouter un utilisateur</h2>
+        <div className="flex gap-4 flex-wrap">
+          <Input
+            type="text"
+            placeholder="Nom"
+            value={newUser.name}
+            onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+            className="flex-1"
+          />
+          <Input
+            type="email"
+            placeholder="Email"
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            className="flex-1"
+          />
+          <Button onClick={handleAddUser}>
+            Ajouter
+          </Button>
         </div>
-      )}
+      </div>
 
-      {/* User display */}
       {loading ? (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -74,56 +123,25 @@ const Admin = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Aucun utilisateur trouvé
+              {users.map((user) => (
+                <tr key={user.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteUser(user.id)}
+                    >
+                      Supprimer
+                    </Button>
                   </td>
                 </tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button 
-                        className="text-indigo-600 hover:text-indigo-900 mr-2"
-                        onClick={() => toast.info(`Éditer l'utilisateur ${user.name}`)}
-                      >
-                        Éditer
-                      </button>
-                      <button 
-                        className="text-red-600 hover:text-red-900"
-                        onClick={() => toast.info(`Supprimer l'utilisateur ${user.name}`)}
-                      >
-                        Supprimer
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
       )}
-
-      {/* Add user button */}
-      <button
-        className="mt-6 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
-        onClick={handleAddUser}
-      >
-        Ajouter un utilisateur
-      </button>
-
-      {/* Refresh button */}
-      <button
-        className="mt-6 ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition-colors"
-        onClick={fetchUsers}
-        disabled={loading}
-      >
-        {loading ? "Chargement..." : "Rafraîchir"}
-      </button>
     </div>
   );
 };

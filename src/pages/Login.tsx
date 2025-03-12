@@ -1,81 +1,39 @@
+
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Facebook, Chrome, Scan, Mail, Lock, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import supabase from "../supabaseClient";
 import { toast } from "sonner";
-
-const formSchema = z.object({
-  email: z.string().email("Email invalide"),
-  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-});
+import { Mail, ArrowLeft } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [isFaceIDAvailable, setIsFaceIDAvailable] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast.success("Connexion réussie !");
-  };
-
-  const handleGoogleLogin = () => {
-    console.log("Connexion avec Google");
-    toast.info("Connexion avec Google en cours...");
-  };
-
-  const handleFacebookLogin = () => {
-    console.log("Connexion avec Facebook");
-    toast.info("Connexion avec Facebook en cours...");
-  };
-
-  const handleFaceIDLogin = async () => {
     try {
-      const supported = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      if (!supported) {
-        toast.error("Face ID n'est pas disponible sur cet appareil");
-        return;
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-      const options = {
-        publicKey: {
-          challenge: new Uint8Array(32),
-          rpId: window.location.hostname,
-          userVerification: "required" as UserVerificationRequirement,
-        }
-      };
+      if (error) throw error;
 
-      await navigator.credentials.get(options);
-      toast.success("Authentification Face ID réussie !");
+      toast.success("Connexion réussie !");
+      navigate("/admin");
     } catch (error) {
-      toast.error("Erreur lors de l'authentification Face ID");
-      console.error(error);
+      console.error('Error:', error);
+      toast.error("Erreur de connexion");
+    } finally {
+      setLoading(false);
     }
   };
-
-  React.useEffect(() => {
-    async function checkFaceIDAvailability() {
-      try {
-        const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        setIsFaceIDAvailable(available);
-      } catch (error) {
-        setIsFaceIDAvailable(false);
-      }
-    }
-    checkFaceIDAvailability();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -90,101 +48,46 @@ const Login = () => {
         </Button>
 
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Connexion</h1>
-          <p className="text-gray-600">Connectez-vous pour accéder à vos lieux favoris</p>
+          <h1 className="text-2xl font-bold mb-2">Connexion Admin</h1>
+          <p className="text-gray-600">Connectez-vous à votre compte administrateur</p>
         </div>
 
-        <div className="space-y-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleLogin}
-          >
-            <Chrome className="mr-2 h-4 w-4 text-red-500" />
-            Continuer avec Google
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleFacebookLogin}
-          >
-            <Facebook className="mr-2 h-4 w-4 text-blue-600" />
-            Continuer avec Facebook
-          </Button>
-
-          {isFaceIDAvailable && (
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleFaceIDLogin}
-            >
-              <Scan className="mr-2 h-4 w-4" />
-              Se connecter avec Face ID
-            </Button>
-          )}
-        </div>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground">
-              Ou connectez-vous avec
-            </span>
-          </div>
-        </div>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                      <Input placeholder="vous@exemple.com" className="pl-10" {...field} />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mot de passe</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                      <Input type="password" className="pl-10" {...field} />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4">
-              <Button type="submit" className="w-full">
-                Se connecter
-              </Button>
-              <p className="text-center text-sm text-gray-600">
-                Pas encore de compte ?{" "}
-                <Link to="/register" className="text-primary hover:underline">
-                  S'inscrire
-                </Link>
-              </p>
+        <form onSubmit={handleEmailLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                className="pl-10"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
-          </form>
-        </Form>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Mot de passe
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Connexion..." : "Se connecter"}
+          </Button>
+        </form>
       </div>
     </div>
   );
