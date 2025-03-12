@@ -4,9 +4,10 @@ import { useState } from 'react';
 interface UseVoiceRecordingProps {
   isRecording: boolean;
   setIsRecording: (recording: boolean) => void;
+  onTextResult?: (text: string) => void;
 }
 
-export const useVoiceRecording = ({ isRecording, setIsRecording }: UseVoiceRecordingProps) => {
+export const useVoiceRecording = ({ isRecording, setIsRecording, onTextResult }: UseVoiceRecordingProps) => {
   const handleMicClick = () => {
     setIsRecording(!isRecording);
     if (!isRecording) {
@@ -15,6 +16,12 @@ export const useVoiceRecording = ({ isRecording, setIsRecording }: UseVoiceRecor
     } else {
       console.log("Arrêt de l'enregistrement...");
       // Code pour arrêter l'enregistrement
+      // Simulate text result for demo purposes
+      if (onTextResult) {
+        setTimeout(() => {
+          onTextResult("Résultat de transcription simulé");
+        }, 1000);
+      }
     }
   };
 

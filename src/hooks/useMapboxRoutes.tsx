@@ -136,7 +136,13 @@ export const useMapboxRoutes = ({
 
   // Effacer tous les itinéraires
   const clearRoutes = () => {
-    setRoutes({});
+    // Fix: Reset routes to an object with all required TransportMode keys set to null
+    setRoutes({
+      'driving': null,
+      'walking': null,
+      'cycling': null,
+      'driving-traffic': null
+    });
   };
 
   return {

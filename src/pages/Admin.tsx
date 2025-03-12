@@ -1,61 +1,128 @@
+
 import React, { useState, useEffect } from "react";
-import supabase from "../supabaseClient"; // Importer la config Supabase
+import supabase from "../supabaseClient"; // Import the Supabase client
+import { toast } from "sonner";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
 
 const Admin = () => {
-  const [users, setUsers] = useState([]); // Stocker les utilisateurs
-  const [loading, setLoading] = useState(true); // Gérer le chargement
+  const [users, setUsers] = useState<User[]>([]); // Store users
+  const [loading, setLoading] = useState(true); // Manage loading state
+  const [error, setError] = useState<string | null>(null);
 
-  // Fonction pour récupérer les utilisateurs depuis Supabase
+  // Function to fetch users from Supabase
   const fetchUsers = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("users").select("*"); // Récupère les utilisateurs
-    if (error) {
-      console.error("Erreur lors de la récupération des utilisateurs :", error);
-    } else {
-      setUsers(data); // Met à jour le state
+    setError(null);
+    
+    try {
+      const { data, error } = await supabase.from("users").select("*");
+      
+      if (error) {
+        throw error;
+      }
+      
+      setUsers(data || []);
+      console.log("Users fetched successfully:", data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to load users. Please try again later.");
+      toast.error("Failed to load users");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  // Charger les utilisateurs au montage du composant
+  // Load users on component mount
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Handle adding a new user
+  const handleAddUser = () => {
+    toast.info("This functionality will be implemented soon");
+  };
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-2xl font-bold mb-4">Administration</h1>
 
-      {/* Affichage des utilisateurs */}
-      {loading ? (
-        <p>Chargement des utilisateurs...</p>
-      ) : (
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Nom</th>
-              <th className="border border-gray-300 px-4 py-2">Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2">{user.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{user.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{user.email}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
       )}
 
-      {/* Bouton pour ajouter un utilisateur */}
+      {/* User display */}
+      {loading ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      ) : (
+        <div className="bg-white shadow overflow-hidden rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
+                    Aucun utilisateur trouvé
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button 
+                        className="text-indigo-600 hover:text-indigo-900 mr-2"
+                        onClick={() => toast.info(`Éditer l'utilisateur ${user.name}`)}
+                      >
+                        Éditer
+                      </button>
+                      <button 
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => toast.info(`Supprimer l'utilisateur ${user.name}`)}
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Add user button */}
       <button
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        onClick={() => alert("Ajout d'un utilisateur à implémenter")}
+        className="mt-6 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors"
+        onClick={handleAddUser}
       >
         Ajouter un utilisateur
+      </button>
+
+      {/* Refresh button */}
+      <button
+        className="mt-6 ml-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition-colors"
+        onClick={fetchUsers}
+        disabled={loading}
+      >
+        {loading ? "Chargement..." : "Rafraîchir"}
       </button>
     </div>
   );
