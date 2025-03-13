@@ -1,203 +1,214 @@
 
-import { toast } from 'sonner';
+/**
+ * Service for managing WebSocket connections
+ */
 
-export type MessageHandler = (data: any) => void;
+interface WebSocketOptions {
+  reconnectAttempts?: number;
+  reconnectInterval?: number;
+  onOpen?: () => void;
+  onClose?: () => void;
+  onError?: (error: Event) => void;
+}
 
-interface WebSocketMessage {
-  type: string;
-  payload: any;
+interface WebSocketEventHandlers {
+  [eventName: string]: Array<(data: any) => void>;
 }
 
 class WebSocketService {
   private socket: WebSocket | null = null;
-  private isConnected: boolean = false;
-  private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 5;
-  private reconnectDelay: number = 1000;
-  private url: string = '';
-  private messageHandlers: Map<string, Set<MessageHandler>> = new Map();
-  private pendingMessages: WebSocketMessage[] = [];
-
+  private url: string | null = null;
+  private reconnectAttempts: number;
+  private reconnectInterval: number;
+  private reconnectTimeoutId: number | null = null;
+  private currentAttempt: number = 0;
+  private eventHandlers: WebSocketEventHandlers = {};
+  private onOpenCallback?: () => void;
+  private onCloseCallback?: () => void;
+  private onErrorCallback?: (error: Event) => void;
+  
+  constructor() {
+    this.reconnectAttempts = 5;
+    this.reconnectInterval = 1000;
+  }
+  
   /**
-   * Initialise une connexion WebSocket
-   * @param url URL du serveur WebSocket
+   * Connect to a WebSocket server
+   * @param url WebSocket server URL
+   * @param options Connection options
+   * @returns Promise that resolves to true if connection successful
    */
-  connect(url: string): Promise<boolean> {
-    this.url = url;
-    
+  public async connect(url: string, options: WebSocketOptions = {}): Promise<boolean> {
     return new Promise((resolve) => {
+      // Store options
+      this.url = url;
+      this.reconnectAttempts = options.reconnectAttempts || 5;
+      this.reconnectInterval = options.reconnectInterval || 1000;
+      this.onOpenCallback = options.onOpen;
+      this.onCloseCallback = options.onClose;
+      this.onErrorCallback = options.onError;
+      
+      // Clear any existing reconnection attempts
+      if (this.reconnectTimeoutId) {
+        clearTimeout(this.reconnectTimeoutId);
+        this.reconnectTimeoutId = null;
+      }
+      
+      // Close existing connection if any
+      if (this.socket) {
+        this.socket.close();
+        this.socket = null;
+      }
+      
       try {
+        // Create new WebSocket connection
         this.socket = new WebSocket(url);
         
+        // Setup event handlers
         this.socket.onopen = () => {
           console.log('WebSocket connection established');
-          this.isConnected = true;
-          this.reconnectAttempts = 0;
-          
-          // Envoyer les messages en attente
-          this.sendPendingMessages();
-          
+          this.currentAttempt = 0;
+          if (this.onOpenCallback) this.onOpenCallback();
           resolve(true);
         };
         
-        this.socket.onclose = () => {
-          console.log('WebSocket connection closed');
-          this.isConnected = false;
-          this.attemptReconnect();
+        this.socket.onclose = (event) => {
+          console.log(`WebSocket connection closed: ${event.code} ${event.reason}`);
+          this.socket = null;
           
-          // Si c'est la première fermeture, résoudre avec false
-          if (this.reconnectAttempts === 1) {
+          if (this.onCloseCallback) this.onCloseCallback();
+          
+          // Attempt to reconnect if not closed cleanly and still have attempts
+          if (!event.wasClean && this.currentAttempt < this.reconnectAttempts) {
+            this.scheduleReconnect();
+          }
+          
+          if (this.currentAttempt === 0) {
             resolve(false);
           }
         };
         
         this.socket.onerror = (error) => {
           console.error('WebSocket error:', error);
-          // Si c'est la première erreur, résoudre avec false
-          if (this.reconnectAttempts === 0) {
-            this.reconnectAttempts = 1;
-            resolve(false);
-          }
+          if (this.onErrorCallback) this.onErrorCallback(error);
+          
+          // Don't resolve here, as onclose will be called after an error
         };
         
         this.socket.onmessage = (event) => {
-          this.handleMessage(event);
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type && this.eventHandlers[data.type]) {
+              this.eventHandlers[data.type].forEach(handler => handler(data.payload));
+            }
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
         };
       } catch (error) {
-        console.error('Error initializing WebSocket:', error);
+        console.error('Error creating WebSocket connection:', error);
         resolve(false);
       }
     });
   }
-
+  
   /**
-   * Tente de se reconnecter au serveur WebSocket
+   * Check if WebSocket is connected
    */
-  private attemptReconnect() {
-    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('Maximum reconnect attempts reached');
-      toast.error('Impossible de se connecter au serveur en temps réel');
-      return;
+  public get isConnected(): boolean {
+    return !!this.socket && this.socket.readyState === WebSocket.OPEN;
+  }
+  
+  /**
+   * Disconnect from WebSocket server
+   */
+  public disconnect(): void {
+    if (this.reconnectTimeoutId) {
+      clearTimeout(this.reconnectTimeoutId);
+      this.reconnectTimeoutId = null;
     }
     
-    this.reconnectAttempts++;
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
-    console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-    
-    setTimeout(() => {
-      this.connect(this.url);
-    }, delay);
-  }
-
-  /**
-   * Gère les messages entrants
-   */
-  private handleMessage(event: MessageEvent) {
-    try {
-      const message = JSON.parse(event.data) as WebSocketMessage;
-      
-      // Vérifier si des gestionnaires sont enregistrés pour ce type de message
-      const handlers = this.messageHandlers.get(message.type);
-      if (handlers) {
-        handlers.forEach(handler => {
-          try {
-            handler(message.payload);
-          } catch (error) {
-            console.error(`Error in message handler for ${message.type}:`, error);
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error parsing WebSocket message:', error);
+    if (this.socket) {
+      this.socket.close(1000, 'Client disconnected');
+      this.socket = null;
     }
   }
-
+  
   /**
-   * Envoie un message au serveur WebSocket
+   * Register an event handler
+   * @param event Event name
+   * @param handler Event handler function
    */
-  send(type: string, payload: any): boolean {
-    const message: WebSocketMessage = { type, payload };
-    
-    if (!this.isConnected || !this.socket) {
-      console.log('WebSocket not connected, queuing message');
-      this.pendingMessages.push(message);
+  public on(event: string, handler: (data: any) => void): void {
+    if (!this.eventHandlers[event]) {
+      this.eventHandlers[event] = [];
+    }
+    this.eventHandlers[event].push(handler);
+  }
+  
+  /**
+   * Remove an event handler
+   * @param event Event name
+   * @param handler Event handler function
+   */
+  public off(event: string, handler: (data: any) => void): void {
+    if (this.eventHandlers[event]) {
+      this.eventHandlers[event] = this.eventHandlers[event].filter(h => h !== handler);
+    }
+  }
+  
+  /**
+   * Send data to the WebSocket server
+   * @param type Message type
+   * @param payload Message payload
+   * @returns Whether the send was successful
+   */
+  public send(type: string, payload: any): boolean {
+    if (!this.isConnected) {
+      console.error('Cannot send message: WebSocket not connected');
       return false;
     }
     
     try {
-      this.socket.send(JSON.stringify(message));
+      const message = JSON.stringify({
+        type,
+        payload
+      });
+      this.socket!.send(message);
       return true;
     } catch (error) {
       console.error('Error sending WebSocket message:', error);
-      this.pendingMessages.push(message);
       return false;
     }
   }
-
+  
   /**
-   * Envoie les messages en attente
+   * Schedule a reconnection attempt
    */
-  private sendPendingMessages() {
-    if (this.pendingMessages.length === 0) return;
+  private scheduleReconnect(): void {
+    if (this.reconnectTimeoutId) {
+      clearTimeout(this.reconnectTimeoutId);
+    }
     
-    console.log(`Sending ${this.pendingMessages.length} pending messages`);
+    this.currentAttempt++;
+    const delay = this.reconnectInterval * Math.pow(1.5, this.currentAttempt - 1);
     
-    for (const message of this.pendingMessages) {
-      try {
-        if (this.socket) {
-          this.socket.send(JSON.stringify(message));
-        }
-      } catch (error) {
-        console.error('Error sending pending WebSocket message:', error);
+    console.log(`Scheduling WebSocket reconnect attempt ${this.currentAttempt} in ${delay}ms`);
+    
+    this.reconnectTimeoutId = setTimeout(() => {
+      if (this.url) {
+        console.log(`Attempting to reconnect to WebSocket (attempt ${this.currentAttempt})`);
+        this.connect(this.url, {
+          reconnectAttempts: this.reconnectAttempts,
+          reconnectInterval: this.reconnectInterval,
+          onOpen: this.onOpenCallback,
+          onClose: this.onCloseCallback,
+          onError: this.onErrorCallback
+        });
       }
-    }
-    
-    this.pendingMessages = [];
-  }
-
-  /**
-   * S'abonne à un type de message
-   */
-  on(type: string, handler: MessageHandler) {
-    if (!this.messageHandlers.has(type)) {
-      this.messageHandlers.set(type, new Set());
-    }
-    
-    this.messageHandlers.get(type)?.add(handler);
-  }
-
-  /**
-   * Se désabonne d'un type de message
-   */
-  off(type: string, handler: MessageHandler) {
-    const handlers = this.messageHandlers.get(type);
-    if (handlers) {
-      handlers.delete(handler);
-      if (handlers.size === 0) {
-        this.messageHandlers.delete(type);
-      }
-    }
-  }
-
-  /**
-   * Ferme la connexion WebSocket
-   */
-  disconnect() {
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-      this.isConnected = false;
-    }
-  }
-
-  /**
-   * Vérifie si la connexion WebSocket est établie
-   */
-  isConnected(): boolean {
-    return this.isConnected && !!this.socket;
+    }, delay) as unknown as number;
   }
 }
 
-// Exporter une instance singleton
+// Export a singleton instance
 export const websocketService = new WebSocketService();

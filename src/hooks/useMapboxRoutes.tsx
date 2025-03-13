@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { mapboxService, RouteResponse, TransportMode } from '@/services/mapboxService';
 import { toast } from 'sonner';
 import { startPerformanceMarker, endPerformanceMarker } from '@/utils/performanceMonitoring';
@@ -21,7 +20,6 @@ export const useMapboxRoutes = ({
   const [from, setFrom] = useState<[number, number] | null>(initialFrom || null);
   const [to, setTo] = useState<[number, number] | null>(initialTo || null);
   const [waypoints, setWaypoints] = useState<[number, number][]>([]);
-  // Initialisation correcte avec tous les modes de transport
   const [routes, setRoutes] = useState<Record<TransportMode, RouteResponse | null>>({
     'driving': null,
     'walking': null,
@@ -33,10 +31,8 @@ export const useMapboxRoutes = ({
   const [error, setError] = useState<string | null>(null);
   const [offlineMode, setOfflineMode] = useState(false);
 
-  // Les modes de transport disponibles
   const transportModes: TransportMode[] = ['driving', 'walking', 'cycling', 'driving-traffic'];
 
-  // Log des points de départ et d'arrivée pour le débogage
   useEffect(() => {
     if (from) {
       console.log('Route from point set:', from);
@@ -46,7 +42,6 @@ export const useMapboxRoutes = ({
     }
   }, [from, to]);
 
-  // Vérifier si le mode hors ligne est activé
   useEffect(() => {
     const checkConnectivity = () => {
       const isOffline = !navigator.onLine;
@@ -63,7 +58,6 @@ export const useMapboxRoutes = ({
     window.addEventListener('online', checkConnectivity);
     window.addEventListener('offline', checkConnectivity);
     
-    // Vérification initiale
     checkConnectivity();
     
     return () => {
@@ -72,7 +66,6 @@ export const useMapboxRoutes = ({
     };
   }, [offlineMode]);
 
-  // Calculer un itinéraire pour un mode de transport spécifique
   const calculateRoute = async (
     mode: TransportMode = activeMode,
     start = from,
@@ -92,15 +85,12 @@ export const useMapboxRoutes = ({
     startPerformanceMarker(perfMarkerId);
 
     try {
-      // Compiler tous les points de l'itinéraire
       const allPoints: [number, number][] = [start];
       
-      // Ajouter les points intermédiaires
       if (viaPoints.length > 0) {
         allPoints.push(...viaPoints);
       }
       
-      // Ajouter le point d'arrivée
       allPoints.push(end);
 
       console.log(`Calculating ${mode} route from ${start} to ${end} with ${viaPoints.length} waypoints`);
@@ -134,87 +124,82 @@ export const useMapboxRoutes = ({
     }
   };
 
-  // Calculer les itinéraires pour tous les modes de transport
-  const calculateAllRoutes = async (
-    start = from,
-    end = to,
-    viaPoints = waypoints
-  ) => {
-    if (!start || !end) {
-      console.warn('Cannot calculate all routes: missing start or end point');
-      toast.error('Points de départ et d\'arrivée requis');
-      return null;
+  const calculateAllRoutes = useCallback(async () => {
+    if (!from || !to) {
+      console.error('Cannot calculate routes: missing origin or destination coordinates');
+      return;
     }
-
-    setLoading(true);
-    setError(null);
     
-    const perfMarkerId = 'multi-route-calculation';
-    startPerformanceMarker(perfMarkerId);
-
+    setLoading(true);
+    
     try {
-      const allPoints: [number, number][] = [start, ...viaPoints, end];
-      
-      console.log(`Calculating routes for all transport modes from ${start} to ${end}`);
-      
-      // En mode hors ligne, vérifier les données en cache d'abord
-      if (offlineMode) {
-        const cachedRoutes = sessionStorage.getItem(`routes-${JSON.stringify(allPoints)}`);
-        if (cachedRoutes) {
-          const parsedRoutes = JSON.parse(cachedRoutes) as Record<TransportMode, RouteResponse | null>;
-          console.log('Using cached routes for offline mode');
-          setRoutes(parsedRoutes);
-          endPerformanceMarker(perfMarkerId);
-          return parsedRoutes;
-        }
-      }
-      
-      const results = await mapboxService.getMultiModeDirections(
-        allPoints,
-        transportModes
+      const results = await Promise.all(
+        transportModes.map(async (mode) => {
+          try {
+            const result = await mapboxService.getDirections({
+              origin: from,
+              destination: to,
+              profile: mode.mapboxId
+            });
+            
+            if (result && 'routes' in result && Array.isArray(result.routes)) {
+              return {
+                mode: mode.mapboxId,
+                data: result.routes
+              };
+            } else {
+              console.error(`No valid routes returned for mode: ${mode.mapboxId}`);
+              return {
+                mode: mode.mapboxId,
+                data: []
+              };
+            }
+          } catch (error) {
+            console.error(`Error fetching ${mode.mapboxId} route:`, error);
+            return {
+              mode: mode.mapboxId,
+              data: []
+            };
+          }
+        })
       );
       
-      // Vérifier quels modes ont réussi
-      Object.entries(results).forEach(([mode, result]) => {
-        if (result) {
-          console.log(`${mode} route calculation successful with ${result.routes.length} routes`);
-        } else {
-          console.warn(`${mode} route calculation failed`);
-        }
+      const newRoutes: Record<string, any[]> = {};
+      results.forEach(result => {
+        newRoutes[result.mode] = result.data;
       });
       
-      // Mettre en cache les résultats pour le mode hors ligne
-      sessionStorage.setItem(`routes-${JSON.stringify(allPoints)}`, JSON.stringify(results));
+      setRoutes(newRoutes);
       
-      setRoutes(results as Record<TransportMode, RouteResponse | null>);
-      endPerformanceMarker(perfMarkerId);
-      return results as Record<TransportMode, RouteResponse | null>;
-    } catch (err) {
-      endPerformanceMarker(perfMarkerId);
-      handleError(err, 'Erreur lors du calcul des itinéraires');
-      setError('Erreur lors du calcul des itinéraires');
-      return null;
+      if ((!newRoutes[activeMode] || newRoutes[activeMode].length === 0) && Object.values(newRoutes).some(r => r.length > 0)) {
+        for (const mode of transportModes) {
+          if (newRoutes[mode.mapboxId] && newRoutes[mode.mapboxId].length > 0) {
+            setActiveMode(mode.mapboxId);
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error calculating routes:', error);
+      toast.error('Erreur lors du calcul des itinéraires');
+      setRoutes({});
     } finally {
       setLoading(false);
     }
-  };
+  }, [from, to, activeMode, setActiveMode, transportModes]);
 
-  // Ajouter un point intermédiaire
   const addWaypoint = (point: [number, number]) => {
     setWaypoints(prev => [...prev, point]);
   };
 
-  // Supprimer un point intermédiaire
   const removeWaypoint = (index: number) => {
     setWaypoints(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Réorganiser les points intermédiaires
   const reorderWaypoints = (newOrder: [number, number][]) => {
     setWaypoints(newOrder);
   };
 
-  // Effacer tous les itinéraires
   const clearRoutes = () => {
     setRoutes({
       'driving': null,
