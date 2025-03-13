@@ -2,6 +2,7 @@
 import React from 'react';
 import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
+import { SearchPanel } from './SearchPanel';
 
 interface MapSectionProps {
   results: Result[];
@@ -25,6 +26,14 @@ interface MapSectionProps {
   onResultClick: (result: Result) => void;
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
+  searchHistory: string[];
+  savedSearches: string[];
+  onHistoryItemClick: (query: string) => void;
+  onSaveSearch: (query: string) => void;
+  onRemoveSavedSearch: (query: string) => void;
+  resetSearch: () => void;
+  onTransportModeChange: (mode: string) => void;
+  userLocation?: [number, number];
 }
 
 export const MapSection: React.FC<MapSectionProps> = ({
@@ -48,10 +57,20 @@ export const MapSection: React.FC<MapSectionProps> = ({
   selectedResultId,
   onResultClick,
   selectedCategory,
-  onCategorySelect
+  onCategorySelect,
+  searchHistory,
+  savedSearches,
+  onHistoryItemClick,
+  onSaveSearch,
+  onRemoveSavedSearch,
+  resetSearch,
+  onTransportModeChange,
+  userLocation
 }) => {
+  const [showHistory, setShowHistory] = useState(false);
+
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
       <MapContainer
         results={results}
         center={center}
@@ -74,7 +93,39 @@ export const MapSection: React.FC<MapSectionProps> = ({
         onResultClick={onResultClick}
         selectedCategory={selectedCategory}
         onCategorySelect={onCategorySelect}
+        userLocation={userLocation}
+      />
+      
+      <SearchPanel
+        query={searchQuery}
+        setQuery={onSearchChange}
+        search={(query) => {
+          onSearchChange(query);
+          onSearch();
+        }}
+        onResultSelect={onResultClick}
+        resetSearch={resetSearch}
+        showHistory={showHistory}
+        setShowHistory={setShowHistory}
+        searchHistory={searchHistory}
+        savedSearches={savedSearches}
+        onHistoryItemClick={onHistoryItemClick}
+        onSaveSearch={onSaveSearch}
+        onRemoveSavedSearch={onRemoveSavedSearch}
+        userLocation={userLocation}
+        isRecording={isRecording}
+        onMicClick={onMicClick}
+        isLocationActive={isLocationActive}
+        onLocationClick={onLocationClick}
+        loading={loading}
+        transportMode={transportMode}
+        onTransportModeChange={onTransportModeChange}
       />
     </div>
   );
 };
+
+// Add missing import
+import { useState } from 'react';
+
+export default MapSection;

@@ -112,6 +112,11 @@ export const useSearchPanel = () => {
     searchMenu,
     searchState,
     resultSelection,
-    handleSearchPress
+    handleSearchPress,
+    isLocationActive: searchState.isLocationActive,
+    transportMode: searchState.transportMode,
+    onTransportModeChange: searchState.setTransportMode
   };
 };
+
+export default useSearchPanel;

@@ -2,9 +2,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { History, Search } from 'lucide-react';
-import SearchAutocomplete from './SearchAutocomplete';
 import SearchHistory from './SearchHistory';
 import { Result } from '@/components/ResultsList';
+import TransparentSearchBar from './TransparentSearchBar';
 
 interface SearchPanelProps {
   query: string;
@@ -20,6 +20,13 @@ interface SearchPanelProps {
   onSaveSearch: (query: string) => void;
   onRemoveSavedSearch: (query: string) => void;
   userLocation?: [number, number];
+  isRecording?: boolean;
+  onMicClick?: () => void;
+  isLocationActive?: boolean;
+  onLocationClick?: () => void;
+  loading?: boolean;
+  transportMode: string;
+  onTransportModeChange: (mode: string) => void;
 }
 
 export const SearchPanel: React.FC<SearchPanelProps> = ({
@@ -35,42 +42,38 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   onHistoryItemClick,
   onSaveSearch,
   onRemoveSavedSearch,
-  userLocation
+  userLocation,
+  isRecording = false,
+  onMicClick = () => {},
+  isLocationActive = false,
+  onLocationClick = () => {},
+  loading = false,
+  transportMode,
+  onTransportModeChange
 }) => {
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
-      <div className="bg-white rounded-lg shadow-md p-3">
-        <div className="flex items-center gap-2">
-          <SearchAutocomplete
-            value={query}
-            onChange={setQuery}
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-full flex items-center gap-2">
+          <TransparentSearchBar
+            searchQuery={query}
+            onSearchChange={setQuery}
             onSearch={search}
-            onResultSelect={(result) => {
-              // Find equivalent in searchResults
-              const formattedResult = {
-                id: result.id,
-                name: result.place_name.split(',')[0],
-                address: result.place_name,
-                distance: 0,
-                duration: 0,
-                category: result.properties?.category || 'other',
-                color: 'blue',
-                latitude: result.center[1],
-                longitude: result.center[0],
-                description: ''
-              };
-              onResultSelect(formattedResult);
-            }}
-            onClear={resetSearch}
-            placeholder="Rechercher un lieu, une entreprise..."
-            userLocation={userLocation}
-            className="flex-1"
+            isRecording={isRecording}
+            onMicClick={onMicClick}
+            isLocationActive={isLocationActive}
+            onLocationClick={onLocationClick}
+            loading={loading}
+            transportMode={transportMode}
+            onTransportModeChange={onTransportModeChange}
+            showCategoryMenu={false}
           />
+          
           <Button
             variant="outline"
             size="icon"
             onClick={() => setShowHistory(!showHistory)}
-            className="flex-shrink-0"
+            className="flex-shrink-0 h-12 w-12 bg-white/80 backdrop-blur-sm rounded-full shadow-md border border-gray-200"
           >
             <History className="h-5 w-5" />
           </Button>
@@ -78,7 +81,7 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
         
         {/* Search history */}
         {showHistory && (
-          <div className="mt-2">
+          <div className="w-full mt-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-gray-200">
             <SearchHistory
               history={searchHistory}
               savedSearches={savedSearches}

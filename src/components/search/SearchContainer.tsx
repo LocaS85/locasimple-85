@@ -1,17 +1,12 @@
 
 import React from 'react';
-import { SearchControls } from './SearchControls';
-import { SearchMenu } from './SearchMenu';
-import { LocationButton } from './LocationButton';
-import { SearchButton } from './SearchButton';
+import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
 import { useRouteDisplay } from '@/hooks/useRouteDisplay';
-import SearchPanel from './SearchPanel';
-import RouteDisplayContainer from './RouteDisplayContainer';
-import { TransportMode } from '@/hooks/useMapboxRoutes';
+import MapSection from './MapSection';
+import SearchMenu from './SearchMenu';
 
-export const SearchContainer = () => {
-  // Use our custom hooks to manage search and routes
+export const SearchContainer: React.FC = () => {
   const {
     query,
     setQuery,
@@ -31,17 +26,14 @@ export const SearchContainer = () => {
     searchMenu,
     searchState,
     resultSelection,
-    handleSearchPress
+    handleSearchPress,
+    isLocationActive,
+    transportMode,
+    onTransportModeChange
   } = useSearchPanel();
 
   // Use route display hook
-  const {
-    from,
-    to,
-    routes,
-    activeMode,
-    setActiveMode
-  } = useRouteDisplay({
+  const { from, to, routes, activeMode, setActiveMode } = useRouteDisplay({
     userLocation: searchState.userLocation,
     searchResults: searchState.searchResults,
     selectedResultId: resultSelection.selectedResultId,
@@ -49,63 +41,42 @@ export const SearchContainer = () => {
   });
 
   return (
-    <div className="relative h-full">
-      <div className="absolute inset-0" onClick={searchMenu.handleMapInteraction}>
-        <SearchControls
-          searchResults={searchState.searchResults}
-          userLocation={searchState.userLocation}
-          selectedDistance={searchState.selectedDistance}
-          selectedDuration={searchState.selectedDuration}
-          distanceUnit={searchState.distanceUnit}
-          transportMode={searchState.transportMode}
-          searchQuery={query}
-          isRecording={isRecording}
-          isLocationActive={searchState.isLocationActive}
-          loading={searchState.loading || searchLoading}
-          onSearchChange={setQuery}
-          onMicClick={handleMicClick}
-          onLocationClick={handleLocationClick}
-          handleSearch={() => search(query)}
-          showRoutes={searchState.showRoutes}
-          selectedResultId={resultSelection.selectedResultId}
-          onResultClick={resultSelection.handleResultClick}
-          selectedCategory={searchState.selectedCategory}
-          onCategorySelect={searchState.setSelectedCategory}
-        />
-      </div>
-      
-      {/* Search panel */}
-      <SearchPanel
-        query={query}
-        setQuery={setQuery}
-        search={search}
-        onResultSelect={resultSelection.handleResultClick}
-        resetSearch={resetSearch}
-        showHistory={showHistory}
-        setShowHistory={setShowHistory}
+    <div className="relative w-full h-full">
+      {/* Map and Search Components */}
+      <MapSection
+        results={searchState.searchResults}
+        center={searchState.userLocation}
+        radius={searchState.selectedDistance || 5}
+        radiusUnit={searchState.distanceUnit}
+        radiusType="distance"
+        duration={searchState.selectedDuration || 15}
+        timeUnit="minutes"
+        transportMode={searchState.transportMode}
+        searchQuery={query}
+        onSearchChange={setQuery}
+        isRecording={isRecording}
+        onMicClick={handleMicClick}
+        onLocationClick={handleLocationClick}
+        isLocationActive={isLocationActive}
+        loading={searchState.loading || searchLoading}
+        showRoutes={searchState.showRoutes}
+        onSearch={handleSearchPress}
+        selectedResultId={resultSelection.selectedResultId}
+        onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
+        selectedCategory={searchState.selectedCategory}
+        onCategorySelect={searchState.setSelectedCategory}
         searchHistory={searchHistory}
         savedSearches={savedSearches}
         onHistoryItemClick={handleHistoryItemClick}
         onSaveSearch={handleSaveSearch}
         onRemoveSavedSearch={removeSavedSearch}
+        resetSearch={resetSearch}
+        onTransportModeChange={onTransportModeChange}
         userLocation={searchState.userLocation}
       />
-      
-      {/* Location button */}
-      <LocationButton 
-        loading={searchState.loading}
-        isLocationActive={searchState.isLocationActive}
-        onClick={handleLocationClick}
-      />
-      
-      {/* Search button */}
-      <SearchButton 
-        loading={searchState.loading || searchLoading}
-        onClick={() => search(query)}
-      />
-      
-      {/* Search menu */}
-      <SearchMenu 
+
+      {/* Bottom slide-up menu */}
+      <SearchMenu
         menuOpen={searchMenu.menuOpen}
         setMenuOpen={searchMenu.setMenuOpen}
         menuRef={searchMenu.menuRef}
@@ -117,20 +88,20 @@ export const SearchContainer = () => {
         distanceUnit={searchState.distanceUnit}
         transportMode={searchState.transportMode}
         resultsCount={searchState.resultsCount}
+        selectedCategory={searchState.selectedCategory}
+        onCategorySelect={searchState.setSelectedCategory}
         onResultsCountChange={searchState.setResultsCount}
         onTransportModeChange={searchState.setTransportMode}
         onDurationChange={searchState.setSelectedDuration}
         onDistanceChange={searchState.setSelectedDistance}
         onDistanceUnitChange={searchState.setDistanceUnit}
-        selectedCategory={searchState.selectedCategory}
-        onCategorySelect={searchState.setSelectedCategory}
         searchResults={searchState.searchResults}
         selectedResultId={resultSelection.selectedResultId}
-        onResultClick={resultSelection.handleResultClick}
-        onSearch={() => search(query)}
+        onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
+        onSearch={handleSearchPress}
       />
-      
-      {/* Route display */}
+
+      {/* Route display when a result is selected */}
       <RouteDisplayContainer
         selectedResultId={resultSelection.selectedResultId}
         from={from}
