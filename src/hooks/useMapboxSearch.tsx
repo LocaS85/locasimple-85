@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { mapboxService, SearchResult, SearchOptions } from '@/services/mapboxService';
+import { toast } from 'sonner';
 
 interface UseMapboxSearchProps {
   initialQuery?: string;
@@ -47,14 +48,16 @@ export const useMapboxSearch = ({
   });
 
   // Effectuer la recherche
-  const search = async (searchQuery = query): Promise<SearchResult[]> => {
+  const search = useCallback(async (searchQuery = query): Promise<SearchResult[]> => {
     if (!searchQuery.trim()) {
+      console.log('Empty search query, clearing results');
       setResults([]);
       return [];
     }
 
     setLoading(true);
     setError(null);
+    console.log(`Performing search for: "${searchQuery}"`);
 
     try {
       const options: SearchOptions = {
@@ -67,9 +70,11 @@ export const useMapboxSearch = ({
 
       if (userLocation) {
         options.proximity = userLocation;
+        console.log(`Using user location for search proximity: ${userLocation}`);
       }
 
       const searchResults = await mapboxService.searchPlaces(options);
+      console.log(`Search returned ${searchResults.length} results`);
       setResults(searchResults);
       
       // Ajouter à l'historique si ce n'est pas déjà la dernière recherche
@@ -88,39 +93,40 @@ export const useMapboxSearch = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, limit, autocomplete, types, language, userLocation, searchHistory]);
 
   // Réinitialiser la recherche
-  const resetSearch = () => {
+  const resetSearch = useCallback(() => {
     setQuery('');
     setResults([]);
-  };
+  }, []);
 
   // Sauvegarder une recherche
-  const saveSearch = (searchQuery: string) => {
+  const saveSearch = useCallback((searchQuery: string) => {
     if (!searchQuery || savedSearches.includes(searchQuery)) return;
     
     const newSavedSearches = [...savedSearches, searchQuery];
     setSavedSearches(newSavedSearches);
     localStorage.setItem('saved_searches', JSON.stringify(newSavedSearches));
-  };
+  }, [savedSearches]);
 
   // Supprimer une recherche sauvegardée
-  const removeSavedSearch = (searchQuery: string) => {
+  const removeSavedSearch = useCallback((searchQuery: string) => {
     const newSavedSearches = savedSearches.filter(s => s !== searchQuery);
     setSavedSearches(newSavedSearches);
     localStorage.setItem('saved_searches', JSON.stringify(newSavedSearches));
-  };
+  }, [savedSearches]);
 
   // Effectuer une recherche lorsque le type ou la position change
   useEffect(() => {
     if (query.trim()) {
+      console.log('User location or language changed, updating search');
       const timer = setTimeout(() => {
         search();
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [userLocation, language]);
+  }, [userLocation, language, search]);
 
   return {
     query,

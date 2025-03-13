@@ -8,10 +8,14 @@ class MapboxSearchService {
   private baseUrl: string = 'https://api.mapbox.com';
 
   constructor() {
-    this.token = MAPBOX_TOKEN;
+    this.token = MAPBOX_TOKEN || '';
+    
+    // Vérification du token à l'initialisation
     if (!this.token) {
       console.error('Mapbox token missing. Search functionality will be limited.');
       toast.error('Clé API Mapbox manquante. La recherche sera limitée.');
+    } else {
+      console.log('MapboxSearchService initialized with valid token');
     }
   }
 
@@ -20,7 +24,8 @@ class MapboxSearchService {
    */
   private checkToken(): boolean {
     if (!this.token) {
-      toast.error('Clé API Mapbox manquante');
+      console.error('Mapbox token missing for search request');
+      toast.error('Clé API Mapbox manquante pour la recherche');
       return false;
     }
     return true;
@@ -31,6 +36,10 @@ class MapboxSearchService {
    */
   async searchPlaces(options: SearchOptions): Promise<SearchResult[]> {
     if (!this.checkToken()) return [];
+    if (!options.query || options.query.trim() === '') {
+      console.warn('Empty search query provided to searchPlaces');
+      return [];
+    }
 
     try {
       const endpoint = `${this.baseUrl}/geocoding/v5/mapbox.places/${encodeURIComponent(options.query)}.json`;
@@ -61,12 +70,21 @@ class MapboxSearchService {
         params.append('bbox', options.bbox.join(','));
       }
 
+      console.log(`Searching places: ${endpoint}?${params.toString()}`);
       const response = await fetch(`${endpoint}?${params.toString()}`);
+      
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        throw new Error(`API Error: ${response.status} - ${await response.text()}`);
       }
 
       const data = await response.json();
+      
+      if (!data.features || data.features.length === 0) {
+        console.log(`No results found for query: ${options.query}`);
+      } else {
+        console.log(`Found ${data.features.length} results for query: ${options.query}`);
+      }
+      
       return data.features || [];
     } catch (error) {
       console.error('Error searching for places:', error);

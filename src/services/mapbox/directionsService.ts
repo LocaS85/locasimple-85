@@ -8,10 +8,14 @@ class MapboxDirectionsService {
   private baseUrl: string = 'https://api.mapbox.com';
 
   constructor() {
-    this.token = MAPBOX_TOKEN;
+    this.token = MAPBOX_TOKEN || '';
+    
+    // Vérification du token à l'initialisation
     if (!this.token) {
       console.error('Mapbox token missing. Directions functionality will be limited.');
       toast.error('Clé API Mapbox manquante. Les itinéraires seront limités.');
+    } else {
+      console.log('MapboxDirectionsService initialized with valid token');
     }
   }
 
@@ -20,7 +24,8 @@ class MapboxDirectionsService {
    */
   private checkToken(): boolean {
     if (!this.token) {
-      toast.error('Clé API Mapbox manquante');
+      console.error('Mapbox token missing for directions request');
+      toast.error('Clé API Mapbox manquante pour les itinéraires');
       return false;
     }
     return true;
@@ -33,7 +38,11 @@ class MapboxDirectionsService {
     waypoints: [number, number][],
     options: RouteOptions
   ): Promise<RouteResponse | null> {
-    if (!this.checkToken() || waypoints.length < 2) return null;
+    if (!this.checkToken()) return null;
+    if (waypoints.length < 2) {
+      console.error('At least 2 waypoints required for directions');
+      return null;
+    }
 
     try {
       // Format waypoints
@@ -77,12 +86,15 @@ class MapboxDirectionsService {
         params.append('waypoints_per_route', String(options.waypoints_per_route));
       }
 
+      console.log(`Fetching directions: ${endpoint}?${params.toString()}`);
       const response = await fetch(`${endpoint}?${params.toString()}`);
+      
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        throw new Error(`API Error: ${response.status} - ${await response.text()}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error calculating route:', error);
       toast.error('Erreur lors du calcul d\'itinéraire');
@@ -97,17 +109,35 @@ class MapboxDirectionsService {
     waypoints: [number, number][],
     modes: TransportMode[]
   ): Promise<Record<TransportMode, RouteResponse | null>> {
-    const results: Record<TransportMode, RouteResponse | null> = {} as any;
+    // Initialiser tous les modes avec null
+    const results: Record<TransportMode, RouteResponse | null> = {
+      'driving': null,
+      'walking': null,
+      'cycling': null,
+      'driving-traffic': null
+    };
+    
+    if (waypoints.length < 2) {
+      console.error('At least 2 waypoints required for multi-mode directions');
+      return results;
+    }
+    
+    console.log(`Calculating routes for ${modes.length} transport modes between ${waypoints.length} waypoints`);
     
     for (const mode of modes) {
-      results[mode] = await this.getDirections(waypoints, {
-        profile: mode,
-        alternatives: true,
-        geometries: 'geojson',
-        steps: true,
-        overview: 'full',
-        annotations: ['distance', 'duration'],
-      });
+      try {
+        results[mode] = await this.getDirections(waypoints, {
+          profile: mode,
+          alternatives: true,
+          geometries: 'geojson',
+          steps: true,
+          overview: 'full',
+          annotations: ['distance', 'duration'],
+        });
+      } catch (error) {
+        console.error(`Error calculating ${mode} route:`, error);
+        results[mode] = null;
+      }
     }
     
     return results;

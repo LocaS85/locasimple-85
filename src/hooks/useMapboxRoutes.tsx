@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { mapboxService, RouteResponse, TransportMode } from '@/services/mapboxService';
 import { toast } from 'sonner';
 
@@ -19,7 +19,7 @@ export const useMapboxRoutes = ({
   const [from, setFrom] = useState<[number, number] | null>(initialFrom || null);
   const [to, setTo] = useState<[number, number] | null>(initialTo || null);
   const [waypoints, setWaypoints] = useState<[number, number][]>([]);
-  // Fix: Initialize routes with all required TransportMode keys
+  // Initialisation correcte avec tous les modes de transport
   const [routes, setRoutes] = useState<Record<TransportMode, RouteResponse | null>>({
     'driving': null,
     'walking': null,
@@ -33,6 +33,16 @@ export const useMapboxRoutes = ({
   // Les modes de transport disponibles
   const transportModes: TransportMode[] = ['driving', 'walking', 'cycling', 'driving-traffic'];
 
+  // Log des points de départ et d'arrivée pour le débogage
+  useEffect(() => {
+    if (from) {
+      console.log('Route from point set:', from);
+    }
+    if (to) {
+      console.log('Route to point set:', to);
+    }
+  }, [from, to]);
+
   // Calculer un itinéraire pour un mode de transport spécifique
   const calculateRoute = async (
     mode: TransportMode = activeMode,
@@ -41,6 +51,7 @@ export const useMapboxRoutes = ({
     viaPoints = waypoints
   ) => {
     if (!start || !end) {
+      console.warn('Cannot calculate route: missing start or end point');
       toast.error('Points de départ et d\'arrivée requis');
       return null;
     }
@@ -60,6 +71,8 @@ export const useMapboxRoutes = ({
       // Ajouter le point d'arrivée
       allPoints.push(end);
 
+      console.log(`Calculating ${mode} route from ${start} to ${end} with ${viaPoints.length} waypoints`);
+      
       const routeResult = await mapboxService.getDirections(allPoints, {
         profile: mode,
         alternatives: true,
@@ -72,6 +85,7 @@ export const useMapboxRoutes = ({
       });
 
       if (routeResult) {
+        console.log(`Route calculated for ${mode} mode, length: ${routeResult.routes.length} routes`);
         setRoutes(prev => ({ ...prev, [mode]: routeResult }));
         return routeResult;
       } else {
@@ -93,6 +107,7 @@ export const useMapboxRoutes = ({
     viaPoints = waypoints
   ) => {
     if (!start || !end) {
+      console.warn('Cannot calculate all routes: missing start or end point');
       toast.error('Points de départ et d\'arrivée requis');
       return null;
     }
@@ -103,10 +118,21 @@ export const useMapboxRoutes = ({
     try {
       const allPoints: [number, number][] = [start, ...viaPoints, end];
       
+      console.log(`Calculating routes for all transport modes from ${start} to ${end}`);
+      
       const results = await mapboxService.getMultiModeDirections(
         allPoints,
         transportModes
       );
+      
+      // Vérifier quels modes ont réussi
+      Object.entries(results).forEach(([mode, result]) => {
+        if (result) {
+          console.log(`${mode} route calculation successful with ${result.routes.length} routes`);
+        } else {
+          console.warn(`${mode} route calculation failed`);
+        }
+      });
       
       setRoutes(results);
       return results;
@@ -136,7 +162,6 @@ export const useMapboxRoutes = ({
 
   // Effacer tous les itinéraires
   const clearRoutes = () => {
-    // Fix: Reset routes to an object with all required TransportMode keys set to null
     setRoutes({
       'driving': null,
       'walking': null,

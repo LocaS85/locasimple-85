@@ -1,4 +1,5 @@
 
+import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { Result } from '@/components/ResultsList';
@@ -16,24 +17,34 @@ export const useSearchApi = ({
   setLoading
 }: UseSearchApiProps) => {
   
-  const searchPlacesNearLocation = async (
+  const searchPlacesNearLocation = useCallback(async (
     searchQuery: string,
     transportMode: string
   ): Promise<Result[] | null> => {
-    if (!MAPBOX_TOKEN || !userLocation) {
+    if (!MAPBOX_TOKEN) {
+      console.error('Mapbox token missing for place search');
       toast.error('Configuration manquante pour la recherche');
       return null;
     }
 
+    if (!userLocation) {
+      console.warn('User location not available for search');
+      toast.warning('Position utilisateur non disponible');
+      return null;
+    }
+
     setLoading(true);
+    console.log(`Searching places near [${userLocation}] for "${searchQuery}" using ${transportMode} mode`);
+    
     try {
       // Paramètres de proximité basés sur la position de l'utilisateur
       const proximity = `${userLocation[0]},${userLocation[1]}`;
       
       // Créer la requête Mapbox avec la recherche de POIs
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&proximity=${proximity}&types=poi&limit=${resultsCount}&language=fr`
-      );
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&proximity=${proximity}&types=poi&limit=${resultsCount}&language=fr`;
+      console.log(`Fetching from: ${url.replace(MAPBOX_TOKEN, 'API_KEY_HIDDEN')}`);
+      
+      const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error(`Erreur API: ${response.status}`);
@@ -42,9 +53,12 @@ export const useSearchApi = ({
       const data = await response.json();
       
       if (!data.features || data.features.length === 0) {
+        console.log(`No results found for "${searchQuery}"`);
         toast.info(`Aucun résultat pour "${searchQuery}" près de votre position`);
         return [];
       }
+      
+      console.log(`Found ${data.features.length} places for "${searchQuery}"`);
       
       // Transform results with proper error handling
       const results: Result[] = await Promise.all(
@@ -70,6 +84,8 @@ export const useSearchApi = ({
               
               try {
                 const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${userLocation[0]},${userLocation[1]};${lon},${lat}?access_token=${MAPBOX_TOKEN}`;
+                console.log(`Fetching directions from: ${directionsUrl.replace(MAPBOX_TOKEN, 'API_KEY_HIDDEN')}`);
+                
                 const directionsResponse = await fetch(directionsUrl);
                 
                 if (directionsResponse.ok) {
@@ -77,6 +93,7 @@ export const useSearchApi = ({
                   if (directionsData.routes && directionsData.routes.length > 0) {
                     defaultResult.distance = (directionsData.routes[0].distance / 1000) || 0; // km
                     defaultResult.duration = Math.round(directionsData.routes[0].duration / 60) || 0; // minutes
+                    console.log(`Route to ${defaultResult.name}: ${defaultResult.distance.toFixed(2)}km, ${defaultResult.duration}min`);
                   }
                 }
               } catch (directionError) {
@@ -92,6 +109,7 @@ export const useSearchApi = ({
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
                 defaultResult.distance = R * c;
                 defaultResult.duration = Math.round(defaultResult.distance / 50 * 60); // Estimate based on 50 km/h
+                console.log(`Estimated route to ${defaultResult.name}: ${defaultResult.distance.toFixed(2)}km, ${defaultResult.duration}min`);
               }
             }
 
@@ -129,10 +147,10 @@ export const useSearchApi = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [userLocation, resultsCount, setLoading]);
 
   // Function to handle fallback to mock data
-  const getSearchResults = async (
+  const getSearchResults = useCallback(async (
     searchQuery: string,
     transportMode: string,
     selectedCategory: string | null,
@@ -141,17 +159,29 @@ export const useSearchApi = ({
     distanceUnit: 'km' | 'miles'
   ): Promise<Result[]> => {
     try {
+      console.log(`Starting search for "${searchQuery}" with filters:`, {
+        category: selectedCategory,
+        distance: selectedDistance,
+        duration: selectedDuration,
+        unit: distanceUnit,
+        mode: transportMode
+      });
+      
       // Use Mapbox for real results
       const mapboxResults = await searchPlacesNearLocation(searchQuery, transportMode);
       
       if (mapboxResults) {
         // Filter results according to selected criteria
+        console.log(`Filtering ${mapboxResults.length} results by criteria`);
+        
         const filteredResults = mapboxResults.filter(result => {
           const matchesCategory = !selectedCategory || result.category === selectedCategory;
           const matchesDistance = !selectedDistance || result.distance <= selectedDistance;
           const matchesDuration = !selectedDuration || result.duration <= selectedDuration;
           return matchesCategory && matchesDistance && matchesDuration;
         });
+        
+        console.log(`Filter resulted in ${filteredResults.length} matching results`);
         
         if (filteredResults.length === 0) {
           toast.info('Aucun résultat ne correspond à vos critères. Essayez d\'ajuster vos filtres.');
@@ -163,6 +193,7 @@ export const useSearchApi = ({
       }
       
       // Fallback to mock data if Mapbox fails
+      console.log('Mapbox search failed, falling back to mock data');
       toast.info('Utilisation de données simulées (API indisponible)');
       
       const mockResults = await new Promise<Result[]>((resolve) => {
@@ -180,6 +211,7 @@ export const useSearchApi = ({
               },
               resultsCount
             );
+            console.log(`Generated ${results.length} mock results`);
             resolve(results);
           } catch (error) {
             console.error('Erreur avec les données simulées:', error);
@@ -200,7 +232,7 @@ export const useSearchApi = ({
       toast.error('Une erreur s\'est produite lors de la recherche');
       return [];
     }
-  };
+  }, [searchPlacesNearLocation, userLocation, resultsCount]);
 
   return {
     searchPlacesNearLocation,

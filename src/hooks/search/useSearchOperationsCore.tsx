@@ -17,7 +17,7 @@ interface UseSearchOperationsCoreProps {
     selectedCategory: string | null;
     setShowRoutes: (show: boolean) => void;
     setSearchPerformed: (performed: boolean) => void;
-    searchPerformed: boolean; // Add this missing property
+    searchPerformed: boolean;
   };
   locationOperations: {
     searchAddress: (address: string) => Promise<void>;
@@ -57,9 +57,18 @@ export const useSearchOperationsCore = ({
   });
 
   const handleSearchPress = async () => {
+    // Ne pas effectuer la recherche si elle est déjà en cours
+    if (loading) {
+      console.log('Search already in progress, ignoring request');
+      return;
+    }
+    
+    console.log(`Search button pressed with query: "${searchQuery}"`);
+    
     if (searchQuery.trim() && !searchState.searchPerformed) {
       setLoading(true);
       try {
+        console.log('Attempting address search first');
         await locationOperations.searchAddress(searchQuery);
       } catch (error) {
         console.error("Error during address search:", error);
@@ -70,11 +79,16 @@ export const useSearchOperationsCore = ({
     }
     
     setSelectedResultId(undefined);
-    
     handleSearch();
   };
 
   const handleSearch = async () => {
+    // Ne pas effectuer la recherche si elle est déjà en cours
+    if (loading) {
+      console.log('Search already in progress, ignoring request');
+      return;
+    }
+    
     setLoading(true);
     console.log(`Recherche pour: ${searchQuery}`);
     console.log(`Filtres: Catégorie: ${selectedCategory}, Distance: ${selectedDistance}${distanceUnit}, Durée: ${selectedDuration}min, Transport: ${transportMode}`);
@@ -101,12 +115,13 @@ export const useSearchOperationsCore = ({
         distanceUnit
       );
       
+      console.log(`Search completed with ${results.length} results`);
       setSearchResults(results);
-      setLoading(false);
     } catch (error) {
       console.error('Erreur globale de recherche:', error);
       toast.error('Une erreur s\'est produite lors de la recherche');
       setSearchResults([]);
+    } finally {
       setLoading(false);
     }
   };
