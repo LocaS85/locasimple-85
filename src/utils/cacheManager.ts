@@ -5,12 +5,21 @@ interface CacheItem<T> {
   value: T;
   expiry: number;
   lastAccessed?: number;
+  hits: number;
 }
 
 interface CacheOptions {
   ttl: number; // Time to live in milliseconds
   policy?: ExpiryPolicy;
   maxSize?: number; // Maximum number of items in cache
+}
+
+interface CacheStats {
+  hits: number;
+  misses: number;
+  items: number;
+  oldestItem: number | null;
+  newestItem: number | null;
 }
 
 /**
@@ -23,6 +32,93 @@ export class CacheManager {
     policy: 'fixed',
     maxSize: 100
   };
+  private hits: number = 0;
+  private misses: number = 0;
+  private persistenceEnabled: boolean = false;
+
+  constructor() {
+    this.loadFromStorage();
+    this.setupAutoCleanup();
+    
+    // Sauvegarder le cache avant de quitter la page
+    window.addEventListener('beforeunload', () => {
+      this.saveToStorage();
+    });
+  }
+
+  /**
+   * Configure le nettoyage automatique du cache toutes les 5 minutes
+   */
+  private setupAutoCleanup() {
+    setInterval(() => {
+      this.clearExpired();
+    }, 5 * 60 * 1000); // Nettoyage toutes les 5 minutes
+  }
+
+  /**
+   * Active ou désactive la persistance du cache dans le localStorage
+   */
+  enablePersistence(enabled: boolean): void {
+    this.persistenceEnabled = enabled;
+    if (enabled) {
+      this.loadFromStorage();
+    }
+  }
+
+  /**
+   * Sauvegarde le cache dans le localStorage
+   */
+  private saveToStorage(): void {
+    if (!this.persistenceEnabled) return;
+    
+    try {
+      const serialized: Record<string, { value: any, expiry: number, hits: number }> = {};
+      
+      this.cache.forEach((item, key) => {
+        // Ne sauvegarder que les éléments qui ne sont pas expirés
+        if (item.expiry > Date.now()) {
+          serialized[key] = {
+            value: item.value,
+            expiry: item.expiry,
+            hits: item.hits
+          };
+        }
+      });
+      
+      localStorage.setItem('app_cache', JSON.stringify(serialized));
+    } catch (error) {
+      console.error('Error saving cache to localStorage:', error);
+    }
+  }
+
+  /**
+   * Charge le cache depuis le localStorage
+   */
+  private loadFromStorage(): void {
+    if (!this.persistenceEnabled) return;
+    
+    try {
+      const serialized = localStorage.getItem('app_cache');
+      if (!serialized) return;
+      
+      const data = JSON.parse(serialized);
+      const now = Date.now();
+      
+      Object.entries(data).forEach(([key, entry]: [string, any]) => {
+        // Ne charger que les éléments qui ne sont pas expirés
+        if (entry.expiry > now) {
+          this.cache.set(key, {
+            value: entry.value,
+            expiry: entry.expiry,
+            lastAccessed: now,
+            hits: entry.hits || 0
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error loading cache from localStorage:', error);
+    }
+  }
 
   /**
    * Set a value in the cache
@@ -42,8 +138,14 @@ export class CacheManager {
     this.cache.set(key, {
       value,
       expiry: now + mergedOptions.ttl,
-      lastAccessed: now
+      lastAccessed: now,
+      hits: 0
     });
+    
+    // Sauvegarder si la persistance est activée
+    if (this.persistenceEnabled) {
+      this.saveToStorage();
+    }
   }
 
   /**
@@ -55,6 +157,7 @@ export class CacheManager {
     const item = this.cache.get(key);
     
     if (!item) {
+      this.misses++;
       return undefined;
     }
     
@@ -63,13 +166,14 @@ export class CacheManager {
     // Check if item is expired
     if (now > item.expiry) {
       this.cache.delete(key);
+      this.misses++;
       return undefined;
     }
     
     // Update last accessed time for sliding expiry
-    if (item.lastAccessed) {
-      item.lastAccessed = now;
-    }
+    item.lastAccessed = now;
+    item.hits++;
+    this.hits++;
     
     return item.value as T;
   }
@@ -87,6 +191,13 @@ export class CacheManager {
    */
   clear(): void {
     this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
+    
+    // Effacer aussi le cache persistant
+    if (this.persistenceEnabled) {
+      localStorage.removeItem('app_cache');
+    }
   }
 
   /**
@@ -94,9 +205,21 @@ export class CacheManager {
    */
   clearExpired(): void {
     const now = Date.now();
+    let count = 0;
+    
     for (const [key, item] of this.cache.entries()) {
       if (now > item.expiry) {
         this.cache.delete(key);
+        count++;
+      }
+    }
+    
+    if (count > 0) {
+      console.log(`Cleared ${count} expired items from cache`);
+      
+      // Mettre à jour le cache persistant
+      if (this.persistenceEnabled) {
+        this.saveToStorage();
       }
     }
   }
@@ -112,6 +235,57 @@ export class CacheManager {
     for (let i = 0; i < Math.min(count, entries.length); i++) {
       this.cache.delete(entries[i][0]);
     }
+    
+    // Mettre à jour le cache persistant
+    if (this.persistenceEnabled && count > 0) {
+      this.saveToStorage();
+    }
+  }
+
+  /**
+   * Obtenir le taux de réussite du cache
+   * @returns Le pourcentage de hits
+   */
+  hitRate(): number {
+    const total = this.hits + this.misses;
+    return total > 0 ? (this.hits / total) * 100 : 0;
+  }
+
+  /**
+   * Obtenir la taille actuelle du cache
+   * @returns Le nombre d'éléments dans le cache
+   */
+  size(): number {
+    return this.cache.size;
+  }
+
+  /**
+   * Obtenir des statistiques sur le cache
+   * @returns Les statistiques du cache
+   */
+  getStats(): CacheStats {
+    let oldestTimestamp: number | null = null;
+    let newestTimestamp: number | null = null;
+    
+    this.cache.forEach(item => {
+      const timestamp = item.lastAccessed || 0;
+      
+      if (oldestTimestamp === null || timestamp < oldestTimestamp) {
+        oldestTimestamp = timestamp;
+      }
+      
+      if (newestTimestamp === null || timestamp > newestTimestamp) {
+        newestTimestamp = timestamp;
+      }
+    });
+    
+    return {
+      hits: this.hits,
+      misses: this.misses,
+      items: this.cache.size,
+      oldestItem: oldestTimestamp,
+      newestItem: newestTimestamp
+    };
   }
 }
 
@@ -143,3 +317,6 @@ export const withCache = async <T, A extends any[]>(
     return result;
   };
 };
+
+// Activer la persistance par défaut
+cacheManager.enablePersistence(true);

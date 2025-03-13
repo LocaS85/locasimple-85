@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { mapboxService, RouteResponse, TransportMode } from '@/services/mapboxService';
 import { toast } from 'sonner';
+import { startPerformanceMarker, endPerformanceMarker } from '@/utils/performanceMonitoring';
+import { handleError } from '@/utils/errorHandling';
 
 interface RouteState {
   [key: string]: RouteResponse | null;
@@ -29,6 +31,7 @@ export const useMapboxRoutes = ({
   const [activeMode, setActiveMode] = useState<TransportMode>('driving');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [offlineMode, setOfflineMode] = useState(false);
 
   // Les modes de transport disponibles
   const transportModes: TransportMode[] = ['driving', 'walking', 'cycling', 'driving-traffic'];
@@ -42,6 +45,32 @@ export const useMapboxRoutes = ({
       console.log('Route to point set:', to);
     }
   }, [from, to]);
+
+  // Vérifier si le mode hors ligne est activé
+  useEffect(() => {
+    const checkConnectivity = () => {
+      const isOffline = !navigator.onLine;
+      if (isOffline !== offlineMode) {
+        setOfflineMode(isOffline);
+        if (isOffline) {
+          toast.info("Mode hors ligne activé - utilisation des données en cache");
+        } else {
+          toast.success("Connexion rétablie");
+        }
+      }
+    };
+
+    window.addEventListener('online', checkConnectivity);
+    window.addEventListener('offline', checkConnectivity);
+    
+    // Vérification initiale
+    checkConnectivity();
+    
+    return () => {
+      window.removeEventListener('online', checkConnectivity);
+      window.removeEventListener('offline', checkConnectivity);
+    };
+  }, [offlineMode]);
 
   // Calculer un itinéraire pour un mode de transport spécifique
   const calculateRoute = async (
@@ -58,6 +87,9 @@ export const useMapboxRoutes = ({
 
     setLoading(true);
     setError(null);
+
+    const perfMarkerId = `route-calculation-${mode}`;
+    startPerformanceMarker(perfMarkerId);
 
     try {
       // Compiler tous les points de l'itinéraire
@@ -87,13 +119,15 @@ export const useMapboxRoutes = ({
       if (routeResult) {
         console.log(`Route calculated for ${mode} mode, length: ${routeResult.routes.length} routes`);
         setRoutes(prev => ({ ...prev, [mode]: routeResult }));
+        endPerformanceMarker(perfMarkerId);
         return routeResult;
       } else {
         throw new Error('Pas d\'itinéraire trouvé');
       }
     } catch (err) {
-      console.error(`Erreur de calcul d'itinéraire (${mode}):`, err);
-      setError(`Erreur lors du calcul de l'itinéraire en ${mode}`);
+      endPerformanceMarker(perfMarkerId);
+      const errorInfo = handleError(err, `Erreur de calcul d'itinéraire (${mode})`);
+      setError(errorInfo.message);
       return null;
     } finally {
       setLoading(false);
@@ -114,11 +148,26 @@ export const useMapboxRoutes = ({
 
     setLoading(true);
     setError(null);
+    
+    const perfMarkerId = 'multi-route-calculation';
+    startPerformanceMarker(perfMarkerId);
 
     try {
       const allPoints: [number, number][] = [start, ...viaPoints, end];
       
       console.log(`Calculating routes for all transport modes from ${start} to ${end}`);
+      
+      // En mode hors ligne, vérifier les données en cache d'abord
+      if (offlineMode) {
+        const cachedRoutes = sessionStorage.getItem(`routes-${JSON.stringify(allPoints)}`);
+        if (cachedRoutes) {
+          const parsedRoutes = JSON.parse(cachedRoutes) as Record<TransportMode, RouteResponse | null>;
+          console.log('Using cached routes for offline mode');
+          setRoutes(parsedRoutes);
+          endPerformanceMarker(perfMarkerId);
+          return parsedRoutes;
+        }
+      }
       
       const results = await mapboxService.getMultiModeDirections(
         allPoints,
@@ -134,10 +183,15 @@ export const useMapboxRoutes = ({
         }
       });
       
-      setRoutes(results);
-      return results;
+      // Mettre en cache les résultats pour le mode hors ligne
+      sessionStorage.setItem(`routes-${JSON.stringify(allPoints)}`, JSON.stringify(results));
+      
+      setRoutes(results as Record<TransportMode, RouteResponse | null>);
+      endPerformanceMarker(perfMarkerId);
+      return results as Record<TransportMode, RouteResponse | null>;
     } catch (err) {
-      console.error('Erreur de calcul des itinéraires:', err);
+      endPerformanceMarker(perfMarkerId);
+      handleError(err, 'Erreur lors du calcul des itinéraires');
       setError('Erreur lors du calcul des itinéraires');
       return null;
     } finally {
@@ -186,6 +240,7 @@ export const useMapboxRoutes = ({
     transportModes,
     loading,
     error,
+    offlineMode,
     calculateRoute,
     calculateAllRoutes,
     clearRoutes
