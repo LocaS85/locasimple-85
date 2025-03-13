@@ -1,234 +1,149 @@
-import { useState, useEffect, useCallback } from 'react';
-import { mapboxService, RouteResponse, TransportMode } from '@/services/mapboxService';
+
+import { useState, useCallback, useEffect } from 'react';
+import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
-import { startPerformanceMarker, endPerformanceMarker } from '@/utils/performanceMonitoring';
-import { handleError } from '@/utils/errorHandling';
 
-interface RouteState {
-  [key: string]: RouteResponse | null;
+// Define proper types for transport modes
+export type TransportMode = 'driving' | 'walking' | 'cycling' | 'driving-traffic';
+
+interface RouteResponse {
+  geometry: any;
+  duration: number;
+  distance: number;
+  legs: any[];
 }
 
-interface UseMapboxRoutesProps {
-  initialFrom?: [number, number];
-  initialTo?: [number, number];
+interface UseMapboxRoutesState {
+  from?: [number, number];
+  to?: [number, number];
+  routes: Record<TransportMode, RouteResponse>;
+  activeMode: TransportMode;
 }
 
-export const useMapboxRoutes = ({
-  initialFrom,
-  initialTo
-}: UseMapboxRoutesProps = {}) => {
-  const [from, setFrom] = useState<[number, number] | null>(initialFrom || null);
-  const [to, setTo] = useState<[number, number] | null>(initialTo || null);
-  const [waypoints, setWaypoints] = useState<[number, number][]>([]);
-  const [routes, setRoutes] = useState<Record<TransportMode, RouteResponse | null>>({
-    'driving': null,
-    'walking': null,
-    'cycling': null,
-    'driving-traffic': null
+const transportModeMap: Record<TransportMode, string> = {
+  'driving': 'driving',
+  'walking': 'walking',
+  'cycling': 'cycling',
+  'driving-traffic': 'driving-traffic'
+};
+
+export const useMapboxRoutes = () => {
+  const [from, setFrom] = useState<[number, number] | undefined>();
+  const [to, setTo] = useState<[number, number] | undefined>();
+  const [routes, setRoutes] = useState<Record<TransportMode, RouteResponse>>({
+    'driving': { geometry: null, duration: 0, distance: 0, legs: [] },
+    'walking': { geometry: null, duration: 0, distance: 0, legs: [] },
+    'cycling': { geometry: null, duration: 0, distance: 0, legs: [] },
+    'driving-traffic': { geometry: null, duration: 0, distance: 0, legs: [] }
   });
   const [activeMode, setActiveMode] = useState<TransportMode>('driving');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [offlineMode, setOfflineMode] = useState(false);
 
-  const transportModes: TransportMode[] = ['driving', 'walking', 'cycling', 'driving-traffic'];
-
-  useEffect(() => {
-    if (from) {
-      console.log('Route from point set:', from);
+  // Calculate a route for a specific transport mode
+  const calculateRoute = useCallback(async (mode: TransportMode): Promise<RouteResponse | null> => {
+    if (!from || !to || !MAPBOX_TOKEN) {
+      console.warn('Missing required parameters for route calculation');
+      return null;
     }
-    if (to) {
-      console.log('Route to point set:', to);
+
+    try {
+      // Format coordinates for Mapbox API
+      const coordinates = `${from[0]},${from[1]};${to[0]},${to[1]}`;
+      
+      // Use the transport mode directly with Mapbox API
+      const url = `https://api.mapbox.com/directions/v5/mapbox/${transportModeMap[mode]}/${coordinates}?alternatives=true&geometries=geojson&steps=true&access_token=${MAPBOX_TOKEN}&language=fr`;
+      
+      console.log(`Calculating ${mode} route from [${from}] to [${to}]`);
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to calculate ${mode} route: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.routes || data.routes.length === 0) {
+        console.warn(`No ${mode} routes found`);
+        return null;
+      }
+      
+      console.log(`Received ${data.routes.length} ${mode} routes, distance: ${data.routes[0].distance / 1000}km, duration: ${Math.round(data.routes[0].duration / 60)}min`);
+      
+      return data.routes[0];
+    } catch (error) {
+      console.error(`Error calculating ${mode} route:`, error);
+      return null;
     }
   }, [from, to]);
 
-  useEffect(() => {
-    const checkConnectivity = () => {
-      const isOffline = !navigator.onLine;
-      if (isOffline !== offlineMode) {
-        setOfflineMode(isOffline);
-        if (isOffline) {
-          toast.info("Mode hors ligne activé - utilisation des données en cache");
-        } else {
-          toast.success("Connexion rétablie");
-        }
-      }
-    };
-
-    window.addEventListener('online', checkConnectivity);
-    window.addEventListener('offline', checkConnectivity);
-    
-    checkConnectivity();
-    
-    return () => {
-      window.removeEventListener('online', checkConnectivity);
-      window.removeEventListener('offline', checkConnectivity);
-    };
-  }, [offlineMode]);
-
-  const calculateRoute = async (
-    mode: TransportMode = activeMode,
-    start = from,
-    end = to,
-    viaPoints = waypoints
-  ) => {
-    if (!start || !end) {
-      console.warn('Cannot calculate route: missing start or end point');
-      toast.error('Points de départ et d\'arrivée requis');
-      return null;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const perfMarkerId = `route-calculation-${mode}`;
-    startPerformanceMarker(perfMarkerId);
-
-    try {
-      const allPoints: [number, number][] = [start];
-      
-      if (viaPoints.length > 0) {
-        allPoints.push(...viaPoints);
-      }
-      
-      allPoints.push(end);
-
-      console.log(`Calculating ${mode} route from ${start} to ${end} with ${viaPoints.length} waypoints`);
-      
-      const routeResult = await mapboxService.getDirections(allPoints, {
-        profile: mode,
-        alternatives: true,
-        geometries: 'geojson',
-        steps: true,
-        overview: 'full',
-        annotations: ['distance', 'duration'],
-        voice_instructions: true,
-        banner_instructions: true
-      });
-
-      if (routeResult) {
-        console.log(`Route calculated for ${mode} mode, length: ${routeResult.routes.length} routes`);
-        setRoutes(prev => ({ ...prev, [mode]: routeResult }));
-        endPerformanceMarker(perfMarkerId);
-        return routeResult;
-      } else {
-        throw new Error('Pas d\'itinéraire trouvé');
-      }
-    } catch (err) {
-      endPerformanceMarker(perfMarkerId);
-      const errorInfo = handleError(err, `Erreur de calcul d'itinéraire (${mode})`);
-      setError(errorInfo.message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Calculate routes for all transport modes
   const calculateAllRoutes = useCallback(async () => {
     if (!from || !to) {
-      console.error('Cannot calculate routes: missing origin or destination coordinates');
+      console.warn('Origin or destination coordinates missing');
       return;
     }
-    
+
     setLoading(true);
+    console.log('Calculating routes for all transport modes');
+
+    const newRoutes: Partial<Record<TransportMode, RouteResponse>> = {};
+    
+    // Parallel calculation of routes for all transport modes
+    const modes: TransportMode[] = ['driving', 'walking', 'cycling', 'driving-traffic'];
     
     try {
       const results = await Promise.all(
-        transportModes.map(async (mode) => {
-          try {
-            const result = await mapboxService.getDirections({
-              origin: from,
-              destination: to,
-              profile: mode.mapboxId
-            });
-            
-            if (result && 'routes' in result && Array.isArray(result.routes)) {
-              return {
-                mode: mode.mapboxId,
-                data: result.routes
-              };
-            } else {
-              console.error(`No valid routes returned for mode: ${mode.mapboxId}`);
-              return {
-                mode: mode.mapboxId,
-                data: []
-              };
-            }
-          } catch (error) {
-            console.error(`Error fetching ${mode.mapboxId} route:`, error);
-            return {
-              mode: mode.mapboxId,
-              data: []
-            };
-          }
+        modes.map(async mode => {
+          const route = await calculateRoute(mode);
+          return { mode, route };
         })
       );
       
-      const newRoutes: Record<string, any[]> = {};
-      results.forEach(result => {
-        newRoutes[result.mode] = result.data;
+      // Process results
+      results.forEach(({ mode, route }) => {
+        if (route) {
+          newRoutes[mode] = route;
+        }
       });
       
-      setRoutes(newRoutes);
-      
-      if ((!newRoutes[activeMode] || newRoutes[activeMode].length === 0) && Object.values(newRoutes).some(r => r.length > 0)) {
-        for (const mode of transportModes) {
-          if (newRoutes[mode.mapboxId] && newRoutes[mode.mapboxId].length > 0) {
-            setActiveMode(mode.mapboxId);
-            break;
-          }
-        }
-      }
+      // Update state with all available routes
+      setRoutes(prev => ({ ...prev, ...newRoutes }));
+      console.log(`Successfully calculated ${Object.keys(newRoutes).length} routes`);
     } catch (error) {
       console.error('Error calculating routes:', error);
       toast.error('Erreur lors du calcul des itinéraires');
-      setRoutes({});
+      
+      // Reset routes on error
+      setRoutes({
+        'driving': { geometry: null, duration: 0, distance: 0, legs: [] },
+        'walking': { geometry: null, duration: 0, distance: 0, legs: [] },
+        'cycling': { geometry: null, duration: 0, distance: 0, legs: [] },
+        'driving-traffic': { geometry: null, duration: 0, distance: 0, legs: [] }
+      });
     } finally {
       setLoading(false);
     }
-  }, [from, to, activeMode, setActiveMode, transportModes]);
+  }, [from, to, calculateRoute]);
 
-  const addWaypoint = (point: [number, number]) => {
-    setWaypoints(prev => [...prev, point]);
-  };
-
-  const removeWaypoint = (index: number) => {
-    setWaypoints(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const reorderWaypoints = (newOrder: [number, number][]) => {
-    setWaypoints(newOrder);
-  };
-
-  const clearRoutes = () => {
-    setRoutes({
-      'driving': null,
-      'walking': null,
-      'cycling': null,
-      'driving-traffic': null
-    });
-  };
+  // Calculate routes when from and to are updated
+  useEffect(() => {
+    if (from && to) {
+      calculateAllRoutes();
+    }
+  }, [from, to, calculateAllRoutes]);
 
   return {
     from,
     setFrom,
-    to, 
+    to,
     setTo,
-    waypoints,
-    setWaypoints,
-    addWaypoint,
-    removeWaypoint,
-    reorderWaypoints,
     routes,
     activeMode,
     setActiveMode,
-    transportModes,
     loading,
-    error,
-    offlineMode,
     calculateRoute,
-    calculateAllRoutes,
-    clearRoutes
+    calculateAllRoutes
   };
 };
 

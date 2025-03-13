@@ -8,6 +8,7 @@ import { useSearchPanel } from '@/hooks/useSearchPanel';
 import { useRouteDisplay } from '@/hooks/useRouteDisplay';
 import SearchPanel from './SearchPanel';
 import RouteDisplayContainer from './RouteDisplayContainer';
+import { TransportMode } from '@/hooks/useMapboxRoutes';
 
 export const SearchContainer = () => {
   // Use our custom hooks to manage search and routes

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useMapboxRoutes } from '@/hooks/useMapboxRoutes';
+import { useMapboxRoutes, TransportMode } from '@/hooks/useMapboxRoutes';
 import { Result } from '@/components/ResultsList';
 
 interface UseRouteDisplayProps {
