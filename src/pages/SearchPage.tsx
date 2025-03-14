@@ -19,9 +19,7 @@ const SearchPage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <div className="bg-black text-white p-4 flex justify-center items-center z-10">
-        <h1 className="text-xl font-bold">Recherche</h1>
-      </div>
+      {/* Removed the black header bar with "Recherche" text */}
       
       <div className="flex-grow relative">
         <SearchContainer />

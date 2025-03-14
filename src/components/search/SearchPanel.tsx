@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { History, Search } from 'lucide-react';
+import { History } from 'lucide-react';
 import SearchHistory from './SearchHistory';
 import { Result } from '@/components/ResultsList';
 import TransparentSearchBar from './TransparentSearchBar';
@@ -27,6 +27,7 @@ interface SearchPanelProps {
   loading?: boolean;
   transportMode: string;
   onTransportModeChange: (mode: string) => void;
+  onMenuClick?: () => void;
 }
 
 export const SearchPanel: React.FC<SearchPanelProps> = ({
@@ -49,37 +50,28 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   onLocationClick = () => {},
   loading = false,
   transportMode,
-  onTransportModeChange
+  onTransportModeChange,
+  onMenuClick = () => {}
 }) => {
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
       <div className="flex flex-col items-center gap-2">
-        <div className="w-full flex items-center gap-2">
-          <TransparentSearchBar
-            searchQuery={query}
-            onSearchChange={setQuery}
-            onSearch={search}
-            isRecording={isRecording}
-            onMicClick={onMicClick}
-            isLocationActive={isLocationActive}
-            onLocationClick={onLocationClick}
-            loading={loading}
-            transportMode={transportMode}
-            onTransportModeChange={onTransportModeChange}
-            showCategoryMenu={false}
-          />
-          
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setShowHistory(!showHistory)}
-            className="flex-shrink-0 h-12 w-12 bg-white/80 backdrop-blur-sm rounded-full shadow-md border border-gray-200"
-          >
-            <History className="h-5 w-5" />
-          </Button>
-        </div>
+        <TransparentSearchBar
+          searchQuery={query}
+          onSearchChange={setQuery}
+          onSearch={search}
+          isRecording={isRecording}
+          onMicClick={onMicClick}
+          isLocationActive={isLocationActive}
+          onLocationClick={onLocationClick}
+          loading={loading}
+          transportMode={transportMode}
+          onTransportModeChange={onTransportModeChange}
+          showCategoryMenu={false}
+          onMenuClick={onMenuClick}
+        />
         
-        {/* Search history */}
+        {/* Search history panel */}
         {showHistory && (
           <div className="w-full mt-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-md border border-gray-200">
             <SearchHistory

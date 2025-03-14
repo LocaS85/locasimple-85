@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
 import { SearchPanel } from './SearchPanel';
+import { useSearchMenu } from '@/hooks/useSearchMenu';
 
 interface MapSectionProps {
   results: Result[];
@@ -68,6 +69,7 @@ export const MapSection: React.FC<MapSectionProps> = ({
   userLocation
 }) => {
   const [showHistory, setShowHistory] = useState(false);
+  const { menuOpen, setMenuOpen, toggleMenu } = useSearchMenu();
 
   return (
     <div className="w-full h-full relative">
@@ -120,12 +122,10 @@ export const MapSection: React.FC<MapSectionProps> = ({
         loading={loading}
         transportMode={transportMode}
         onTransportModeChange={onTransportModeChange}
+        onMenuClick={toggleMenu}
       />
     </div>
   );
 };
-
-// Add missing import
-import { useState } from 'react';
 
 export default MapSection;

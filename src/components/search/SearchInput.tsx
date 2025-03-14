@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinOff, Loader2, Search, X } from 'lucide-react';
+import { Mic, MapPin, MapPinOff, Loader2, Search, X, Menu } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import TransparentSearchBar from './TransparentSearchBar';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -18,6 +19,9 @@ interface SearchInputProps {
   onSearch?: () => void;
   onClear?: () => void;
   userLocation?: [number, number];
+  transportMode?: string;
+  onTransportModeChange?: (mode: string) => void;
+  onMenuClick?: () => void;
 }
 
 interface AddressSuggestion {
@@ -36,13 +40,15 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   onLocationClick = () => {},
   onSearch = () => {},
   onClear,
-  userLocation = [2.3522, 48.8566]
+  userLocation = [2.3522, 48.8566],
+  transportMode = 'driving',
+  onTransportModeChange = () => {},
+  onMenuClick = () => {}
 }) => {
   const { t, language } = useLanguage();
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -91,13 +97,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     return () => clearTimeout(timer);
   }, [searchQuery, userLocation, language]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      setShowSuggestions(false);
-      onSearch();
-    }
-  };
-
   const handleSuggestionClick = (suggestion: AddressSuggestion) => {
     onSearchChange(suggestion.place_name);
     setShowSuggestions(false);
@@ -106,78 +105,26 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     }, 100);
   };
 
-  const handleClearSearch = () => {
-    onSearchChange('');
-    if (onClear) onClear();
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
-  const placeholderText = isLocationActive 
-    ? t('useMyLocation') || "Rechercher un lieu autour de ma position..." 
-    : t('searchPlaceholder') || "Rechercher un lieu...";
-
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="relative flex items-center w-full bg-white rounded-full shadow-md overflow-hidden border border-gray-200">
-        <div className="flex items-center pl-4 text-gray-400">
-          <Search className="h-5 w-5" />
-        </div>
-        <Input 
-          ref={inputRef}
-          type="text" 
-          placeholder={placeholderText}
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setShowSuggestions(searchQuery.length >= 2 && suggestions.length > 0)}
-          className="w-full border-0 h-12 text-base pl-2 bg-transparent text-black focus-visible:ring-0 focus-visible:ring-offset-0" 
-        />
-        {searchQuery && (
-          <Button
-            onClick={handleClearSearch}
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 mr-1 text-gray-400 hover:text-gray-600"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-        <div className="flex items-center h-full">
-          <Button 
-            onClick={onMicClick}
-            className={`${isRecording ? 'text-red-500' : 'text-gray-500'} bg-transparent hover:bg-transparent p-2 rounded-none`}
-            aria-label={t('voiceSearch') || "Activer la recherche vocale"}
-            variant="ghost"
-          >
-            <Mic className="h-5 w-5" />
-          </Button>
-          <Button 
-            onClick={onLocationClick}
-            className={`h-12 w-12 p-0 rounded-r-full transition-colors ${isLocationActive 
-              ? "bg-primary text-white hover:bg-primary/80" 
-              : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
-            aria-pressed={isLocationActive}
-            aria-label={t('useMyLocation') || "Utiliser ma position"}
-            disabled={loading}
-            variant="ghost"
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : isLocationActive ? (
-              <MapPin className="h-5 w-5" />
-            ) : (
-              <MapPinOff className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
-      </div>
+      <TransparentSearchBar
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+        onSearch={onSearch}
+        isRecording={isRecording}
+        onMicClick={onMicClick}
+        isLocationActive={isLocationActive}
+        onLocationClick={onLocationClick}
+        loading={loading}
+        transportMode={transportMode}
+        onTransportModeChange={onTransportModeChange}
+        onMenuClick={onMenuClick}
+      />
 
       {showSuggestions && suggestions.length > 0 && (
         <div 
           ref={suggestionsRef}
-          className="absolute z-20 w-full mt-1 bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto border border-gray-200 animate-fade-in"
+          className="absolute z-20 w-full mt-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg max-h-60 overflow-y-auto border border-gray-200 animate-fade-in"
         >
           {suggestions.map((suggestion) => (
             <div
