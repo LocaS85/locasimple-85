@@ -131,15 +131,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
         />
       </div>
       
-      {/* Toggle Categories Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 rounded-full px-4 py-1 text-xs bg-white/80 backdrop-blur-sm shadow-sm border border-gray-200"
-        onClick={() => setShowCategories(!showCategories)}
-      >
-        {showCategories ? 'Masquer catégories' : 'Afficher catégories'}
-      </Button>
+      {/* Removed the toggle categories button */}
     </div>
   );
 };

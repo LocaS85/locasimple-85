@@ -7,7 +7,6 @@ import MapMarkers from './MapMarkers';
 import { MapStyle } from './MapStyleSelector';
 import MapControls from './MapControls';
 import MapResults from './MapResults';
-import CategoryScroller from './CategoryScroller';
 import useMapInitialization from '@/hooks/useMapInitialization';
 import useMarkerManagement from '@/hooks/useMarkerManagement';
 import { toast } from 'sonner';
@@ -144,12 +143,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
           userLocation={userLocation}
         />
       </div>
-
-      {/* Category Scroller */}
-      <CategoryScroller 
-        selectedCategory={selectedCategory} 
-        onCategorySelect={onCategorySelect} 
-      />
       
       {/* Map Controls (Categories and Map Style) */}
       <MapControls
