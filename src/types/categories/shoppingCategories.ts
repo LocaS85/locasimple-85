@@ -8,24 +8,24 @@ export const SHOPPING_CATEGORIES: Category[] = [
     icon: '🛍️',
     subCategories: [
       {
-        id: 'magasins-de-vetements',
+        id: 'vetements',
         name: 'Magasins de vêtements',
         parentId: 'achats',
         children: [
-          { id: 'pret-a-porter', name: 'Prêt-à-porter', parentId: 'magasins-de-vetements' },
-          { id: 'boutiques-de-luxe', name: 'Boutiques de luxe', parentId: 'magasins-de-vetements' },
-          { id: 'magasins-de-chaussures', name: 'Magasins de chaussures', parentId: 'magasins-de-vetements' },
-          { id: 'accessoires', name: 'Accessoires', parentId: 'magasins-de-vetements' },
+          { id: 'pret-a-porter', name: 'Prêt-à-porter', parentId: 'vetements' },
+          { id: 'boutiques-de-luxe', name: 'Boutiques de luxe', parentId: 'vetements' },
+          { id: 'chaussures', name: 'Magasins de chaussures', parentId: 'vetements' },
+          { id: 'accessoires', name: 'Accessoires', parentId: 'vetements' },
         ],
       },
       {
-        id: 'magasins-electronique',
+        id: 'electronique',
         name: 'Magasins d\'électronique',
         parentId: 'achats',
         children: [
-          { id: 'telephonie', name: 'Téléphonie', parentId: 'magasins-electronique' },
-          { id: 'informatique', name: 'Informatique', parentId: 'magasins-electronique' },
-          { id: 'electromenager', name: 'Électroménager', parentId: 'magasins-electronique' },
+          { id: 'telephonie', name: 'Téléphonie', parentId: 'electronique' },
+          { id: 'informatique', name: 'Informatique', parentId: 'electronique' },
+          { id: 'electromenager', name: 'Électroménager', parentId: 'electronique' },
         ],
       },
       {
@@ -38,12 +38,12 @@ export const SHOPPING_CATEGORIES: Category[] = [
           { id: 'occasion', name: 'D\'occasion', parentId: 'bibliotheques' },
         ],
       },
-      { id: 'magasins-de-jouets', name: 'Magasins de jouets', parentId: 'achats' },
+      { id: 'jouets', name: 'Magasins de jouets', parentId: 'achats' },
       { id: 'pharmacies', name: 'Pharmacies', parentId: 'achats' },
       { id: 'parfumeries', name: 'Parfumeries', parentId: 'achats' },
       { id: 'bijouteries', name: 'Bijouteries', parentId: 'achats' },
       { id: 'opticiens', name: 'Opticiens', parentId: 'achats' },
-      { id: 'magasins-de-sport', name: 'Magasins de sport', parentId: 'achats' },
+      { id: 'sport', name: 'Magasins de sport', parentId: 'achats' },
       { id: 'fleuristes', name: 'Fleuristes', parentId: 'achats' },
     ],
   }

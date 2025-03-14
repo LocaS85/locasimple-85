@@ -3,17 +3,22 @@ import React from 'react';
 import { Category } from '@/data/mockCategories';
 import { transportModes } from '@/data/transportModes';
 import { Car, PersonStanding, Bike, Bus, Plus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CategoryMenuProps {
   categories: Category[];
   transportMode: string;
   onTransportModeChange: (mode: string) => void;
+  onCategorySelect?: (categoryId: string) => void;
+  selectedCategory?: string | null;
 }
 
 export const CategoryMenu: React.FC<CategoryMenuProps> = ({
   categories,
   transportMode,
-  onTransportModeChange
+  onTransportModeChange,
+  onCategorySelect,
+  selectedCategory
 }) => {
   // Get icon for transport mode
   const getTransportIcon = (mode: string) => {
@@ -37,7 +42,11 @@ export const CategoryMenu: React.FC<CategoryMenuProps> = ({
         {categories.slice(0, 9).map((category) => (
           <button
             key={category.id}
-            className="flex flex-col items-center justify-center p-2 rounded-lg bg-white/90 hover:bg-gray-100 transition-colors border border-gray-100 shadow-sm"
+            className={cn(
+              "flex flex-col items-center justify-center p-2 rounded-lg bg-white/90 hover:bg-gray-100 transition-colors border border-gray-100 shadow-sm",
+              selectedCategory === category.id && "ring-2 ring-primary"
+            )}
+            onClick={() => onCategorySelect && onCategorySelect(category.id)}
           >
             <div className="mb-1 text-gray-600">
               {category.icon}
