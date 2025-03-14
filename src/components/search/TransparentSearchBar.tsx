@@ -3,9 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Mic, MapPin, Menu, X } from 'lucide-react';
-import { CategoryMenu } from './CategoryMenu';
-import { mockCategories } from '@/data/mockCategories';
-import { toast } from 'sonner';
 
 interface TransparentSearchBarProps {
   searchQuery: string;
@@ -18,7 +15,6 @@ interface TransparentSearchBarProps {
   loading?: boolean;
   transportMode: string;
   onTransportModeChange: (mode: string) => void;
-  showCategoryMenu?: boolean;
   onMenuClick?: () => void;
 }
 
@@ -33,12 +29,9 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
   loading = false,
   transportMode,
   onTransportModeChange,
-  showCategoryMenu = false,
   onMenuClick = () => {}
 }) => {
-  const [showCategories, setShowCategories] = useState(showCategoryMenu);
   const inputRef = useRef<HTMLInputElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,20 +44,6 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
       inputRef.current.focus();
     }
   };
-
-  // Close the menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowCategories(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="relative w-full max-w-md mx-auto">
@@ -130,18 +109,6 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
           </Button>
         </div>
       </form>
-
-      {/* Category Menu */}
-      <div 
-        ref={menuRef} 
-        className={`absolute left-0 right-0 mt-2 z-20 ${showCategories ? 'block' : 'hidden'}`}
-      >
-        <CategoryMenu 
-          categories={mockCategories} 
-          transportMode={transportMode} 
-          onTransportModeChange={onTransportModeChange} 
-        />
-      </div>
     </div>
   );
 };
