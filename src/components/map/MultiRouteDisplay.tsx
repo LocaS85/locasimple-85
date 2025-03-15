@@ -1,22 +1,24 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { TransportMode } from '@/hooks/useMapboxRoutes';
-import { Car, Walk, Bike, Clock, LocateIcon, Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Car, PersonStanding, Bike, Clock, Bus } from 'lucide-react';
+import { getTransportModeColor } from '@/data/transportModes';
 
-interface RouteResponse {
-  geometry: any;
-  duration: number;
+interface RouteInfo {
   distance: number;
-  legs: any[];
+  duration: number;
+  geometry?: any;
+  legs?: any[];
 }
 
 interface MultiRouteDisplayProps {
-  routes: Record<TransportMode, RouteResponse>;
+  routes: Record<TransportMode, RouteInfo>;
   activeMode: TransportMode;
   onModeChange: (mode: string) => void;
-  onRouteSelect?: (route: RouteResponse, mode: string) => void;
-  onSaveRoute?: (route: RouteResponse, mode: string) => void;
+  onRouteSelect?: (route: RouteInfo, mode: string) => void;
+  onSaveRoute?: (route: RouteInfo, mode: string) => void;
 }
 
 const MultiRouteDisplay: React.FC<MultiRouteDisplayProps> = ({
@@ -26,117 +28,103 @@ const MultiRouteDisplay: React.FC<MultiRouteDisplayProps> = ({
   onRouteSelect,
   onSaveRoute
 }) => {
-  // Get the appropriate icon based on transport mode
-  const getTransportIcon = (mode: string) => {
+  // Format distance and duration
+  const formatDistance = (meters: number): string => {
+    if (meters < 1000) {
+      return `${Math.round(meters)} m`;
+    }
+    return `${(meters / 1000).toFixed(1)} km`;
+  };
+
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours} h ${remainingMinutes} min`;
+  };
+
+  // Get icon based on mode
+  const getModeIcon = (mode: string) => {
     switch (mode) {
       case 'driving':
       case 'driving-traffic':
         return <Car className="h-4 w-4" />;
+      case 'walking':
+        return <PersonStanding className="h-4 w-4" />;
       case 'cycling':
         return <Bike className="h-4 w-4" />;
-      case 'walking':
-        return <Walk className="h-4 w-4" />;
+      case 'transit':
+        return <Bus className="h-4 w-4" />;
       default:
-        return <Car className="h-4 w-4" />;
+        return <Clock className="h-4 w-4" />;
     }
   };
 
-  // Format duration from seconds to minutes
-  const formatDuration = (seconds: number): string => {
-    if (!seconds) return 'N/A';
-    const minutes = Math.round(seconds / 60);
-    if (minutes < 60) return `${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ''}`;
-  };
-
-  // Format distance from meters to km
-  const formatDistance = (meters: number): string => {
-    if (!meters) return 'N/A';
-    const km = meters / 1000;
-    return km < 10 ? `${km.toFixed(1)} km` : `${Math.round(km)} km`;
-  };
-
-  // Get all available modes that have routes
-  const availableModes = Object.entries(routes)
-    .filter(([_, route]) => route && route.geometry)
-    .map(([mode]) => mode as TransportMode);
+  // Filter out modes with no routes
+  const availableModes = Object.entries(routes).filter(
+    ([_, routeInfo]) => routeInfo.geometry && routeInfo.distance > 0
+  ) as [TransportMode, RouteInfo][];
 
   if (availableModes.length === 0) {
-    return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 text-center">
-        <p className="text-gray-600">Calcul d'itinéraire en cours...</p>
-      </div>
-    );
+    return null;
   }
 
-  const selectedRoute = routes[activeMode];
-
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
-      {/* Header with mode tabs */}
-      <div className="flex border-b">
-        {availableModes.map((mode) => (
-          <button
-            key={mode}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 px-3 text-xs font-medium ${
-              activeMode === mode
-                ? 'bg-primary text-white'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-            }`}
-            onClick={() => onModeChange(mode)}
-          >
-            {getTransportIcon(mode)}
-            <span>
-              {mode === 'driving-traffic' 
-                ? 'Trafic' 
-                : mode === 'driving' 
-                  ? 'Voiture' 
-                  : mode === 'walking' 
-                    ? 'À pied' 
-                    : 'Vélo'}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Route details */}
-      {selectedRoute && selectedRoute.geometry && (
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">{formatDuration(selectedRoute.duration)}</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <LocateIcon className="h-4 w-4" />
-              <span className="font-medium">{formatDistance(selectedRoute.distance)}</span>
-            </div>
+    <Card className="w-full shadow-lg">
+      <CardContent className="p-4">
+        <div className="flex flex-col space-y-4">
+          <div className="grid grid-cols-4 gap-2">
+            {availableModes.map(([mode, routeInfo]) => {
+              const isActive = mode === activeMode;
+              const modeColor = getTransportModeColor(mode);
+              
+              return (
+                <Button
+                  key={mode}
+                  variant={isActive ? "default" : "outline"}
+                  className={`flex flex-col items-center justify-center p-2 h-auto ${
+                    isActive ? `bg-[${modeColor}]` : 'bg-white'
+                  }`}
+                  onClick={() => onModeChange(mode)}
+                >
+                  <div className="flex items-center justify-center mb-1">
+                    {getModeIcon(mode)}
+                  </div>
+                  <div className="text-xs font-medium">
+                    {formatDuration(routeInfo.duration)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatDistance(routeInfo.distance)}
+                  </div>
+                </Button>
+              );
+            })}
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-2 mt-2">
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="flex-1"
-              onClick={() => onRouteSelect && onRouteSelect(selectedRoute, activeMode)}
-            >
-              Démarrer
-            </Button>
-            <Button 
-              variant="outline" 
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
               size="sm"
-              onClick={() => onSaveRoute && onSaveRoute(selectedRoute, activeMode)}
+              onClick={() => onRouteSelect && onRouteSelect(routes[activeMode], activeMode)}
+              className="text-xs"
             >
-              <Save className="h-4 w-4 mr-1" />
+              Détails
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSaveRoute && onSaveRoute(routes[activeMode], activeMode)}
+              className="text-xs"
+            >
               Sauvegarder
             </Button>
           </div>
         </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

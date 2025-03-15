@@ -14,7 +14,13 @@ import {
   Dumbbell
 } from 'lucide-react';
 
-export const mockCategories = [
+export interface Category {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+}
+
+export const mockCategories: Category[] = [
   {
     id: 'restaurant',
     name: 'Restaurants',

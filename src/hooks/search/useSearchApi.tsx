@@ -57,14 +57,18 @@ export const useSearchApi = ({
       if (distance) {
         // Convert from km/miles to meters
         const distanceInMeters = distance * (distanceUnit === 'km' ? 1000 : 1609.34);
-        filteredResults = filteredResults.filter(result => result.distanceInMeters <= distanceInMeters);
+        filteredResults = filteredResults.filter(result => 
+          result.distanceInMeters ? result.distanceInMeters <= distanceInMeters : true
+        );
       }
       
       // Apply duration filter
       if (duration) {
         // Convert from minutes to seconds
         const durationInSeconds = duration * 60;
-        filteredResults = filteredResults.filter(result => result.durationInSeconds <= durationInSeconds);
+        filteredResults = filteredResults.filter(result => 
+          result.durationInSeconds ? result.durationInSeconds <= durationInSeconds : true
+        );
       }
       
       // Limit results

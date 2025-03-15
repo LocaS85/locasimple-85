@@ -1,8 +1,8 @@
 
-import { Car, Walking, Bicycle, Bus, Clock } from 'lucide-react';
+import { Car, PersonStanding, Bike, Bus, Clock } from 'lucide-react';
 import React from 'react';
 
-export type TransportMode = 'driving' | 'walking' | 'cycling' | 'driving-traffic';
+export type TransportMode = 'driving' | 'walking' | 'cycling' | 'driving-traffic' | 'transit';
 
 export interface TransportModeOption {
   id: string;
@@ -21,13 +21,13 @@ export const transportModes: TransportModeOption[] = [
   {
     id: 'walking',
     name: 'À pied',
-    icon: React.createElement(Walking, { size: 16 }),
+    icon: React.createElement(PersonStanding, { size: 16 }),
     color: '#10b981' // emerald-500
   },
   {
     id: 'cycling',
     name: 'Vélo',
-    icon: React.createElement(Bicycle, { size: 16 }),
+    icon: React.createElement(Bike, { size: 16 }),
     color: '#f59e0b' // amber-500
   },
   {
@@ -47,4 +47,8 @@ export const transportModes: TransportModeOption[] = [
 export function getTransportModeColor(transportMode: string): string {
   const mode = transportModes.find(m => m.id === transportMode);
   return mode ? mode.color : '#3b82f6'; // Default to blue if mode not found
+}
+
+export function getTransportModeOption(transportMode: string): TransportModeOption | undefined {
+  return transportModes.find(m => m.id === transportMode);
 }

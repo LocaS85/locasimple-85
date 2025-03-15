@@ -32,8 +32,9 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
   const navigate = useNavigate();
   const [mapReady, setMapReady] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [userMarker, setUserMarker] = useState<mapboxgl.Marker | null>(null);
 
-  // Check when the map is actually ready to receive markers
+  // Vérifier quand la carte est prête à recevoir des marqueurs
   useEffect(() => {
     if (!map) return;
     
@@ -55,7 +56,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     map.on('load', handleStyleLoad);
     map.on('style.load', handleStyleLoad);
     
-    // Initial check
+    // Vérification initiale
     checkMapReady();
     
     return () => {
@@ -64,7 +65,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     };
   }, [map]);
   
-  // Use custom hooks for marker and bounds management
+  // Utiliser des hooks personnalisés pour la gestion des marqueurs et des limites
   const { markers, popups } = useMapMarkers({
     map,
     results,
@@ -81,15 +82,47 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     onMarkersReady
   });
 
-  // Animation effect when a result is selected
+  // Créer et mettre à jour le marqueur de position utilisateur
+  useEffect(() => {
+    if (!map || !mapReady) return;
+    
+    // Supprimer le marqueur existant s'il y en a un
+    if (userMarker) {
+      userMarker.remove();
+    }
+    
+    // Créer un élément HTML personnalisé pour le marqueur utilisateur
+    const el = document.createElement('div');
+    el.className = 'user-location-marker';
+    el.innerHTML = `
+      <div class="relative">
+        <div class="absolute w-8 h-8 bg-blue-500/20 rounded-full animate-ping"></div>
+        <div class="relative bg-blue-500 border-2 border-white w-4 h-4 rounded-full"></div>
+      </div>
+    `;
+    
+    // Créer le nouveau marqueur à l'emplacement du centre
+    const marker = new mapboxgl.Marker(el)
+      .setLngLat(center)
+      .addTo(map);
+    
+    setUserMarker(marker);
+    
+    // Nettoyer le marqueur au démontage
+    return () => {
+      marker.remove();
+    };
+  }, [map, mapReady, center]);
+
+  // Animation quand un résultat est sélectionné
   useEffect(() => {
     if (selectedResultId && map) {
-      // Find the selected result
+      // Trouver le résultat sélectionné
       const selectedResult = results.find(r => r.id === selectedResultId);
       if (selectedResult) {
         setAnimating(true);
         
-        // Zoom and fly to the selection with animation
+        // Zoom et vol vers la sélection avec animation
         map.flyTo({
           center: [selectedResult.longitude, selectedResult.latitude],
           zoom: 14,
@@ -98,7 +131,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
           essential: true
         });
         
-        // Reset animation state after transition
+        // Réinitialiser l'état d'animation après la transition
         setTimeout(() => {
           setAnimating(false);
         }, 1500);
@@ -106,15 +139,15 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     }
   }, [selectedResultId, map, results]);
 
-  // Get transport mode color for routes
+  // Obtenir la couleur du mode de transport pour les itinéraires
   const transportModeColor = getTransportModeColor(transportMode);
 
-  // Route display for selected result or all results
+  // Affichage des itinéraires pour le résultat sélectionné ou tous les résultats
   const routesToShow = selectedResultId 
     ? results.filter(r => r.id === selectedResultId)
     : (showRoutes ? results : []);
 
-  // Handle navigation start
+  // Gérer le début de la navigation
   const handleStartNavigation = (result: Result) => {
     navigate('/navigation', {
       state: {
@@ -126,11 +159,11 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     });
   };
 
-  // Add navigation start handler to each popup
+  // Ajouter le gestionnaire de démarrage de navigation à chaque popup
   useEffect(() => {
     if (!mapReady) return;
 
-    // Add event listeners to all "Start Navigation" buttons in popups
+    // Ajouter des écouteurs d'événements à tous les boutons "Démarrer la navigation" dans les popups
     const addNavigationListeners = () => {
       document.querySelectorAll('.start-navigation-btn').forEach(btn => {
         const resultId = btn.getAttribute('data-id');
@@ -146,10 +179,10 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
       });
     };
 
-    // Run initially and whenever popups change
+    // Exécuter initialement et chaque fois que les popups changent
     addNavigationListeners();
 
-    // Check for new popups every second (since they're created dynamically)
+    // Vérifier les nouveaux popups toutes les secondes (puisqu'ils sont créés dynamiquement)
     const interval = setInterval(addNavigationListeners, 1000);
 
     return () => {

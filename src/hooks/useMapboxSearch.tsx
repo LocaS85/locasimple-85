@@ -47,6 +47,17 @@ export const useMapboxSearch = ({
     }
   });
 
+  // Lieux favoris
+  const [favoritePlaces, setFavoritePlaces] = useState<SearchResult[]>(() => {
+    try {
+      const saved = localStorage.getItem('favorite_places');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error('Erreur lors du chargement des lieux favoris:', e);
+      return [];
+    }
+  });
+
   // Effectuer la recherche
   const search = useCallback(async (searchQuery = query): Promise<SearchResult[]> => {
     if (!searchQuery.trim()) {
@@ -75,7 +86,14 @@ export const useMapboxSearch = ({
 
       const searchResults = await mapboxService.searchPlaces(options);
       console.log(`Search returned ${searchResults.length} results`);
-      setResults(searchResults);
+      
+      // Marquer les résultats qui sont des favoris
+      const enhancedResults = searchResults.map(result => {
+        const isFavorite = favoritePlaces.some(fp => fp.id === result.id);
+        return { ...result, isFavorite };
+      });
+      
+      setResults(enhancedResults);
       
       // Ajouter à l'historique si ce n'est pas déjà la dernière recherche
       if (searchQuery && (!searchHistory.length || searchHistory[0] !== searchQuery)) {
@@ -84,7 +102,7 @@ export const useMapboxSearch = ({
         localStorage.setItem('search_history', JSON.stringify(newHistory));
       }
       
-      return searchResults;
+      return enhancedResults;
     } catch (err) {
       console.error('Erreur de recherche:', err);
       setError('Erreur lors de la recherche');
@@ -93,7 +111,7 @@ export const useMapboxSearch = ({
     } finally {
       setLoading(false);
     }
-  }, [query, limit, autocomplete, types, language, userLocation, searchHistory]);
+  }, [query, limit, autocomplete, types, language, userLocation, searchHistory, favoritePlaces]);
 
   // Réinitialiser la recherche
   const resetSearch = useCallback(() => {
@@ -117,6 +135,32 @@ export const useMapboxSearch = ({
     localStorage.setItem('saved_searches', JSON.stringify(newSavedSearches));
   }, [savedSearches]);
 
+  // Ajouter un lieu aux favoris
+  const addFavoritePlace = useCallback((place: SearchResult) => {
+    if (favoritePlaces.some(fp => fp.id === place.id)) return;
+    
+    const newFavorites = [...favoritePlaces, place];
+    setFavoritePlaces(newFavorites);
+    localStorage.setItem('favorite_places', JSON.stringify(newFavorites));
+    
+    // Mettre à jour le résultat dans les résultats actuels
+    setResults(prev => prev.map(r => r.id === place.id ? { ...r, isFavorite: true } : r));
+    
+    toast.success(`${place.place_name} ajouté aux favoris`);
+  }, [favoritePlaces]);
+
+  // Supprimer un lieu des favoris
+  const removeFavoritePlace = useCallback((placeId: string) => {
+    const newFavorites = favoritePlaces.filter(fp => fp.id !== placeId);
+    setFavoritePlaces(newFavorites);
+    localStorage.setItem('favorite_places', JSON.stringify(newFavorites));
+    
+    // Mettre à jour le résultat dans les résultats actuels
+    setResults(prev => prev.map(r => r.id === placeId ? { ...r, isFavorite: false } : r));
+    
+    toast.success(`Lieu retiré des favoris`);
+  }, [favoritePlaces]);
+
   // Effectuer une recherche lorsque le type ou la position change
   useEffect(() => {
     if (query.trim()) {
@@ -128,6 +172,7 @@ export const useMapboxSearch = ({
     }
   }, [userLocation, language, search]);
 
+  // Offrir une interface complète pour la gestion des recherches
   return {
     query,
     setQuery,
@@ -139,7 +184,10 @@ export const useMapboxSearch = ({
     searchHistory,
     savedSearches,
     saveSearch,
-    removeSavedSearch
+    removeSavedSearch,
+    favoritePlaces,
+    addFavoritePlace,
+    removeFavoritePlace
   };
 };
 

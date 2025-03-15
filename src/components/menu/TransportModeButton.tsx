@@ -1,48 +1,44 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import type { TransportMode } from '@/data/transportModes';
-import { cn } from '@/lib/utils';
+import { getTransportModeOption } from '@/data/transportModes';
 
 interface TransportModeButtonProps {
-  mode: TransportMode;
-  isSelected: boolean;
-  onClick: () => void;
+  mode: string;
+  isActive: boolean;
+  onClick: (mode: string) => void;
+  className?: string;
 }
 
-export const TransportModeButton: React.FC<TransportModeButtonProps> = ({
+const TransportModeButton: React.FC<TransportModeButtonProps> = ({
   mode,
-  isSelected,
-  onClick
+  isActive,
+  onClick,
+  className = ''
 }) => {
+  // Get the transport mode option details
+  const modeOption = getTransportModeOption(mode);
+  
+  if (!modeOption) {
+    return null;
+  }
+  
   return (
-    <Button 
-      variant="outline" 
-      className={cn(
-        "flex-shrink-0 whitespace-nowrap rounded-full px-3 py-1 h-9 flex items-center gap-2 text-sm transition-all hover:scale-105",
-        isSelected ? "text-white" : "bg-white text-black hover:text-white"
-      )}
-      onClick={onClick}
-      style={{
-        backgroundColor: isSelected ? mode.color : 'white',
-        borderColor: mode.color,
-        color: isSelected ? 'white' : 'black',
-      }}
-      onMouseOver={(e) => {
-        if (!isSelected) {
-          e.currentTarget.style.backgroundColor = `${mode.color}20`;
-          e.currentTarget.style.color = mode.color;
-        }
-      }}
-      onMouseOut={(e) => {
-        if (!isSelected) {
-          e.currentTarget.style.backgroundColor = 'white';
-          e.currentTarget.style.color = 'black';
-        }
-      }}
+    <Button
+      variant={isActive ? "default" : "outline"}
+      className={`flex items-center justify-center p-2 h-10 ${className} ${
+        isActive 
+          ? `bg-[${modeOption.color}] text-white` 
+          : 'bg-white text-gray-700 border-gray-200'
+      }`}
+      onClick={() => onClick(mode)}
     >
-      {mode.icon}
-      <span>{mode.name}</span>
+      <div className="flex items-center space-x-2">
+        {modeOption.icon}
+        <span className="text-xs font-medium">{modeOption.name}</span>
+      </div>
     </Button>
   );
 };
+
+export default TransportModeButton;
