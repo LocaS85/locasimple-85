@@ -1,38 +1,47 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLanguage } from '@/contexts/LanguageContext';
+import CategoryButton from './CategoryButton';
 import { mockCategories } from '@/data/mockCategories';
-import { CategoryButton } from './CategoryButton';
-import { AddCategoryButton } from './AddCategoryButton';
 
-export const CategoriesSelector: React.FC = () => {
-  const categoriesRef = useRef<HTMLDivElement>(null);
+interface CategoriesSelectorProps {
+  selectedCategory: string | null;
+  onCategorySelect: (categoryId: string | null) => void;
+}
 
-  const scrollLeft = () => {
-    if (categoriesRef.current) {
-      categoriesRef.current.scrollBy({ left: -200, behavior: 'smooth' });
-    }
-  };
+export const CategoriesSelector: React.FC<CategoriesSelectorProps> = ({
+  selectedCategory,
+  onCategorySelect
+}) => {
+  const { t } = useLanguage();
 
-  const scrollRight = () => {
-    if (categoriesRef.current) {
-      categoriesRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+  const handleCategoryClick = (categoryId: string) => {
+    if (selectedCategory === categoryId) {
+      // Si la catégorie est déjà sélectionnée, la désélectionner
+      onCategorySelect(null);
+    } else {
+      // Sinon, sélectionner la nouvelle catégorie
+      onCategorySelect(categoryId);
     }
   };
 
   return (
-    <div className="px-4 pb-2 relative">
-      <div 
-        ref={categoriesRef}
-        className="flex items-center overflow-x-auto pb-2 gap-2 scrollbar-hide"
-      >
+    <div className="w-full">
+      <h3 className="text-sm font-medium mb-2">{t('categories')}</h3>
+      <div className="flex flex-wrap gap-2">
         {mockCategories.map((category) => (
-          <CategoryButton 
-            key={category.id} 
-            category={category}
+          <CategoryButton
+            key={category.id}
+            categoryId={category.id}
+            isActive={selectedCategory === category.id}
+            onClick={handleCategoryClick}
+            className="flex-shrink-0"
           />
         ))}
-        <AddCategoryButton />
       </div>
     </div>
   );
 };
+
+export default CategoriesSelector;

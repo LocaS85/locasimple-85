@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import mapboxgl from 'mapbox-gl';
 import type { Result } from '../ResultsList';
 import RouteLayer from './RouteLayer';
 import useMapMarkers from '@/hooks/useMapMarkers';

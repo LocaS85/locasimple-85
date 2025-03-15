@@ -1,123 +1,126 @@
 
-import React from 'react';
-import { FiltersSection } from '@/components/search/FiltersSection';
-import { SelectedFilters } from '@/components/search/SelectedFilters';
-import { SearchFooter } from '@/components/search/SearchFooter';
-import { MenuToggleHeader } from '@/components/search/MenuToggleHeader';
-import ResultsList, { Result } from '@/components/ResultsList';
+import React, { useState } from 'react';
+import { X, ArrowUpDown, ChevronRight, Filter, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Map, List } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CategoriesSelector } from '@/components/menu/CategoriesSelector';
+import { RadiusSelector } from '@/components/menu/RadiusSelector';
+import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
+import { FiltersSection } from '@/components/search/FiltersSection';
+import { ResultsSection } from '@/components/search/ResultsSection';
+import ResultsList, { Result } from '@/components/ResultsList';
+import { SavedSearches } from '@/components/search/SavedSearches';
+import { SearchHistory } from '@/components/search/SearchHistory';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchMenuProps {
-  menuOpen: boolean;
-  setMenuOpen: (open: boolean) => void;
-  menuRef: React.RefObject<HTMLDivElement>;
-  handleTouchStart: (e: React.TouchEvent) => void;
-  handleTouchMove: (e: React.TouchEvent) => void;
-  handleTouchEnd: () => void;
-  selectedDuration: number | null;
-  selectedDistance: number | null;
-  distanceUnit: 'km' | 'miles';
+  show: boolean;
+  onClose: () => void;
+  onReset?: () => void;
   transportMode: string;
-  resultsCount: number;
+  onTransportModeChange: (mode: string) => void;
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
-  onResultsCountChange: (count: number) => void;
-  onTransportModeChange: (mode: string) => void;
-  onDurationChange: (duration: number) => void;
+  selectedDistance: number | null;
   onDistanceChange: (distance: number) => void;
+  selectedDuration: number | null;
+  onDurationChange: (duration: number) => void;
+  distanceUnit: 'km' | 'miles';
   onDistanceUnitChange: (unit: 'km' | 'miles') => void;
-  searchResults: Result[];
-  selectedResultId?: string;
+  resultsCount: number;
+  onResultsCountChange: (count: number) => void;
+  results: Result[];
   onResultClick: (result: Result) => void;
-  onSearch?: () => void;
+  selectedResultId?: string;
+  searchHistory: string[];
+  savedSearches: string[];
+  onHistoryItemClick: (query: string) => void;
+  onSaveSearch: (query: string) => void;
+  onRemoveSavedSearch: (query: string) => void;
+  searchQuery: string;
+  favoritePlaces?: Result[];
+  onToggleFavorite?: (result: Result) => void;
 }
 
 export const SearchMenu: React.FC<SearchMenuProps> = ({
-  menuOpen,
-  setMenuOpen,
-  menuRef,
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
-  selectedDuration,
-  selectedDistance,
-  distanceUnit,
+  show,
+  onClose,
+  onReset,
   transportMode,
-  resultsCount,
+  onTransportModeChange,
   selectedCategory,
   onCategorySelect,
-  onResultsCountChange,
-  onTransportModeChange,
-  onDurationChange,
+  selectedDistance,
   onDistanceChange,
+  selectedDuration,
+  onDurationChange,
+  distanceUnit,
   onDistanceUnitChange,
-  searchResults,
-  selectedResultId,
+  resultsCount,
+  onResultsCountChange,
+  results,
   onResultClick,
-  onSearch
+  selectedResultId,
+  searchHistory,
+  savedSearches,
+  onHistoryItemClick,
+  onSaveSearch,
+  onRemoveSavedSearch,
+  searchQuery,
+  favoritePlaces = [],
+  onToggleFavorite = () => {}
 }) => {
-  // Toggle between map view and list view
-  const [showListView, setShowListView] = useState(false);
+  const { t } = useLanguage();
+  const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
+  const [duration, setDuration] = useState(30);
+  const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes');
+
+  if (!show) return null;
+
+  const handleRadiusTypeChange = (type: 'distance' | 'duration') => {
+    setRadiusType(type);
+    // Si on change pour durée, utiliser la valeur sélectionnée précédemment
+    if (type === 'duration' && selectedDuration) {
+      setDuration(selectedDuration);
+    }
+  };
+
+  const handleDurationChange = (value: number) => {
+    setDuration(value);
+    onDurationChange(value);
+  };
 
   return (
-    <div 
-      ref={menuRef}
-      className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-all duration-300 ease-in-out z-20 ${
-        menuOpen ? 'h-[60vh]' : 'h-auto'
-      }`}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      <MenuToggleHeader 
-        menuOpen={menuOpen}
-        setMenuOpen={setMenuOpen}
-      />
-      
-      {!menuOpen && (
-        <div className="px-3 py-2">
-          <SelectedFilters 
-            selectedDuration={selectedDuration}
-            selectedDistance={selectedDistance}
-            distanceUnit={distanceUnit}
-            transportMode={transportMode}
-            resultsCount={resultsCount}
-            selectedCategory={selectedCategory}
-          />
-        </div>
-      )}
-      
-      {menuOpen && (
-        <div className="overflow-y-auto max-h-[calc(60vh-3rem)] pb-16">
-          {/* View toggle */}
-          <div className="flex justify-center mb-2 px-4 py-1">
-            <div className="bg-gray-100 rounded-full p-1 flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`rounded-full px-4 ${!showListView ? 'bg-white shadow-sm' : ''}`}
-                onClick={() => setShowListView(false)}
-              >
-                <Map className="h-4 w-4 mr-1" />
-                <span className="text-xs">Carte</span>
-              </Button>
-              <Button
-                variant="ghost" 
-                size="sm"
-                className={`rounded-full px-4 ${showListView ? 'bg-white shadow-sm' : ''}`}
-                onClick={() => setShowListView(true)}
-              >
-                <List className="h-4 w-4 mr-1" />
-                <span className="text-xs">Liste</span>
-              </Button>
-            </div>
-          </div>
-
-          {!showListView ? (
-            // Filters tab
-            <>
-              <FiltersSection 
+    <div className="fixed inset-0 z-50 flex items-start justify-end">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <Card className="h-full w-full max-w-md overflow-y-auto rounded-none shadow-xl relative">
+        <CardHeader className="flex-row items-center justify-between space-y-0 p-4">
+          <CardTitle className="text-lg">{t('search_and_filters')}</CardTitle>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+        
+        <CardContent className="p-4">
+          <Tabs defaultValue="filters" className="w-full">
+            <TabsList className="w-full mb-4 grid grid-cols-3">
+              <TabsTrigger value="filters" className="flex gap-1 items-center">
+                <Filter className="h-4 w-4" />
+                {t('filters')}
+              </TabsTrigger>
+              <TabsTrigger value="history" className="flex gap-1 items-center">
+                <Clock className="h-4 w-4" />
+                {t('history')}
+              </TabsTrigger>
+              <TabsTrigger value="favorites" className="flex gap-1 items-center">
+                <Star className="h-4 w-4" />
+                {t('favorites')}
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="filters" className="space-y-6">
+              <FiltersSection
                 resultsCount={resultsCount}
                 onResultsCountChange={onResultsCountChange}
                 transportMode={transportMode}
@@ -132,52 +135,65 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
                 onCategorySelect={onCategorySelect}
               />
               
-              <div className="mt-4 px-4">
-                <Button 
-                  onClick={onSearch}
-                  className="w-full bg-primary text-white font-medium rounded-full py-6 flex items-center justify-center gap-2"
-                >
-                  <Search className="w-5 h-5" />
-                  Rechercher
-                </Button>
-              </div>
-            </>
-          ) : (
-            // Results list tab
-            <div className="px-4">
-              <h3 className="font-semibold text-lg mb-2 flex items-center">
-                <Filter className="h-4 w-4 mr-1" />
-                Résultats {searchResults.length > 0 && `(${searchResults.length})`}
-              </h3>
-              {searchResults && searchResults.length > 0 ? (
-                <ResultsList 
-                  results={searchResults} 
-                  onResultClick={onResultClick} 
-                  selectedResultId={selectedResultId}
-                  selectedCategory={selectedCategory}
-                  selectedDuration={selectedDuration}
-                  selectedDistance={selectedDistance}
-                  transportMode={transportMode}
-                />
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p>Aucun résultat trouvé</p>
-                  <p className="text-sm mt-1">Essayez de modifier vos filtres ou votre recherche</p>
+              {results.length > 0 && (
+                <div className="mt-4">
+                  <ResultsList 
+                    results={results}
+                    onResultClick={onResultClick}
+                    selectedResultId={selectedResultId}
+                  />
                 </div>
               )}
-            </div>
-          )}
-        </div>
-      )}
-      
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
-        <SearchFooter />
-      </div>
+              
+              {onReset && (
+                <Button 
+                  variant="outline" 
+                  className="mt-4 w-full"
+                  onClick={onReset}
+                >
+                  {t('reset_filters')}
+                </Button>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="history">
+              <div className="space-y-4">
+                <SavedSearches
+                  searches={savedSearches}
+                  onSearchClick={onHistoryItemClick}
+                  onRemoveSearch={onRemoveSavedSearch}
+                />
+                
+                <SearchHistory
+                  history={searchHistory}
+                  onHistoryItemClick={onHistoryItemClick}
+                  onSaveSearch={onSaveSearch}
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="favorites">
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium mb-2">{t('favorite_places')}</h3>
+                {favoritePlaces.length > 0 ? (
+                  <ResultsList 
+                    results={favoritePlaces}
+                    onResultClick={onResultClick}
+                    selectedResultId={selectedResultId}
+                  />
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    <p>{t('no_favorites')}</p>
+                    <p className="text-sm mt-2">{t('add_favorites_hint')}</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
-
-// Add missing import
-import { useState } from 'react';
 
 export default SearchMenu;

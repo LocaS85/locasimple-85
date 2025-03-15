@@ -23,15 +23,22 @@ const TransportModeButton: React.FC<TransportModeButtonProps> = ({
     return null;
   }
   
+  // Utilisons directement la couleur de transportMode au lieu de l'interpolation
+  const backgroundColor = isActive ? modeOption.color : 'white';
+  const textColor = isActive ? 'white' : 'gray-700';
+  const borderColor = isActive ? modeOption.color : 'gray-200';
+  
   return (
     <Button
       variant={isActive ? "default" : "outline"}
-      className={`flex items-center justify-center p-2 h-10 ${className} ${
-        isActive 
-          ? `bg-[${modeOption.color}] text-white` 
-          : 'bg-white text-gray-700 border-gray-200'
-      }`}
+      className={`flex items-center justify-center p-2 h-10 ${className}`}
       onClick={() => onClick(mode)}
+      style={{
+        backgroundColor: isActive ? modeOption.color : 'white',
+        color: isActive ? 'white' : '#374151',
+        borderColor: isActive ? modeOption.color : '#e5e7eb',
+        borderWidth: '1px'
+      }}
     >
       <div className="flex items-center space-x-2">
         {modeOption.icon}
