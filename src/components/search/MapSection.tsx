@@ -105,7 +105,7 @@ export const MapSection: React.FC<MapSectionProps> = ({
           onSearchChange(query);
           onSearch();
         }}
-        onResultSelect={onResultClick}
+        onResultSelect={(result) => onResultClick(result)}
         resetSearch={resetSearch}
         showHistory={showHistory}
         setShowHistory={setShowHistory}
