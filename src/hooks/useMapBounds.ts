@@ -18,33 +18,64 @@ export const useMapBounds = ({
   mapReady,
   onMarkersReady
 }: UseMapBoundsProps) => {
-  // Fit bounds to show all markers
+  // Update map bounds when results or center changes
   useEffect(() => {
-    if (!map || !mapReady || results.length === 0) return;
-    
-    try {
-      console.log("Fitting bounds to show all markers");
-      const bounds = new mapboxgl.LngLatBounds();
-      
-      // Add center point to bounds
-      bounds.extend(center);
-      
-      // Add all result locations to bounds
-      results.forEach(result => {
-        bounds.extend([result.longitude, result.latitude]);
-      });
-      
-      // Fit the map to these bounds with padding
-      map.fitBounds(bounds, { padding: 50 });
-      
-      // Callback when markers are ready
-      if (onMarkersReady) {
-        onMarkersReady();
-      }
-    } catch (error) {
-      console.error("Error fitting bounds:", error);
+    if (!map || !mapReady) {
+      console.log("Map not ready for bounds calculation");
+      return;
     }
-  }, [map, mapReady, results, center, onMarkersReady]);
+
+    // If we have results, fit bounds to include all markers
+    if (results.length > 0) {
+      try {
+        const bounds = new mapboxgl.LngLatBounds();
+        
+        // Add user location to bounds
+        bounds.extend(center);
+        
+        // Add all result locations to bounds
+        results.forEach(result => {
+          bounds.extend([result.longitude, result.latitude]);
+        });
+        
+        // Check if bounds are valid
+        if (bounds.isEmpty()) {
+          console.log("Empty bounds, defaulting to center");
+          map.flyTo({
+            center: center,
+            zoom: 13,
+            essential: true
+          });
+        } else {
+          // Fit map to bounds with padding
+          map.fitBounds(bounds, {
+            padding: { top: 100, bottom: 150, left: 100, right: 100 },
+            maxZoom: 15,
+            duration: 1000
+          });
+        }
+        
+        // Signal that markers are ready
+        if (onMarkersReady) {
+          onMarkersReady();
+        }
+      } catch (error) {
+        console.error("Error calculating map bounds:", error);
+        // Fallback to center
+        map.flyTo({
+          center: center,
+          zoom: 12
+        });
+      }
+    } else {
+      // If no results, center on user location
+      map.flyTo({
+        center: center,
+        zoom: 13,
+        essential: true
+      });
+    }
+  }, [map, results, center, mapReady, onMarkersReady]);
 };
 
 export default useMapBounds;

@@ -1,226 +1,141 @@
 
-import React, { useEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TransportMode, RouteResponse, Route } from '@/services/mapboxService';
-import { Car, Clock, Navigation2, MapPin, MoreHorizontal, Save, Share } from 'lucide-react';
+import { TransportMode } from '@/hooks/useMapboxRoutes';
+import { Car, Walk, Bike, Clock, LocateIcon, Save } from 'lucide-react';
 
-interface MultiRouteDisplayProps {
-  routes: Record<TransportMode, RouteResponse | null>;
-  activeMode: TransportMode;
-  onModeChange: (mode: TransportMode) => void;
-  onRouteSelect?: (route: Route, mode: TransportMode) => void;
-  onSaveRoute?: (route: Route, mode: TransportMode) => void;
-  isFullScreen?: boolean;
+interface RouteResponse {
+  geometry: any;
+  duration: number;
+  distance: number;
+  legs: any[];
 }
 
-// Helper pour formater les durées
-const formatDuration = (seconds: number): string => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes}min`;
-  }
-  return `${minutes} min`;
-};
+interface MultiRouteDisplayProps {
+  routes: Record<TransportMode, RouteResponse>;
+  activeMode: TransportMode;
+  onModeChange: (mode: string) => void;
+  onRouteSelect?: (route: RouteResponse, mode: string) => void;
+  onSaveRoute?: (route: RouteResponse, mode: string) => void;
+}
 
-// Helper pour formater les distances
-const formatDistance = (meters: number): string => {
-  if (meters < 1000) {
-    return `${Math.round(meters)} m`;
-  }
-  return `${(meters / 1000).toFixed(1)} km`;
-};
-
-// Composant pour afficher les icônes de mode de transport
-const TransportModeIcon: React.FC<{ mode: TransportMode }> = ({ mode }) => {
-  switch (mode) {
-    case 'driving':
-      return <Car className="h-4 w-4" />;
-    case 'walking':
-      return <Navigation2 className="h-4 w-4" />;
-    case 'cycling':
-      return <span className="text-lg">🚲</span>;
-    case 'driving-traffic':
-      return <span className="text-lg">🚦</span>;
-    default:
-      return <Navigation2 className="h-4 w-4" />;
-  }
-};
-
-// Composant principal
 const MultiRouteDisplay: React.FC<MultiRouteDisplayProps> = ({
   routes,
   activeMode,
   onModeChange,
   onRouteSelect,
-  onSaveRoute,
-  isFullScreen = false
+  onSaveRoute
 }) => {
-  // Fix: Properly initialize the state with required TransportMode keys
-  const [selectedRouteIndices, setSelectedRouteIndices] = useState<Record<TransportMode, number>>({
-    'driving': 0,
-    'walking': 0,
-    'cycling': 0,
-    'driving-traffic': 0
-  });
-  
-  // Mode labels pour l'affichage
-  const modeLabels: Record<TransportMode, string> = {
-    'driving': 'Voiture',
-    'walking': 'À pied',
-    'cycling': 'Vélo',
-    'driving-traffic': 'Traffic'
-  };
-
-  // Sélectionner le premier itinéraire par défaut pour chaque mode
-  useEffect(() => {
-    const defaultSelected: Record<TransportMode, number> = {
-      'driving': 0,
-      'walking': 0,
-      'cycling': 0,
-      'driving-traffic': 0
-    };
-    
-    Object.entries(routes).forEach(([mode, response]) => {
-      if (response && response.routes.length > 0) {
-        defaultSelected[mode as TransportMode] = 0;
-      }
-    });
-    
-    setSelectedRouteIndices(defaultSelected);
-  }, [routes]);
-
-  // Gérer la sélection d'un itinéraire
-  const handleRouteSelect = (mode: TransportMode, index: number) => {
-    setSelectedRouteIndices(prev => ({ ...prev, [mode]: index }));
-    
-    if (onRouteSelect && routes[mode]?.routes[index]) {
-      onRouteSelect(routes[mode]!.routes[index], mode);
+  // Get the appropriate icon based on transport mode
+  const getTransportIcon = (mode: string) => {
+    switch (mode) {
+      case 'driving':
+      case 'driving-traffic':
+        return <Car className="h-4 w-4" />;
+      case 'cycling':
+        return <Bike className="h-4 w-4" />;
+      case 'walking':
+        return <Walk className="h-4 w-4" />;
+      default:
+        return <Car className="h-4 w-4" />;
     }
   };
 
-  // Sauvegarder un itinéraire
-  const handleSaveRoute = (mode: TransportMode, index: number) => {
-    if (onSaveRoute && routes[mode]?.routes[index]) {
-      onSaveRoute(routes[mode]!.routes[index], mode);
-    }
+  // Format duration from seconds to minutes
+  const formatDuration = (seconds: number): string => {
+    if (!seconds) return 'N/A';
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ''}`;
   };
+
+  // Format distance from meters to km
+  const formatDistance = (meters: number): string => {
+    if (!meters) return 'N/A';
+    const km = meters / 1000;
+    return km < 10 ? `${km.toFixed(1)} km` : `${Math.round(km)} km`;
+  };
+
+  // Get all available modes that have routes
+  const availableModes = Object.entries(routes)
+    .filter(([_, route]) => route && route.geometry)
+    .map(([mode]) => mode as TransportMode);
+
+  if (availableModes.length === 0) {
+    return (
+      <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 text-center">
+        <p className="text-gray-600">Calcul d'itinéraire en cours...</p>
+      </div>
+    );
+  }
+
+  const selectedRoute = routes[activeMode];
 
   return (
-    <div className={`bg-white rounded-lg shadow-md ${isFullScreen ? 'h-full' : ''}`}>
-      <Tabs defaultValue={activeMode} onValueChange={(value) => onModeChange(value as TransportMode)}>
-        <TabsList className="w-full">
-          {Object.keys(routes).map((mode) => {
-            const routeData = routes[mode as TransportMode];
-            const hasRoutes = routeData && routeData.routes.length > 0;
-            const fastestRoute = hasRoutes ? routeData!.routes[0] : null;
-            
-            return (
-              <TabsTrigger 
-                key={mode} 
-                value={mode}
-                disabled={!hasRoutes}
-                className="flex-1"
-              >
-                <div className="flex flex-col items-center">
-                  <TransportModeIcon mode={mode as TransportMode} />
-                  <span className="text-xs mt-1">{modeLabels[mode as TransportMode]}</span>
-                  {fastestRoute && (
-                    <span className="text-xs text-gray-500 mt-0.5">
-                      {formatDuration(fastestRoute.duration)}
-                    </span>
-                  )}
-                </div>
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-        
-        {Object.keys(routes).map((mode) => {
-          const routeData = routes[mode as TransportMode];
-          const hasRoutes = routeData && routeData.routes.length > 0;
-          
-          return (
-            <TabsContent key={mode} value={mode} className="p-2">
-              {!hasRoutes ? (
-                <div className="text-center py-8 text-gray-500">
-                  Aucun itinéraire disponible pour ce mode de transport
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {routeData!.routes.map((route, index) => {
-                    const isSelected = selectedRouteIndices[mode as TransportMode] === index;
-                    
-                    return (
-                      <Card 
-                        key={index}
-                        className={`cursor-pointer transition-all ${
-                          isSelected ? 'border-primary ring-1 ring-primary' : ''
-                        }`}
-                        onClick={() => handleRouteSelect(mode as TransportMode, index)}
-                      >
-                        <CardHeader className="py-3 px-4">
-                          <div className="flex justify-between items-center">
-                            <CardTitle className="text-sm font-medium flex items-center">
-                              <TransportModeIcon mode={mode as TransportMode} />
-                              <span className="ml-2">
-                                {index === 0 ? 'Itinéraire recommandé' : `Alternative ${index}`}
-                              </span>
-                            </CardTitle>
-                            <Badge variant={index === 0 ? "default" : "outline"}>
-                              {formatDuration(route.duration)}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="py-2 px-4">
-                          <div className="flex justify-between items-center text-sm">
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center text-gray-500">
-                                <MapPin className="h-3.5 w-3.5 mr-1" />
-                                <span>{formatDistance(route.distance)}</span>
-                              </div>
-                              <div className="flex items-center text-gray-500">
-                                <Clock className="h-3.5 w-3.5 mr-1" />
-                                <span>{formatDuration(route.duration)}</span>
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSaveRoute(mode as TransportMode, index);
-                                }}
-                              >
-                                <Save className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="ghost"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Partage à implémenter
-                                }}
-                              >
-                                <Share className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
-            </TabsContent>
-          );
-        })}
-      </Tabs>
+    <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
+      {/* Header with mode tabs */}
+      <div className="flex border-b">
+        {availableModes.map((mode) => (
+          <button
+            key={mode}
+            className={`flex-1 flex items-center justify-center gap-1 py-2 px-3 text-xs font-medium ${
+              activeMode === mode
+                ? 'bg-primary text-white'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => onModeChange(mode)}
+          >
+            {getTransportIcon(mode)}
+            <span>
+              {mode === 'driving-traffic' 
+                ? 'Trafic' 
+                : mode === 'driving' 
+                  ? 'Voiture' 
+                  : mode === 'walking' 
+                    ? 'À pied' 
+                    : 'Vélo'}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Route details */}
+      {selectedRoute && selectedRoute.geometry && (
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-gray-700">
+              <Clock className="h-4 w-4" />
+              <span className="font-medium">{formatDuration(selectedRoute.duration)}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-700">
+              <LocateIcon className="h-4 w-4" />
+              <span className="font-medium">{formatDistance(selectedRoute.distance)}</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 mt-2">
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="flex-1"
+              onClick={() => onRouteSelect && onRouteSelect(selectedRoute, activeMode)}
+            >
+              Démarrer
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => onSaveRoute && onSaveRoute(selectedRoute, activeMode)}
+            >
+              <Save className="h-4 w-4 mr-1" />
+              Sauvegarder
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

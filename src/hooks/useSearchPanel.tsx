@@ -4,9 +4,8 @@ import { useSearchState } from '@/hooks/useSearchState';
 import { useSearchMenu } from '@/hooks/useSearchMenu';
 import { useResultSelection } from '@/hooks/useResultSelection';
 import { useSearchOperations } from '@/hooks/useSearchOperations';
-import { useSearchLocation } from './SearchLocation';
-import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { useMapboxSearch } from '@/hooks/useMapboxSearch';
+import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 import { toast } from 'sonner';
 
 export const useSearchPanel = () => {
@@ -40,56 +39,47 @@ export const useSearchPanel = () => {
     setIsRecording,
     onTextResult: (text) => {
       setQuery(text);
-      search(text);
+      handleSearchPress();
     }
   });
-  
-  // Location handling
-  const { handleLocationClick, searchAddress } = useSearchLocation(
-    searchState.isLocationActive,
-    searchLoading || searchState.loading,
-    searchState.setLoading,
-    searchState.setIsLocationActive,
-    searchState.setUserLocation
-  );
-  
-  // Search operations
-  const { handleSearchPress } = useSearchOperations({
+
+  // Use search operations
+  const { handleSearchPress, handleSearch, activateGeolocation } = useSearchOperations({
     searchState,
-    locationOperations: { handleLocationClick, searchAddress },
     resultSelection
   });
 
-  // History item handling
-  const handleHistoryItemClick = (query: string) => {
-    setQuery(query);
-    search(query);
+  // Handle location button click
+  const handleLocationClick = () => {
+    activateGeolocation();
+  };
+
+  // Handle history item click
+  const handleHistoryItemClick = (historyQuery: string) => {
+    setQuery(historyQuery);
     setShowHistory(false);
+    handleSearchPress();
   };
 
-  const handleSaveSearch = (query: string) => {
-    saveSearch(query);
-    toast.success(`Recherche "${query}" sauvegardée`);
+  // Handle save search
+  const handleSaveSearch = (searchQuery: string) => {
+    saveSearch(searchQuery);
+    toast.success(`Recherche "${searchQuery}" sauvegardée`);
   };
 
-  // Fill search results when mapbox results change
+  // Handle transport mode change
+  const onTransportModeChange = (mode: string) => {
+    searchState.setTransportMode(mode);
+    // If we have active search results, update the routes
+    if (searchState.searchPerformed) {
+      handleSearch();
+    }
+  };
+
+  // Update search results when query results change
   useEffect(() => {
     if (results.length > 0) {
-      const formattedResults = results.map(result => ({
-        id: result.id,
-        name: result.place_name.split(',')[0],
-        address: result.place_name,
-        distance: 0,
-        duration: 0,
-        category: result.properties?.category || 'other',
-        color: 'blue',
-        latitude: result.center[1],
-        longitude: result.center[0],
-        description: result.properties?.description || '',
-      }));
-      
-      searchState.setSearchResults(formattedResults);
-      searchState.setSearchPerformed(true);
+      searchState.setSearchResults(results);
     }
   }, [results]);
 
@@ -115,7 +105,7 @@ export const useSearchPanel = () => {
     handleSearchPress,
     isLocationActive: searchState.isLocationActive,
     transportMode: searchState.transportMode,
-    onTransportModeChange: searchState.setTransportMode
+    onTransportModeChange
   };
 };
 

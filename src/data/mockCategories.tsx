@@ -1,34 +1,68 @@
 
 import React from 'react';
 import { 
-  Utensils, 
-  Beer, 
   Coffee, 
   ShoppingBag, 
+  Utensils, 
+  Building2, 
+  Landmark, 
   Hotel, 
-  Film, 
-  Stethoscope, 
-  Wrench, 
   GraduationCap, 
-  Bus,
-  Layers
+  Bus, 
+  Building, 
+  Heart, 
+  Dumbbell
 } from 'lucide-react';
 
-export interface Category {
-  id: string;
-  name: string;
-  icon?: React.ReactNode;
-}
-
-export const mockCategories: Category[] = [
-  { id: 'restaurants', name: 'Restaurants', icon: <Utensils className="h-4 w-4" /> },
-  { id: 'bars', name: 'Bars', icon: <Beer className="h-4 w-4" /> },
-  { id: 'cafes', name: 'Cafés', icon: <Coffee className="h-4 w-4" /> },
-  { id: 'shopping', name: 'Shopping', icon: <ShoppingBag className="h-4 w-4" /> },
-  { id: 'hotels', name: 'Hôtels', icon: <Hotel className="h-4 w-4" /> },
-  { id: 'entertainment', name: 'Divertissement', icon: <Film className="h-4 w-4" /> },
-  { id: 'health', name: 'Santé', icon: <Stethoscope className="h-4 w-4" /> },
-  { id: 'services', name: 'Services', icon: <Wrench className="h-4 w-4" /> },
-  { id: 'education', name: 'Éducation', icon: <GraduationCap className="h-4 w-4" /> },
-  { id: 'transport', name: 'Transport', icon: <Bus className="h-4 w-4" /> },
+export const mockCategories = [
+  {
+    id: 'restaurant',
+    name: 'Restaurants',
+    icon: React.createElement(Utensils, { size: 16 })
+  },
+  {
+    id: 'cafe',
+    name: 'Cafés',
+    icon: React.createElement(Coffee, { size: 16 })
+  },
+  {
+    id: 'shopping',
+    name: 'Shopping',
+    icon: React.createElement(ShoppingBag, { size: 16 })
+  },
+  {
+    id: 'hotel',
+    name: 'Hôtels',
+    icon: React.createElement(Hotel, { size: 16 })
+  },
+  {
+    id: 'attraction',
+    name: 'Attractions',
+    icon: React.createElement(Landmark, { size: 16 })
+  },
+  {
+    id: 'education',
+    name: 'Education',
+    icon: React.createElement(GraduationCap, { size: 16 })
+  },
+  {
+    id: 'transport',
+    name: 'Transport',
+    icon: React.createElement(Bus, { size: 16 })
+  },
+  {
+    id: 'business',
+    name: 'Entreprises',
+    icon: React.createElement(Building, { size: 16 })
+  },
+  {
+    id: 'health',
+    name: 'Santé',
+    icon: React.createElement(Heart, { size: 16 })
+  },
+  {
+    id: 'sport',
+    name: 'Sport',
+    icon: React.createElement(Dumbbell, { size: 16 })
+  }
 ];
