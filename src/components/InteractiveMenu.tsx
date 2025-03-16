@@ -29,6 +29,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
   const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
   const [resultsCount, setResultsCount] = useState(5);
   const [transportMode, setTransportMode] = useState('driving');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -80,7 +81,10 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
             </div>
 
             <div className="space-y-6">
-              <CategoriesSelector />
+              <CategoriesSelector 
+                selectedCategory={selectedCategory}
+                onCategorySelect={setSelectedCategory}
+              />
               
               <RadiusSelector 
                 radius={radius}

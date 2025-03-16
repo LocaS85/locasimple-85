@@ -8,10 +8,9 @@ import { CategoriesSelector } from '@/components/menu/CategoriesSelector';
 import { RadiusSelector } from '@/components/menu/RadiusSelector';
 import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
 import { FiltersSection } from '@/components/search/FiltersSection';
-import { ResultsSection } from '@/components/search/ResultsSection';
 import ResultsList, { Result } from '@/components/ResultsList';
-import { SavedSearches } from '@/components/search/SavedSearches';
-import { SearchHistory } from '@/components/search/SearchHistory';
+import SavedSearches from '@/components/search/SavedSearches';
+import SearchHistory from '@/components/search/SearchHistory';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchMenuProps {
@@ -166,8 +165,10 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
                 
                 <SearchHistory
                   history={searchHistory}
+                  savedSearches={savedSearches}
                   onHistoryItemClick={onHistoryItemClick}
                   onSaveSearch={onSaveSearch}
+                  onRemoveSavedSearch={onRemoveSavedSearch}
                 />
               </div>
             </TabsContent>

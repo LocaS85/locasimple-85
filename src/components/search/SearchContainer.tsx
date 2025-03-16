@@ -77,12 +77,8 @@ export const SearchContainer: React.FC = () => {
 
       {/* Bottom slide-up menu */}
       <SearchMenu
-        menuOpen={searchMenu.menuOpen}
-        setMenuOpen={searchMenu.setMenuOpen}
-        menuRef={searchMenu.menuRef}
-        handleTouchStart={searchMenu.handleTouchStart}
-        handleTouchMove={searchMenu.handleTouchMove}
-        handleTouchEnd={searchMenu.handleTouchEnd}
+        show={searchMenu.menuOpen}
+        onClose={() => searchMenu.setMenuOpen(false)}
         selectedDuration={searchState.selectedDuration}
         selectedDistance={searchState.selectedDistance}
         distanceUnit={searchState.distanceUnit}
@@ -95,10 +91,16 @@ export const SearchContainer: React.FC = () => {
         onDurationChange={searchState.setSelectedDuration}
         onDistanceChange={searchState.setSelectedDistance}
         onDistanceUnitChange={searchState.setDistanceUnit}
-        searchResults={searchState.searchResults}
-        selectedResultId={resultSelection.selectedResultId}
+        results={searchState.searchResults}
         onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
-        onSearch={handleSearchPress}
+        selectedResultId={resultSelection.selectedResultId}
+        searchHistory={searchHistory}
+        savedSearches={savedSearches}
+        onHistoryItemClick={handleHistoryItemClick}
+        onSaveSearch={handleSaveSearch}
+        onRemoveSavedSearch={removeSavedSearch}
+        searchQuery={query}
+        onReset={resetSearch}
       />
 
       {/* Route display when a result is selected */}
