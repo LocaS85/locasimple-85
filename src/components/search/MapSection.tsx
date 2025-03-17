@@ -4,6 +4,7 @@ import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
 import { SearchPanel } from './SearchPanel';
 import { useSearchMenu } from '@/hooks/useSearchMenu';
+import LocationButton from '@/components/search/LocationButton';
 
 interface MapSectionProps {
   results: Result[];
@@ -123,6 +124,14 @@ export const MapSection: React.FC<MapSectionProps> = ({
         transportMode={transportMode}
         onTransportModeChange={onTransportModeChange}
         onMenuClick={toggleMenu}
+      />
+      
+      {/* Le bouton "Remonter ICI" est remplacé par le LocationButton */}
+      <LocationButton
+        loading={loading}
+        isLocationActive={isLocationActive}
+        isWatching={false}
+        onClick={onLocationClick}
       />
     </div>
   );

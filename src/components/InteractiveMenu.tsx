@@ -17,6 +17,7 @@ interface InteractiveMenuProps {
     resultsCount: number;
     transportMode: string;
     radiusType: 'distance' | 'duration';
+    categories?: string[];
   }) => void;
 }
 
@@ -30,9 +31,19 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
   const [resultsCount, setResultsCount] = useState(5);
   const [transportMode, setTransportMode] = useState('driving');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleCategorySelect = (category: string | null) => {
+    setSelectedCategory(category);
+    if (category && !selectedCategories.includes(category)) {
+      setSelectedCategories([...selectedCategories, category]);
+    } else if (category) {
+      setSelectedCategories(selectedCategories.filter(c => c !== category));
+    }
   };
 
   const handleFiltersChange = () => {
@@ -44,6 +55,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
       resultsCount,
       transportMode,
       radiusType,
+      categories: selectedCategories
     });
     setIsOpen(false);
   };
@@ -83,7 +95,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
             <div className="space-y-6">
               <CategoriesSelector 
                 selectedCategory={selectedCategory}
-                onCategorySelect={setSelectedCategory}
+                onCategorySelect={handleCategorySelect}
               />
               
               <RadiusSelector 

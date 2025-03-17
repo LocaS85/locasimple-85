@@ -87,14 +87,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
     isLocationActive
   });
 
-  // Display the map initialization state for debugging
-  useEffect(() => {
-    console.log('Map initialized state:', isMapInitialized);
-    if (!isMapInitialized && mapContainer.current) {
-      console.log('Map container exists but map not initialized');
-    }
-  }, [isMapInitialized]);
-
   // Update map center and marker when coordinates change
   useEffect(() => {
     updateMapCenter(center);
@@ -130,7 +122,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" style={{ backgroundColor: '#e9eef2' }} />
       
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-auto">
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
         <SearchInput
           searchQuery={searchQuery}
           isRecording={isRecording}
@@ -141,17 +133,22 @@ const MapContainer: React.FC<MapContainerProps> = ({
           onLocationClick={onLocationClick}
           onSearch={onSearch}
           userLocation={userLocation}
+          transportMode={transportMode}
+          onTransportModeChange={(mode) => console.log('Transport mode changed:', mode)}
         />
       </div>
       
-      {/* Map Controls (Categories and Map Style) */}
-      <MapControls
-        mapStyle={mapStyle}
-        onStyleChange={handleStyleChange}
-        selectedCategory={selectedCategory}
-        onCategorySelect={onCategorySelect}
-        map={map} // Pass the map instance to MapControls
-      />
+      {/* Map Controls with more minimal UI - now only style selector */}
+      <div className="absolute top-4 right-4 z-10">
+        <MapControls
+          mapStyle={mapStyle}
+          onStyleChange={handleStyleChange}
+          selectedCategory={selectedCategory}
+          onCategorySelect={onCategorySelect}
+          map={map}
+          minimal={true} // Add minimal prop to show less controls
+        />
+      </div>
       
       {isMapInitialized && map && (
         <>

@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, MapPinOff, Loader2, Search, X, Menu } from 'lucide-react';
+import { Mic, MapPin, Loader2, Search, X, Menu, Car, Bike, Walk, Bus } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -45,7 +44,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   onTransportModeChange = () => {},
   onMenuClick = () => {}
 }) => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
