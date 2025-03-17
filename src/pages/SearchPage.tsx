@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSearchPageState } from '@/hooks/useSearchPageState';
 import SearchHeader from '@/components/search/SearchHeader';

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +11,8 @@ interface LocationButtonProps {
   onToggleTracking?: () => void;
 }
 
+// This component is not being rendered anymore, but we're keeping the file
+// for compatibility with other components that might still import it
 export const LocationButton: React.FC<LocationButtonProps> = ({ 
   loading, 
   isLocationActive, 
@@ -19,46 +20,7 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
   onClick,
   onToggleTracking
 }) => {
-  const handleClick = () => {
-    if (isLocationActive && onToggleTracking) {
-      // Si la localisation est déjà active, basculer entre le suivi et la position fixe
-      onToggleTracking();
-    } else {
-      // Sinon, activer la localisation
-      onClick();
-    }
-  };
-  
-  return (
-    <div className="absolute bottom-32 right-4 z-10">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={handleClick}
-              className={`rounded-full h-14 w-14 shadow-lg transition-all hover:scale-105 ${
-                isWatching 
-                  ? 'bg-green-500 text-white border-white border-2' 
-                  : 'bg-white text-primary border border-gray-200'
-              }`}
-              disabled={loading}
-              aria-label="Ma position"
-            >
-              <Navigation className={`h-6 w-6 ${isWatching ? 'animate-pulse' : ''}`} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {loading 
-              ? 'Localisation en cours...' 
-              : isWatching 
-                ? 'Suivi de position actif (cliquer pour désactiver)' 
-                : 'Remonter à ma position'
-            }
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
-  );
+  return null; // Return null to render nothing
 };
 
 export default LocationButton;

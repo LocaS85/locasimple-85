@@ -4,7 +4,6 @@ import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
 import { SearchPanel } from './SearchPanel';
 import { useSearchMenu } from '@/hooks/useSearchMenu';
-import LocationButton from '@/components/search/LocationButton';
 import TransportModeFilter from '@/components/search/TransportModeFilter';
 
 interface MapSectionProps {
@@ -115,7 +114,7 @@ export const MapSection: React.FC<MapSectionProps> = ({
         savedSearches={savedSearches}
         onHistoryItemClick={onHistoryItemClick}
         onSaveSearch={onSaveSearch}
-        onRemoveSavedSearch={onRemoveSavedSearch}
+        onRemoveSavedSearch={removeSavedSearch}
         userLocation={userLocation}
         isRecording={isRecording}
         onMicClick={onMicClick}
@@ -125,14 +124,6 @@ export const MapSection: React.FC<MapSectionProps> = ({
         transportMode={transportMode}
         onTransportModeChange={onTransportModeChange}
         onMenuClick={toggleMenu}
-      />
-      
-      {/* Location Button - moved up */}
-      <LocationButton
-        loading={loading}
-        isLocationActive={isLocationActive}
-        isWatching={false}
-        onClick={onLocationClick}
       />
       
       {/* Transport Mode Filter - added below location button */}

@@ -3,7 +3,6 @@ import React from 'react';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import LocationButton from '@/components/search/LocationButton';
 
 interface Place {
   id: string;
@@ -139,13 +138,6 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
           <p className="text-red-500">Token Mapbox manquant</p>
         </div>
       )}
-      
-      {/* Location Button */}
-      <LocationButton 
-        loading={loading}
-        isLocationActive={isLocationActive}
-        onClick={handleLocationClick}
-      />
     </>
   );
 };
