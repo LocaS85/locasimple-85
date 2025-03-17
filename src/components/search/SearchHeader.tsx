@@ -1,8 +1,5 @@
 
 import React from 'react';
-import { ResultsCountPopover } from '@/components/search/ResultsCountPopover';
-import { DurationFilter } from '@/components/search/DurationFilter';
-import { DistanceFilter } from '@/components/search/DistanceFilter';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchHeaderProps {
@@ -31,22 +28,6 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   return (
     <div className="p-4 flex justify-between items-center bg-white shadow-sm z-10">
       <h1 className="text-xl font-bold">{t('search')}</h1>
-      <div className="flex gap-2">
-        <ResultsCountPopover 
-          resultsCount={resultsCount} 
-          onResultsCountChange={setResultsCount} 
-        />
-        <DurationFilter 
-          selectedDuration={selectedDuration} 
-          onDurationChange={setSelectedDuration} 
-        />
-        <DistanceFilter 
-          selectedDistance={selectedDistance} 
-          distanceUnit={distanceUnit} 
-          onDistanceChange={setSelectedDistance} 
-          onDistanceUnitChange={setDistanceUnit} 
-        />
-      </div>
     </div>
   );
 };

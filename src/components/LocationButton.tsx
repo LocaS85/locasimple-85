@@ -30,7 +30,7 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
   };
   
   return (
-    <div className="absolute bottom-24 right-4 z-10">
+    <div className="absolute bottom-32 right-4 z-10">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
