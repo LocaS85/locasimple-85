@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MapPin, Loader2, Navigation } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 interface LocationButtonProps {
   loading: boolean;
@@ -37,22 +37,14 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
             <Button
               onClick={handleClick}
               className={`rounded-full h-14 w-14 shadow-lg transition-all hover:scale-105 ${
-                isLocationActive 
-                  ? (isWatching 
-                      ? 'bg-green-500 text-white border-white border-2' 
-                      : 'bg-primary text-white border-white border-2')
+                isWatching 
+                  ? 'bg-green-500 text-white border-white border-2' 
                   : 'bg-white text-primary border border-gray-200'
               }`}
               disabled={loading}
               aria-label="Ma position"
             >
-              {loading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : isWatching ? (
-                <Navigation className="h-6 w-6 animate-pulse" />
-              ) : (
-                <MapPin className="h-6 w-6" />
-              )}
+              <Navigation className={`h-6 w-6 ${isWatching ? 'animate-pulse' : ''}`} />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -60,9 +52,8 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
               ? 'Localisation en cours...' 
               : isWatching 
                 ? 'Suivi de position actif (cliquer pour désactiver)' 
-                : isLocationActive 
-                  ? 'Position définie (cliquer pour activer le suivi)' 
-                  : 'Activer ma position'}
+                : 'Remonter à ma position'
+            }
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

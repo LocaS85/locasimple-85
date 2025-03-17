@@ -1,0 +1,85 @@
+
+/* New flat design styles */
+.flat-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background: white;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.flat-button {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.flat-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.custom-shadow {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Responsive layout classes */
+@media (max-width: 640px) {
+  .responsive-container {
+    padding: 0.5rem;
+  }
+  
+  .responsive-input {
+    font-size: 0.875rem;
+  }
+  
+  .responsive-button {
+    padding: 0.5rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .responsive-container {
+    padding: 0.75rem;
+  }
+  
+  .responsive-input {
+    font-size: 0.9375rem;
+  }
+  
+  .responsive-button {
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .responsive-container {
+    padding: 1rem;
+  }
+  
+  .responsive-input {
+    font-size: 1rem;
+  }
+  
+  .responsive-button {
+    padding: 1rem;
+  }
+}
+
+/* Search bar styles */
+.search-bar {
+  transition: all 0.3s ease;
+}
+
+.search-bar:focus-within {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Button hover effects */
+.btn-hover-effect {
+  transition: all 0.2s ease;
+}
+
+.btn-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

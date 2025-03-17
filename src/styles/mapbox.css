@@ -1,0 +1,103 @@
+
+/* Mapbox popup customization */
+.mapboxgl-popup-content {
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 3;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 16px;
+  color: #6b7280;
+  padding: 6px;
+  border-radius: 50%;
+  right: 8px;
+  top: 8px;
+}
+
+.mapboxgl-popup-close-button:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+/* Hide the actual Mapbox zoom controls (since we're using our own) */
+.mapboxgl-ctrl-top-right {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Make sure map canvas is visible */
+.mapboxgl-canvas {
+  outline: none;
+}
+
+/* Ensure controls don't overlap */
+.mapboxgl-ctrl-bottom-right {
+  bottom: 100px !important;
+}
+
+/* Custom controls styling to match Mapbox controls */
+.map-custom-controls {
+  margin: 0 !important;
+  width: 30px;
+}
+
+/* Match the Mapbox control button style */
+.map-ctrl-btn {
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  background-color: white !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+
+/* Override button styling */
+.map-ctrl-btn:focus, 
+.map-ctrl-btn:active {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Style mapbox control group for our custom controls */
+.mapboxgl-ctrl-group {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.mapboxgl-ctrl-group > button {
+  width: 30px;
+  height: 30px;
+  display: block;
+  padding: 0;
+  outline: none;
+  border: 0;
+  box-sizing: border-box;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.mapboxgl-ctrl-group > button:last-child {
+  border-bottom: none;
+}
+
+/* Additional styling to better integrate with Mapbox controls */
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl {
+  margin: 10px 10px 0 0;
+}
+
+.mapboxgl-ctrl-group button + button {
+  border-top: 1px solid #ddd;
+}

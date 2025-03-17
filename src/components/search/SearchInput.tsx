@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, MapPin, Loader2, Search, X, Menu, Car, Bike, Walk, Bus } from 'lucide-react';
+import { Mic, MapPin, Loader2, Search, X, Menu, Car, Bike, Bus } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';

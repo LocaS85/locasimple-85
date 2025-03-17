@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Mic, MapPin, Menu, X, ZoomIn, ZoomOut, Car, Bus, Walk, Bike } from 'lucide-react';
+import { Search, Mic, MapPin, Menu, X, ZoomIn, ZoomOut, Car, Bus, Bike } from 'lucide-react';
 import { ResultsCountPopover } from '@/components/search/ResultsCountPopover';
 import { DurationFilter } from '@/components/search/DurationFilter';
 import { DistanceFilter } from '@/components/search/DistanceFilter';
@@ -132,7 +132,12 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
               onClick={() => onTransportModeChange('walking')}
               aria-label="Walking"
             >
-              <Walk className="h-4 w-4" />
+              {/* Replace Walk with PersonStanding */}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <path d="M14 11h1.86a2 2 0 0 1 1.8 1.67L19 19"/>
+                <path d="M5 19v-2a4 4 0 0 1 4-4h4.5"/>
+                <circle cx="12" cy="5" r="2"/>
+              </svg>
             </Button>
             
             <Button 
