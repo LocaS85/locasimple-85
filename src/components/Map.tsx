@@ -15,8 +15,6 @@ interface MapProps {
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
   transportMode?: string;
-  searchQuery?: string;
-  onSearchChange?: (value: string) => void;
   isRecording?: boolean;
   onMicClick?: () => void;
   onLocationClick?: () => void;
@@ -40,8 +38,6 @@ const Map = ({
   duration = 15,
   timeUnit = 'minutes',
   transportMode = 'driving',
-  searchQuery = '',
-  onSearchChange = () => {},
   isRecording = false,
   onMicClick = () => {},
   onLocationClick = () => {},
@@ -76,8 +72,6 @@ const Map = ({
         duration={duration}
         timeUnit={timeUnit}
         transportMode={transportMode}
-        searchQuery={searchQuery}
-        onSearchChange={onSearchChange}
         isRecording={isRecording}
         onMicClick={onMicClick}
         onLocationClick={onLocationClick}

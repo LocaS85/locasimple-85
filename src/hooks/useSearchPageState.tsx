@@ -38,30 +38,7 @@ export const useSearchPageState = () => {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [popupInfo, setPopupInfo] = useState<Place | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
   
-  // Search history
-  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('search_history');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error('Error loading search history:', e);
-      return [];
-    }
-  });
-
-  // Saved searches
-  const [savedSearches, setSavedSearches] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('saved_searches');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error('Error loading saved searches:', e);
-      return [];
-    }
-  });
-
   // Use geolocation hook
   const { activateGeolocation } = useGeolocation({
     setLoading,
@@ -75,70 +52,9 @@ export const useSearchPageState = () => {
     setIsRecording,
     onTextResult: (text) => {
       setSearchQuery(text);
-      // Trigger search with the transcribed text
-      performSearch(text);
     }
   });
 
-  const performSearch = useCallback(async (query: string) => {
-    if (!query.trim()) return;
-    
-    setLoading(true);
-    console.log(`Searching for: ${query}`);
-    
-    try {
-      if (MAPBOX_TOKEN) {
-        // Use Mapbox search API
-        const searchOptions = {
-          query,
-          limit: resultsCount,
-          language: 'fr',
-          types: ['poi', 'address', 'place'],
-        };
-        
-        if (isLocationActive && userLocation) {
-          searchOptions['proximity'] = userLocation;
-        }
-        
-        const results = await mapboxService.searchPlaces(searchOptions);
-        setSearchResults(results);
-        
-        // Transform to places format
-        const newPlaces = results.map(result => ({
-          id: result.id,
-          name: result.place_name.split(',')[0],
-          lat: result.center[1],
-          lon: result.center[0],
-          address: result.place_name,
-          category: result.properties?.category || 'other'
-        }));
-        
-        setPlaces(newPlaces);
-        
-        // Update search history
-        if (query && (!searchHistory.length || searchHistory[0] !== query)) {
-          const newHistory = [query, ...searchHistory.filter(s => s !== query)].slice(0, 10);
-          setSearchHistory(newHistory);
-          localStorage.setItem('search_history', JSON.stringify(newHistory));
-        }
-        
-        toast.success(`${newPlaces.length} résultats trouvés pour "${query}"`);
-      } else {
-        // Si pas de token Mapbox, on ne fait rien au lieu de simuler
-        setPlaces([]);
-        toast.error('Token Mapbox manquant. Impossible de rechercher.');
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      toast.error('Erreur lors de la recherche');
-      setPlaces([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [resultsCount, isLocationActive, userLocation, searchHistory]);
-
-  // Supprimons la fonction simulateSearch qui créait des résultats fictifs
-  
   const handleLocationClick = () => {
     activateGeolocation();
     
@@ -171,28 +87,6 @@ export const useSearchPageState = () => {
     setPopupInfo(null);
   };
 
-  const handleHistoryItemClick = (query: string) => {
-    setSearchQuery(query);
-    performSearch(query);
-    setShowHistory(false);
-  };
-
-  const handleSaveSearch = (query: string) => {
-    if (!query || savedSearches.includes(query)) return;
-    
-    const newSavedSearches = [...savedSearches, query];
-    setSavedSearches(newSavedSearches);
-    localStorage.setItem('saved_searches', JSON.stringify(newSavedSearches));
-    toast.success(`Recherche "${query}" sauvegardée`);
-  };
-
-  const handleRemoveSavedSearch = (query: string) => {
-    const newSavedSearches = savedSearches.filter(s => s !== query);
-    setSavedSearches(newSavedSearches);
-    localStorage.setItem('saved_searches', JSON.stringify(newSavedSearches));
-    toast.success(`Recherche "${query}" supprimée`);
-  };
-
   // Update viewport when user location changes and is active
   useEffect(() => {
     if (isLocationActive && userLocation) {
@@ -215,8 +109,6 @@ export const useSearchPageState = () => {
       toast.error('Token Mapbox manquant. La carte ne fonctionnera pas correctement.');
     } else {
       console.log('SearchPage loaded with Mapbox token available');
-      // Ne pas charger de résultats par défaut
-      setPlaces([]);
     }
   }, []);
 
@@ -245,18 +137,10 @@ export const useSearchPageState = () => {
     popupInfo,
     setPopupInfo,
     searchResults,
-    showHistory,
-    setShowHistory,
-    searchHistory,
-    savedSearches,
-    performSearch,
     handleLocationClick,
     handleMenuClick,
     handleResultClick,
     resetSearch,
-    handleHistoryItemClick,
-    handleSaveSearch,
-    handleRemoveSavedSearch,
     handleMicClick
   };
 };

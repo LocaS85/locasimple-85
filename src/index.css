@@ -9,6 +9,7 @@
   max-width: 100% !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   border-radius: 999px !important;
+  margin: 10px 0 !important;
 }
 
 .mapboxgl-ctrl-geocoder--input {
@@ -27,6 +28,13 @@
 
 .geocoder-container {
   width: 100%;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  max-width: 500px;
+  padding: 0 16px;
 }
 
 .mapboxgl-ctrl-geocoder .suggestions {
@@ -62,3 +70,24 @@
   @apply px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer transition-colors;
 }
 
+/* Map controls positioning */
+.map-custom-controls {
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.map-ctrl-btn {
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 0 !important;
+}
+
+.map-ctrl-btn:last-child {
+  border-bottom: none !important;
+}

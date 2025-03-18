@@ -66,7 +66,7 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     const geocoder = new MapboxGeocoder({
       accessToken: MAPBOX_TOKEN,
       mapboxgl: mapboxgl as any,
-      placeholder: 'Rechercher un lieu...',
+      placeholder: 'Rechercher un lieu, une entreprise...',
       countries: 'fr', // Filtre sur la France
       types: 'poi,place,address', // Recherche d'adresses et de points d'intérêt
       marker: false, // Désactiver le marqueur automatique
@@ -111,6 +111,8 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     <>
       {MAPBOX_TOKEN ? (
         <div className="relative w-full h-full">
+          <div ref={geocoderContainerRef} className="geocoder-container" />
+          
           <Map
             ref={mapRef}
             {...viewport}
@@ -120,11 +122,8 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
             onMove={evt => setViewport(evt.viewState)}
             reuseMaps
           >
-            {/* Geocoder Container */}
-            <div 
-              ref={geocoderContainerRef} 
-              className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-md px-4"
-            />
+            <GeolocateControl position="top-right" />
+            <NavigationControl position="top-right" />
             
             {places.slice(0, resultsCount).map((place) => (
               <Marker 
