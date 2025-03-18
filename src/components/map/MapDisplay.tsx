@@ -5,7 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import mapboxgl from 'mapbox-gl';
+import * as mapboxgl from 'mapbox-gl';
 
 interface Place {
   id: string;
@@ -65,7 +65,7 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     // Create the geocoder control
     const geocoder = new MapboxGeocoder({
       accessToken: MAPBOX_TOKEN,
-      mapboxgl: mapboxgl,
+      mapboxgl: mapboxgl as any,
       placeholder: 'Rechercher un lieu...',
       countries: 'fr', // Filtre sur la France
       types: 'poi,place,address', // Recherche d'adresses et de points d'intérêt

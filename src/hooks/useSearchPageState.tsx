@@ -124,35 +124,21 @@ export const useSearchPageState = () => {
         
         toast.success(`${newPlaces.length} résultats trouvés pour "${query}"`);
       } else {
-        // Simulate search if no Mapbox token
-        simulateSearch(query);
+        // Si pas de token Mapbox, on ne fait rien au lieu de simuler
+        setPlaces([]);
+        toast.error('Token Mapbox manquant. Impossible de rechercher.');
       }
     } catch (error) {
       console.error('Search error:', error);
       toast.error('Erreur lors de la recherche');
-      simulateSearch(query);
+      setPlaces([]);
     } finally {
       setLoading(false);
     }
   }, [resultsCount, isLocationActive, userLocation, searchHistory]);
 
-  const simulateSearch = (query: string) => {
-    // Simulate search delay
-    setTimeout(() => {
-      // Update places based on search query (simulated)
-      const newPlaces = [
-        { id: '1', name: `${query} A`, lat: 48.857, lon: 2.353 },
-        { id: '2', name: `${query} B`, lat: 48.858, lon: 2.354 },
-        { id: '3', name: `${query} C`, lat: 48.856, lon: 2.351 },
-        { id: '4', name: `${query} D`, lat: 48.855, lon: 2.356 },
-        { id: '5', name: `${query} E`, lat: 48.859, lon: 2.358 },
-      ];
-      
-      setPlaces(newPlaces.slice(0, resultsCount));
-      toast.success(`${resultsCount} résultats trouvés pour "${query}"`);
-    }, 1000);
-  };
-
+  // Supprimons la fonction simulateSearch qui créait des résultats fictifs
+  
   const handleLocationClick = () => {
     activateGeolocation();
     
@@ -229,9 +215,8 @@ export const useSearchPageState = () => {
       toast.error('Token Mapbox manquant. La carte ne fonctionnera pas correctement.');
     } else {
       console.log('SearchPage loaded with Mapbox token available');
-      
-      // Initial places
-      simulateSearch('');
+      // Ne pas charger de résultats par défaut
+      setPlaces([]);
     }
   }, []);
 
