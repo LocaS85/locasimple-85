@@ -30,7 +30,7 @@ const Categories = () => {
         {/* Main content with sidebar */}
         <div className="container mx-auto px-4 py-6">
           <SidebarProvider>
-            <div className="flex min-h-[calc(100vh-5rem)] w-full rounded-lg overflow-hidden border">
+            <div className="flex min-h-[calc(100vh-5rem)] w-full rounded-lg overflow-hidden border floating-panel">
               <CategorySidebar />
               <CategoryContent />
             </div>

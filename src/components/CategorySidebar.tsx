@@ -3,6 +3,7 @@ import React from 'react';
 import { useCategory } from './CategoryContext';
 import { CATEGORIES } from '@/types/categories';
 import { cn } from '@/lib/utils';
+import { Settings } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -35,16 +36,23 @@ export const CategorySidebar = () => {
                     <SidebarMenuButton
                       onClick={() => setSelectedCategory(category.id)}
                       className={cn(
-                        'flex items-center gap-2 w-full p-2 rounded-md transition-colors',
-                        selectedCategory === category.id && 'bg-accent'
+                        'flex items-center justify-between gap-2 w-full p-2 rounded-md transition-colors',
+                        selectedCategory === category.id 
+                          ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                          : 'hover:bg-gray-100'
                       )}
                       style={{
                         backgroundColor: selectedCategory === category.id ? categoryColors[category.id] : undefined,
                         color: selectedCategory === category.id ? '#ffffff' : undefined,
                       }}
                     >
-                      <span>{category.icon}</span>
-                      <span>{category.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span>{category.icon}</span>
+                        <span>{category.name}</span>
+                      </div>
+                      {selectedCategory === category.id && (
+                        <Settings className="h-4 w-4" />
+                      )}
                     </SidebarMenuButton>
                     {selectedCategory === category.id && (
                       <ColorPicker
