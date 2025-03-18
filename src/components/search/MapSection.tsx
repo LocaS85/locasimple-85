@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
-import { SearchPanel } from './SearchPanel';
 import { useSearchMenu } from '@/hooks/useSearchMenu';
 import TransportModeFilter from '@/components/search/TransportModeFilter';
 
@@ -97,33 +96,6 @@ export const MapSection: React.FC<MapSectionProps> = ({
         selectedCategory={selectedCategory}
         onCategorySelect={onCategorySelect}
         userLocation={userLocation}
-      />
-      
-      <SearchPanel
-        query={searchQuery}
-        setQuery={onSearchChange}
-        search={(query) => {
-          onSearchChange(query);
-          onSearch();
-        }}
-        onResultSelect={(result) => onResultClick(result)}
-        resetSearch={resetSearch}
-        showHistory={showHistory}
-        setShowHistory={setShowHistory}
-        searchHistory={searchHistory}
-        savedSearches={savedSearches}
-        onHistoryItemClick={onHistoryItemClick}
-        onSaveSearch={onSaveSearch}
-        onRemoveSavedSearch={onRemoveSavedSearch}
-        userLocation={userLocation}
-        isRecording={isRecording}
-        onMicClick={onMicClick}
-        isLocationActive={isLocationActive}
-        onLocationClick={onLocationClick}
-        loading={loading}
-        transportMode={transportMode}
-        onTransportModeChange={onTransportModeChange}
-        onMenuClick={toggleMenu}
       />
       
       {/* Transport Mode Filter - added below location button */}

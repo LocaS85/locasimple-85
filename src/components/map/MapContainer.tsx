@@ -1,6 +1,4 @@
-
 import React, { useRef, useState, useEffect } from 'react';
-import { SearchInput } from '../search/SearchInput';
 import type { Result } from '../ResultsList';
 import RadiusCircle from './RadiusCircle';
 import MapMarkers from './MapMarkers';
@@ -10,6 +8,7 @@ import MapResults from './MapResults';
 import useMapInitialization from '@/hooks/useMapInitialization';
 import useMarkerManagement from '@/hooks/useMarkerManagement';
 import { toast } from 'sonner';
+import MapDisplay from './MapDisplay';
 
 interface MapContainerProps {
   results: Result[];
@@ -62,125 +61,75 @@ const MapContainer: React.FC<MapContainerProps> = ({
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const [mapStyle, setMapStyle] = useState<MapStyle>('streets');
-  
-  // Use custom hook for map initialization and management
-  const { 
-    map, 
-    isMapInitialized,
-    updateMapCenter,
-    updateMapStyle
-  } = useMapInitialization({
-    container: mapContainer,
-    center,
-    mapStyle,
-    disableNavControls: true // Disable Mapbox built-in nav controls
+  const [viewport, setViewport] = useState({
+    latitude: center[1],
+    longitude: center[0],
+    zoom: 13
   });
+  const [popupInfo, setPopupInfo] = useState<any>(null);
   
-  // Use custom hook for marker management
-  const { 
-    centerMarker,
-    updateMarkerPosition
-  } = useMarkerManagement({
-    map,
-    center,
-    isMapInitialized,
-    isLocationActive
-  });
-
-  // Update map center and marker when coordinates change
+  // Update viewport when center changes
   useEffect(() => {
-    updateMapCenter(center);
-    updateMarkerPosition(center, isLocationActive);
-  }, [center, isLocationActive, updateMapCenter, updateMarkerPosition]);
+    setViewport(prev => ({
+      ...prev,
+      latitude: center[1],
+      longitude: center[0]
+    }));
+  }, [center]);
 
-  // Handle map style change
-  const handleStyleChange = (newStyle: MapStyle) => {
-    setMapStyle(newStyle);
-    updateMapStyle(newStyle);
-    toast.success(`Style de carte changé en ${newStyle}`);
-  };
-
-  // Handle search result marker click
-  const handleMarkerClick = (result: Result) => {
+  // Handle marker click
+  const handleMarkerClick = (place: any) => {
+    setPopupInfo(place);
     if (onResultClick) {
-      onResultClick(result);
-    }
-    
-    // Fly to the selected result with animation
-    if (map && isMapInitialized) {
-      map.flyTo({
-        center: [result.longitude, result.latitude],
-        zoom: 15,
-        speed: 1.2,
-        curve: 1.42,
-        essential: true
-      });
+      onResultClick(place);
     }
   };
 
   return (
     <div className="relative w-full h-full">
-      <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" style={{ backgroundColor: '#e9eef2' }} />
+      <MapDisplay 
+        viewport={viewport}
+        setViewport={setViewport}
+        places={results.map(r => ({
+          id: r.id,
+          name: r.name,
+          lat: r.latitude,
+          lon: r.longitude,
+          address: r.address,
+          category: r.category
+        }))}
+        resultsCount={results.length}
+        selectedPlaceId={selectedResultId || null}
+        popupInfo={popupInfo}
+        setPopupInfo={setPopupInfo}
+        handleResultClick={handleMarkerClick}
+        isLocationActive={isLocationActive}
+        userLocation={userLocation}
+        loading={loading}
+        handleLocationClick={onLocationClick}
+        transportMode={transportMode}
+      />
       
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
-        <SearchInput
-          searchQuery={searchQuery}
-          isRecording={isRecording}
-          isLocationActive={isLocationActive}
-          loading={loading}
-          onSearchChange={onSearchChange}
-          onMicClick={onMicClick}
-          onLocationClick={onLocationClick}
-          onSearch={onSearch}
-          userLocation={userLocation}
-          transportMode={transportMode}
-          onTransportModeChange={(mode) => console.log('Transport mode changed:', mode)}
-        />
-      </div>
-      
-      {/* Map Controls with more minimal UI - now only style selector */}
+      {/* Map Controls with more minimal UI */}
       <div className="absolute top-4 right-4 z-10">
         <MapControls
           mapStyle={mapStyle}
-          onStyleChange={handleStyleChange}
+          onStyleChange={(newStyle: MapStyle) => {
+            setMapStyle(newStyle);
+            toast.success(`Style de carte changé en ${newStyle}`);
+          }}
           selectedCategory={selectedCategory}
           onCategorySelect={onCategorySelect}
-          map={map}
-          minimal={true} // Add minimal prop to show less controls
+          map={null}
+          minimal={true}
+          onTransportModeClick={() => {
+            // Handle transport mode click
+          }}
+          onFiltersClick={() => {
+            // Handle filters click
+          }}
         />
       </div>
-      
-      {isMapInitialized && map && (
-        <>
-          <RadiusCircle
-            map={map}
-            center={center}
-            radius={radius}
-            radiusUnit={radiusUnit}
-            radiusType={radiusType}
-            duration={duration}
-            timeUnit={timeUnit}
-            transportMode={transportMode}
-          />
-          
-          <MapMarkers
-            map={map}
-            results={results}
-            center={center}
-            transportMode={transportMode}
-            showRoutes={showRoutes}
-            selectedResultId={selectedResultId}
-            onResultClick={handleMarkerClick}
-          />
-        </>
-      )}
-      
-      {/* Display message when map is not initialized */}
-      {!isMapInitialized && (
-        <div className="absolute inset-0 flex items-center justify-center text-gray-600">
-          <p>Chargement de la carte...</p>
-        </div>
-      )}
       
       {/* Results Counter */}
       <MapResults results={results} />

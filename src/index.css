@@ -1,12 +1,39 @@
 
-/* Import base styles */
-@import './styles/base.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Import component styles */
-@import './styles/components.css';
+/* Add custom styles for Mapbox geocoder */
+.mapboxgl-ctrl-geocoder {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 999px !important;
+}
 
-/* Import marker styles */
-@import './styles/markers.css';
+.mapboxgl-ctrl-geocoder--input {
+  height: 45px !important;
+  padding-left: 40px !important;
+}
 
-/* Import mapbox styles */
-@import './styles/mapbox.css';
+.mapboxgl-ctrl-geocoder--icon-search {
+  top: 12px !important;
+  left: 12px !important;
+}
+
+.mapboxgl-ctrl-geocoder--button {
+  top: 5px !important;
+}
+
+.geocoder-container {
+  width: 100%;
+}
+
+.mapboxgl-ctrl-geocoder .suggestions {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.mapboxgl-ctrl-geocoder .suggestions > li > a {
+  padding: 10px 12px !important;
+}
