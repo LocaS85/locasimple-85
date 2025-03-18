@@ -50,3 +50,15 @@
 .category-button.active {
   @apply bg-blue-500 text-white hover:bg-blue-600;
 }
+
+/* Hover card styles for category sidebar */
+.category-hover-card {
+  @apply p-2 bg-white rounded-md shadow-lg border border-gray-200;
+  min-width: 220px;
+}
+
+/* Subcategory item hover effect */
+.subcategory-item {
+  @apply px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer transition-colors;
+}
+

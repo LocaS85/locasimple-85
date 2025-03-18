@@ -1,9 +1,7 @@
 
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CategorySidebar } from '@/components/CategorySidebar';
 import { CategoryContent } from '@/components/CategoryContent';
@@ -12,7 +10,6 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 
 const Categories = () => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
 
   return (
     <CategoryProvider>
