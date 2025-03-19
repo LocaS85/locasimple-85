@@ -134,6 +134,24 @@ const SearchPage = () => {
     }
   };
 
+  // Check if Flask server is running on component mount
+  useEffect(() => {
+    const checkFlaskServer = async () => {
+      try {
+        await axios.get('http://127.0.0.1:5000/search', { 
+          params: { query: 'test', mode: 'driving', lat: 48.8566, lon: 2.3522, limit: 1 },
+          timeout: 2000
+        });
+        console.log('Flask server is running');
+      } catch (error) {
+        console.warn('Flask server is not running:', error);
+        toast.warning('Le serveur Flask n\'est pas démarré. Certaines fonctionnalités peuvent ne pas fonctionner.');
+      }
+    };
+    
+    checkFlaskServer();
+  }, []);
+
   return (
     <div className="flex flex-col h-screen bg-white">
       <SearchHeader 
