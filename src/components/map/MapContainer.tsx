@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import type { Result } from '../ResultsList';
 import RadiusCircle from './RadiusCircle';
@@ -19,8 +20,6 @@ interface MapContainerProps {
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
   transportMode?: string;
-  searchQuery?: string;
-  onSearchChange?: (value: string) => void;
   isRecording?: boolean;
   onMicClick?: () => void;
   onLocationClick?: () => void;
@@ -44,8 +43,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
   duration = 15,
   timeUnit = 'minutes',
   transportMode = 'driving',
-  searchQuery = '',
-  onSearchChange = () => {},
   isRecording = false,
   onMicClick = () => {},
   onLocationClick = () => {},
