@@ -1,33 +1,20 @@
 
 import React from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchHeaderProps {
   resultsCount: number;
   setResultsCount: (count: number) => void;
-  selectedDuration: number | null;
-  setSelectedDuration: (duration: number | null) => void;
-  selectedDistance: number | null;
-  setSelectedDistance: (distance: number | null) => void;
-  distanceUnit: 'km' | 'miles';
-  setDistanceUnit: (unit: 'km' | 'miles') => void;
 }
 
-const SearchHeader: React.FC<SearchHeaderProps> = ({
+const SearchHeader: React.FC<SearchHeaderProps> = ({ 
   resultsCount,
   setResultsCount,
-  selectedDuration,
-  setSelectedDuration,
-  selectedDistance,
-  setSelectedDistance,
-  distanceUnit,
-  setDistanceUnit
 }) => {
-  const { t } = useLanguage();
-
   return (
-    <div className="p-4 flex justify-between items-center bg-white shadow-sm z-10">
-      <h1 className="text-xl font-bold">{t('search')}</h1>
+    <div className="bg-white shadow-sm p-4">
+      <div className="container mx-auto flex items-center justify-between">
+        <h1 className="text-xl font-bold">Recherche de lieux</h1>
+      </div>
     </div>
   );
 };

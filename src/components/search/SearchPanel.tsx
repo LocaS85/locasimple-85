@@ -28,6 +28,8 @@ interface SearchPanelProps {
   onRemoveSavedSearch?: (query: string) => void;
   userLocation?: [number, number];
   generatePDF?: () => void;
+  limit?: number;
+  setLimit?: (limit: number) => void;
 }
 
 export const SearchPanel: React.FC<SearchPanelProps> = ({
@@ -52,7 +54,9 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   onSaveSearch = () => {},
   onRemoveSavedSearch = () => {},
   userLocation,
-  generatePDF = () => {}
+  generatePDF = () => {},
+  limit = 3,
+  setLimit = () => {}
 }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,42 +65,21 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
 
   return (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-10 px-4">
-      <div className="bg-white rounded-full shadow-lg">
-        <form onSubmit={handleSubmit} className="flex items-center">
-          <Input
-            type="text"
-            placeholder="Rechercher un lieu, une entreprise..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="border-none flex-1 py-6 px-6 rounded-l-full focus:ring-0"
-          />
-          
-          <div className="flex items-center pr-2">
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              onClick={onMicClick}
-              className={`rounded-full ${isRecording ? 'text-red-500' : ''}`}
-            >
-              <Mic size={20} />
-            </Button>
-            
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              onClick={onLocationClick}
-              className={`rounded-full ${isLocationActive ? 'text-blue-500' : ''}`}
-            >
-              <MapPin size={20} />
-            </Button>
+      <div className="bg-white rounded-lg shadow-lg p-4">
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+          <div className="flex items-center">
+            <Input
+              type="text"
+              placeholder="Rechercher un lieu, une entreprise..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 py-2 px-4 rounded-l-lg focus:ring-0"
+            />
             
             <Button
               type="submit"
-              size="icon"
               variant="default"
-              className="rounded-full"
+              className="rounded-r-lg"
               disabled={loading}
             >
               {loading ? (
@@ -104,6 +87,71 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
               ) : (
                 <Search size={20} />
               )}
+            </Button>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <label htmlFor="mode" className="text-sm">Mode de transport :</label>
+              <select 
+                id="mode"
+                value={transportMode}
+                onChange={(e) => onTransportModeChange(e.target.value)}
+                className="border border-gray-300 rounded px-2 py-1 text-sm"
+              >
+                <option value="driving">Voiture</option>
+                <option value="walking">Marche</option>
+                <option value="cycling">Vélo</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <label htmlFor="limit" className="text-sm">Résultats :</label>
+              <input 
+                type="number" 
+                id="limit" 
+                min="1" 
+                max="10" 
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value))}
+                className="border border-gray-300 rounded w-12 px-2 py-1 text-sm"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-between">
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={onMicClick}
+              className={`rounded-full ${isRecording ? 'text-red-500' : ''}`}
+            >
+              <Mic size={18} />
+              <span className="text-xs">Voix</span>
+            </Button>
+            
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={onLocationClick}
+              className={`rounded-full ${isLocationActive ? 'text-blue-500' : ''}`}
+            >
+              <MapPin size={18} />
+              <span className="text-xs">Position</span>
+            </Button>
+            
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={generatePDF}
+              disabled={loading}
+              title="Générer un PDF"
+            >
+              <FileText size={18} />
+              <span className="text-xs">PDF</span>
             </Button>
           </div>
         </form>
@@ -135,20 +183,6 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
           </ul>
         </div>
       )}
-      
-      {/* PDF Generation Button */}
-      <div className="absolute top-0 right-[-70px]">
-        <Button
-          size="icon"
-          variant="outline"
-          onClick={generatePDF}
-          disabled={loading}
-          title="Générer un PDF"
-          className="bg-white shadow-md"
-        >
-          <FileText size={18} />
-        </Button>
-      </div>
     </div>
   );
 };
