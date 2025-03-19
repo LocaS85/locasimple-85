@@ -13,6 +13,8 @@ interface Place {
   lon: number;
   address?: string;
   category?: string;
+  duration?: number;
+  distance?: number;
 }
 
 export const useSearchPageState = () => {
@@ -38,6 +40,9 @@ export const useSearchPageState = () => {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [popupInfo, setPopupInfo] = useState<Place | null>(null);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [savedSearches, setSavedSearches] = useState<string[]>([]);
   
   // Use geolocation hook
   const { activateGeolocation } = useGeolocation({
@@ -54,6 +59,52 @@ export const useSearchPageState = () => {
       setSearchQuery(text);
     }
   });
+
+  const performSearch = useCallback(async (query: string = searchQuery) => {
+    if (!query.trim()) {
+      toast.error('Veuillez entrer une recherche');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Add to search history
+      setSearchHistory(prev => [query, ...prev.filter(q => q !== query)].slice(0, 10));
+      
+      // Connect to Flask API for search
+      const response = await fetch(`http://localhost:5000/search?query=${encodeURIComponent(query)}&mode=${transportMode}&lat=${userLocation[1]}&lon=${userLocation[0]}&limit=${resultsCount}`);
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la recherche');
+      }
+      
+      const results = await response.json();
+      console.log('API search results:', results);
+      
+      // Transform to Place objects
+      const places = results.map((result: any, index: number) => ({
+        id: `place-${index}`,
+        name: result.name,
+        lat: result.lat,
+        lon: result.lon,
+        duration: result.duration,
+        distance: result.distance
+      }));
+      
+      setPlaces(places);
+      
+      if (places.length === 0) {
+        toast.info('Aucun résultat trouvé');
+      } else {
+        toast.success(`${places.length} résultats trouvés`);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Erreur lors de la recherche. Vérifiez que le serveur Flask est en cours d\'exécution.');
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, transportMode, userLocation, resultsCount]);
 
   const handleLocationClick = () => {
     activateGeolocation();
@@ -85,6 +136,49 @@ export const useSearchPageState = () => {
     setPlaces([]);
     setSearchResults([]);
     setPopupInfo(null);
+  };
+
+  const handleHistoryItemClick = (query: string) => {
+    setSearchQuery(query);
+    performSearch(query);
+  };
+
+  const handleSaveSearch = (query: string) => {
+    if (!savedSearches.includes(query)) {
+      setSavedSearches(prev => [query, ...prev]);
+      toast.success(`Recherche "${query}" sauvegardée`);
+    }
+  };
+
+  const handleRemoveSavedSearch = (query: string) => {
+    setSavedSearches(prev => prev.filter(q => q !== query));
+    toast.success(`Recherche "${query}" supprimée`);
+  };
+
+  const generatePDF = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/generate_pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ places }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la génération du PDF');
+      }
+      
+      const result = await response.json();
+      toast.success('PDF généré avec succès');
+      console.log('PDF result:', result);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Erreur lors de la génération du PDF');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Update viewport when user location changes and is active
@@ -137,11 +231,20 @@ export const useSearchPageState = () => {
     popupInfo,
     setPopupInfo,
     searchResults,
+    showHistory,
+    setShowHistory,
+    searchHistory,
+    savedSearches,
+    performSearch,
     handleLocationClick,
     handleMenuClick,
     handleResultClick,
     resetSearch,
-    handleMicClick
+    handleHistoryItemClick,
+    handleSaveSearch,
+    handleRemoveSavedSearch,
+    handleMicClick,
+    generatePDF
   };
 };
 

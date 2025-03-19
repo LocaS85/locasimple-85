@@ -43,7 +43,8 @@ const SearchPage = () => {
     handleHistoryItemClick,
     handleSaveSearch,
     handleRemoveSavedSearch,
-    handleMicClick
+    handleMicClick,
+    generatePDF
   } = useSearchPageState();
 
   return (
@@ -76,7 +77,7 @@ const SearchPage = () => {
           transportMode={transportMode}
         />
         
-        {/* Transparent Search Panel overlay */}
+        {/* Search Panel overlay */}
         <SearchPanel 
           query={searchQuery}
           setQuery={setSearchQuery}
@@ -98,6 +99,7 @@ const SearchPage = () => {
           onSaveSearch={handleSaveSearch}
           onRemoveSavedSearch={handleRemoveSavedSearch}
           userLocation={userLocation}
+          generatePDF={generatePDF}
           onResultSelect={(result) => {
             // Handle result selection from search panel
             const place = {
