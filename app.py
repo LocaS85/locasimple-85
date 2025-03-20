@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Obtenir le token Mapbox depuis les variables d'environnement
-MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', 'YOUR_MAPBOX_ACCESS_TOKEN')
+MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', 'pk.eyJ1IjoibG92YWJsZWRldiIsImEiOiJjbHN1d3c0c2cwMWt1MmpueGd3OG11MWhhIn0.Qm4mGicZkPq5Af6C0BFmkA')
 
 # Créer l'application Flask
 app = Flask(__name__)

@@ -14,13 +14,146 @@ document.addEventListener('DOMContentLoaded', function() {
     const filters = {
         category: 'restaurant',
         resultCount: 5,
-        transportMode: 'driving', // 'driving', 'walking', 'cycling'
+        transportMode: 'driving', // 'driving', 'walking', 'cycling', 'transit'
         duration: 15,
-        distance: 5
+        distance: 5,
+        unit: 'km' // 'km', 'miles'
     };
     
     // Initialiser la carte Mapbox
     initMap();
+    
+    // Gestion des accordéons de filtres
+    document.querySelectorAll('.filter-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetContent = document.getElementById(targetId);
+            
+            // Fermer tous les autres contenus de filtre
+            document.querySelectorAll('.filter-content').forEach(content => {
+                if (content.id !== targetId) {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Basculer la classe active sur le contenu cible
+            targetContent.classList.toggle('active');
+            
+            // Rotation de l'icône
+            const icon = this.querySelector('.fa-chevron-right');
+            if (targetContent.classList.contains('active')) {
+                icon.style.transform = 'rotate(90deg)';
+            } else {
+                icon.style.transform = 'rotate(0)';
+            }
+        });
+    });
+    
+    // Gestion des boutons de transport
+    document.querySelectorAll('.transport-button').forEach(button => {
+        button.addEventListener('click', function() {
+            // Retirer la classe active de tous les boutons
+            document.querySelectorAll('.transport-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Ajouter la classe active au bouton cliqué
+            this.classList.add('active');
+            
+            // Mettre à jour le mode de transport
+            filters.transportMode = this.getAttribute('data-mode');
+            console.log('Mode de transport:', filters.transportMode);
+        });
+    });
+    
+    // Gestion du changement de catégorie
+    document.querySelectorAll('.category-item input').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkedCategories = [];
+            document.querySelectorAll('.category-item input:checked').forEach(checked => {
+                checkedCategories.push(checked.id.replace('cat-', ''));
+            });
+            
+            // Si au moins une catégorie est cochée, mettre à jour le filtre
+            if (checkedCategories.length > 0) {
+                filters.category = checkedCategories;
+            } else {
+                // Si aucune catégorie n'est cochée, cocher par défaut "restaurant"
+                document.getElementById('cat-restaurant').checked = true;
+                filters.category = ['restaurant'];
+            }
+            
+            console.log('Catégories:', filters.category);
+        });
+    });
+    
+    // Gestion du changement du nombre de résultats
+    document.getElementById('resultCount').addEventListener('change', function() {
+        filters.resultCount = parseInt(this.value, 10);
+        console.log('Nombre de résultats:', filters.resultCount);
+    });
+    
+    // Gestion de la durée
+    const durationSlider = document.createElement('input');
+    durationSlider.type = 'range';
+    durationSlider.id = 'durationSlider';
+    durationSlider.min = '5';
+    durationSlider.max = '60';
+    durationSlider.value = '15';
+    
+    // Ajouter le slider après le texte de durée
+    const durationItem = document.querySelector('.duration-item');
+    durationItem.appendChild(durationSlider);
+    
+    // Écouter les changements du slider de durée
+    durationSlider.addEventListener('input', function() {
+        filters.duration = parseInt(this.value, 10);
+        document.getElementById('durationValue').textContent = this.value;
+        console.log('Durée max:', filters.duration, 'min');
+    });
+    
+    // Gestion de la distance
+    const distanceSlider = document.createElement('input');
+    distanceSlider.type = 'range';
+    distanceSlider.id = 'distanceSlider';
+    distanceSlider.min = '1';
+    distanceSlider.max = '20';
+    distanceSlider.value = '5';
+    
+    // Ajouter le slider après le texte de distance
+    const distanceItem = document.querySelector('.distance-item');
+    distanceItem.appendChild(distanceSlider);
+    
+    // Écouter les changements du slider de distance
+    distanceSlider.addEventListener('input', function() {
+        filters.distance = parseInt(this.value, 10);
+        document.getElementById('distanceValue').textContent = this.value;
+        console.log('Distance max:', filters.distance, filters.unit);
+    });
+    
+    // Gestion du changement d'unité (km/miles)
+    document.getElementById('toggleUnit').addEventListener('click', function() {
+        if (filters.unit === 'km') {
+            filters.unit = 'miles';
+            this.textContent = 'miles';
+            
+            // Convertir la valeur de km à miles
+            const kmValue = parseInt(distanceSlider.value, 10);
+            const mileValue = Math.round(kmValue * 0.621371);
+            distanceSlider.value = mileValue;
+            document.getElementById('distanceValue').textContent = mileValue;
+        } else {
+            filters.unit = 'km';
+            this.textContent = 'km';
+            
+            // Convertir la valeur de miles à km
+            const mileValue = parseInt(distanceSlider.value, 10);
+            const kmValue = Math.round(mileValue / 0.621371);
+            distanceSlider.value = kmValue;
+            document.getElementById('distanceValue').textContent = kmValue;
+        }
+        console.log('Unité de distance:', filters.unit);
+    });
     
     // Fonctions d'initialisation et d'événements
     function initMap() {
@@ -40,11 +173,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Carte chargée avec succès');
         });
     }
-    
-    // Gestion du bouton de filtre
-    document.getElementById('toggleFilters').addEventListener('click', function() {
-        document.getElementById('filtersContainer').classList.toggle('hidden');
-    });
     
     // Gestion du formulaire de recherche
     document.getElementById('searchForm').addEventListener('submit', function(e) {
@@ -116,50 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Effacer les résultats
         clearResults();
-    });
-    
-    // Gestion des options de transport
-    const transportButtons = document.querySelectorAll('.transport-button');
-    transportButtons.forEach((button, index) => {
-        button.addEventListener('click', function() {
-            // Retirer la classe active de tous les boutons
-            transportButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Ajouter la classe active au bouton cliqué
-            this.classList.add('active');
-            
-            // Mettre à jour le mode de transport
-            const modes = ['driving', 'walking', 'cycling'];
-            filters.transportMode = modes[index];
-            
-            console.log('Mode de transport:', filters.transportMode);
-        });
-    });
-    
-    // Gestion du changement de catégorie
-    document.getElementById('categories').addEventListener('change', function() {
-        filters.category = this.value;
-        console.log('Catégorie:', filters.category);
-    });
-    
-    // Gestion du changement du nombre de résultats
-    document.getElementById('resultCount').addEventListener('change', function() {
-        filters.resultCount = parseInt(this.value, 10);
-        console.log('Nombre de résultats:', filters.resultCount);
-    });
-    
-    // Gestion du changement de durée
-    document.getElementById('duration').addEventListener('input', function() {
-        filters.duration = parseInt(this.value, 10);
-        document.getElementById('durationValue').textContent = this.value;
-        console.log('Durée max:', filters.duration, 'min');
-    });
-    
-    // Gestion du changement de distance
-    document.getElementById('distance').addEventListener('input', function() {
-        filters.distance = parseInt(this.value, 10);
-        document.getElementById('distanceValue').textContent = this.value;
-        console.log('Distance max:', filters.distance, 'km');
     });
     
     // Fonction pour rechercher un lieu
@@ -237,9 +321,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Effacer les résultats précédents
         clearResults();
         
-        // Créer un conteneur pour les résultats
-        const resultsContainer = document.createElement('div');
-        resultsContainer.className = 'results-container';
+        // Référence au conteneur de résultats
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.classList.remove('hidden');
         
         // Ajouter des marqueurs et des informations pour chaque résultat
         results.forEach((place, index) => {
@@ -262,7 +346,23 @@ document.addEventListener('DOMContentLoaded', function() {
             address.textContent = place.place_name;
             resultItem.appendChild(address);
             
-            // Ajouter des informations supplémentaires (à implémenter)
+            // Ajouter la distance et la durée (simulées pour l'exemple)
+            const info = document.createElement('div');
+            info.className = 'result-info';
+            
+            // Distance (simulée)
+            const distance = document.createElement('span');
+            const distanceValue = Math.random() * 10;
+            distance.textContent = `${distanceValue.toFixed(1)} ${filters.unit}`;
+            info.appendChild(distance);
+            
+            // Durée (simulée)
+            const duration = document.createElement('span');
+            const durationValue = Math.floor(distanceValue * 5);
+            duration.textContent = `${durationValue} min`;
+            info.appendChild(duration);
+            
+            resultItem.appendChild(info);
             
             // Ajouter un événement de clic pour centrer la carte sur ce résultat
             resultItem.addEventListener('click', function() {
@@ -276,9 +376,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ajouter cet élément au conteneur de résultats
             resultsContainer.appendChild(resultItem);
         });
-        
-        // Ajouter le conteneur de résultats au corps du document
-        document.body.appendChild(resultsContainer);
     }
     
     // Fonction pour ajouter un marqueur à la carte
@@ -299,11 +396,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fonction pour effacer les résultats
     function clearResults() {
-        // Supprimer le conteneur de résultats s'il existe
-        const existingResults = document.querySelector('.results-container');
-        if (existingResults) {
-            existingResults.remove();
-        }
+        // Masquer le conteneur de résultats
+        document.getElementById('resultsContainer').classList.add('hidden');
+        
+        // Vider le conteneur de résultats
+        document.getElementById('resultsContainer').innerHTML = '';
         
         // Supprimer tous les marqueurs
         const markers = document.querySelectorAll('.mapboxgl-marker');
@@ -322,56 +419,39 @@ document.addEventListener('DOMContentLoaded', function() {
         filters.transportMode = 'driving';
         filters.duration = 15;
         filters.distance = 5;
+        filters.unit = 'km';
         
         // Réinitialiser les éléments de l'interface
-        document.getElementById('categories').value = 'restaurant';
         document.getElementById('resultCount').value = '5';
         
+        // Réinitialiser les catégories
+        document.querySelectorAll('.category-item input').forEach(checkbox => {
+            checkbox.checked = checkbox.id === 'cat-restaurant';
+        });
+        
         // Réinitialiser les boutons de transport
-        transportButtons.forEach((button, index) => {
-            if (index === 0) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
+        document.querySelectorAll('.transport-button').forEach((button, index) => {
+            button.classList.toggle('active', index === 0);
         });
         
         // Réinitialiser les curseurs
-        document.getElementById('duration').value = '15';
+        document.getElementById('durationSlider').value = '15';
         document.getElementById('durationValue').textContent = '15';
         
-        document.getElementById('distance').value = '5';
+        document.getElementById('distanceSlider').value = '5';
         document.getElementById('distanceValue').textContent = '5';
+        
+        // Réinitialiser l'unité
+        document.getElementById('toggleUnit').textContent = 'km';
     }
     
     // Fonction pour afficher un indicateur de chargement
     function showLoader() {
-        // Supprimer l'indicateur de chargement existant s'il y en a un
-        hideLoader();
-        
-        // Créer un nouvel indicateur de chargement
-        const loader = document.createElement('div');
-        loader.className = 'loader';
-        
-        const spinner = document.createElement('div');
-        spinner.className = 'spinner';
-        loader.appendChild(spinner);
-        
-        const text = document.createElement('div');
-        text.textContent = 'Chargement...';
-        loader.appendChild(text);
-        
-        document.body.appendChild(loader);
+        document.getElementById('loader').classList.remove('hidden');
     }
     
     // Fonction pour masquer l'indicateur de chargement
     function hideLoader() {
-        const existingLoader = document.querySelector('.loader');
-        if (existingLoader) {
-            existingLoader.remove();
-        }
+        document.getElementById('loader').classList.add('hidden');
     }
-    
-    // Initialisation: définir le premier bouton de transport comme actif
-    transportButtons[0].classList.add('active');
 });

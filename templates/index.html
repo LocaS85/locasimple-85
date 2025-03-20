@@ -11,60 +11,126 @@
     
     <!-- Styles personnalisés -->
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Conteneur de la carte -->
     <div id="map"></div>
     
+    <!-- Titre de la page -->
+    <h1 class="search-title">Recherche de lieux</h1>
+    
     <!-- Barre de recherche -->
     <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <form id="searchForm">
-            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher un lieu...">
-            <button type="submit" class="search-button">🔍</button>
+            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher un lieu, une entreprise...">
         </form>
     </div>
     
-    <!-- Bouton des filtres -->
-    <button id="toggleFilters" class="filters-button">⚙️</button>
-    
-    <!-- Conteneur des filtres -->
-    <div id="filtersContainer" class="filters hidden">
-        <div class="filter-group">
-            <label for="categories">Catégories</label>
-            <select id="categories">
-                <option value="restaurant">Restaurants</option>
-                <option value="cafe">Cafés</option>
-                <option value="grocery">Épiceries</option>
-                <option value="pharmacy">Pharmacies</option>
-                <option value="hotel">Hôtels</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="resultCount">Nombre de résultats</label>
-            <input type="number" id="resultCount" min="1" max="10" value="5">
-        </div>
-        <div class="filter-group">
-            <label>Mode de transport</label>
-            <div class="transport-buttons">
-                <button type="button" class="transport-button">🚗</button>
-                <button type="button" class="transport-button">🚶</button>
-                <button type="button" class="transport-button">🚴</button>
+    <!-- Section des contrôles et filtres -->
+    <div class="controls-section">
+        <div class="filters-panels">
+            <!-- Filtre Catégories -->
+            <div class="filter-panel">
+                <div class="filter-header" data-target="categories-content">
+                    <div class="filter-title">
+                        <i class="fa-solid fa-layer-group"></i> Catégories
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="filter-content" id="categories-content">
+                    <div class="categories-list">
+                        <div class="category-item">
+                            <input type="checkbox" id="cat-restaurant" checked>
+                            <label for="cat-restaurant">Restaurants</label>
+                        </div>
+                        <div class="category-item">
+                            <input type="checkbox" id="cat-hotel">
+                            <label for="cat-hotel">Hôtels</label>
+                        </div>
+                        <div class="category-item">
+                            <input type="checkbox" id="cat-shop">
+                            <label for="cat-shop">Magasins</label>
+                        </div>
+                        <div class="category-item">
+                            <input type="checkbox" id="cat-attraction">
+                            <label for="cat-attraction">Attractions</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtre Nombre de résultats -->
+            <div class="filter-panel">
+                <div class="filter-header" data-target="results-content">
+                    <div class="filter-title">
+                        <i class="fa-solid fa-list-ol"></i> Nombre de résultats
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+                <div class="filter-content" id="results-content">
+                    <select id="resultCount" class="filter-select">
+                        <option value="3">3 résultats</option>
+                        <option value="5" selected>5 résultats</option>
+                        <option value="10">10 résultats</option>
+                        <option value="20">20 résultats</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="filter-group">
-            <label for="duration">Durée maximale: <span id="durationValue">15</span> min</label>
-            <input type="range" id="duration" min="5" max="60" value="15" oninput="document.getElementById('durationValue').textContent = this.value">
+        
+        <!-- Modes de transport -->
+        <div class="transport-buttons">
+            <button type="button" class="transport-button active" data-mode="driving">
+                <i class="fa-solid fa-car"></i> Voiture
+            </button>
+            <button type="button" class="transport-button" data-mode="walking">
+                <i class="fa-solid fa-person-walking"></i> À pied
+            </button>
+            <button type="button" class="transport-button" data-mode="cycling">
+                <i class="fa-solid fa-bicycle"></i> Vélo
+            </button>
+            <button type="button" class="transport-button" data-mode="transit">
+                <i class="fa-solid fa-train"></i> Transit
+            </button>
         </div>
-        <div class="filter-group">
-            <label for="distance">Distance maximale: <span id="distanceValue">5</span> km</label>
-            <input type="range" id="distance" min="1" max="20" value="5" oninput="document.getElementById('distanceValue').textContent = this.value">
+        
+        <!-- Durée et distance -->
+        <div class="duration-panel">
+            <div class="duration-item">
+                <i class="fa-regular fa-clock"></i>
+                Durée: <span id="durationValue">15</span> min
+            </div>
+            <div class="distance-item">
+                <i class="fa-solid fa-route"></i>
+                Distance: <span id="distanceValue">5</span> 
+                <button id="toggleUnit" class="unit-toggle">km</button>
+            </div>
         </div>
     </div>
     
     <!-- Boutons d'action -->
     <div class="action-buttons">
-        <button id="locationButton" title="Ma position">📍</button>
-        <button id="resetButton" title="Réinitialiser">🔄</button>
+        <button id="locationButton" class="action-button" title="Ma position">
+            <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+        <button id="resetButton" class="action-button" title="Réinitialiser">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
+    </div>
+    
+    <!-- Conteneur des résultats (initialement caché) -->
+    <div id="resultsContainer" class="results-container hidden">
+        <!-- Les résultats seront ajoutés dynamiquement ici -->
+    </div>
+    
+    <!-- Indicateur de chargement (initialement caché) -->
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <div>Chargement en cours...</div>
     </div>
     
     <!-- Mapbox JS -->
