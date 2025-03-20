@@ -1,31 +1,42 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 import os
+import json
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from dotenv import load_dotenv
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Charger les variables d'environnement depuis .env
+load_dotenv()
 
-# Replace with your actual Mapbox API key
+# Obtenir le token Mapbox depuis les variables d'environnement
 MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', 'YOUR_MAPBOX_ACCESS_TOKEN')
 
-@app.route("/search", methods=["GET"])
-def search_places():
-    """Search for places and calculate routes"""
-    query = request.args.get("query")
-    mode = request.args.get("mode")
-    lat = request.args.get("lat")
-    lon = request.args.get("lon")
-    limit = int(request.args.get("limit", 5))  # Default to 5 results
+# Créer l'application Flask
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/')
+def index():
+    """Route principale qui affiche la page d'accueil"""
+    return render_template('index.html', mapbox_token=MAPBOX_ACCESS_TOKEN)
+
+@app.route('/api/search')
+def api_search():
+    """API de recherche qui renvoie les résultats au format JSON"""
+    query = request.args.get('query')
+    mode = request.args.get('mode', 'driving')
+    lat = request.args.get('lat')
+    lon = request.args.get('lon')
+    limit = request.args.get('limit', 5)
     
     if not all([query, lat, lon]):
-        return jsonify({"error": "Missing required parameters"}), 400
+        return jsonify({"error": "Paramètres manquants"}), 400
     
+    # Appel à l'API Mapbox Geocoding
     try:
-        # Search for places using Mapbox Geocoding API
         geocoding_url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{query}.json"
         params = {
             "proximity": f"{lon},{lat}",
@@ -34,128 +45,117 @@ def search_places():
         }
         
         response = requests.get(geocoding_url, params=params)
-        response.raise_for_status()  # Raise an exception for 4XX/5XX responses
-        
         data = response.json()
-        features = data.get("features", [])
         
         results = []
-        # Calculate routes to each place
-        for place in features:
-            place_name = place.get("text", "Unknown place")
-            coords = place.get("center", [0, 0])
-            
-            # Skip if no coordinates
-            if not coords:
-                continue
-                
-            # Get route from user location to place
-            # Default to driving if mode not specified
-            transport_mode = mode if mode in ["driving", "walking", "cycling"] else "driving"
-            
-            route_url = f"https://api.mapbox.com/directions/v5/mapbox/{transport_mode}/{lon},{lat};{coords[0]},{coords[1]}"
-            route_params = {
-                "access_token": MAPBOX_ACCESS_TOKEN,
-                "overview": "full",
-                "geometries": "geojson"
+        for place in data.get("features", []):
+            place_data = {
+                "name": place.get("text", ""),
+                "place_name": place.get("place_name", ""),
+                "coordinates": place.get("center", [0, 0]),
+                "category": query
             }
-            
-            try:
-                route_res = requests.get(route_url, params=route_params)
-                route_res.raise_for_status()
-                route_data = route_res.json()
-                
-                if "routes" in route_data and route_data["routes"]:
-                    route = route_data["routes"][0]
-                    duration = route.get("duration", 0) / 60  # Convert to minutes
-                    distance = route.get("distance", 0) / 1000  # Convert to km
-                    
-                    results.append({
-                        "name": place_name,
-                        "place_name": place.get("place_name", ""),
-                        "lat": coords[1],
-                        "lon": coords[0],
-                        "duration": round(duration, 1),
-                        "distance": round(distance, 1),
-                        "category": query  # Use the search query as category
-                    })
-            except Exception as route_error:
-                print(f"Error getting route to {place_name}: {route_error}")
-                # Still add the place even if route calculation fails
-                results.append({
-                    "name": place_name,
-                    "place_name": place.get("place_name", ""),
-                    "lat": coords[1],
-                    "lon": coords[0],
-                    "duration": None,
-                    "distance": None,
-                    "category": query
-                })
+            results.append(place_data)
         
         return jsonify(results)
-    
+        
     except Exception as e:
-        print(f"Error in search: {e}")
+        app.logger.error(f"Erreur de recherche: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@app.route("/generate_pdf", methods=["POST"])
+@app.route('/generate_pdf', methods=['POST'])
 def generate_pdf():
-    """Generate a PDF with search results"""
+    """Générer un PDF avec les résultats de recherche"""
     try:
-        data = request.json
-        places = data.get("places", [])
+        # Récupérer les données depuis la requête
+        data = request.get_json()
+        places = data.get('places', [])
         
         if not places:
-            return jsonify({"error": "No places provided"}), 400
-            
-        filename = "resultats.pdf"
+            return jsonify({"error": "Aucun lieu fourni"}), 400
         
-        # Create PDF
-        c = canvas.Canvas(filename, pagesize=letter)
+        # Créer un PDF
+        pdf_path = os.path.join(app.root_path, 'static', 'resultats.pdf')
+        c = canvas.Canvas(pdf_path, pagesize=letter)
+        
+        # Titre
         c.setFont("Helvetica-Bold", 16)
-        c.drawString(50, 750, "Résultats de recherche")
+        c.drawString(30, 750, "Résultats de recherche de lieux")
         
-        c.setFont("Helvetica", 12)
-        c.drawString(50, 730, f"Nombre de résultats: {len(places)}")
+        # Date
+        from datetime import datetime
+        c.setFont("Helvetica", 10)
+        c.drawString(30, 730, f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}")
         
-        y = 700
-        for i, place in enumerate(places, 1):
-            # Skip if y position is too low (page overflow)
-            if y < 50:
-                c.showPage()  # Start new page
-                y = 750
+        # Ligne de séparation
+        c.line(30, 720, 550, 720)
+        
+        # En-têtes
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(30, 700, "Nom")
+        c.drawString(230, 700, "Catégorie")
+        c.drawString(350, 700, "Distance")
+        c.drawString(450, 700, "Durée")
+        
+        # Ligne sous les en-têtes
+        c.line(30, 690, 550, 690)
+        
+        # Données
+        y = 670
+        c.setFont("Helvetica", 11)
+        
+        for place in places:
+            if y < 50:  # Nouvelle page si on atteint le bas
+                c.showPage()
+                c.setFont("Helvetica-Bold", 12)
+                c.drawString(30, 750, "Résultats de recherche (suite)")
+                c.line(30, 740, 550, 740)
                 
-            name = place.get("name", "Sans nom")
-            distance = place.get("distance", "N/A")
-            duration = place.get("duration", "N/A")
+                c.setFont("Helvetica-Bold", 12)
+                c.drawString(30, 720, "Nom")
+                c.drawString(230, 720, "Catégorie")
+                c.drawString(350, 720, "Distance")
+                c.drawString(450, 720, "Durée")
+                
+                c.line(30, 710, 550, 710)
+                
+                y = 690
+                c.setFont("Helvetica", 11)
             
-            c.setFont("Helvetica-Bold", 12)
-            c.drawString(50, y, f"{i}. {name}")
+            # Nom (limité à 25 caractères)
+            name = place.get('name', '')
+            if len(name) > 25:
+                name = name[:22] + '...'
+            c.drawString(30, y, name)
+            
+            # Catégorie
+            c.drawString(230, y, place.get('category', ''))
+            
+            # Distance
+            distance = place.get('distance', '')
+            if distance:
+                c.drawString(350, y, f"{distance} km")
+            
+            # Durée
+            duration = place.get('duration', '')
+            if duration:
+                c.drawString(450, y, f"{duration} min")
+            
             y -= 20
-            
-            c.setFont("Helvetica", 10)
-            c.drawString(70, y, f"Distance: {distance} km")
-            y -= 15
-            
-            c.drawString(70, y, f"Durée: {duration} min")
-            y -= 25
         
+        # Finaliser le PDF
         c.save()
         
-        return jsonify({
-            "success": True,
-            "message": "PDF généré avec succès",
-            "filename": filename
-        })
+        return jsonify({"success": True, "url": "/static/resultats.pdf"})
         
     except Exception as e:
-        print(f"Error generating PDF: {e}")
+        app.logger.error(f"Erreur lors de la génération du PDF: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@app.route("/health", methods=["GET"])
+@app.route('/health')
 def health_check():
-    """Simple health check endpoint"""
-    return jsonify({"status": "ok", "message": "Flask server is running"})
+    """Vérification de l'état de santé de l'API"""
+    return jsonify({"status": "ok"})
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

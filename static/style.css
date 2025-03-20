@@ -51,24 +51,18 @@ body {
     cursor: pointer;
 }
 
-/* Supprimer la barre "Recherche de lieux" sur mobile */
+/* Responsive adjustment for mobile */
 @media screen and (max-width: 768px) {
     .search-title {
         display: none;
     }
 }
 
-/* Réduction de la barre de recherche */
-.search-bar {
-    height: 40px;
-    font-size: 14px;
-}
-
-/* Positionnement du bouton des filtres */
+/* Positioning of the filters button */
 .filters-button {
     position: absolute;
-    top: 120px;
-    left: 10px;
+    right: 10px;
+    top: 160px;
     background: #fff;
     border: 1px solid #ccc;
     padding: 8px;
@@ -76,14 +70,19 @@ body {
     cursor: pointer;
     z-index: 10;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s;
 }
 
-/* Style du menu de filtres */
+.filters-button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Enhanced style for the filters panel */
 .filters {
     position: absolute;
     top: 160px;
-    left: 10px;
-    width: 250px;
+    right: 60px;
+    width: 280px;
     background: white;
     border: 1px solid #ccc;
     padding: 15px;
@@ -111,15 +110,38 @@ body {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+.filter-group select:hover,
+.filter-group input:hover {
+    border-color: #aaa;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    border-color: #4285f4;
+    outline: none;
+}
+
+/* Transport buttons styling */
+.transport-buttons {
+    display: flex;
+    gap: 5px;
 }
 
 .transport-button {
+    flex: 1;
     padding: 8px 12px;
-    margin-right: 5px;
     background: #f0f0f0;
     border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.transport-button:hover {
+    background-color: #e0e0e0;
 }
 
 .transport-button.active {
@@ -128,14 +150,42 @@ body {
     border-color: #3367d6;
 }
 
-/* Masquer les filtres par défaut */
+/* Improved range slider styling */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #4285f4;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #4285f4;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+/* Hide filters by default */
 .hidden {
     display: none;
 }
 
-/* Positionnement des boutons en bas à droite */
+/* Positioning action buttons at bottom right */
 .action-buttons {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     right: 20px;
     display: flex;
@@ -155,6 +205,31 @@ body {
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+}
+
+.action-buttons button:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .filters {
+        width: 250px;
+        right: 10px;
+    }
+    
+    .action-buttons {
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .action-buttons button {
+        width: 45px;
+        height: 45px;
+    }
 }
 
 /* Results container */
