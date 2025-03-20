@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche de lieux</title>
+    
+    <!-- Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    
+    <!-- Styles personnalisés -->
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Conteneur de la carte -->
+    <div id="map"></div>
+    
+    <!-- Barre de recherche -->
+    <div class="search-container">
+        <form id="searchForm">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Rechercher un lieu...">
+            <button type="submit" class="search-button">🔍</button>
+        </form>
+    </div>
+    
+    <!-- Bouton des filtres -->
+    <button id="toggleFilters" class="filters-button">⚙️</button>
+    
+    <!-- Conteneur des filtres -->
+    <div id="filtersContainer" class="filters hidden">
+        <div class="filter-group">
+            <label for="categories">Catégories</label>
+            <select id="categories">
+                <option value="restaurant">Restaurants</option>
+                <option value="cafe">Cafés</option>
+                <option value="grocery">Épiceries</option>
+                <option value="pharmacy">Pharmacies</option>
+                <option value="hotel">Hôtels</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="resultCount">Nombre de résultats</label>
+            <input type="number" id="resultCount" min="1" max="10" value="5">
+        </div>
+        <div class="filter-group">
+            <label>Mode de transport</label>
+            <div class="transport-buttons">
+                <button type="button" class="transport-button">🚗</button>
+                <button type="button" class="transport-button">🚶</button>
+                <button type="button" class="transport-button">🚴</button>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label for="duration">Durée maximale: <span id="durationValue">15</span> min</label>
+            <input type="range" id="duration" min="5" max="60" value="15" oninput="document.getElementById('durationValue').textContent = this.value">
+        </div>
+        <div class="filter-group">
+            <label for="distance">Distance maximale: <span id="distanceValue">5</span> km</label>
+            <input type="range" id="distance" min="1" max="20" value="5" oninput="document.getElementById('distanceValue').textContent = this.value">
+        </div>
+    </div>
+    
+    <!-- Boutons d'action -->
+    <div class="action-buttons">
+        <button id="locationButton" title="Ma position">📍</button>
+        <button id="resetButton" title="Réinitialiser">🔄</button>
+    </div>
+    
+    <!-- Mapbox JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    
+    <!-- Configuration Mapbox -->
+    <script>
+        // Définir le token Mapbox
+        mapboxgl.accessToken = '{{ mapbox_token }}';
+    </script>
+    
+    <!-- Scripts personnalisés -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

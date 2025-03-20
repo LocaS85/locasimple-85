@@ -1,69 +1,43 @@
-# Welcome to your Lovable project
 
-## Project info
+# Application de recherche de lieux
 
-**URL**: https://lovable.dev/projects/87e55104-4d3c-4c1b-b582-a795a39ce54b
+Cette application permet de rechercher des lieux à proximité d'une position donnée et de calculer les itinéraires vers ces lieux.
 
-## How can I edit this code?
+## Architecture
 
-There are several ways of editing your application.
+L'application est composée de deux parties :
+- **Frontend** : Interface utilisateur React avec Mapbox GL JS
+- **Backend** : Serveur Flask qui sert d'intermédiaire pour les API Mapbox
 
-**Use Lovable**
+## Configuration du frontend
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/87e55104-4d3c-4c1b-b582-a795a39ce54b) and start prompting.
+Le frontend est déjà configuré. Assurez-vous d'avoir un token Mapbox valide dans votre fichier d'environnement.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Configuration du backend Flask
 
-**Use your preferred IDE**
+Voir les instructions détaillées dans le fichier `FLASK_SETUP_INSTRUCTIONS.md`.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Fonctionnalités
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Recherche de lieux par nom ou catégorie
+- Filtrage par type de lieu
+- Calcul d'itinéraires avec différents modes de transport
+- Génération de PDF avec les résultats de recherche
+- Affichage des lieux sur une carte interactive
 
-Follow these steps:
+## Utilisation des filtres
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+L'application dispose d'un panneau de filtres accessible via le bouton ⚙️ :
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Catégories** : Filtrer par type de lieu (restaurants, bars, magasins, etc.)
+- **Nombre de résultats** : Limiter le nombre de résultats affichés
+- **Mode de transport** : Choisir entre voiture, marche à pied ou vélo
+- **Durée** : Filtrer par temps de trajet maximal
+- **Distance** : Filtrer par distance maximale
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Résolution des problèmes
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/87e55104-4d3c-4c1b-b582-a795a39ce54b) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Si vous rencontrez des erreurs lors de l'utilisation de l'application, vérifiez que :
+1. Le serveur Flask est en cours d'exécution
+2. Votre token Mapbox est valide et dispose des droits nécessaires
+3. Votre connexion internet est active
