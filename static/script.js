@@ -1,4 +1,3 @@
-
 // Initialisation de la carte Mapbox
 document.addEventListener('DOMContentLoaded', function() {
     // Configuration de la carte

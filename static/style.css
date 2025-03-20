@@ -81,7 +81,7 @@ body {
     }
 }
 
-/* Bouton de paramètres */
+/* Settings button */
 .settings-button {
     position: absolute;
     top: 110px;
@@ -106,12 +106,12 @@ body {
     background-color: #f0f0f0;
 }
 
-/* Menu des filtres */
+/* Filters menu */
 .filters-menu {
     position: absolute;
     top: 155px;
     right: 10px;
-    width: 300px;
+    width: 240px; /* Reduced from 300px to 240px */
     max-width: 90%;
     background: white;
     border-radius: 8px;
@@ -132,7 +132,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 10px 15px; /* Reduced padding from 12px 20px to 10px 15px */
     cursor: pointer;
     background-color: white;
     transition: background-color 0.2s;
@@ -146,6 +146,7 @@ body {
     font-weight: 500;
     display: flex;
     align-items: center;
+    font-size: 14px; /* Added smaller font size */
 }
 
 .filter-title i {
@@ -153,7 +154,7 @@ body {
 }
 
 .filter-content {
-    padding: 15px 20px;
+    padding: 12px 15px; /* Reduced padding from 15px 20px to 12px 15px */
     border-top: 1px solid #f1f3f4;
     display: none;
 }
@@ -166,25 +167,25 @@ body {
 .transport-buttons {
     display: flex;
     overflow-x: auto;
-    padding: 10px;
+    padding: 8px; /* Reduced padding from 10px to 8px */
     background-color: white;
     border-bottom: 1px solid #f1f3f4;
 }
 
 .transport-button {
     flex: 1;
-    padding: 8px;
+    padding: 6px; /* Reduced padding from 8px to 6px */
     background: white;
     border: 1px solid #e0e0e0;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px; /* Reduced font size from 14px to 12px */
     font-weight: 500;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 5px;
-    border-radius: 20px;
-    min-width: 80px;
+    margin-right: 4px; /* Reduced margin from 5px to 4px */
+    border-radius: 16px; /* Reduced border-radius from 20px to 16px */
+    min-width: 60px; /* Reduced min-width from 80px to 60px */
     transition: all 0.2s;
 }
 
@@ -203,7 +204,7 @@ body {
 }
 
 .transport-button i {
-    margin-right: 6px;
+    margin-right: 4px; /* Reduced margin from 6px to 4px */
 }
 
 /* Distance and duration panels */
@@ -214,33 +215,35 @@ body {
 }
 
 .duration-item {
-    padding: 12px 15px;
+    padding: 10px; /* Reduced padding from 12px 15px to 10px */
     background: #FF5722;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
+    font-size: 13px; /* Added smaller font size */
 }
 
 .distance-item {
-    padding: 12px 15px;
+    padding: 10px; /* Reduced padding from 12px 15px to 10px */
     background: #4285F4;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
+    font-size: 13px; /* Added smaller font size */
 }
 
 .unit-toggle {
     background: rgba(255, 255, 255, 0.3);
     border: none;
     border-radius: 12px;
-    padding: 2px 8px;
-    margin-left: 5px;
+    padding: 2px 6px; /* Reduced padding from 2px 8px to 2px 6px */
+    margin-left: 4px; /* Reduced margin from 5px to 4px */
     color: white;
-    font-size: 12px;
+    font-size: 11px; /* Reduced font size from 12px to 11px */
     cursor: pointer;
 }
 
@@ -370,13 +373,13 @@ body {
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
     .filters-menu {
-        width: 260px;
+        width: 200px; /* Reduced from 260px to 200px */
     }
     
     .transport-button {
-        font-size: 12px;
-        min-width: 60px;
-        padding: 6px;
+        font-size: 11px; /* Reduced from 12px to 11px */
+        min-width: 50px; /* Reduced from 60px to 50px */
+        padding: 5px; /* Reduced from 6px to 5px */
     }
     
     .action-buttons {
