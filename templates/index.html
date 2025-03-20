@@ -30,55 +30,56 @@
         </form>
     </div>
     
-    <!-- Section des contrôles et filtres -->
-    <div class="controls-section">
-        <div class="filters-panels">
-            <!-- Filtre Catégories -->
-            <div class="filter-panel">
-                <div class="filter-header" data-target="categories-content">
-                    <div class="filter-title">
-                        <i class="fa-solid fa-layer-group"></i> Catégories
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
+    <!-- Bouton de paramètres (sous le zoom) -->
+    <button id="settingsButton" class="settings-button" title="Paramètres">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+    
+    <!-- Menu de filtres (initialement caché) -->
+    <div id="filtersMenu" class="filters-menu hidden">
+        <div class="filter-panel">
+            <div class="filter-header" data-target="categories-content">
+                <div class="filter-title">
+                    <i class="fa-solid fa-layer-group"></i> Catégories
                 </div>
-                <div class="filter-content" id="categories-content">
-                    <div class="categories-list">
-                        <div class="category-item">
-                            <input type="checkbox" id="cat-restaurant" checked>
-                            <label for="cat-restaurant">Restaurants</label>
-                        </div>
-                        <div class="category-item">
-                            <input type="checkbox" id="cat-hotel">
-                            <label for="cat-hotel">Hôtels</label>
-                        </div>
-                        <div class="category-item">
-                            <input type="checkbox" id="cat-shop">
-                            <label for="cat-shop">Magasins</label>
-                        </div>
-                        <div class="category-item">
-                            <input type="checkbox" id="cat-attraction">
-                            <label for="cat-attraction">Attractions</label>
-                        </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="filter-content" id="categories-content">
+                <div class="categories-list">
+                    <div class="category-item">
+                        <input type="checkbox" id="cat-restaurant" checked>
+                        <label for="cat-restaurant">Restaurants</label>
+                    </div>
+                    <div class="category-item">
+                        <input type="checkbox" id="cat-hotel">
+                        <label for="cat-hotel">Hôtels</label>
+                    </div>
+                    <div class="category-item">
+                        <input type="checkbox" id="cat-shop">
+                        <label for="cat-shop">Magasins</label>
+                    </div>
+                    <div class="category-item">
+                        <input type="checkbox" id="cat-attraction">
+                        <label for="cat-attraction">Attractions</label>
                     </div>
                 </div>
             </div>
-            
-            <!-- Filtre Nombre de résultats -->
-            <div class="filter-panel">
-                <div class="filter-header" data-target="results-content">
-                    <div class="filter-title">
-                        <i class="fa-solid fa-list-ol"></i> Nombre de résultats
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
+        </div>
+
+        <div class="filter-panel">
+            <div class="filter-header" data-target="results-content">
+                <div class="filter-title">
+                    <i class="fa-solid fa-list-ol"></i> Nombre de résultats
                 </div>
-                <div class="filter-content" id="results-content">
-                    <select id="resultCount" class="filter-select">
-                        <option value="3">3 résultats</option>
-                        <option value="5" selected>5 résultats</option>
-                        <option value="10">10 résultats</option>
-                        <option value="20">20 résultats</option>
-                    </select>
-                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </div>
+            <div class="filter-content" id="results-content">
+                <select id="resultCount" class="filter-select">
+                    <option value="3">3 résultats</option>
+                    <option value="5" selected>5 résultats</option>
+                    <option value="10">10 résultats</option>
+                    <option value="20">20 résultats</option>
+                </select>
             </div>
         </div>
         
