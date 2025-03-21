@@ -1,40 +1,41 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSearchPageState } from '@/hooks/useSearchPageState';
-import SearchHeader from '@/components/search/SearchHeader';
-import { SearchPanel } from '@/components/search/SearchPanel';
+import { SearchInput } from '@/components/search/SearchInput';
 import MapDisplay from '@/components/search/MapDisplay';
-import axios from 'axios';
 import { toast } from 'sonner';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import { MAPBOX_TOKEN, API_URL } from '@/config/environment';
+import axios from 'axios';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [resultsCount, setResultsCount] = useState(3);
-  const [searchResults, setSearchResults] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isLocationActive, setIsLocationActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [transportMode, setTransportMode] = useState('driving');
-  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Paris by default
-  const [isLocationActive, setIsLocationActive] = useState(false);
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [popupInfo, setPopupInfo] = useState<any | null>(null);
+  const [resultsCount, setResultsCount] = useState(5);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   const [viewport, setViewport] = useState({
     latitude: 48.8566,
     longitude: 2.3522,
     zoom: 12
   });
-  
-  // Convert search results to places format for the map
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [popupInfo, setPopupInfo] = useState<any | null>(null);
+
+  // Convertir les résultats de recherche en format compatible avec la carte
   const places = searchResults.map((result: any) => ({
     id: result.id || `place-${Math.random().toString(36).substr(2, 9)}`,
     name: result.name,
     lat: result.lat,
     lon: result.lon,
     distance: result.distance,
-    duration: result.duration
+    duration: result.duration,
+    address: result.place_name,
+    category: result.category
   }));
 
-  // Handle location button click
+  // Gérer le clic sur le bouton de localisation
   const handleLocationClick = () => {
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
@@ -54,12 +55,17 @@ const SearchPage = () => {
         console.error('Erreur de géolocalisation:', error);
         toast.error('Impossible de récupérer votre position');
         setLoading(false);
-        setIsLocationActive(false);
       }
     );
   };
 
-  // Handle search submission
+  // Gérer le clic sur le bouton du microphone
+  const handleMicClick = () => {
+    setIsRecording(!isRecording);
+    // Logique d'enregistrement vocal à implémenter
+  };
+
+  // Effectuer une recherche
   const performSearch = async (query: string) => {
     if (!query.trim()) {
       toast.error('Veuillez entrer un terme de recherche');
@@ -68,7 +74,7 @@ const SearchPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/search`, {
+      const response = await axios.get(`${API_URL}/search`, {
         params: {
           query,
           mode: transportMode,
@@ -81,7 +87,7 @@ const SearchPage = () => {
       if (response.data && response.data.length > 0) {
         setSearchResults(response.data);
         
-        // Center map on first result
+        // Centrer la carte sur le premier résultat
         setViewport({
           latitude: response.data[0].lat,
           longitude: response.data[0].lon,
@@ -101,7 +107,7 @@ const SearchPage = () => {
     }
   };
 
-  // Handle clicking on a search result
+  // Gérer le clic sur un résultat
   const handleResultClick = (place: any) => {
     setSelectedPlaceId(place.id);
     setPopupInfo(place);
@@ -112,20 +118,25 @@ const SearchPage = () => {
     });
   };
 
-  // Generate PDF with current results
+  // Générer un PDF avec les résultats
   const generatePDF = async () => {
-    if (places.length === 0) {
+    if (searchResults.length === 0) {
       toast.error('Aucun résultat à exporter');
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.post('http://127.0.0.1:5000/generate_pdf', { places });
-      toast.success('PDF généré avec succès');
+      const response = await axios.post(`${API_URL}/generate_pdf`, { 
+        places: searchResults 
+      });
       
-      // Open the PDF in a new window/tab
-      window.open('resultats.pdf');
+      if (response.data.success) {
+        window.open(`${API_URL}${response.data.url}`, '_blank');
+        toast.success('PDF généré avec succès');
+      } else {
+        throw new Error(response.data.error || 'Erreur lors de la génération du PDF');
+      }
     } catch (error) {
       console.error('Erreur lors de la génération du PDF:', error);
       toast.error('Erreur lors de la génération du PDF');
@@ -134,17 +145,14 @@ const SearchPage = () => {
     }
   };
 
-  // Check if Flask server is running on component mount
+  // Vérifier si le serveur Flask est en cours d'exécution
   useEffect(() => {
     const checkFlaskServer = async () => {
       try {
-        await axios.get('http://127.0.0.1:5000/search', { 
-          params: { query: 'test', mode: 'driving', lat: 48.8566, lon: 2.3522, limit: 1 },
-          timeout: 2000
-        });
-        console.log('Flask server is running');
+        await axios.get(`${API_URL}/health`, { timeout: 2000 });
+        console.log('Serveur Flask connecté');
       } catch (error) {
-        console.warn('Flask server is not running:', error);
+        console.warn('Serveur Flask non connecté:', error);
         toast.warning('Le serveur Flask n\'est pas démarré. Certaines fonctionnalités peuvent ne pas fonctionner.');
       }
     };
@@ -153,13 +161,8 @@ const SearchPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <SearchHeader 
-        resultsCount={resultsCount}
-        setResultsCount={setResultsCount}
-      />
-      
-      <div className="flex-grow relative">
+    <div className="flex flex-col h-screen">
+      <div className="relative flex-grow">
         <MapDisplay 
           viewport={viewport}
           setViewport={setViewport}
@@ -176,27 +179,35 @@ const SearchPage = () => {
           transportMode={transportMode}
         />
         
-        {/* Search Panel overlay */}
-        <SearchPanel 
-          query={searchQuery}
-          setQuery={setSearchQuery}
-          search={performSearch}
-          isLocationActive={isLocationActive}
-          onLocationClick={handleLocationClick}
-          loading={loading}
-          transportMode={transportMode}
-          onTransportModeChange={setTransportMode}
-          userLocation={userLocation}
-          generatePDF={generatePDF}
-          limit={resultsCount}
-          setLimit={setResultsCount}
-        />
+        {/* Contrôles de recherche */}
+        <div className="absolute top-4 left-0 right-0 z-10 flex justify-center">
+          <SearchInput 
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            isRecording={isRecording}
+            onMicClick={handleMicClick}
+            isLocationActive={isLocationActive}
+            onLocationClick={handleLocationClick}
+            loading={loading}
+            onSearch={() => performSearch(searchQuery)}
+            transportMode={transportMode}
+            onTransportModeChange={setTransportMode}
+          />
+        </div>
         
-        {/* Results list */}
+        {/* Résultats de recherche */}
         {searchResults.length > 0 && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-10 px-4">
             <div className="bg-white rounded-lg shadow-lg p-2 max-h-60 overflow-y-auto">
-              <h3 className="text-sm font-medium px-3 py-1">Résultats</h3>
+              <div className="flex justify-between items-center px-3 py-1">
+                <h3 className="text-sm font-medium">Résultats</h3>
+                <button 
+                  onClick={generatePDF}
+                  className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                >
+                  Exporter PDF
+                </button>
+              </div>
               <ul className="divide-y divide-gray-100">
                 {searchResults.map((result: any, index: number) => (
                   <li 
@@ -208,7 +219,10 @@ const SearchPage = () => {
                       id: result.id || `place-${index}`,
                       name: result.name,
                       lat: result.lat,
-                      lon: result.lon
+                      lon: result.lon,
+                      distance: result.distance,
+                      duration: result.duration,
+                      category: result.category
                     })}
                   >
                     <div className="font-medium">{result.name}</div>

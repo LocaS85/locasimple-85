@@ -18,7 +18,7 @@ MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN')
 if not MAPBOX_ACCESS_TOKEN:
     print("ATTENTION: Token Mapbox manquant! Définissez MAPBOX_ACCESS_TOKEN dans votre fichier .env")
     # Utiliser un token de secours pour le développement
-    MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibG92YWJsZWRldiIsImEiOiJjbHN1d3c0c2cwMWt1MmpueGd3OG11MWhhIn0.Qm4mGicZkPq5Af6C0BFmkA'
+    MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw'
 
 # Créer l'application Flask
 app = Flask(__name__)
