@@ -1,43 +1,42 @@
 
-# Application de recherche de lieux
+# Application de recherche de lieux avec Flask et Mapbox
 
-Cette application permet de rechercher des lieux à proximité d'une position donnée et de calculer les itinéraires vers ces lieux.
+Cette application permet de rechercher des lieux à proximité et d'afficher les itinéraires.
 
-## Architecture
+## Installation
 
-L'application est composée de deux parties :
-- **Frontend** : Interface utilisateur React avec Mapbox GL JS
-- **Backend** : Serveur Flask qui sert d'intermédiaire pour les API Mapbox
+1. Clonez ce dépôt
+2. Installez les dépendances : `pip install -r requirements.txt`
+3. Configurez votre token Mapbox dans le fichier `.env` (copiez `.env.example` en `.env`)
 
-## Configuration du frontend
+## Démarrage du serveur
 
-Le frontend est déjà configuré. Assurez-vous d'avoir un token Mapbox valide dans votre fichier d'environnement.
+Pour démarrer le serveur Flask, exécutez :
 
-## Configuration du backend Flask
+```bash
+python run_server.py
+```
 
-Voir les instructions détaillées dans le fichier `FLASK_SETUP_INSTRUCTIONS.md`.
+Ou directement :
+
+```bash
+python app.py
+```
+
+L'application sera accessible à l'adresse : http://127.0.0.1:5000/
 
 ## Fonctionnalités
 
-- Recherche de lieux par nom ou catégorie
-- Filtrage par type de lieu
-- Calcul d'itinéraires avec différents modes de transport
-- Génération de PDF avec les résultats de recherche
-- Affichage des lieux sur une carte interactive
+- Recherche de lieux à proximité
+- Affichage des itinéraires
+- Calcul des distances et durées
+- Filtrage par catégorie et mode de transport
+- Génération de PDF avec les résultats
 
-## Utilisation des filtres
+## Configuration
 
-L'application dispose d'un panneau de filtres accessible via le bouton ⚙️ :
+Les paramètres de l'application sont configurés dans le fichier `.env` :
 
-- **Catégories** : Filtrer par type de lieu (restaurants, bars, magasins, etc.)
-- **Nombre de résultats** : Limiter le nombre de résultats affichés
-- **Mode de transport** : Choisir entre voiture, marche à pied ou vélo
-- **Durée** : Filtrer par temps de trajet maximal
-- **Distance** : Filtrer par distance maximale
-
-## Résolution des problèmes
-
-Si vous rencontrez des erreurs lors de l'utilisation de l'application, vérifiez que :
-1. Le serveur Flask est en cours d'exécution
-2. Votre token Mapbox est valide et dispose des droits nécessaires
-3. Votre connexion internet est active
+- `MAPBOX_ACCESS_TOKEN` : Votre token d'accès Mapbox
+- `FLASK_ENV` : Environnement Flask (development, production)
+- `DEBUG` : Mode debug (True/False)
