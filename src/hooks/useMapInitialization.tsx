@@ -44,7 +44,7 @@ export const useMapInitialization = ({
 
     try {
       // Verify token
-      if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+      if (!MAPBOX_TOKEN) {
         console.error('Mapbox token is missing or empty');
         toast.error('Token Mapbox manquant. Vérifiez votre fichier .env');
         setInitializationAttempted(true);

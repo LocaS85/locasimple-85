@@ -199,7 +199,7 @@ export const useSearchPageState = () => {
 
   // Check Mapbox token on component mount
   useEffect(() => {
-    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+    if (!MAPBOX_TOKEN) {
       toast.error('Token Mapbox manquant. La carte ne fonctionnera pas correctement.');
     } else {
       console.log('SearchPage loaded with Mapbox token available');

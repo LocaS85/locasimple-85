@@ -10,3 +10,7 @@ export const API_URL = 'http://localhost:5000';
 // Autres variables d'environnement
 export const DEFAULT_LOCATION = [2.3522, 48.8566]; // Paris
 export const DEFAULT_ZOOM = 12;
+
+// Variables pour Supabase (temporaires pour éviter les erreurs de build)
+export const SUPABASE_URL = '';
+export const SUPABASE_ANON_KEY = '';
