@@ -14,6 +14,9 @@ load_dotenv()
 # Obtenir le token Mapbox depuis les variables d'environnement
 MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', 'pk.eyJ1IjoibG92YWJsZWRldiIsImEiOiJjbHN1d3c0c2cwMWt1MmpueGd3OG11MWhhIn0.Qm4mGicZkPq5Af6C0BFmkA')
 
+if not MAPBOX_ACCESS_TOKEN:
+    print("ATTENTION: Token Mapbox manquant! Définissez MAPBOX_ACCESS_TOKEN dans votre fichier .env")
+
 # Créer l'application Flask
 app = Flask(__name__)
 CORS(app)
@@ -155,7 +158,10 @@ def generate_pdf():
 @app.route('/health')
 def health_check():
     """Vérification de l'état de santé de l'API"""
-    return jsonify({"status": "ok"})
+    return jsonify({
+        "status": "ok",
+        "mapbox_token_available": bool(MAPBOX_ACCESS_TOKEN)
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

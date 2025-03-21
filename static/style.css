@@ -20,6 +20,22 @@ body {
     z-index: 1;
 }
 
+/* Error message */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 40vh;
+    transform: translateY(-50%);
+    font-weight: bold;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
 /* Search bar */
 .search-container {
     position: absolute;
@@ -207,6 +223,31 @@ body {
     margin-right: 4px; /* Reduced margin from 6px to 4px */
 }
 
+/* Category filter styles */
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+.category-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
 /* Distance and duration panels */
 .duration-panel {
     display: flex;
@@ -288,6 +329,18 @@ body {
     display: none !important;
 }
 
+/* Route styles */
+.route-line {
+    stroke-dasharray: 2, 2;
+    animation: dash 10s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 100;
+    }
+}
+
 /* Results container */
 .results-container {
     position: absolute;
@@ -336,6 +389,13 @@ body {
     color: #5f6368;
 }
 
+.no-results {
+    padding: 15px;
+    text-align: center;
+    color: #5f6368;
+    font-style: italic;
+}
+
 /* Loading indicator */
 .loader {
     position: absolute;
@@ -365,6 +425,24 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+/* User marker styling */
+.user-marker {
+    box-shadow: 0 0 0 rgba(66, 133, 244, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(66, 133, 244, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(66, 133, 244, 0);
+    }
+}
+
 /* Zoom controls styling */
 .mapboxgl-ctrl-top-right {
     top: 80px !important;
@@ -385,5 +463,10 @@ body {
     .action-buttons {
         bottom: 20px;
         right: 20px;
+    }
+    
+    .results-container {
+        max-height: 250px;
+        bottom: 90px;
     }
 }
