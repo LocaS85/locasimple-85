@@ -2,47 +2,60 @@
 import React from 'react';
 import { Car, PersonStanding, Bike, Bus } from 'lucide-react';
 
-export interface TransportMode {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
+export type TransportMode = 'driving' | 'walking' | 'cycling' | 'transit';
+
+interface TransportModeInfo {
   color: string;
-  hoverColor: string;
+  icon: string;
+  label: string;
 }
 
-export const transportModes: TransportMode[] = [
-  { 
-    id: 'driving', 
-    name: 'Voiture', 
-    icon: <Car className="h-4 w-4" />, 
-    color: '#0EA5E9', 
-    hoverColor: '#0284C7' 
+export const transportModes: Record<string, TransportModeInfo> = {
+  driving: {
+    color: '#3b82f6',
+    icon: 'car',
+    label: 'Voiture'
   },
-  { 
-    id: 'walking', 
-    name: 'À pied', 
-    icon: <PersonStanding className="h-4 w-4" />, 
-    color: '#EF4444', 
-    hoverColor: '#DC2626' 
+  walking: {
+    color: '#10b981',
+    icon: 'footprints',
+    label: 'À pied'
   },
-  { 
-    id: 'cycling', 
-    name: 'Vélo', 
-    icon: <Bike className="h-4 w-4" />, 
-    color: '#10B981', 
-    hoverColor: '#059669' 
+  cycling: {
+    color: '#f59e0b',
+    icon: 'bike',
+    label: 'Vélo'
   },
-  { 
-    id: 'transit', 
-    name: 'Transport+', 
-    icon: <Bus className="h-4 w-4" />, 
-    color: '#8B5CF6', 
-    hoverColor: '#7C3AED' 
-  },
-];
-
-// Function to get color by transport mode id
-export const getTransportModeColor = (modeId: string): string => {
-  const mode = transportModes.find(m => m.id === modeId);
-  return mode?.color || '#3B82F6'; // Default to blue if not found
+  transit: {
+    color: '#8b5cf6',
+    icon: 'bus',
+    label: 'Transport'
+  }
 };
+
+export const getTransportModeColor = (mode: string): string => {
+  return transportModes[mode]?.color || '#3b82f6';
+};
+
+export const getTransportModeIcon = (mode: string): React.ReactNode => {
+  const iconName = transportModes[mode]?.icon || 'car';
+  
+  switch (iconName) {
+    case 'car':
+      return <Car size={20} />;
+    case 'footprints':
+      return <PersonStanding size={20} />;
+    case 'bike':
+      return <Bike size={20} />;
+    case 'bus':
+      return <Bus size={20} />;
+    default:
+      return <Car size={20} />;
+  }
+};
+
+export const getTransportModeLabel = (mode: string): string => {
+  return transportModes[mode]?.label || 'Voiture';
+};
+
+export default transportModes;
