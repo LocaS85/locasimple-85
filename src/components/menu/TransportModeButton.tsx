@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { transportModes, getTransportModeColor, getTransportModeIcon, getTransportModeLabel } from '@/data/transportModes';
+import { getTransportModeColor, getTransportModeIcon, getTransportModeLabel } from '@/data/transportModes';
 
 interface TransportModeButtonProps {
   mode: string;
