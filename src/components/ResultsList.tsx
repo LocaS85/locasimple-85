@@ -1,85 +1,86 @@
 
 import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ExternalLink, Clock, MapPin } from 'lucide-react';
 
 export interface Result {
   id: string;
   name: string;
-  address?: string;
-  category?: string;
-  categories?: string[];
-  distance: number;
-  duration: number;
   latitude: number;
   longitude: number;
-  distanceInMeters?: number;
-  durationInSeconds?: number;
-  rating?: number;
-  openingHours?: string;
+  distance?: number;
+  duration?: number;
+  address?: string;
+  category?: string;
   color?: string;
-  phoneNumber?: string;
-  website?: string;
-  isFavorite?: boolean;
-  description?: string;
 }
 
 interface ResultsListProps {
   results: Result[];
   onResultClick?: (result: Result) => void;
   selectedResultId?: string;
-  selectedCategory?: string;
-  selectedDuration?: number;
-  selectedDistance?: number;
-  transportMode?: string;
 }
 
-export const ResultsList: React.FC<ResultsListProps> = ({
-  results,
+const ResultsList: React.FC<ResultsListProps> = ({ 
+  results, 
   onResultClick,
   selectedResultId
 }) => {
   if (results.length === 0) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="text-center py-4 text-gray-500">
         Aucun résultat trouvé
       </div>
     );
   }
 
   return (
-    <div className="divide-y divide-gray-200">
+    <div className="space-y-2">
       {results.map((result) => (
-        <div
+        <Card 
           key={result.id}
-          className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-            selectedResultId === result.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+          className={`cursor-pointer transition-all hover:shadow-md ${
+            selectedResultId === result.id ? 'ring-2 ring-primary' : ''
           }`}
-          onClick={() => onResultClick && onResultClick(result)}
+          onClick={() => onResultClick?.(result)}
         >
-          <h3 className="text-lg font-medium">{result.name}</h3>
-          {result.address && (
-            <p className="text-sm text-gray-600 mt-1">{result.address}</p>
-          )}
-          <div className="flex items-center justify-between mt-2 text-sm">
-            <div className="flex items-center space-x-4">
+          <CardContent className="p-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-semibold text-sm">{result.name}</h3>
+                {result.address && (
+                  <div className="text-xs text-gray-500 flex items-center mt-1">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    {result.address}
+                  </div>
+                )}
+              </div>
               {result.category && (
-                <span className="bg-gray-100 px-2 py-1 rounded-full text-xs text-gray-600">
+                <Badge className="ml-2" variant="outline">
                   {result.category}
-                </span>
-              )}
-              {result.isFavorite && (
-                <span className="text-amber-500">★ Favori</span>
+                </Badge>
               )}
             </div>
-            <div className="flex items-center space-x-2 text-gray-500">
-              <span>{result.distance.toFixed(1)} km</span>
-              <span>•</span>
-              <span>{result.duration} min</span>
-            </div>
-          </div>
-          {result.description && (
-            <p className="text-xs text-gray-600 mt-1 line-clamp-2">{result.description}</p>
-          )}
-        </div>
+            
+            {(result.distance !== undefined || result.duration !== undefined) && (
+              <div className="flex items-center mt-2 text-xs text-gray-600">
+                {result.distance !== undefined && (
+                  <div className="mr-3">
+                    <ExternalLink className="h-3 w-3 inline mr-1" />
+                    {result.distance} km
+                  </div>
+                )}
+                {result.duration !== undefined && (
+                  <div>
+                    <Clock className="h-3 w-3 inline mr-1" />
+                    {result.duration} min
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       ))}
     </div>
   );

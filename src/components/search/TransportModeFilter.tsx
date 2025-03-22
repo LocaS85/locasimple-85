@@ -1,49 +1,23 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Car, Bus, Bike } from 'lucide-react';
+import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
 
 interface TransportModeFilterProps {
   transportMode: string;
   onTransportModeChange: (mode: string) => void;
 }
 
-export const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
+const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
   transportMode,
   onTransportModeChange
 }) => {
   return (
-    <div className="absolute bottom-16 right-4 z-10">
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-md p-2 flex flex-col gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className={`h-10 w-10 rounded-full ${transportMode === 'driving' ? 'text-blue-500 bg-blue-50' : 'text-gray-500'}`}
-          onClick={() => onTransportModeChange('driving')}
-          aria-label="Driving"
-        >
-          <Car className="h-5 w-5" />
-        </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className={`h-10 w-10 rounded-full ${transportMode === 'transit' ? 'text-green-500 bg-green-50' : 'text-gray-500'}`}
-          onClick={() => onTransportModeChange('transit')}
-          aria-label="Transit"
-        >
-          <Bus className="h-5 w-5" />
-        </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className={`h-10 w-10 rounded-full ${transportMode === 'cycling' ? 'text-purple-500 bg-purple-50' : 'text-gray-500'}`}
-          onClick={() => onTransportModeChange('cycling')}
-          aria-label="Cycling"
-        >
-          <Bike className="h-5 w-5" />
-        </Button>
+    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 max-w-xs w-full px-4 z-10">
+      <div className="bg-white rounded-full shadow-lg p-1">
+        <TransportModeSelector 
+          transportMode={transportMode} 
+          onTransportModeChange={onTransportModeChange} 
+        />
       </div>
     </div>
   );

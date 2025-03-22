@@ -5,6 +5,7 @@ import MapSection from '@/components/search/MapSection';
 import { toast } from 'sonner';
 import { useSearchPageState } from '@/hooks/useSearchPageState';
 import Layout from '@/components/Layout';
+import { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const {
@@ -43,11 +44,11 @@ const SearchPage = () => {
   } = useSearchPageState();
 
   // Transform searchResults into places format expected by MapDisplay
-  const places = searchResults.map((result: any) => ({
+  const places: Result[] = searchResults.map((result: any) => ({
     id: result.id || `place-${Math.random().toString(36).substr(2, 9)}`,
     name: result.name,
-    lat: result.lat,
-    lon: result.lon,
+    latitude: result.lat,
+    longitude: result.lon,
     distance: result.distance,
     duration: result.duration,
     address: result.place_name,

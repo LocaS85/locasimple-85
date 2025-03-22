@@ -34,12 +34,9 @@ const NavigationMap: React.FC<NavigationMapProps> = ({
     container: mapContainer,
     center: start,
     mapStyle: 'streets',
-    initialOptions: {
-      style: 'mapbox://styles/mapbox/navigation-night-v1',
-      zoom: 14,
-      pitch: 45,
-      bearing: 0
-    }
+    zoom: 14,
+    pitch: 45,
+    bearing: 0
   });
 
   // Set map as ready when initialized

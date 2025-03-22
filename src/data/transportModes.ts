@@ -1,54 +1,45 @@
 
-import { Car, PersonStanding, Bike, Bus, Clock } from 'lucide-react';
-import React from 'react';
+export type TransportMode = 'driving' | 'walking' | 'cycling' | 'transit';
 
-export type TransportMode = 'driving' | 'walking' | 'cycling' | 'driving-traffic' | 'transit';
-
-export interface TransportModeOption {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
+interface TransportModeInfo {
   color: string;
+  icon: string;
+  label: string;
 }
 
-export const transportModes: TransportModeOption[] = [
-  {
-    id: 'driving',
-    name: 'Voiture',
-    icon: React.createElement(Car, { size: 16 }),
-    color: '#3b82f6' // blue-500
+export const transportModes: Record<string, TransportModeInfo> = {
+  driving: {
+    color: '#3b82f6',
+    icon: 'car',
+    label: 'Voiture'
   },
-  {
-    id: 'walking',
-    name: 'À pied',
-    icon: React.createElement(PersonStanding, { size: 16 }),
-    color: '#10b981' // emerald-500
+  walking: {
+    color: '#10b981',
+    icon: 'footprints',
+    label: 'À pied'
   },
-  {
-    id: 'cycling',
-    name: 'Vélo',
-    icon: React.createElement(Bike, { size: 16 }),
-    color: '#f59e0b' // amber-500
+  cycling: {
+    color: '#f59e0b',
+    icon: 'bike',
+    label: 'Vélo'
   },
-  {
-    id: 'driving-traffic',
-    name: 'Trafic',
-    icon: React.createElement(Clock, { size: 16 }),
-    color: '#ef4444' // red-500
-  },
-  {
-    id: 'transit',
-    name: 'Transit',
-    icon: React.createElement(Bus, { size: 16 }),
-    color: '#8b5cf6' // violet-500
+  transit: {
+    color: '#8b5cf6',
+    icon: 'bus',
+    label: 'Transport'
   }
-];
+};
 
-export function getTransportModeColor(transportMode: string): string {
-  const mode = transportModes.find(m => m.id === transportMode);
-  return mode ? mode.color : '#3b82f6'; // Default to blue if mode not found
-}
+export const getTransportModeColor = (mode: string): string => {
+  return transportModes[mode]?.color || '#3b82f6';
+};
 
-export function getTransportModeOption(transportMode: string): TransportModeOption | undefined {
-  return transportModes.find(m => m.id === transportMode);
-}
+export const getTransportModeIcon = (mode: string): string => {
+  return transportModes[mode]?.icon || 'car';
+};
+
+export const getTransportModeLabel = (mode: string): string => {
+  return transportModes[mode]?.label || 'Voiture';
+};
+
+export default transportModes;

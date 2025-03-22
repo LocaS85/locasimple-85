@@ -5,6 +5,7 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 import { useSearchCore } from './useSearchCore';
 import { useGeolocation } from './useGeolocation';
 import { useVoiceRecording } from './useVoiceRecording';
+import { Result } from '@/components/ResultsList';
 
 export const useSearchPageState = () => {
   // Get core search functionality
@@ -31,6 +32,7 @@ export const useSearchPageState = () => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
   const [showRoutes, setShowRoutes] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   // Use geolocation hook
   const { activateGeolocation } = useGeolocation({
@@ -184,7 +186,9 @@ export const useSearchPageState = () => {
     handleSaveSearch,
     handleRemoveSavedSearch,
     handleMicClick,
-    executeSearch
+    executeSearch,
+    selectedCategory,
+    setSelectedCategory
   };
 };
 

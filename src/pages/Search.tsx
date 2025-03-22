@@ -6,9 +6,7 @@ import Layout from '@/components/Layout';
 const Search = () => {
   return (
     <Layout className="h-screen p-0 overflow-hidden">
-      <div className="h-full w-full">
-        <SearchContainer />
-      </div>
+      <SearchContainer />
     </Layout>
   );
 };
