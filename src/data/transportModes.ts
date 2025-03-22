@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, Footprints, Bike, Bus } from 'lucide-react';
+import { Car, PersonStanding, Bike, Bus } from 'lucide-react';
 
 export type TransportMode = 'driving' | 'walking' | 'cycling' | 'transit';
 
@@ -44,7 +44,7 @@ export const getTransportModeIcon = (mode: string): React.ReactNode => {
     case 'car':
       return <Car size={20} />;
     case 'footprints':
-      return <Footprints size={20} />;
+      return <PersonStanding size={20} />;
     case 'bike':
       return <Bike size={20} />;
     case 'bus':
