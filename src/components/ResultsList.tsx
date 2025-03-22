@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +12,16 @@ export interface Result {
   duration?: number;
   address?: string;
   category?: string;
+  categories?: string[];
   color?: string;
+  rating?: number;
+  openingHours?: string;
+  description?: string;
+  distanceInMeters?: number;
+  durationInSeconds?: number;
+  phoneNumber?: string;
+  website?: string;
+  isFavorite?: boolean;
 }
 
 interface ResultsListProps {

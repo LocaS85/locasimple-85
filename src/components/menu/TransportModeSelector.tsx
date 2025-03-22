@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Car, Walk, Bike, Bus } from 'lucide-react';
+import { Car, Footprints, Bike, Bus } from 'lucide-react';
 import { transportModes } from '@/data/transportModes';
 
 interface TransportModeSelectorProps {
@@ -15,7 +15,7 @@ export const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
   // Transport mode icons
   const icons = {
     driving: <Car size={20} />,
-    walking: <Walk size={20} />,
+    walking: <Footprints size={20} />,
     cycling: <Bike size={20} />,
     transit: <Bus size={20} />
   };

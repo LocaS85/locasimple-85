@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { getTransportModeOption } from '@/data/transportModes';
+import { transportModes, getTransportModeColor, getTransportModeIcon, getTransportModeLabel } from '@/data/transportModes';
 
 interface TransportModeButtonProps {
   mode: string;
@@ -16,17 +16,10 @@ const TransportModeButton: React.FC<TransportModeButtonProps> = ({
   onClick,
   className = ''
 }) => {
-  // Get the transport mode option details
-  const modeOption = getTransportModeOption(mode);
-  
-  if (!modeOption) {
-    return null;
-  }
-  
-  // Utilisons directement la couleur de transportMode au lieu de l'interpolation
-  const backgroundColor = isActive ? modeOption.color : 'white';
-  const textColor = isActive ? 'white' : 'gray-700';
-  const borderColor = isActive ? modeOption.color : 'gray-200';
+  // Get the transport mode details
+  const color = getTransportModeColor(mode);
+  const icon = getTransportModeIcon(mode);
+  const label = getTransportModeLabel(mode);
   
   return (
     <Button
@@ -34,15 +27,15 @@ const TransportModeButton: React.FC<TransportModeButtonProps> = ({
       className={`flex items-center justify-center p-2 h-10 ${className}`}
       onClick={() => onClick(mode)}
       style={{
-        backgroundColor: isActive ? modeOption.color : 'white',
+        backgroundColor: isActive ? color : 'white',
         color: isActive ? 'white' : '#374151',
-        borderColor: isActive ? modeOption.color : '#e5e7eb',
+        borderColor: isActive ? color : '#e5e7eb',
         borderWidth: '1px'
       }}
     >
       <div className="flex items-center space-x-2">
-        {modeOption.icon}
-        <span className="text-xs font-medium">{modeOption.name}</span>
+        {icon}
+        <span className="text-xs font-medium">{label}</span>
       </div>
     </Button>
   );

@@ -1,4 +1,7 @@
 
+import React from 'react';
+import { Car, Footprints, Bike, Bus } from 'lucide-react';
+
 export type TransportMode = 'driving' | 'walking' | 'cycling' | 'transit';
 
 interface TransportModeInfo {
@@ -34,8 +37,21 @@ export const getTransportModeColor = (mode: string): string => {
   return transportModes[mode]?.color || '#3b82f6';
 };
 
-export const getTransportModeIcon = (mode: string): string => {
-  return transportModes[mode]?.icon || 'car';
+export const getTransportModeIcon = (mode: string): React.ReactNode => {
+  const iconName = transportModes[mode]?.icon || 'car';
+  
+  switch (iconName) {
+    case 'car':
+      return <Car size={20} />;
+    case 'footprints':
+      return <Footprints size={20} />;
+    case 'bike':
+      return <Bike size={20} />;
+    case 'bus':
+      return <Bus size={20} />;
+    default:
+      return <Car size={20} />;
+  }
 };
 
 export const getTransportModeLabel = (mode: string): string => {
