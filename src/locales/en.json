@@ -15,5 +15,9 @@
   "popular": "Popular",
   "specificNeeds": "Specific needs?",
   "contactForCustomPlan": "Contact us for a custom plan",
-  "contactUs": "Contact Us"
+  "contactUs": "Contact Us",
+  "driving": "Car",
+  "walking": "Walking",
+  "cycling": "Cycling",
+  "transit": "Transit"
 }
