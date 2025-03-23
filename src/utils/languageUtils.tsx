@@ -23,10 +23,11 @@ export function withTranslation<P extends object>(
 export const useTranslation = () => {
   const { t, language } = useLanguage();
   
-  const translateWithWarning = (key: string): string => {
+  const translateWithWarning = (key: string, defaultValue?: string): string => {
     const translation = t(key);
     if (translation === key && process.env.NODE_ENV === 'development') {
       console.warn(`Missing translation key: "${key}" for language "${language}"`);
+      return defaultValue || key;
     }
     return translation;
   };

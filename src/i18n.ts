@@ -10,6 +10,7 @@ import es from './locales/es.json';
 import it from './locales/it.json';
 import pt from './locales/pt.json';
 
+// Initialize i18next
 i18n
   .use(initReactI18next)
   .use(LanguageDetector)

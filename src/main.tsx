@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
-// Import i18n configuration
+// Import i18n configuration before any components that use it
 import './i18n';
 // Import Mapbox CSS
 import 'mapbox-gl/dist/mapbox-gl.css';
