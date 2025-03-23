@@ -25,15 +25,14 @@ export const useRouteDisplay = ({
     routes,
     activeMode,
     setActiveMode,
-    calculateAllRoutes,
-    loading
+    calculateAllRoutes
   } = useMapboxRoutes();
 
   const [alternativeRoutes, setAlternativeRoutes] = useState<any[]>([]);
   const [selectedRoute, setSelectedRoute] = useState<any>(null);
   const [savedRoutes, setSavedRoutes] = useState<any[]>([]);
 
-  // Mise à jour des coordonnées from/to lorsque userLocation ou le résultat sélectionné change
+  // Update from/to coordinates when userLocation or selected result changes
   useEffect(() => {
     if (userLocation) {
       setFrom(userLocation);
@@ -51,23 +50,23 @@ export const useRouteDisplay = ({
     }
   }, [selectedResultId, searchResults, setTo]);
 
-  // Calculer les itinéraires lorsque from et to sont définis
+  // Calculate routes when from and to are defined
   useEffect(() => {
     if (from && to && selectedResultId) {
       calculateAllRoutes();
     }
   }, [from, to, selectedResultId, transportMode, calculateAllRoutes]);
 
-  // Récupérer les itinéraires alternatifs
+  // Get alternative routes
   const fetchAlternativeRoutes = useCallback(async () => {
     if (!from || !to) return;
     
     try {
-      // Code pour récupérer des itinéraires alternatifs
-      // Dans une implémentation réelle, on ferait appel à Mapbox Directions API
-      // avec le paramètre alternatives=true
+      // Code to fetch alternative routes
+      // In a real implementation, we would call Mapbox Directions API
+      // with the alternatives=true parameter
       
-      // Pour l'instant, simulons avec des données d'exemple
+      // For now, simulate with example data
       const mockAlternatives = [
         {
           id: 'alt-1',
@@ -79,7 +78,7 @@ export const useRouteDisplay = ({
         {
           id: 'alt-2',
           name: 'Itinéraire alternatif',
-          distance: routes[activeMode].distance * 1.1, // Légèrement plus long
+          distance: routes[activeMode].distance * 1.1, // Slightly longer
           duration: routes[activeMode].duration * 1.2,
           description: 'Moins de trafic'
         },
@@ -95,19 +94,19 @@ export const useRouteDisplay = ({
       setAlternativeRoutes(mockAlternatives);
       setSelectedRoute(mockAlternatives[0]);
     } catch (error) {
-      console.error('Erreur lors de la récupération des itinéraires alternatifs:', error);
+      console.error('Error fetching alternative routes:', error);
       toast.error('Impossible de récupérer les itinéraires alternatifs');
     }
   }, [from, to, routes, activeMode]);
 
-  // Charger les itinéraires alternatifs lorsqu'un itinéraire est calculé
+  // Load alternative routes when a route is calculated
   useEffect(() => {
     if (routes[activeMode]?.geometry && from && to) {
       fetchAlternativeRoutes();
     }
   }, [routes, activeMode, from, to, fetchAlternativeRoutes]);
 
-  // Fonction pour enregistrer un itinéraire
+  // Function to save a route
   const saveRoute = useCallback((route: any, mode: string) => {
     const selectedResult = searchResults.find(r => r.id === selectedResultId);
     if (!selectedResult) return;
@@ -125,11 +124,11 @@ export const useRouteDisplay = ({
     
     setSavedRoutes(prev => {
       const newSavedRoutes = [...prev, savedRoute];
-      // Stocker en localStorage
+      // Store in localStorage
       try {
         localStorage.setItem('saved_routes', JSON.stringify(newSavedRoutes));
       } catch (error) {
-        console.error('Erreur lors de l\'enregistrement des itinéraires:', error);
+        console.error('Error saving routes:', error);
       }
       return newSavedRoutes;
     });
@@ -137,7 +136,7 @@ export const useRouteDisplay = ({
     toast.success(`Itinéraire vers ${selectedResult.name} enregistré`);
   }, [from, to, selectedResultId, searchResults]);
 
-  // Charger les itinéraires enregistrés depuis localStorage au montage
+  // Load saved routes from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('saved_routes');
@@ -145,7 +144,7 @@ export const useRouteDisplay = ({
         setSavedRoutes(JSON.parse(saved));
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des itinéraires enregistrés:', error);
+      console.error('Error loading saved routes:', error);
     }
   }, []);
 
@@ -159,8 +158,7 @@ export const useRouteDisplay = ({
     selectedRoute,
     setSelectedRoute,
     saveRoute,
-    savedRoutes,
-    loading
+    savedRoutes
   };
 };
 

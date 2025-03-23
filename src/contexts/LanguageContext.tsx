@@ -1,49 +1,65 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { translations } from '@/utils/translations';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
-interface LanguageContextType {
+interface LanguageContextProps {
   language: string;
   setLanguage: (lang: string) => void;
   t: (key: string) => string;
+  languages: {code: string, name: string}[];
 }
 
-const LanguageContext = createContext<LanguageContextType>({
-  language: 'fr',
+const defaultLanguage = localStorage.getItem('language') || 'fr';
+
+const LanguageContext = createContext<LanguageContextProps>({
+  language: defaultLanguage,
   setLanguage: () => {},
   t: (key: string) => key,
+  languages: [
+    { code: 'fr', name: 'Français' },
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'it', name: 'Italiano' },
+    { code: 'pt', name: 'Português' }
+  ]
 });
 
-export const useLanguage = () => useContext(LanguageContext);
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useTranslation();
+  const [language, setLanguageState] = useState(defaultLanguage);
+  
+  const languages = [
+    { code: 'fr', name: 'Français' },
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'it', name: 'Italiano' },
+    { code: 'pt', name: 'Português' }
+  ];
 
-interface LanguageProviderProps {
-  children: ReactNode;
-}
-
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  // Get language from localStorage or use default
-  const [language, setLanguage] = useState(() => {
-    const storedLanguage = localStorage.getItem('language');
-    return storedLanguage || 'fr';
-  });
-
-  // Save language to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
-
-  // Translation function
-  const t = (key: string): string => {
-    if (!translations[language] || !translations[language][key]) {
-      // Fallback to English, then to the key itself
-      return translations['en']?.[key] || key;
-    }
-    return translations[language][key];
+  const setLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('language', lang);
+    setLanguageState(lang);
   };
 
+  useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language]);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, languages }}>
       {children}
     </LanguageContext.Provider>
   );
 };
+
+export const useLanguage = (): LanguageContextProps => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
+
+export default LanguageContext;
