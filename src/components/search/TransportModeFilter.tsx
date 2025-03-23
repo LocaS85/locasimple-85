@@ -16,10 +16,10 @@ const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
   const { t } = useTranslation();
   
   const modes = [
-    { id: 'driving', icon: <Car size={18} />, label: t('driving') || 'Voiture' },
-    { id: 'walking', icon: <PersonStanding size={18} />, label: t('walking') || 'À pied' },
-    { id: 'cycling', icon: <Bike size={18} />, label: t('cycling') || 'Vélo' },
-    { id: 'transit', icon: <Bus size={18} />, label: t('transit') || 'Transport' }
+    { id: 'driving', icon: <Car size={18} />, label: t('driving') },
+    { id: 'walking', icon: <PersonStanding size={18} />, label: t('walking') },
+    { id: 'cycling', icon: <Bike size={18} />, label: t('cycling') },
+    { id: 'transit', icon: <Bus size={18} />, label: t('transit') }
   ];
 
   return (
