@@ -10,10 +10,13 @@ interface LanguageContextProps {
   languages: {code: string, name: string}[];
 }
 
-const defaultLanguage = localStorage.getItem('language') || 'fr';
+// Obtenir la langue depuis localStorage ou utiliser français par défaut
+const getInitialLanguage = () => {
+  return localStorage.getItem('i18nextLng') || 'fr';
+};
 
 const LanguageContext = createContext<LanguageContextProps>({
-  language: defaultLanguage,
+  language: getInitialLanguage(),
   setLanguage: () => {},
   t: (key: string) => key,
   languages: [
@@ -27,7 +30,7 @@ const LanguageContext = createContext<LanguageContextProps>({
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { t } = useTranslation();
-  const [language, setLanguageState] = useState(defaultLanguage);
+  const [language, setLanguageState] = useState(getInitialLanguage());
   
   const languages = [
     { code: 'fr', name: 'Français' },
@@ -39,13 +42,34 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const setLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
-    localStorage.setItem('language', lang);
+    localStorage.setItem('i18nextLng', lang);
     setLanguageState(lang);
   };
 
+  // Synchroniser l'état avec localStorage si changé ailleurs
   useEffect(() => {
-    i18n.changeLanguage(language);
+    const handleLanguageChange = () => {
+      const currentLang = i18n.language;
+      if (currentLang !== language) {
+        setLanguageState(currentLang);
+      }
+    };
+
+    i18n.on('languageChanged', handleLanguageChange);
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
   }, [language]);
+
+  useEffect(() => {
+    // Initialiser la langue au démarrage
+    const savedLanguage = localStorage.getItem('i18nextLng');
+    if (savedLanguage) {
+      i18n.changeLanguage(savedLanguage);
+      setLanguageState(savedLanguage);
+    }
+  }, []);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, languages }}>

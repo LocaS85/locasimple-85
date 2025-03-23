@@ -10,20 +10,31 @@ import es from './locales/es.json';
 import it from './locales/it.json';
 import pt from './locales/pt.json';
 
-// Initialize i18next
+// Liste des langues supportées
+const supportedLanguages = ['fr', 'en', 'es', 'it', 'pt'];
+
+// Construction dynamique des ressources
+const resources = {
+  fr: { translation: fr },
+  en: { translation: en },
+  es: { translation: es },
+  it: { translation: it },
+  pt: { translation: pt },
+};
+
+// Configuration i18next avec option de mémorisation de la langue
 i18n
   .use(initReactI18next)
   .use(LanguageDetector)
   .init({
-    resources: {
-      fr: { translation: fr },
-      en: { translation: en },
-      es: { translation: es },
-      it: { translation: it },
-      pt: { translation: pt },
-    },
-    fallbackLng: 'fr',
+    resources,
+    fallbackLng: localStorage.getItem('i18nextLng') || 'fr',
     interpolation: { escapeValue: false },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      lookupLocalStorage: 'i18nextLng',
+      caches: ['localStorage'],
+    },
     debug: process.env.NODE_ENV === 'development',
   });
 
