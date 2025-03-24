@@ -7,11 +7,13 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: "0.0.0.0", // Use 0.0.0.0 instead of :: for better compatibility
     port: 8080,
     hmr: {
       // Ensure HMR (Hot Module Replacement) works properly
       clientPort: 443, // Use SSL port for secure connections
+      host: '127.0.0.1', // Use localhost for HMR connections
+      protocol: 'wss', // Use secure WebSocket
       overlay: true, // Show errors as overlay
     },
   },
@@ -33,6 +35,7 @@ export default defineConfig(({ mode }) => ({
   },
   // Use the override typescript configuration
   optimizeDeps: {
-    force: true // Forces dependencies to be re-optimized when config changes
+    force: true, // Forces dependencies to be re-optimized when config changes
+    exclude: ['lovable-tagger'], // Exclude problematic dependencies
   }
 }));

@@ -8,8 +8,15 @@ import './i18n';
 // Import Mapbox CSS
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Ensure DOM is ready before mounting
+const root = document.getElementById('root');
+
+if (root) {
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} else {
+  console.error("Root element not found! Make sure there is a div with id 'root' in your HTML.");
+}
