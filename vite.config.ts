@@ -9,6 +9,11 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    hmr: {
+      // Ensure HMR (Hot Module Replacement) works properly
+      clientPort: 443, // Use SSL port for secure connections
+      overlay: true, // Show errors as overlay
+    },
   },
   plugins: [
     react(),
