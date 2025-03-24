@@ -39,8 +39,14 @@ const initApp = () => {
 };
 
 // S'assurer que le DOM est complètement chargé avant de monter l'application
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM fully loaded, initializing app');
   initApp();
+});
+
+// En cas de perte de connexion au serveur de développement
+if (import.meta.hot) {
+  import.meta.hot.on('vite:beforeUpdate', () => {
+    console.log('HMR update detected');
+  });
 }

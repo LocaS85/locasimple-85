@@ -8,7 +8,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: '0.0.0.0',  // Utiliser 0.0.0.0 pour une meilleure accessibilité
-    port: 3000,       // Utiliser le port 3000 comme suggéré
+    port: 8080,       // Utiliser le port 8080 comme demandé
     strictPort: true, // Échouer si le port est déjà utilisé
     cors: true,       // Activer CORS pour toutes les origines
     hmr: {
@@ -17,6 +17,10 @@ export default defineConfig(({ mode }) => ({
       protocol: 'wss',    // Utiliser WebSocket sécurisé
       overlay: true,      // Afficher les erreurs en overlay
     },
+    watch: {
+      usePolling: true,   // Utiliser le polling pour détecter les changements (plus fiable)
+    },
+    open: true,           // Ouvrir automatiquement le navigateur
   },
   plugins: [
     react(),
@@ -38,5 +42,11 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     force: true,  // Forcer la réoptimisation des dépendances lors des changements de config
     exclude: ['lovable-tagger'],  // Exclure les dépendances problématiques
+  },
+  preview: {
+    port: 8080,
+    host: '0.0.0.0',
+    strictPort: true,
+    cors: true,
   }
 }));
