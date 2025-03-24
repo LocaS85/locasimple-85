@@ -26,4 +26,8 @@ export default defineConfig(({ mode }) => ({
     // Reduce chunk size for better performance on mobile
     chunkSizeWarningLimit: 1000,
   },
+  // Use the override typescript configuration
+  optimizeDeps: {
+    force: true // Forces dependencies to be re-optimized when config changes
+  }
 }));
