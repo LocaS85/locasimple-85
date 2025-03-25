@@ -48,5 +48,7 @@ export default defineConfig(({ mode }) => ({
     host: '0.0.0.0',
     strictPort: true,
     cors: true,
-  }
+  },
+  // Configuration pour GitHub Pages - utiliser chemin relatif
+  base: './'
 }));
