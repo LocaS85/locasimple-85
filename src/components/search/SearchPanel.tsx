@@ -39,8 +39,8 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
   };
 
   return (
-    <div className="absolute top-4 left-0 right-0 px-4 z-10">
-      <form onSubmit={handleSearchSubmit} className="flex flex-col gap-2">
+    <div className="absolute top-2 left-0 right-0 px-4 z-10">
+      <form onSubmit={handleSearchSubmit} className="flex flex-col gap-1">
         <div className="flex gap-2">
           <div className="flex-grow">
             <SearchInput
@@ -69,16 +69,6 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
             ) : (
               <Search className="h-5 w-5" />
             )}
-          </Button>
-          
-          <Button 
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={generatePDF}
-            disabled={loading}
-          >
-            <Download className="h-5 w-5" />
           </Button>
         </div>
       </form>

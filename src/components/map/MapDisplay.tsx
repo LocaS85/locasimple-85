@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -34,6 +33,7 @@ interface MapDisplayProps {
   loading: boolean;
   handleLocationClick: () => void;
   transportMode: string;
+  setMap?: (map: mapboxgl.Map) => void;
 }
 
 const MapDisplay: React.FC<MapDisplayProps> = ({
@@ -49,7 +49,8 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
   userLocation,
   loading,
   handleLocationClick,
-  transportMode
+  transportMode,
+  setMap
 }) => {
   const mapRef = useRef<any>(null);
   const geocoderContainerRef = useRef<HTMLDivElement>(null);

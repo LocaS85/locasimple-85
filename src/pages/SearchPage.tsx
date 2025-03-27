@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchPageState } from '@/hooks/useSearchPageState';
 import SearchHeader from '@/components/search/SearchHeader';
@@ -10,6 +9,7 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 import { Printer, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Result } from '@/components/ResultsList';
+import SearchFooter from '@/components/search/SearchFooter';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,7 +28,6 @@ const SearchPage = () => {
   });
   const [showRoutes, setShowRoutes] = useState(true);
   
-  // Convert search results to places format for the map
   const places: Result[] = searchResults.map((result: any, index: number) => ({
     id: result.id || `place-${index}`,
     name: result.name,
@@ -41,7 +40,6 @@ const SearchPage = () => {
     color: index % 2 === 0 ? '#0EA5E9' : '#8B5CF6' // Alternate colors
   }));
 
-  // Handle location button click
   const handleLocationClick = () => {
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
@@ -66,7 +64,6 @@ const SearchPage = () => {
     );
   };
 
-  // Handle search submission
   const performSearch = async (query: string) => {
     if (!query.trim()) {
       toast.error('Veuillez entrer un terme de recherche');
@@ -88,7 +85,6 @@ const SearchPage = () => {
       if (response.data && response.data.length > 0) {
         setSearchResults(response.data);
         
-        // Center map on first result
         setViewport({
           latitude: response.data[0].lat,
           longitude: response.data[0].lon,
@@ -104,7 +100,6 @@ const SearchPage = () => {
       console.error('Erreur lors de la recherche:', error);
       toast.error('Erreur lors de la recherche. Vérifiez que le serveur Flask est démarré.');
       
-      // Fallback to use Mapbox API directly if Flask server is not running
       try {
         await searchWithMapbox(query);
       } catch (mapboxError) {
@@ -115,7 +110,6 @@ const SearchPage = () => {
     }
   };
 
-  // Fallback search method using Mapbox directly
   const searchWithMapbox = async (query: string) => {
     if (!MAPBOX_TOKEN) {
       toast.error('Token Mapbox manquant');
@@ -137,7 +131,6 @@ const SearchPage = () => {
       );
 
       if (response.data && response.data.features.length > 0) {
-        // Transform mapbox results to match our format
         const formattedResults = response.data.features.map((feature: any) => ({
           id: feature.id,
           name: feature.text,
@@ -145,13 +138,12 @@ const SearchPage = () => {
           lon: feature.center[0],
           place_name: feature.place_name,
           category: feature.properties?.category || '',
-          distance: 0, // Would need to calculate
-          duration: 0  // Would need to calculate
+          distance: 0,
+          duration: 0
         }));
 
         setSearchResults(formattedResults);
         
-        // Center map on first result
         setViewport({
           latitude: formattedResults[0].lat,
           longitude: formattedResults[0].lon,
@@ -170,7 +162,6 @@ const SearchPage = () => {
     }
   };
 
-  // Handle clicking on a search result
   const handleResultClick = (place: any) => {
     setSelectedPlaceId(place.id);
     setPopupInfo(place);
@@ -181,7 +172,6 @@ const SearchPage = () => {
     });
   };
 
-  // Generate PDF with current results
   const generatePDF = async () => {
     if (places.length === 0) {
       toast.error('Aucun résultat à exporter');
@@ -193,7 +183,6 @@ const SearchPage = () => {
       const response = await axios.post('http://127.0.0.1:5000/generate_pdf', { places });
       toast.success('PDF généré avec succès');
       
-      // Open the PDF in a new window/tab
       window.open('resultats.pdf');
     } catch (error) {
       console.error('Erreur lors de la génération du PDF:', error);
@@ -203,12 +192,10 @@ const SearchPage = () => {
     }
   };
 
-  // Toggle route display
   const toggleRoutes = () => {
     setShowRoutes(!showRoutes);
   };
 
-  // Check if Flask server is running on component mount
   useEffect(() => {
     const checkFlaskServer = async () => {
       try {
@@ -225,7 +212,6 @@ const SearchPage = () => {
     
     checkFlaskServer();
     
-    // Attempt to get user location on mount
     handleLocationClick();
   }, []);
 
@@ -272,7 +258,6 @@ const SearchPage = () => {
           timeUnit="minutes"
         />
         
-        {/* Search Panel overlay */}
         <SearchPanel 
           query={searchQuery}
           setQuery={setSearchQuery}
@@ -288,22 +273,12 @@ const SearchPage = () => {
           setLimit={setResultsCount}
         />
         
-        {/* Control buttons */}
-        <div className="absolute top-4 right-4 flex space-x-2 z-20">
-          <Button variant="outline" size="sm" onClick={generatePDF} className="bg-white">
-            <Printer className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={toggleRoutes} 
-            className={`${showRoutes ? 'bg-blue-100' : 'bg-white'}`}
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
-        </div>
+        <SearchFooter 
+          generatePDF={generatePDF}
+          toggleRoutes={toggleRoutes}
+          showRoutes={showRoutes}
+        />
         
-        {/* Results list */}
         {searchResults.length > 0 && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-10 px-4">
             <div className="bg-white rounded-lg shadow-lg p-2 max-h-60 overflow-y-auto">

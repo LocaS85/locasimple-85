@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import type { Result } from '../ResultsList';
 import RadiusCircle from './RadiusCircle';
@@ -119,28 +118,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         setMap={setMap}
       />
       
-      {/* Map Controls with more minimal UI */}
-      <div className="absolute top-4 right-4 z-10">
-        <MapControls
-          mapStyle={mapStyle}
-          onStyleChange={(newStyle: MapStyle) => {
-            setMapStyle(newStyle);
-            toast.success(`Style de carte changé en ${newStyle}`);
-          }}
-          selectedCategory={selectedCategory}
-          onCategorySelect={onCategorySelect || (() => {})}
-          map={map}
-          minimal={true}
-          onTransportModeClick={() => {
-            // Handle transport mode click
-          }}
-          onFiltersClick={() => {
-            // Handle filters click
-          }}
-        />
-      </div>
-      
-      {/* Results Counter */}
+      {/* Map Results */}
       <MapResults results={results} />
     </div>
   );
