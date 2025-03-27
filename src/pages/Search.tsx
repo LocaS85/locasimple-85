@@ -1,14 +1,9 @@
 
 import React from 'react';
-import { SearchContainer } from '@/components/search/SearchContainer';
-import Layout from '@/components/Layout';
+import SearchPage from './SearchPage';
 
 const Search = () => {
-  return (
-    <Layout className="h-screen p-0 overflow-hidden">
-      <SearchContainer />
-    </Layout>
-  );
+  return <SearchPage />;
 };
 
 export default Search;

@@ -20,13 +20,13 @@ const ResultDetail: React.FC<ResultDetailProps> = ({ result }) => {
       <div className="mt-2 grid grid-cols-2 gap-2">
         <div>
           <span className="text-gray-500">{t('distance')}:</span> 
-          <span className="font-medium ml-1">{result.distance?.toFixed(1)} km</span>
+          <span className="font-medium ml-1">{result.distance.toFixed(1)} km</span>
         </div>
         <div>
           <span className="text-gray-500">{t('duration')}:</span> 
           <span className="font-medium ml-1">{result.duration} min</span>
         </div>
-        {result.rating !== undefined && (
+        {result.rating && (
           <div>
             <span className="text-gray-500">{t('rating')}:</span> 
             <span className="font-medium ml-1">{result.rating}/5</span>

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Car, Footprints, Bike, Bus } from 'lucide-react';
-import { transportModes } from '@/data/transportModes';
+import { TransportMode, transportModes } from '@/data/transportModes';
+import { Car, Bike, MapPin, Bus, Shuffle } from 'lucide-react';
 
 interface TransportModeSelectorProps {
   transportMode: string;
@@ -12,30 +12,43 @@ export const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
   transportMode,
   onTransportModeChange
 }) => {
-  // Transport mode icons
-  const icons = {
-    driving: <Car size={20} />,
-    walking: <Footprints size={20} />,
-    cycling: <Bike size={20} />,
-    transit: <Bus size={20} />
+  // Get the appropriate icon based on transport mode
+  const getTransportIcon = (mode: string) => {
+    switch (mode) {
+      case 'driving':
+      case 'driving-traffic':
+        return <Car className="h-4 w-4" />;
+      case 'cycling':
+        return <Bike className="h-4 w-4" />;
+      case 'walking':
+        return <MapPin className="h-4 w-4" />; // Changed from Walking to MapPin
+      case 'transit':
+        return <Bus className="h-4 w-4" />;
+      default:
+        return <Shuffle className="h-4 w-4" />;
+    }
   };
 
   return (
-    <div className="flex justify-between rounded-full overflow-hidden border border-gray-200 shadow-sm">
-      {Object.keys(transportModes).map((mode) => (
-        <button
-          key={mode}
-          className={`flex items-center justify-center px-3 py-2 transition-colors ${
-            transportMode === mode
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => onTransportModeChange(mode)}
-          title={transportModes[mode].label}
-        >
-          {icons[mode as keyof typeof icons] || <Car size={20} />}
-        </button>
-      ))}
+    <div className="flex justify-between items-center w-full p-1 bg-gray-100 rounded-full">
+      {transportModes.map((mode) => {
+        const isSelected = transportMode === mode.id;
+        return (
+          <button
+            key={mode.id}
+            onClick={() => onTransportModeChange(mode.id)}
+            className={`flex items-center justify-center space-x-1 py-1.5 px-3 rounded-full transition-colors ${
+              isSelected
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-gray-600 hover:bg-gray-200'
+            }`}
+            aria-pressed={isSelected}
+          >
+            {getTransportIcon(mode.id)}
+            <span className="text-xs font-medium">{mode.name}</span>
+          </button>
+        );
+      })}
     </div>
   );
 };

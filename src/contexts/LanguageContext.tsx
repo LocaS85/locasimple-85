@@ -1,89 +1,49 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { translations } from '@/utils/translations';
 
-interface LanguageContextProps {
+interface LanguageContextType {
   language: string;
   setLanguage: (lang: string) => void;
   t: (key: string) => string;
-  languages: {code: string, name: string}[];
 }
 
-// Obtenir la langue depuis localStorage ou utiliser français par défaut
-const getInitialLanguage = () => {
-  return localStorage.getItem('i18nextLng') || 'fr';
-};
-
-const LanguageContext = createContext<LanguageContextProps>({
-  language: getInitialLanguage(),
+const LanguageContext = createContext<LanguageContextType>({
+  language: 'fr',
   setLanguage: () => {},
   t: (key: string) => key,
-  languages: [
-    { code: 'fr', name: 'Français' },
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'it', name: 'Italiano' },
-    { code: 'pt', name: 'Português' }
-  ]
 });
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { t } = useTranslation();
-  const [language, setLanguageState] = useState(getInitialLanguage());
-  
-  const languages = [
-    { code: 'fr', name: 'Français' },
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'it', name: 'Italiano' },
-    { code: 'pt', name: 'Português' }
-  ];
+export const useLanguage = () => useContext(LanguageContext);
 
-  const setLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
-    localStorage.setItem('i18nextLng', lang);
-    setLanguageState(lang);
-  };
+interface LanguageProviderProps {
+  children: ReactNode;
+}
 
-  // Synchroniser l'état avec localStorage si changé ailleurs
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  // Get language from localStorage or use default
+  const [language, setLanguage] = useState(() => {
+    const storedLanguage = localStorage.getItem('language');
+    return storedLanguage || 'fr';
+  });
+
+  // Save language to localStorage when it changes
   useEffect(() => {
-    const handleLanguageChange = () => {
-      const currentLang = i18n.language;
-      if (currentLang !== language) {
-        setLanguageState(currentLang);
-      }
-    };
-
-    i18n.on('languageChanged', handleLanguageChange);
-    
-    return () => {
-      i18n.off('languageChanged', handleLanguageChange);
-    };
+    localStorage.setItem('language', language);
   }, [language]);
 
-  useEffect(() => {
-    // Initialiser la langue au démarrage
-    const savedLanguage = localStorage.getItem('i18nextLng');
-    if (savedLanguage) {
-      i18n.changeLanguage(savedLanguage);
-      setLanguageState(savedLanguage);
+  // Translation function
+  const t = (key: string): string => {
+    if (!translations[language] || !translations[language][key]) {
+      // Fallback to English, then to the key itself
+      return translations['en']?.[key] || key;
     }
-  }, []);
+    return translations[language][key];
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, languages }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 };
-
-export const useLanguage = (): LanguageContextProps => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
-};
-
-export default LanguageContext;

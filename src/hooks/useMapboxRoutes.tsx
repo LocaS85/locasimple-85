@@ -13,6 +13,13 @@ interface RouteResponse {
   legs: any[];
 }
 
+interface UseMapboxRoutesState {
+  from?: [number, number];
+  to?: [number, number];
+  routes: Record<TransportMode, RouteResponse>;
+  activeMode: TransportMode;
+}
+
 const transportModeMap: Record<TransportMode, string> = {
   'driving': 'driving',
   'walking': 'walking',

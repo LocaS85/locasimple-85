@@ -10,6 +10,7 @@ class MapboxDirectionsService {
   constructor() {
     this.token = MAPBOX_TOKEN || '';
     
+    // Vérification du token à l'initialisation
     if (!this.token) {
       console.error('Mapbox token missing. Directions functionality will be limited.');
       toast.error('Clé API Mapbox manquante. Les itinéraires seront limités.');
@@ -19,18 +20,25 @@ class MapboxDirectionsService {
   }
 
   /**
+   * Checks if the token is defined
+   */
+  private checkToken(): boolean {
+    if (!this.token) {
+      console.error('Mapbox token missing for directions request');
+      toast.error('Clé API Mapbox manquante pour les itinéraires');
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Calculate route between multiple points
    */
   async getDirections(
     waypoints: [number, number][],
     options: RouteOptions
   ): Promise<RouteResponse | null> {
-    if (!this.token) {
-      console.error('Mapbox token missing for directions request');
-      toast.error('Clé API Mapbox manquante pour les itinéraires');
-      return null;
-    }
-    
+    if (!this.checkToken()) return null;
     if (waypoints.length < 2) {
       console.error('At least 2 waypoints required for directions');
       return null;
@@ -62,7 +70,23 @@ class MapboxDirectionsService {
         params.append('annotations', options.annotations.join(','));
       }
 
-      console.log(`Fetching directions: ${endpoint}?${params.toString().replace(this.token, 'API_KEY_HIDDEN')}`);
+      if (options.continue_straight !== undefined) {
+        params.append('continue_straight', String(options.continue_straight));
+      }
+
+      if (options.voice_instructions !== undefined) {
+        params.append('voice_instructions', String(options.voice_instructions));
+      }
+
+      if (options.banner_instructions !== undefined) {
+        params.append('banner_instructions', String(options.banner_instructions));
+      }
+
+      if (options.waypoints_per_route !== undefined) {
+        params.append('waypoints_per_route', String(options.waypoints_per_route));
+      }
+
+      console.log(`Fetching directions: ${endpoint}?${params.toString()}`);
       const response = await fetch(`${endpoint}?${params.toString()}`);
       
       if (!response.ok) {
@@ -85,6 +109,7 @@ class MapboxDirectionsService {
     waypoints: [number, number][],
     modes: TransportMode[]
   ): Promise<Record<TransportMode, RouteResponse | null>> {
+    // Initialiser tous les modes avec null
     const results: Record<TransportMode, RouteResponse | null> = {
       'driving': null,
       'walking': null,

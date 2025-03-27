@@ -1,141 +1,106 @@
 
-import React, { FormEvent } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState, useRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { Mic, MapPin, Search, X, Menu, Car, Bike, PersonStanding, Bus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, Mic, MapPin, Menu, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface TransparentSearchBarProps {
   searchQuery: string;
-  onSearchChange: (value: string) => void;
-  onSearch: () => void;
-  isRecording: boolean;
-  onMicClick: () => void;
+  onSearchChange: (query: string) => void;
+  onSearch: (query: string) => void;
+  isRecording?: boolean;
+  onMicClick?: () => void;
   isLocationActive?: boolean;
   onLocationClick?: () => void;
   loading?: boolean;
-  transportMode?: string;
-  onTransportModeChange?: (mode: string) => void;
+  transportMode: string;
+  onTransportModeChange: (mode: string) => void;
   onMenuClick?: () => void;
 }
 
-const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
+export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
   searchQuery,
   onSearchChange,
   onSearch,
-  isRecording,
-  onMicClick,
+  isRecording = false,
+  onMicClick = () => {},
   isLocationActive = false,
-  onLocationClick,
+  onLocationClick = () => {},
   loading = false,
-  transportMode = 'driving',
+  transportMode,
   onTransportModeChange,
-  onMenuClick
+  onMenuClick = () => {}
 }) => {
-  const handleSubmit = (e: FormEvent) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch();
+    onSearch(searchQuery);
   };
 
-  const transportModes = [
-    { id: 'driving', icon: Car, label: 'Voiture' },
-    { id: 'walking', icon: PersonStanding, label: 'À pied' },
-    { id: 'cycling', icon: Bike, label: 'Vélo' },
-    { id: 'transit', icon: Bus, label: 'Transport' }
-  ];
+  const handleClearSearch = () => {
+    onSearchChange('');
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="relative w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md border border-gray-200">
-          {/* Bouton Menu */}
+        <div className="relative flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-gray-200 px-2">
           <Button
+            type="button"
             variant="ghost"
             size="icon"
-            type="button"
             onClick={onMenuClick}
-            className="rounded-full"
+            className="h-10 w-10 flex-shrink-0 text-primary hover:bg-primary/10 rounded-full"
+            aria-label="Menu"
           >
-            <Menu className="h-5 w-5 text-gray-500" />
+            <Menu className="h-5 w-5" />
           </Button>
           
-          {/* Champ de recherche */}
-          <Input
-            type="text"
-            placeholder="Rechercher un lieu..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
-          
-          {/* Bouton de réinitialisation */}
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              type="button"
-              onClick={() => onSearchChange('')}
-              className="rounded-full"
-            >
-              <X className="h-4 w-4 text-gray-500" />
-            </Button>
-          )}
-          
-          {/* Bouton Microphone */}
-          <Button
-            variant="ghost"
-            size="icon"
-            type="button"
-            onClick={onMicClick}
-            className={`rounded-full ${isRecording ? 'text-red-500' : 'text-gray-500'}`}
-          >
-            <Mic className={`h-5 w-5 ${isRecording && 'animate-pulse'}`} />
-          </Button>
-          
-          {/* Bouton Localisation */}
-          <Button
-            variant="ghost"
-            size="icon"
-            type="button"
-            onClick={onLocationClick}
-            className={`rounded-full ${isLocationActive ? 'text-blue-500' : 'text-gray-500'}`}
-          >
-            <MapPin className="h-5 w-5" />
-          </Button>
-          
-          {/* Bouton Recherche */}
-          <Button
-            variant="default"
-            size="icon"
-            type="submit"
-            className="rounded-full bg-blue-500 hover:bg-blue-600"
-            disabled={loading}
-          >
-            {loading ? (
-              <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
+          <div className="relative flex-grow">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
               <Search className="h-5 w-5" />
+            </div>
+            
+            <Input
+              ref={inputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Rechercher un lieu, une entreprise..."
+              className="pl-10 pr-2 py-2 h-10 border-0 shadow-none bg-transparent focus:ring-0 w-full"
+            />
+            
+            {searchQuery && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                onClick={handleClearSearch}
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             )}
+          </div>
+          
+          <Button 
+            type="button"
+            variant="ghost" 
+            size="icon" 
+            className={`h-10 w-10 flex-shrink-0 rounded-full ${isRecording ? 'text-red-500 bg-red-50' : 'text-orange-500 hover:bg-orange-50'}`}
+            onClick={onMicClick}
+            aria-label="Voice search"
+          >
+            <Mic className="h-5 w-5" />
           </Button>
         </div>
       </form>
-      
-      {/* Modes de transport */}
-      <div className="flex items-center justify-center gap-1 mt-2">
-        {transportModes.map(({ id, icon: Icon, label }) => (
-          <Button
-            key={id}
-            variant={transportMode === id ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onTransportModeChange && onTransportModeChange(id)}
-            className={`rounded-full px-3 py-1 h-8 ${
-              transportMode === id ? 'bg-blue-500 text-white' : 'bg-white/80'
-            }`}
-          >
-            <Icon className="h-3 w-3 mr-1" />
-            <span className="text-xs">{label}</span>
-          </Button>
-        ))}
-      </div>
     </div>
   );
 };

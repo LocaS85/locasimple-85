@@ -5,17 +5,75 @@ import mapboxgl from 'mapbox-gl';
 interface RouteInfo {
   distance: number;
   duration: number;
-  coordinates: any[];
+  coordinates: [number, number][];
 }
 
 export const useRoutePopup = (
   map: mapboxgl.Map | null,
   placeName?: string,
-  showDistance = true,
-  showDuration = true,
+  showDistance?: boolean,
+  showDuration?: boolean,
   routeInfo?: RouteInfo
 ) => {
   const popupRef = useRef<mapboxgl.Popup | null>(null);
+
+  const formatDuration = (seconds: number): string => {
+    if (!seconds) return '';
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ''}`;
+  };
+
+  const formatDistance = (meters: number): string => {
+    if (!meters) return '';
+    const km = meters / 1000;
+    return km < 10 ? `${km.toFixed(1)} km` : `${Math.round(km)} km`;
+  };
+
+  const showPopup = useCallback(
+    (coordinate: [number, number]) => {
+      if (!map) return;
+
+      // Remove existing popup
+      if (popupRef.current) {
+        popupRef.current.remove();
+      }
+
+      // Don't show popup if no place name
+      if (!placeName) return;
+
+      // Create HTML content for popup
+      let popupContent = `<div class="text-sm font-medium">${placeName}</div>`;
+      
+      // Add distance and duration if available
+      if (routeInfo) {
+        if (showDistance && routeInfo.distance) {
+          popupContent += `<div class="text-xs text-gray-600 mt-1">Distance: ${formatDistance(routeInfo.distance)}</div>`;
+        }
+        
+        if (showDuration && routeInfo.duration) {
+          popupContent += `<div class="text-xs text-gray-600">Durée: ${formatDuration(routeInfo.duration)}</div>`;
+        }
+      }
+
+      // Create popup
+      const popup = new mapboxgl.Popup({
+        closeButton: true,
+        closeOnClick: false,
+        className: 'route-popup',
+        maxWidth: '220px',
+        offset: 15
+      })
+        .setLngLat(coordinate)
+        .setHTML(popupContent)
+        .addTo(map);
+
+      popupRef.current = popup;
+    },
+    [map, placeName, showDistance, showDuration, routeInfo]
+  );
 
   const cleanupPopup = useCallback(() => {
     if (popupRef.current) {
@@ -23,51 +81,6 @@ export const useRoutePopup = (
       popupRef.current = null;
     }
   }, []);
-
-  const showPopup = useCallback(
-    (coordinates: [number, number]) => {
-      if (!map || !placeName) return;
-
-      // Clean up existing popup
-      cleanupPopup();
-
-      // Format distance and duration
-      const distance = routeInfo?.distance ? (routeInfo.distance / 1000).toFixed(1) : '?';
-      const duration = routeInfo?.duration ? Math.round(routeInfo.duration / 60) : '?';
-
-      // Create HTML content
-      const html = `
-        <div class="route-popup">
-          <h4 class="font-medium text-sm">${placeName}</h4>
-          ${
-            showDistance || showDuration
-              ? `<div class="text-xs text-gray-600 mt-1">
-                  ${showDistance ? `${distance} km` : ''}
-                  ${showDistance && showDuration ? ' • ' : ''}
-                  ${showDuration ? `${duration} min` : ''}
-                </div>`
-              : ''
-          }
-          <div class="mt-2">
-            <button class="start-navigation-btn bg-blue-500 text-white text-xs px-2 py-1 rounded">
-              Démarrer la navigation
-            </button>
-          </div>
-        </div>
-      `;
-
-      // Create and add the popup
-      popupRef.current = new mapboxgl.Popup({
-        closeButton: true,
-        closeOnClick: false,
-        className: 'route-popup'
-      })
-        .setLngLat(coordinates)
-        .setHTML(html)
-        .addTo(map);
-    },
-    [map, placeName, showDistance, showDuration, routeInfo, cleanupPopup]
-  );
 
   return {
     showPopup,

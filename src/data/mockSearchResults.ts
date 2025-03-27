@@ -127,9 +127,7 @@ export const generateFilteredMockResults = (
       latitude,
       longitude,
       rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // Rating between 3.0 and 5.0
-      openingHours: Math.random() > 0.3 ? 'Ouvert maintenant' : 'Fermé',
-      distanceInMeters: distance * 1000,
-      durationInSeconds: duration * 60
+      openingHours: Math.random() > 0.3 ? 'Ouvert maintenant' : 'Fermé'
     });
   }
   

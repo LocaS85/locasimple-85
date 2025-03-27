@@ -4,134 +4,160 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 export interface SearchResult {
   id: string;
   place_name: string;
-  name?: string;
-  center: [number, number];
-  text: string;
-  place_type: string[];
-  geometry: {
-    type: string;
-    coordinates: [number, number];
+  center: [number, number]; // [longitude, latitude]
+  properties?: {
+    category?: string;
+    description?: string;
+    [key: string]: any;
   };
-  properties: Record<string, any>;
-  isFavorite?: boolean;
+  [key: string]: any;
 }
 
 export interface SearchOptions {
   query: string;
-  proximity?: [number, number];
   limit?: number;
-  autocomplete?: boolean;
-  types?: string[];
   language?: string;
+  types?: string[];
+  proximity?: [number, number]; // [longitude, latitude]
+  bbox?: [number, number, number, number]; // [minLng, minLat, maxLng, maxLat]
+  country?: string[];
+  autocomplete?: boolean;
 }
 
-export interface RouteOptions {
-  profile?: 'driving' | 'walking' | 'cycling' | 'driving-traffic';
-  alternatives?: boolean;
-  steps?: boolean;
-  geometries?: 'geojson' | 'polyline';
-  overview?: 'full' | 'simplified' | 'false';
-  annotations?: string[];
-}
-
-export const mapboxService = {
+class MapboxService {
+  private baseUrl = 'https://api.mapbox.com';
+  
+  constructor(private apiKey: string = MAPBOX_TOKEN || '') {}
+  
+  /**
+   * Search for places using Mapbox Geocoding API
+   */
   async searchPlaces(options: SearchOptions): Promise<SearchResult[]> {
-    if (!MAPBOX_TOKEN) {
-      console.error('Mapbox token is missing');
-      return [];
-    }
-
     try {
-      console.log(`Searching for "${options.query}" with Mapbox API`);
-      
-      // Build URL and parameters
-      let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(options.query)}.json`;
-      
-      const params: Record<string, string> = {
-        access_token: MAPBOX_TOKEN,
-        limit: String(options.limit || 5)
-      };
-      
-      if (options.proximity) {
-        params.proximity = `${options.proximity[0]},${options.proximity[1]}`;
+      if (!this.apiKey) {
+        console.error('Mapbox API key is missing');
+        return [];
       }
       
-      if (options.autocomplete !== undefined) {
-        params.autocomplete = options.autocomplete ? 'true' : 'false';
+      const {
+        query,
+        limit = 5,
+        language = 'en',
+        types = ['poi', 'address', 'place'],
+        proximity,
+        bbox,
+        country,
+        autocomplete = true
+      } = options;
+      
+      // Build query parameters
+      const params = new URLSearchParams({
+        access_token: this.apiKey,
+        limit: limit.toString(),
+        language,
+        types: types.join(','),
+        autocomplete: autocomplete.toString()
+      });
+      
+      if (proximity) {
+        params.append('proximity', proximity.join(','));
       }
       
-      if (options.types && options.types.length > 0) {
-        params.types = options.types.join(',');
+      if (bbox) {
+        params.append('bbox', bbox.join(','));
       }
       
-      if (options.language) {
-        params.language = options.language;
+      if (country) {
+        params.append('country', country.join(','));
       }
       
-      // Append query parameters
-      url += '?' + new URLSearchParams(params).toString();
+      // Build the URL
+      const encodedQuery = encodeURIComponent(query);
+      const url = `${this.baseUrl}/geocoding/v5/mapbox.places/${encodedQuery}.json?${params.toString()}`;
       
-      // Execute the search
+      // Make the request
       const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error(`Mapbox search failed: ${response.status}`);
+        throw new Error(`Mapbox API error: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
-      
-      console.log(`Found ${data.features?.length || 0} results`);
-      
       return data.features || [];
     } catch (error) {
-      console.error('Error searching with Mapbox:', error);
+      console.error('Error searching places:', error);
       return [];
     }
-  },
+  }
   
+  /**
+   * Get directions between two points
+   */
   async getDirections(
-    origin: [number, number],
-    destination: [number, number],
-    options: RouteOptions = {}
+    start: [number, number], // [longitude, latitude]
+    end: [number, number], // [longitude, latitude]
+    profile: 'driving' | 'walking' | 'cycling' = 'driving'
   ): Promise<any> {
-    if (!MAPBOX_TOKEN) {
-      console.error('Mapbox token is missing');
-      return null;
-    }
-    
     try {
-      const profile = options.profile || 'driving';
-      let url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${origin[0]},${origin[1]};${destination[0]},${destination[1]}`;
-      
-      const params: Record<string, string> = {
-        access_token: MAPBOX_TOKEN,
-        geometries: options.geometries || 'geojson',
-        steps: (options.steps !== undefined) ? String(options.steps) : 'true',
-        overview: options.overview || 'full'
-      };
-      
-      if (options.alternatives !== undefined) {
-        params.alternatives = options.alternatives ? 'true' : 'false';
+      if (!this.apiKey) {
+        console.error('Mapbox API key is missing');
+        return null;
       }
       
-      if (options.annotations && options.annotations.length > 0) {
-        params.annotations = options.annotations.join(',');
-      }
-      
-      url += '?' + new URLSearchParams(params).toString();
+      const url = `${this.baseUrl}/directions/v5/mapbox/${profile}/${start.join(',')};${end.join(',')}?access_token=${this.apiKey}&geometries=geojson&overview=full&steps=true`;
       
       const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error(`Mapbox directions failed: ${response.status}`);
+        throw new Error(`Mapbox API error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data.routes?.[0] || null;
+    } catch (error) {
+      console.error('Error getting directions:', error);
+      return null;
+    }
+  }
+  
+  /**
+   * Get the distance and duration between two points
+   */
+  async getDistanceMatrix(
+    origins: [number, number][], // [[longitude, latitude], ...]
+    destinations: [number, number][], // [[longitude, latitude], ...]
+    profile: 'driving' | 'walking' | 'cycling' = 'driving'
+  ): Promise<any> {
+    try {
+      if (!this.apiKey) {
+        console.error('Mapbox API key is missing');
+        return null;
+      }
+      
+      // Convert coordinates to strings
+      const coords = [...origins, ...destinations].map(coord => coord.join(',')).join(';');
+      
+      // Build the sources and destinations arrays
+      const sources = origins.map((_, i) => i.toString());
+      const dests = destinations.map((_, i) => (i + origins.length).toString());
+      
+      const url = `${this.baseUrl}/directions-matrix/v1/mapbox/${profile}/${coords}?access_token=${this.apiKey}&sources=${sources.join(';')}&destinations=${dests.join(';')}`;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Mapbox API error: ${response.status} ${response.statusText}`);
       }
       
       return await response.json();
     } catch (error) {
-      console.error('Error fetching directions from Mapbox:', error);
+      console.error('Error getting distance matrix:', error);
       return null;
     }
   }
-};
+}
+
+// Create a singleton instance
+export const mapboxService = new MapboxService();
 
 export default mapboxService;

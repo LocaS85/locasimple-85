@@ -30,12 +30,12 @@ interface SearchAutocompleteProps {
 
 // Helper pour déterminer l'icône en fonction du type de résultat
 const getResultIcon = (result: SearchResult) => {
-  const type = result.properties?.type || 'place';
-  const category = result.properties?.category || '';
+  const type = result.type;
+  const properties = result.properties || {};
   
-  if (type === 'poi' || category) {
-    if (category === 'food') return <Store className="h-4 w-4" />;
-    if (category === 'lodging') return <Building className="h-4 w-4" />;
+  if (type === 'poi') {
+    if (properties.category === 'food') return <Store className="h-4 w-4" />;
+    if (properties.category === 'lodging') return <Building className="h-4 w-4" />;
     return <MapPinned className="h-4 w-4" />;
   }
   

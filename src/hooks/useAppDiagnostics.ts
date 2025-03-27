@@ -49,7 +49,7 @@ export const useAppDiagnostics = () => {
     const apiStatus = await verifyApiConnections();
     
     // Check for Mapbox token
-    if (!MAPBOX_TOKEN) {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
       issues.push('Token Mapbox manquant ou invalide');
     }
     

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { transportModes, getTransportModeLabel } from '@/data/transportModes';
+import { transportModes } from '@/data/transportModes';
 import { mockCategories } from '@/data/mockCategories';
 import { Clock, MapPin, Navigation, Gauge, Users } from 'lucide-react';
 
@@ -48,7 +48,8 @@ export const SelectedFilters: React.FC<SelectedFiltersProps> = ({
   };
 
   const getTransportModeName = () => {
-    return getTransportModeLabel(transportMode) || 'Voiture';
+    const mode = transportModes.find(mode => mode.id === transportMode);
+    return t(transportMode) || mode?.name || 'Voiture';
   };
 
   const getCategoryName = () => {

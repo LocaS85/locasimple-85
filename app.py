@@ -7,22 +7,19 @@ import json
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from dotenv import load_dotenv
-from datetime import datetime
 
 # Charger les variables d'environnement depuis .env
 load_dotenv()
 
 # Obtenir le token Mapbox depuis les variables d'environnement
-MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN')
+MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN', 'pk.eyJ1IjoibG92YWJsZWRldiIsImEiOiJjbHN1d3c0c2cwMWt1MmpueGd3OG11MWhhIn0.Qm4mGicZkPq5Af6C0BFmkA')
 
 if not MAPBOX_ACCESS_TOKEN:
     print("ATTENTION: Token Mapbox manquant! Définissez MAPBOX_ACCESS_TOKEN dans votre fichier .env")
-    # Utiliser un token de secours pour le développement
-    MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw'
 
 # Créer l'application Flask
 app = Flask(__name__)
-CORS(app)  # Permet les requêtes cross-origin pour l'API
+CORS(app)
 
 @app.route('/')
 def index():
@@ -51,7 +48,6 @@ def api_search():
         }
         
         response = requests.get(geocoding_url, params=params)
-        response.raise_for_status()  # Lève une exception si la requête échoue
         data = response.json()
         
         results = []
@@ -63,71 +59,6 @@ def api_search():
                 "category": query
             }
             results.append(place_data)
-        
-        return jsonify(results)
-        
-    except Exception as e:
-        app.logger.error(f"Erreur de recherche: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/search')
-def search():
-    """Endpoint de recherche avec calcul d'itinéraires"""
-    query = request.args.get('query')
-    mode = request.args.get('mode', 'driving')
-    lat = request.args.get('lat')
-    lon = request.args.get('lon')
-    limit = int(request.args.get('limit', 5))
-    
-    if not all([query, lat, lon]):
-        return jsonify({"error": "Paramètres manquants"}), 400
-    
-    try:
-        # Recherche de lieux via l'API Mapbox Geocoding
-        geocoding_url = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{query}.json"
-        geocoding_params = {
-            "proximity": f"{lon},{lat}",
-            "limit": limit,
-            "access_token": MAPBOX_ACCESS_TOKEN
-        }
-        
-        geocoding_response = requests.get(geocoding_url, params=geocoding_params)
-        geocoding_response.raise_for_status()
-        geocoding_data = geocoding_response.json()
-        
-        results = []
-        for place in geocoding_data.get("features", []):
-            place_coords = place.get("center", [0, 0])
-            place_name = place.get("text", "")
-            
-            # Calcul d'itinéraire via l'API Mapbox Directions
-            directions_url = f"https://api.mapbox.com/directions/v5/mapbox/{mode}/{lon},{lat};{place_coords[0]},{place_coords[1]}"
-            directions_params = {
-                "access_token": MAPBOX_ACCESS_TOKEN,
-                "overview": "full",
-                "geometries": "geojson"
-            }
-            
-            directions_response = requests.get(directions_url, params=directions_params)
-            directions_response.raise_for_status()
-            directions_data = directions_response.json()
-            
-            if "routes" in directions_data and directions_data["routes"]:
-                route = directions_data["routes"][0]
-                duration_min = round(route["duration"] / 60, 1)  # Convertir en minutes
-                distance_km = round(route["distance"] / 1000, 1)  # Convertir en km
-                
-                result = {
-                    "name": place_name,
-                    "place_name": place.get("place_name", ""),
-                    "lat": place_coords[1],
-                    "lon": place_coords[0],
-                    "duration": duration_min,
-                    "distance": distance_km,
-                    "category": query
-                }
-                
-                results.append(result)
         
         return jsonify(results)
         
@@ -155,6 +86,7 @@ def generate_pdf():
         c.drawString(30, 750, "Résultats de recherche de lieux")
         
         # Date
+        from datetime import datetime
         c.setFont("Helvetica", 10)
         c.drawString(30, 730, f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}")
         
@@ -217,7 +149,6 @@ def generate_pdf():
         # Finaliser le PDF
         c.save()
         
-        # Retourner l'URL du PDF généré
         return jsonify({"success": True, "url": "/static/resultats.pdf"})
         
     except Exception as e:
@@ -229,16 +160,8 @@ def health_check():
     """Vérification de l'état de santé de l'API"""
     return jsonify({
         "status": "ok",
-        "mapbox_token_available": bool(MAPBOX_ACCESS_TOKEN),
-        "version": "1.0.0"
+        "mapbox_token_available": bool(MAPBOX_ACCESS_TOKEN)
     })
 
-# Point d'entrée principal
 if __name__ == '__main__':
-    # Vérifier si le dossier static existe, sinon le créer
-    static_dir = os.path.join(app.root_path, 'static')
-    if not os.path.exists(static_dir):
-        os.makedirs(static_dir)
-    
-    # Démarrer le serveur Flask en mode debug
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)

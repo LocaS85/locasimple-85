@@ -1,13 +1,25 @@
 
-// Mapbox access token
-export const MAPBOX_TOKEN = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw';
+/**
+ * Environment variables configuration
+ */
 
-// API URL
-export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-// Map default center (Paris)
-export const DEFAULT_CENTER: [number, number] = [2.3522, 48.8566];
+// Mapbox configuration
+export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
 // Supabase configuration
-export const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || '';
-export const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
+export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 
+  'https://lnnzfcdkqdqtfmpyxsst.supabase.co';
+export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxubnpmY2RrcWRxdGZtcHl4c3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyNjU0MjAsImV4cCI6MjA1Njg0MTQyMH0.9sjYQRFf0FX0Ria7DlD16tuF7fNzTXpyIc6Uh9yGoNQ';
+
+// Log configurations for debugging
+console.log('Environment configuration loaded:');
+console.log('- Mapbox token available:', !!MAPBOX_TOKEN);
+console.log('- Supabase URL:', SUPABASE_URL);
+
+// Verify and log configuration status
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Supabase configuration is incomplete');
+} else {
+  console.log('Supabase configuration loaded');
+}

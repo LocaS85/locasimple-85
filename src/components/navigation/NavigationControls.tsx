@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, MapPin, Navigation, Eye } from 'lucide-react';
-import { transportModes, getTransportModeColor, getTransportModeIcon } from '@/data/transportModes';
+import { transportModes } from '@/data/transportModes';
 
 interface NavigationControlsProps {
   placeName: string;
@@ -26,12 +26,8 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
   onToggleFollow,
   onBack
 }) => {
-  // Get color and icon for the selected transport mode
-  const modeColor = getTransportModeColor(transportMode);
-  const ModeIcon = () => {
-    const icon = getTransportModeIcon(transportMode);
-    return <span>{icon}</span>;
-  };
+  // Find the selected transport mode for icon and color
+  const selectedMode = transportModes.find(mode => mode.id === transportMode) || transportModes[0];
 
   return (
     <div className="absolute top-0 left-0 right-0 z-10">
@@ -48,7 +44,7 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
         
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <ModeIcon />
+            {selectedMode.icon}
             <h1 className="text-lg font-bold text-white">{placeName}</h1>
           </div>
           <div className="flex items-center text-xs text-gray-300 mt-1">
@@ -63,8 +59,8 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
           variant="ghost"
           size="icon"
           onClick={onToggleFollow}
-          className={`${isFollowing ? 'text-white' : 'text-white hover:bg-white/20'} transition-colors`}
-          style={{ backgroundColor: isFollowing ? modeColor : 'transparent' }}
+          className={`${isFollowing ? 'text-white bg-' + selectedMode.color : 'text-white hover:bg-white/20'} transition-colors`}
+          style={{ backgroundColor: isFollowing ? selectedMode.color : 'transparent' }}
         >
           <Navigation className="h-5 w-5" />
         </Button>
@@ -74,7 +70,7 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
       <Progress 
         value={progress} 
         className="h-1 rounded-none" 
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', '--progress-foreground': modeColor } as React.CSSProperties}
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', '--progress-foreground': selectedMode.color } as React.CSSProperties}
       />
     </div>
   );

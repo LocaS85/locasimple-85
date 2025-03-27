@@ -53,7 +53,7 @@ const Map = ({
 }: MapProps) => {
   // Verify that we have a Mapbox token
   useEffect(() => {
-    if (!MAPBOX_TOKEN) {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
       toast.error('Mapbox token manquant. Veuillez configurer votre token dans le fichier .env.');
       console.error('Mapbox token is missing or empty');
     } else {

@@ -1,38 +1,50 @@
 
 import React from 'react';
-import { Car, PersonStanding, Bike, Bus } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import TransportModeButton from '../menu/TransportModeButton';
+import { Button } from '@/components/ui/button';
+import { Car, Bus, Bike } from 'lucide-react';
 
 interface TransportModeFilterProps {
   transportMode: string;
   onTransportModeChange: (mode: string) => void;
 }
 
-const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
+export const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
   transportMode,
   onTransportModeChange
 }) => {
-  const { t } = useTranslation();
-  
-  const modes = [
-    { id: 'driving', icon: <Car size={18} />, label: t('driving') },
-    { id: 'walking', icon: <PersonStanding size={18} />, label: t('walking') },
-    { id: 'cycling', icon: <Bike size={18} />, label: t('cycling') },
-    { id: 'transit', icon: <Bus size={18} />, label: t('transit') }
-  ];
-
   return (
-    <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 flex bg-white rounded-full shadow-lg p-1">
-      {modes.map((mode) => (
-        <TransportModeButton
-          key={mode.id}
-          mode={mode.id}
-          isActive={transportMode === mode.id}
-          onClick={onTransportModeChange}
-          className="mx-1"
-        />
-      ))}
+    <div className="absolute bottom-16 right-4 z-10">
+      <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-md p-2 flex flex-col gap-2">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`h-10 w-10 rounded-full ${transportMode === 'driving' ? 'text-blue-500 bg-blue-50' : 'text-gray-500'}`}
+          onClick={() => onTransportModeChange('driving')}
+          aria-label="Driving"
+        >
+          <Car className="h-5 w-5" />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`h-10 w-10 rounded-full ${transportMode === 'transit' ? 'text-green-500 bg-green-50' : 'text-gray-500'}`}
+          onClick={() => onTransportModeChange('transit')}
+          aria-label="Transit"
+        >
+          <Bus className="h-5 w-5" />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`h-10 w-10 rounded-full ${transportMode === 'cycling' ? 'text-purple-500 bg-purple-50' : 'text-gray-500'}`}
+          onClick={() => onTransportModeChange('cycling')}
+          aria-label="Cycling"
+        >
+          <Bike className="h-5 w-5" />
+        </Button>
+      </div>
     </div>
   );
 };

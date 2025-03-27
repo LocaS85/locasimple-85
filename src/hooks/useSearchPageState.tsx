@@ -2,16 +2,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import { useSearchCore } from './useSearchCore';
-import { useGeolocation } from './useGeolocation';
-import { useVoiceRecording } from './useVoiceRecording';
-import { Result } from '@/components/ResultsList';
+import { mapboxService, SearchResult } from '@/services/mapboxService';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { useVoiceRecording } from '@/hooks/useVoiceRecording';
+
+interface Place {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  address?: string;
+  category?: string;
+  duration?: number;
+  distance?: number;
+}
 
 export const useSearchPageState = () => {
-  // Get core search functionality
-  const searchCore = useSearchCore();
-  
-  // Additional UI state
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [resultsCount, setResultsCount] = useState<number>(5);
   const [selectedDuration, setSelectedDuration] = useState<number | null>(15);
   const [selectedDistance, setSelectedDistance] = useState<number | null>(5);
   const [distanceUnit, setDistanceUnit] = useState<'km' | 'miles'>('km');
@@ -21,24 +29,26 @@ export const useSearchPageState = () => {
     zoom: 12
   });
   
-  // UI interaction state
+  // State for search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
   const [isLocationActive, setIsLocationActive] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   const [isRecording, setIsRecording] = useState(false);
+  const [transportMode, setTransportMode] = useState('driving');
   const [showMenu, setShowMenu] = useState(false);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [popupInfo, setPopupInfo] = useState<any | null>(null);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [popupInfo, setPopupInfo] = useState<Place | null>(null);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
-  const [showRoutes, setShowRoutes] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   // Use geolocation hook
   const { activateGeolocation } = useGeolocation({
-    setLoading: searchCore.setLoading,
+    setLoading,
     setIsLocationActive,
-    setUserLocation: searchCore.setUserLocation
+    setUserLocation
   });
 
   // Use voice recording hook
@@ -46,16 +56,56 @@ export const useSearchPageState = () => {
     isRecording,
     setIsRecording,
     onTextResult: (text) => {
-      searchCore.setSearchQuery(text);
+      setSearchQuery(text);
     }
   });
 
-  // Handle search input changes
-  const handleSearchChange = (value: string) => {
-    searchCore.setSearchQuery(value);
-  };
+  const performSearch = useCallback(async (query: string = searchQuery) => {
+    if (!query.trim()) {
+      toast.error('Veuillez entrer une recherche');
+      return;
+    }
 
-  // Handle location button click
+    setLoading(true);
+    try {
+      // Add to search history
+      setSearchHistory(prev => [query, ...prev.filter(q => q !== query)].slice(0, 10));
+      
+      // Connect to Flask API for search
+      const response = await fetch(`http://localhost:5000/search?query=${encodeURIComponent(query)}&mode=${transportMode}&lat=${userLocation[1]}&lon=${userLocation[0]}&limit=${resultsCount}`);
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la recherche');
+      }
+      
+      const results = await response.json();
+      console.log('API search results:', results);
+      
+      // Transform to Place objects
+      const places = results.map((result: any, index: number) => ({
+        id: `place-${index}`,
+        name: result.name,
+        lat: result.lat,
+        lon: result.lon,
+        duration: result.duration,
+        distance: result.distance
+      }));
+      
+      setPlaces(places);
+      
+      if (places.length === 0) {
+        toast.info('Aucun résultat trouvé');
+      } else {
+        toast.success(`${places.length} résultats trouvés`);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Erreur lors de la recherche. Vérifiez que le serveur Flask est en cours d\'exécution.');
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, transportMode, userLocation, resultsCount]);
+
   const handleLocationClick = () => {
     activateGeolocation();
     
@@ -65,13 +115,11 @@ export const useSearchPageState = () => {
     }
   };
 
-  // Handle menu toggle
   const handleMenuClick = () => {
     setShowMenu(!showMenu);
   };
 
-  // Handle result click
-  const handleResultClick = (place: any) => {
+  const handleResultClick = (place: Place) => {
     setSelectedPlaceId(place.id);
     setPopupInfo(place);
     
@@ -83,24 +131,18 @@ export const useSearchPageState = () => {
     });
   };
 
-  // Reset search
   const resetSearch = () => {
-    searchCore.setSearchQuery('');
-    searchCore.setPlaces([]);
+    setSearchQuery('');
+    setPlaces([]);
     setSearchResults([]);
     setPopupInfo(null);
-    setSelectedPlaceId(null);
-    setShowRoutes(false);
-    searchCore.setSearchPerformed(false);
   };
 
-  // Handle history item click
   const handleHistoryItemClick = (query: string) => {
-    searchCore.setSearchQuery(query);
-    searchCore.performSearch(query);
+    setSearchQuery(query);
+    performSearch(query);
   };
 
-  // Handle save search
   const handleSaveSearch = (query: string) => {
     if (!savedSearches.includes(query)) {
       setSavedSearches(prev => [query, ...prev]);
@@ -108,54 +150,66 @@ export const useSearchPageState = () => {
     }
   };
 
-  // Handle remove saved search
   const handleRemoveSavedSearch = (query: string) => {
     setSavedSearches(prev => prev.filter(q => q !== query));
     toast.success(`Recherche "${query}" supprimée`);
   };
 
-  // Update our results state when core places change
-  useEffect(() => {
-    setSearchResults(searchCore.places);
-  }, [searchCore.places]);
+  const generatePDF = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/generate_pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ places }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la génération du PDF');
+      }
+      
+      const result = await response.json();
+      toast.success('PDF généré avec succès');
+      console.log('PDF result:', result);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Erreur lors de la génération du PDF');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Update viewport when user location changes and is active
   useEffect(() => {
-    if (isLocationActive && searchCore.userLocation) {
+    if (isLocationActive && userLocation) {
       setViewport({
-        latitude: searchCore.userLocation[1],
-        longitude: searchCore.userLocation[0],
+        latitude: userLocation[1],
+        longitude: userLocation[0],
         zoom: 14
       });
     }
-  }, [isLocationActive, searchCore.userLocation]);
+  }, [isLocationActive, userLocation]);
+
+  // Update places based on resultsCount
+  useEffect(() => {
+    setPlaces(prev => prev.slice(0, resultsCount));
+  }, [resultsCount]);
 
   // Check Mapbox token on component mount
   useEffect(() => {
-    if (!MAPBOX_TOKEN) {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
       toast.error('Token Mapbox manquant. La carte ne fonctionnera pas correctement.');
     } else {
       console.log('SearchPage loaded with Mapbox token available');
     }
   }, []);
 
-  // Add searched term to history
-  useEffect(() => {
-    if (searchCore.searchPerformed && searchCore.searchQuery) {
-      setSearchHistory(prev => 
-        [searchCore.searchQuery, ...prev.filter(q => q !== searchCore.searchQuery)].slice(0, 10)
-      );
-    }
-  }, [searchCore.searchPerformed, searchCore.searchQuery]);
-
-  // Wrap search execution to handle history and UI updates
-  const executeSearch = useCallback(() => {
-    searchCore.performSearch();
-    setShowRoutes(true);
-  }, [searchCore]);
-
   return {
-    ...searchCore,
+    places,
+    resultsCount,
+    setResultsCount,
     selectedDuration,
     setSelectedDuration,
     selectedDistance,
@@ -164,8 +218,14 @@ export const useSearchPageState = () => {
     setDistanceUnit,
     viewport,
     setViewport,
+    searchQuery,
+    setSearchQuery,
+    loading,
     isLocationActive,
+    userLocation,
     isRecording,
+    transportMode,
+    setTransportMode,
     showMenu,
     selectedPlaceId,
     popupInfo,
@@ -175,9 +235,7 @@ export const useSearchPageState = () => {
     setShowHistory,
     searchHistory,
     savedSearches,
-    showRoutes,
-    setShowRoutes,
-    handleSearchChange,
+    performSearch,
     handleLocationClick,
     handleMenuClick,
     handleResultClick,
@@ -186,9 +244,7 @@ export const useSearchPageState = () => {
     handleSaveSearch,
     handleRemoveSavedSearch,
     handleMicClick,
-    executeSearch,
-    selectedCategory,
-    setSelectedCategory
+    generatePDF
   };
 };
 

@@ -1,538 +1,536 @@
 
-// Variables globales
-let map;
-let userMarker;
-let searchResults = [];
-let activeTransportMode = 'driving';
-let distanceUnit = 'km';
-let isFilterMenuOpen = false;
-
-// Initialisation de la carte
-function initMap() {
-    try {
-        // Vérifier si le token est défini
-        if (!mapboxgl.accessToken || mapboxgl.accessToken === 'undefined' || mapboxgl.accessToken === '') {
-            showError("Token Mapbox non défini. Veuillez configurer votre fichier .env avec MAPBOX_ACCESS_TOKEN");
-            return;
-        }
-
-        // Créer la carte
-        map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [2.3522, 48.8566], // Paris par défaut
-            zoom: 12,
-            minZoom: 3
-        });
-
-        // Ajouter les contrôles de navigation (zoom, etc.)
-        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-        // Gestionnaire d'événement pour la fin du chargement de la carte
-        map.on('load', () => {
-            console.log('Carte chargée avec succès');
-            
-            // Ajouter une source pour les itinéraires
-            map.addSource('route', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'properties': {},
-                    'geometry': {
-                        'type': 'LineString',
-                        'coordinates': []
-                    }
-                }
-            });
-            
-            // Ajouter une couche pour afficher les itinéraires
-            map.addLayer({
-                'id': 'route',
-                'type': 'line',
-                'source': 'route',
-                'layout': {
-                    'line-join': 'round',
-                    'line-cap': 'round'
-                },
-                'paint': {
-                    'line-color': '#4285F4',
-                    'line-width': 5,
-                    'line-opacity': 0.7
-                }
-            });
-        });
-
-        // Gestionnaire d'erreur pour la carte
-        map.on('error', (e) => {
-            console.error('Erreur de carte Mapbox:', e);
-            showError("Erreur lors du chargement de la carte. Vérifiez votre connexion internet et votre token Mapbox.");
-        });
-
-    } catch (error) {
-        console.error('Erreur d\'initialisation de la carte:', error);
-        showError("Erreur d'initialisation de la carte. Vérifiez votre token Mapbox et votre connexion.");
-    }
-}
-
-// Afficher une erreur sur la page
-function showError(message) {
-    // Masquer la carte
-    document.getElementById('map').style.display = 'none';
-    
-    // Créer et afficher le message d'erreur
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-message';
-    errorElement.innerHTML = `
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <p>${message}</p>
-    `;
-    document.body.appendChild(errorElement);
-}
-
-// Gérer la soumission du formulaire de recherche
-document.getElementById('searchForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const searchInput = document.getElementById('searchInput').value.trim();
-    
-    if (searchInput === '') return;
-    
-    searchPlaces(searchInput);
-});
-
-// Rechercher des lieux
-async function searchPlaces(query) {
-    try {
-        showLoader(true);
-        
-        // Vérifier si l'utilisateur a une position
-        if (!userMarker) {
-            // Par défaut, utiliser Paris
-            userMarker = new mapboxgl.Marker({ color: '#4285F4' })
-                .setLngLat([2.3522, 48.8566])
-                .addTo(map);
-        }
-
-        const userPosition = userMarker.getLngLat();
-        const resultCount = document.getElementById('resultCount').value;
-        
-        // Faire la requête au serveur Flask
-        const response = await fetch(`/search?query=${encodeURIComponent(query)}&mode=${activeTransportMode}&lat=${userPosition.lat}&lon=${userPosition.lng}&limit=${resultCount}`);
-        
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        // Afficher les résultats
-        displayResults(data);
-        
-    } catch (error) {
-        console.error('Erreur lors de la recherche:', error);
-        alert(`Erreur de recherche: ${error.message}`);
-    } finally {
-        showLoader(false);
-    }
-}
-
-// Afficher les résultats sur la carte et dans le panneau
-function displayResults(results) {
-    // Effacer les résultats précédents
-    clearResults();
-    
-    // Stocker les nouveaux résultats
-    searchResults = results;
-    
-    if (results.length === 0) {
-        // Aucun résultat
-        const resultsContainer = document.getElementById('resultsContainer');
-        resultsContainer.classList.remove('hidden');
-        resultsContainer.innerHTML = '<div class="no-results">Aucun résultat trouvé</div>';
+// Initialisation de la carte Mapbox
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérification du token Mapbox
+    if (!mapboxgl.accessToken || mapboxgl.accessToken === 'undefined') {
+        console.error('Token Mapbox manquant ou invalide');
+        document.getElementById('map').innerHTML = '<div class="error-message">Erreur de chargement de la carte: Token Mapbox manquant</div>';
         return;
     }
     
-    // Ajouter les marqueurs sur la carte
-    const bounds = new mapboxgl.LngLatBounds();
-    
-    results.forEach((result, index) => {
-        // Créer un élément HTML pour le marqueur
-        const el = document.createElement('div');
-        el.className = 'custom-marker';
-        el.innerHTML = `<div class="marker-label">${index + 1}</div>`;
-        
-        // Ajouter le marqueur à la carte
-        const marker = new mapboxgl.Marker(el)
-            .setLngLat([result.lon, result.lat])
-            .addTo(map);
-        
-        // Ajouter un popup
-        const popup = new mapboxgl.Popup({ offset: 25 })
-            .setHTML(`
-                <h3>${result.name}</h3>
-                <p>${result.place_name || ''}</p>
-                <p>Distance: ${result.distance} km</p>
-                <p>Durée: ${result.duration} min</p>
-            `);
-        
-        marker.setPopup(popup);
-        
-        // Étendre les limites pour inclure ce point
-        bounds.extend([result.lon, result.lat]);
-    });
-    
-    // Inclure la position de l'utilisateur dans les limites
-    bounds.extend(userMarker.getLngLat());
-    
-    // Ajuster la carte pour afficher tous les points
-    map.fitBounds(bounds, {
-        padding: 50,
-        maxZoom: 15
-    });
-    
-    // Afficher le panneau de résultats
-    displayResultsPanel(results);
-    
-    // Afficher les informations de distance et durée pour le premier résultat
-    updateDistanceDuration(results[0]);
-    
-    // Afficher le tracé pour le premier résultat
-    showRoute(userMarker.getLngLat(), [results[0].lon, results[0].lat]);
-}
-
-// Afficher le panneau de résultats
-function displayResultsPanel(results) {
-    const resultsContainer = document.getElementById('resultsContainer');
-    resultsContainer.innerHTML = '';
-    resultsContainer.classList.remove('hidden');
-    
-    results.forEach((result, index) => {
-        const resultItem = document.createElement('div');
-        resultItem.className = 'result-item';
-        resultItem.innerHTML = `
-            <div class="result-title">${index + 1}. ${result.name}</div>
-            <div class="result-address">${result.place_name || ''}</div>
-            <div class="result-info">
-                <span><i class="fa-solid fa-route"></i> ${result.distance} km</span>
-                <span><i class="fa-regular fa-clock"></i> ${result.duration} min</span>
-            </div>
-        `;
-        
-        // Ajouter un gestionnaire d'événement pour cliquer sur un résultat
-        resultItem.addEventListener('click', () => {
-            // Centrer la carte sur ce résultat
-            map.flyTo({
-                center: [result.lon, result.lat],
-                zoom: 14
-            });
-            
-            // Afficher le tracé pour ce résultat
-            showRoute(userMarker.getLngLat(), [result.lon, result.lat]);
-            
-            // Mettre à jour les informations de distance et durée
-            updateDistanceDuration(result);
-        });
-        
-        resultsContainer.appendChild(resultItem);
-    });
-}
-
-// Afficher le tracé entre deux points
-async function showRoute(start, end) {
-    try {
-        // Obtenir les coordonnées
-        const startCoords = Array.isArray(start) ? start : [start.lng, start.lat];
-        const endCoords = Array.isArray(end) ? end : [end.lng, end.lat];
-        
-        // Construire l'URL pour l'API Directions
-        const url = `https://api.mapbox.com/directions/v5/mapbox/${activeTransportMode}/${startCoords[0]},${startCoords[1]};${endCoords[0]},${endCoords[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-        
-        // Faire la requête
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.routes && data.routes.length > 0) {
-            // Mettre à jour la source de données pour le tracé
-            map.getSource('route').setData({
-                type: 'Feature',
-                properties: {},
-                geometry: data.routes[0].geometry
-            });
-        }
-    } catch (error) {
-        console.error('Erreur lors de l\'affichage du tracé:', error);
-    }
-}
-
-// Mettre à jour les informations de distance et durée
-function updateDistanceDuration(result) {
-    if (!result) return;
-    
-    document.getElementById('durationValue').textContent = result.duration;
-    
-    // Mettre à jour la distance en fonction de l'unité sélectionnée
-    const distance = distanceUnit === 'km' ? result.distance : result.distance * 0.621371;
-    document.getElementById('distanceValue').textContent = distance.toFixed(1);
-    document.getElementById('toggleUnit').textContent = distanceUnit;
-}
-
-// Nettoyer les résultats précédents
-function clearResults() {
-    // Supprimer tous les marqueurs sauf celui de l'utilisateur
-    document.querySelectorAll('.mapboxgl-marker:not(.user-marker)').forEach(marker => {
-        marker.remove();
-    });
-    
-    // Vider le panneau de résultats
-    const resultsContainer = document.getElementById('resultsContainer');
-    resultsContainer.innerHTML = '';
-    resultsContainer.classList.add('hidden');
-    
-    // Réinitialiser le tracé
-    if (map.getSource('route')) {
-        map.getSource('route').setData({
-            type: 'Feature',
-            properties: {},
-            geometry: {
-                type: 'LineString',
-                coordinates: []
-            }
-        });
-    }
-}
-
-// Gérer le bouton de géolocalisation
-document.getElementById('locationButton').addEventListener('click', function() {
-    getUserLocation();
-});
-
-// Obtenir la position de l'utilisateur
-function getUserLocation() {
-    showLoader(true);
-    
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            // Succès
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                
-                // Mettre à jour ou créer le marqueur de l'utilisateur
-                if (userMarker) {
-                    userMarker.setLngLat([longitude, latitude]);
-                } else {
-                    userMarker = new mapboxgl.Marker({ color: '#4285F4', className: 'user-marker' })
-                        .setLngLat([longitude, latitude])
-                        .addTo(map);
-                }
-                
-                // Centrer la carte sur la position de l'utilisateur
-                map.flyTo({
-                    center: [longitude, latitude],
-                    zoom: 14
-                });
-                
-                showLoader(false);
-            },
-            // Erreur
-            (error) => {
-                console.error('Erreur de géolocalisation:', error);
-                alert("Impossible d'obtenir votre position. Vérifiez que vous avez autorisé la géolocalisation.");
-                showLoader(false);
-            }
-        );
-    } else {
-        alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
-        showLoader(false);
-    }
-}
-
-// Gérer le bouton de réinitialisation
-document.getElementById('resetButton').addEventListener('click', function() {
-    // Réinitialiser la recherche
-    document.getElementById('searchInput').value = '';
-    clearResults();
-    
-    // Centrer la carte sur Paris (par défaut)
-    map.flyTo({
-        center: [2.3522, 48.8566],
+    // Configuration de la carte
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [2.3522, 48.8566], // Paris par défaut
         zoom: 12
     });
-    
-    // Réinitialiser les filtres
-    resetFilters();
-});
 
-// Gérer le bouton d'impression
-document.getElementById('printButton').addEventListener('click', function() {
-    if (searchResults.length === 0) {
-        alert("Aucun résultat à imprimer. Faites d'abord une recherche.");
-        return;
-    }
-    
-    generatePDF(searchResults);
-});
+    // Variables d'état
+    let userMarker = null;
+    let searchResults = [];
+    let distanceUnit = 'km';
+    let selectedTransportMode = 'driving';
+    let directionsLayer = null;
+    let directionsSource = null;
 
-// Générer un PDF avec les résultats
-async function generatePDF(results) {
-    try {
-        showLoader(true);
-        
-        // Faire la requête pour générer le PDF
-        const response = await fetch('/generate_pdf', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ places: results })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Ouvrir le PDF dans un nouvel onglet
-            window.open(data.url, '_blank');
-        } else {
-            throw new Error(data.error || "Erreur lors de la génération du PDF");
-        }
-    } catch (error) {
-        console.error('Erreur lors de la génération du PDF:', error);
-        alert(`Erreur: ${error.message}`);
-    } finally {
-        showLoader(false);
-    }
-}
-
-// Gérer le bouton de paramètres
-document.getElementById('settingsButton').addEventListener('click', function() {
-    toggleFiltersMenu();
-});
-
-// Afficher/masquer le menu de filtres
-function toggleFiltersMenu() {
-    const filtersMenu = document.getElementById('filtersMenu');
-    isFilterMenuOpen = !isFilterMenuOpen;
-    
-    if (isFilterMenuOpen) {
-        filtersMenu.classList.remove('hidden');
-    } else {
-        filtersMenu.classList.add('hidden');
-    }
-}
-
-// Initialiser les panneaux de filtres dépliables
-function initFilterPanels() {
+    // Référence aux éléments DOM
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const loader = document.getElementById('loader');
+    const locationButton = document.getElementById('locationButton');
+    const resetButton = document.getElementById('resetButton');
+    const printButton = document.getElementById('printButton');
+    const durationValue = document.getElementById('durationValue');
+    const distanceValue = document.getElementById('distanceValue');
+    const toggleUnitButton = document.getElementById('toggleUnit');
+    const transportButtons = document.querySelectorAll('.transport-button');
     const filterHeaders = document.querySelectorAll('.filter-header');
-    
+    const settingsButton = document.getElementById('settingsButton');
+    const filtersMenu = document.getElementById('filtersMenu');
+    const categoryCheckboxes = document.querySelectorAll('.category-item input[type="checkbox"]');
+
+    // Gestion du bouton de paramètres
+    settingsButton.addEventListener('click', function() {
+        filtersMenu.classList.toggle('hidden');
+    });
+
+    // Gestionnaire pour fermer le menu des filtres si on clique en dehors
+    document.addEventListener('click', function(event) {
+        const isClickInside = filtersMenu.contains(event.target) || settingsButton.contains(event.target);
+        if (!isClickInside && !filtersMenu.classList.contains('hidden')) {
+            filtersMenu.classList.add('hidden');
+        }
+    });
+
+    // Gestionnaire pour les en-têtes des filtres (accordéon)
     filterHeaders.forEach(header => {
         header.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const targetContent = document.getElementById(targetId);
+            const target = this.getAttribute('data-target');
+            const content = document.getElementById(target);
             
-            // Replier tous les autres panneaux
-            document.querySelectorAll('.filter-content').forEach(content => {
-                if (content.id !== targetId) {
-                    content.classList.remove('active');
-                }
-            });
+            // Toggle class active
+            content.classList.toggle('active');
             
-            // Déplier ou replier le panneau actuel
-            targetContent.classList.toggle('active');
-            
-            // Faire pivoter l'icône
-            const icon = this.querySelector('.fa-chevron-right');
-            if (targetContent.classList.contains('active')) {
-                icon.style.transform = 'rotate(90deg)';
+            // Mise à jour de l'icône
+            const icon = this.querySelector('.fa-chevron-right, .fa-chevron-down');
+            if (content.classList.contains('active')) {
+                icon.classList.replace('fa-chevron-right', 'fa-chevron-down');
             } else {
-                icon.style.transform = 'rotate(0)';
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-right');
             }
         });
     });
-    
-    // Ouvrir le premier panneau par défaut
-    if (filterHeaders.length > 0) {
-        const firstHeader = filterHeaders[0];
-        const firstTargetId = firstHeader.getAttribute('data-target');
-        document.getElementById(firstTargetId).classList.add('active');
-        firstHeader.querySelector('.fa-chevron-right').style.transform = 'rotate(90deg)';
-    }
-}
 
-// Gérer les modes de transport
-document.querySelectorAll('.transport-button').forEach(button => {
-    button.addEventListener('click', function() {
-        // Supprimer la classe active de tous les boutons
-        document.querySelectorAll('.transport-button').forEach(btn => {
-            btn.classList.remove('active');
+    // Gestionnaire pour les boutons de mode de transport
+    transportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Retirer la classe active de tous les boutons
+            transportButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Ajouter la classe active au bouton cliqué
+            this.classList.add('active');
+            
+            // Mettre à jour le mode de transport sélectionné
+            selectedTransportMode = this.getAttribute('data-mode');
+            
+            // Si des résultats sont déjà affichés, mettre à jour les itinéraires
+            if (searchResults.length > 0 && directionsSource) {
+                updateRoutes();
+            }
         });
+    });
+
+    // Gestionnaire pour le bouton de changement d'unité
+    toggleUnitButton.addEventListener('click', function() {
+        if (distanceUnit === 'km') {
+            distanceUnit = 'miles';
+            toggleUnitButton.textContent = 'miles';
+            // Conversion des kilomètres en miles
+            if (distanceValue.textContent) {
+                distanceValue.textContent = (parseFloat(distanceValue.textContent) * 0.621371).toFixed(1);
+            }
+        } else {
+            distanceUnit = 'km';
+            toggleUnitButton.textContent = 'km';
+            // Conversion des miles en kilomètres
+            if (distanceValue.textContent) {
+                distanceValue.textContent = (parseFloat(distanceValue.textContent) / 0.621371).toFixed(1);
+            }
+        }
         
-        // Ajouter la classe active au bouton cliqué
-        this.classList.add('active');
-        
-        // Mettre à jour le mode de transport actif
-        activeTransportMode = this.getAttribute('data-mode');
-        
-        // Si des résultats sont affichés, mettre à jour le tracé
+        // Si des résultats sont déjà affichés, mettre à jour les distances
         if (searchResults.length > 0) {
-            showRoute(userMarker.getLngLat(), [searchResults[0].lon, searchResults[0].lat]);
+            updateDistances();
         }
     });
-});
 
-// Basculer entre kilomètres et miles
-document.getElementById('toggleUnit').addEventListener('click', function() {
-    distanceUnit = distanceUnit === 'km' ? 'miles' : 'km';
-    this.textContent = distanceUnit;
-    
-    // Mettre à jour la distance affichée
-    if (searchResults.length > 0) {
-        updateDistanceDuration(searchResults[0]);
-    }
-});
-
-// Afficher/masquer le chargeur
-function showLoader(show) {
-    const loader = document.getElementById('loader');
-    if (show) {
+    // Gestionnaire pour le bouton de géolocalisation
+    locationButton.addEventListener('click', function() {
         loader.classList.remove('hidden');
-    } else {
-        loader.classList.add('hidden');
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const { latitude, longitude } = position.coords;
+                    
+                    // Création ou mise à jour du marqueur utilisateur
+                    if (userMarker) {
+                        userMarker.setLngLat([longitude, latitude]);
+                    } else {
+                        const el = document.createElement('div');
+                        el.className = 'user-marker';
+                        el.style.width = '20px';
+                        el.style.height = '20px';
+                        el.style.borderRadius = '50%';
+                        el.style.backgroundColor = '#4285F4';
+                        el.style.border = '2px solid white';
+                        
+                        userMarker = new mapboxgl.Marker(el)
+                            .setLngLat([longitude, latitude])
+                            .addTo(map);
+                    }
+                    
+                    // Centrer la carte sur la position de l'utilisateur
+                    map.flyTo({
+                        center: [longitude, latitude],
+                        zoom: 14
+                    });
+                    
+                    loader.classList.add('hidden');
+                },
+                function(error) {
+                    console.error('Erreur de géolocalisation:', error);
+                    alert('Impossible d\'obtenir votre position');
+                    loader.classList.add('hidden');
+                }
+            );
+        } else {
+            alert('La géolocalisation n\'est pas prise en charge par votre navigateur');
+            loader.classList.add('hidden');
+        }
+    });
+
+    // Gestionnaire pour le bouton de réinitialisation
+    resetButton.addEventListener('click', function() {
+        // Réinitialiser la recherche
+        searchInput.value = '';
+        resultsContainer.classList.add('hidden');
+        resultsContainer.innerHTML = '';
+        
+        // Retirer les marqueurs des résultats
+        searchResults.forEach(marker => {
+            if (marker.marker) marker.marker.remove();
+        });
+        searchResults = [];
+        
+        // Supprimer les itinéraires
+        if (directionsSource && map.getSource('directions')) {
+            if (map.getLayer('directions-route')) {
+                map.removeLayer('directions-route');
+            }
+            if (map.getLayer('directions-route-outline')) {
+                map.removeLayer('directions-route-outline');
+            }
+            map.removeSource('directions');
+            directionsSource = null;
+        }
+        
+        // Réinitialiser la carte
+        map.flyTo({
+            center: [2.3522, 48.8566], // Paris
+            zoom: 12
+        });
+    });
+
+    // Gestionnaire pour le bouton d'impression
+    if (printButton) {
+        printButton.addEventListener('click', function() {
+            if (searchResults.length === 0) {
+                alert('Veuillez effectuer une recherche avant d\'imprimer');
+                return;
+            }
+            
+            // Préparation des données pour l'impression
+            const printData = {
+                title: `Résultats pour "${searchInput.value}"`,
+                date: new Date().toLocaleDateString(),
+                results: searchResults.map(result => ({
+                    name: result.name,
+                    address: result.place_name,
+                    distance: `${calculateDistance(
+                        map.getCenter(), 
+                        [result.coordinates[0], result.coordinates[1]]
+                    ).toFixed(1)} ${distanceUnit}`,
+                    category: result.category || 'Non spécifiée'
+                }))
+            };
+            
+            // Génération du PDF (simulation)
+            console.log('Données pour impression:', printData);
+            alert('Fonctionnalité d\'impression en cours de développement');
+            
+            // Ici, vous pourriez implémenter une vraie génération de PDF
+            // ou envoyer les données à une API pour générer le PDF
+        });
     }
-}
 
-// Réinitialiser les filtres
-function resetFilters() {
-    // Réinitialiser les catégories
-    document.querySelectorAll('.category-item input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
+    // Gestionnaire pour le formulaire de recherche
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        
+        if (!query) {
+            alert('Veuillez entrer un terme de recherche');
+            return;
+        }
+        
+        // Afficher le chargement
+        loader.classList.remove('hidden');
+        
+        // Récupérer les catégories sélectionnées
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(checkbox => (checkbox as HTMLInputElement).checked)
+            .map(checkbox => checkbox.id.replace('cat-', ''));
+        
+        // Récupérer les coordonnées actuelles de la carte
+        const center = map.getCenter();
+        
+        // Récupérer le nombre de résultats demandé
+        const resultCount = parseInt(document.getElementById('resultCount').value);
+        
+        // Envoyer la requête à l'API Mapbox
+        searchMapbox(query, center, selectedCategories, resultCount);
     });
-    
-    // Réinitialiser le nombre de résultats
-    document.getElementById('resultCount').value = '5';
-    
-    // Réinitialiser le mode de transport
-    document.querySelectorAll('.transport-button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector('.transport-button[data-mode="driving"]').classList.add('active');
-    activeTransportMode = 'driving';
-    
-    // Réinitialiser l'unité de distance
-    distanceUnit = 'km';
-    document.getElementById('toggleUnit').textContent = distanceUnit;
-    
-    // Réinitialiser les valeurs de durée et distance
-    document.getElementById('durationValue').textContent = '--';
-    document.getElementById('distanceValue').textContent = '--';
-}
 
-// Initialiser la page
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser la carte
-    initMap();
-    
-    // Initialiser les panneaux de filtres
-    initFilterPanels();
+    // Fonction pour rechercher via l'API Mapbox
+    function searchMapbox(query, center, categories, limit) {
+        const categoriesParam = categories.length > 0 ? categories.join(',') : '';
+        
+        // Construire l'URL de l'API Mapbox Geocoding
+        const geocodingUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`;
+        const params = {
+            proximity: `${center.lng},${center.lat}`,
+            limit: limit,
+            access_token: mapboxgl.accessToken,
+            types: 'poi,place,address'
+        };
+        
+        if (categoriesParam) {
+            params.categories = categoriesParam;
+        }
+        
+        // Construire l'URL avec les paramètres
+        const url = geocodingUrl + '?' + Object.entries(params)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&');
+        
+        // Faire la requête
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Vider les résultats précédents
+                resultsContainer.innerHTML = '';
+                
+                // Retirer les marqueurs des résultats précédents
+                searchResults.forEach(marker => {
+                    if (marker.marker) marker.marker.remove();
+                });
+                searchResults = [];
+                
+                if (!data.features || data.features.length === 0) {
+                    resultsContainer.innerHTML = '<div class="no-results">Aucun résultat trouvé</div>';
+                    resultsContainer.classList.remove('hidden');
+                    loader.classList.add('hidden');
+                    return;
+                }
+                
+                // Traiter les résultats
+                searchResults = data.features.map((feature, index) => {
+                    const result = {
+                        id: feature.id,
+                        name: feature.text,
+                        place_name: feature.place_name,
+                        coordinates: feature.center,
+                        category: feature.properties?.category || query,
+                        marker: null
+                    };
+                    
+                    // Créer le marqueur sur la carte
+                    const el = document.createElement('div');
+                    el.className = 'result-marker';
+                    el.innerHTML = `<span>${index + 1}</span>`;
+                    el.style.backgroundColor = '#4285F4';
+                    el.style.color = 'white';
+                    el.style.width = '24px';
+                    el.style.height = '24px';
+                    el.style.borderRadius = '50%';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                    el.style.fontWeight = 'bold';
+                    el.style.border = '2px solid white';
+                    
+                    result.marker = new mapboxgl.Marker(el)
+                        .setLngLat(feature.center)
+                        .addTo(map);
+                    
+                    return result;
+                });
+                
+                // Ajouter les résultats à la liste
+                searchResults.forEach((result, index) => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    
+                    const distance = calculateDistance(center, result.coordinates);
+                    
+                    resultItem.innerHTML = `
+                        <div class="result-title">${result.name}</div>
+                        <div class="result-address">${result.place_name}</div>
+                        <div class="result-info">
+                            <span>Distance: ${distance.toFixed(1)} ${distanceUnit}</span>
+                            <span>Catégorie: ${result.category}</span>
+                        </div>
+                    `;
+                    
+                    // Ajouter un gestionnaire de clic sur le résultat
+                    resultItem.addEventListener('click', function() {
+                        map.flyTo({
+                            center: result.coordinates,
+                            zoom: 15
+                        });
+                        
+                        // Obtenir les itinéraires depuis la position actuelle vers ce résultat
+                        if (userMarker) {
+                            getDirections(userMarker.getLngLat(), result.coordinates, selectedTransportMode);
+                        }
+                    });
+                    
+                    resultsContainer.appendChild(resultItem);
+                });
+                
+                // Afficher les résultats
+                resultsContainer.classList.remove('hidden');
+                
+                // Adapter la vue pour montrer tous les résultats
+                if (searchResults.length > 1) {
+                    const bounds = new mapboxgl.LngLatBounds();
+                    searchResults.forEach(result => bounds.extend(result.coordinates));
+                    map.fitBounds(bounds, { padding: 100 });
+                } else if (searchResults.length === 1) {
+                    map.flyTo({
+                        center: searchResults[0].coordinates,
+                        zoom: 15
+                    });
+                }
+                
+                // Mettre à jour la durée et la distance pour le premier résultat
+                if (searchResults.length > 0 && userMarker) {
+                    getDirections(userMarker.getLngLat(), searchResults[0].coordinates, selectedTransportMode);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la recherche:', error);
+                alert('Une erreur est survenue lors de la recherche');
+            })
+            .finally(() => {
+                loader.classList.add('hidden');
+            });
+    }
+
+    // Fonction pour obtenir les itinéraires
+    function getDirections(start, end, mode) {
+        const url = `https://api.mapbox.com/directions/v5/mapbox/${mode}/${start.lng},${start.lat};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.routes || data.routes.length === 0) {
+                    console.error('Aucun itinéraire trouvé');
+                    return;
+                }
+                
+                const route = data.routes[0];
+                
+                // Mettre à jour les valeurs de durée et de distance
+                if (durationValue) {
+                    durationValue.textContent = Math.round(route.duration / 60).toString();
+                }
+                
+                if (distanceValue) {
+                    const distanceInKm = route.distance / 1000;
+                    const distanceToShow = distanceUnit === 'km' ? 
+                        distanceInKm : 
+                        distanceInKm * 0.621371;
+                    distanceValue.textContent = distanceToShow.toFixed(1);
+                }
+                
+                // Afficher l'itinéraire sur la carte
+                const coordinates = route.geometry.coordinates;
+                
+                // Si la source d'itinéraire existe déjà, la mettre à jour
+                if (directionsSource) {
+                    directionsSource.setData({
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: coordinates
+                        }
+                    });
+                } else {
+                    // Sinon, créer une nouvelle source et des couches
+                    map.addSource('directions', {
+                        type: 'geojson',
+                        data: {
+                            type: 'Feature',
+                            properties: {},
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: coordinates
+                            }
+                        }
+                    });
+                    
+                    directionsSource = map.getSource('directions');
+                    
+                    // Ajouter la couche de contour d'itinéraire
+                    map.addLayer({
+                        id: 'directions-route-outline',
+                        type: 'line',
+                        source: 'directions',
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#ffffff',
+                            'line-width': 8
+                        }
+                    });
+                    
+                    // Ajouter la couche d'itinéraire
+                    map.addLayer({
+                        id: 'directions-route',
+                        type: 'line',
+                        source: 'directions',
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#4285F4',
+                            'line-width': 4
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'obtention des itinéraires:', error);
+            });
+    }
+
+    // Fonction pour mettre à jour les itinéraires quand le mode de transport change
+    function updateRoutes() {
+        if (userMarker && searchResults.length > 0) {
+            getDirections(userMarker.getLngLat(), searchResults[0].coordinates, selectedTransportMode);
+        }
+    }
+
+    // Fonction pour mettre à jour les distances quand l'unité change
+    function updateDistances() {
+        const center = map.getCenter();
+        
+        // Mettre à jour les distances dans la liste de résultats
+        const resultItems = resultsContainer.querySelectorAll('.result-item');
+        resultItems.forEach((item, index) => {
+            if (index < searchResults.length) {
+                const distance = calculateDistance(center, searchResults[index].coordinates);
+                const distanceSpan = item.querySelector('.result-info span:first-child');
+                if (distanceSpan) {
+                    distanceSpan.textContent = `Distance: ${distance.toFixed(1)} ${distanceUnit}`;
+                }
+            }
+        });
+    }
+
+    // Fonction pour calculer la distance entre deux points
+    function calculateDistance(point1, point2) {
+        // Conversion des coordonnées en radians
+        const lat1 = point1.lat * Math.PI / 180;
+        const lon1 = point1.lng * Math.PI / 180;
+        const lat2 = point2[1] * Math.PI / 180;
+        const lon2 = point2[0] * Math.PI / 180;
+        
+        // Rayon de la Terre en kilomètres
+        const R = 6371;
+        
+        // Formule de Haversine
+        const dLat = lat2 - lat1;
+        const dLon = lon2 - lon1;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1) * Math.cos(lat2) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        let distance = R * c;
+        
+        // Conversion en miles si nécessaire
+        if (distanceUnit === 'miles') {
+            distance *= 0.621371;
+        }
+        
+        return distance;
+    }
 });
