@@ -9,7 +9,7 @@ import MapResults from './MapResults';
 import useMapInitialization from '@/hooks/useMapInitialization';
 import useMarkerManagement from '@/hooks/useMarkerManagement';
 import { toast } from 'sonner';
-import MapDisplay from './MapDisplay';
+import MapDisplay from '../search/MapDisplay';
 import mapboxgl from 'mapbox-gl';
 
 interface MapContainerProps {
@@ -114,8 +114,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
         isLocationActive={isLocationActive}
         userLocation={userLocation}
         loading={loading}
-        handleLocationClick={onLocationClick}
-        transportMode={transportMode}
+        handleLocationClick={onLocationClick || (() => {})}
+        transportMode={transportMode || 'driving'}
         setMap={setMap}
       />
       
@@ -128,7 +128,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
             toast.success(`Style de carte changé en ${newStyle}`);
           }}
           selectedCategory={selectedCategory}
-          onCategorySelect={onCategorySelect}
+          onCategorySelect={onCategorySelect || (() => {})}
           map={map}
           minimal={true}
           onTransportModeClick={() => {
