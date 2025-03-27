@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Search, Map, ListFilter, Download } from 'lucide-react';
+import { Search, Map, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from './SearchInput';
-import { FiltersSection } from './FiltersSection';
 
 interface SearchPanelProps {
   query: string;
@@ -76,40 +75,11 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => {
-              // Open filters menu
-              console.log("Open filters menu");
-            }}
-          >
-            <ListFilter className="h-5 w-5" />
-          </Button>
-
-          <Button 
-            type="button"
-            variant="outline"
-            size="icon"
             onClick={generatePDF}
             disabled={loading}
           >
             <Download className="h-5 w-5" />
           </Button>
-        </div>
-        
-        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-md">
-          <FiltersSection
-            resultsCount={limit}
-            onResultsCountChange={setLimit}
-            transportMode={transportMode}
-            onTransportModeChange={onTransportModeChange}
-            selectedDuration={15}
-            onDurationChange={() => {}}
-            selectedDistance={5}
-            distanceUnit="km"
-            onDistanceChange={() => {}}
-            onDistanceUnitChange={() => {}}
-            selectedCategory={null}
-            onCategorySelect={() => {}}
-          />
         </div>
       </form>
     </div>

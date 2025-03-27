@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import MapContainer from '@/components/map/MapContainer';
 import type { Result } from '@/components/ResultsList';
 import { useSearchMenu } from '@/hooks/useSearchMenu';
-import RouteControls from '@/components/map/RouteControls';
 import HistoryPanel from '@/components/search/HistoryPanel';
 import useRoutes from '@/hooks/useRoutes';
 import mapboxgl from 'mapbox-gl';
@@ -114,12 +113,6 @@ export const MapSection: React.FC<MapSectionProps> = ({
         onCategorySelect={onCategorySelect}
         userLocation={userLocation}
         onMapInitialized={handleMapInitialized}
-      />
-      
-      {/* Transport Mode Filter */}
-      <RouteControls
-        transportMode={transportMode}
-        onTransportModeChange={onTransportModeChange}
       />
       
       {/* History Panel */}
