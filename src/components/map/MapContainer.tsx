@@ -10,6 +10,7 @@ import useMapInitialization from '@/hooks/useMapInitialization';
 import useMarkerManagement from '@/hooks/useMarkerManagement';
 import { toast } from 'sonner';
 import MapDisplay from './MapDisplay';
+import mapboxgl from 'mapbox-gl';
 
 interface MapContainerProps {
   results: Result[];
@@ -32,6 +33,7 @@ interface MapContainerProps {
   selectedCategory?: string | null;
   onCategorySelect?: (categoryId: string | null) => void;
   userLocation?: [number, number];
+  onMapInitialized?: (map: mapboxgl.Map) => void;
 }
 
 const MapContainer: React.FC<MapContainerProps> = ({ 
@@ -51,10 +53,11 @@ const MapContainer: React.FC<MapContainerProps> = ({
   showRoutes = false,
   onSearch = () => {},
   selectedResultId,
-  onResultClick,
+  onResultClick = () => {},
   selectedCategory = null,
   onCategorySelect = () => {},
-  userLocation
+  userLocation,
+  onMapInitialized
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const [mapStyle, setMapStyle] = useState<MapStyle>('streets');
@@ -64,6 +67,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     zoom: 13
   });
   const [popupInfo, setPopupInfo] = useState<any>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
   
   // Update viewport when center changes
   useEffect(() => {
@@ -81,6 +85,13 @@ const MapContainer: React.FC<MapContainerProps> = ({
       onResultClick(place);
     }
   };
+
+  // Call the onMapInitialized callback when map is set
+  useEffect(() => {
+    if (map && onMapInitialized) {
+      onMapInitialized(map);
+    }
+  }, [map, onMapInitialized]);
 
   return (
     <div className="relative w-full h-full">
@@ -105,6 +116,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         loading={loading}
         handleLocationClick={onLocationClick}
         transportMode={transportMode}
+        setMap={setMap}
       />
       
       {/* Map Controls with more minimal UI */}
@@ -117,7 +129,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
           }}
           selectedCategory={selectedCategory}
           onCategorySelect={onCategorySelect}
-          map={null}
+          map={map}
           minimal={true}
           onTransportModeClick={() => {
             // Handle transport mode click

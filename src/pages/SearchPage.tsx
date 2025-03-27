@@ -3,10 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { useSearchPageState } from '@/hooks/useSearchPageState';
 import SearchHeader from '@/components/search/SearchHeader';
 import { SearchPanel } from '@/components/search/SearchPanel';
-import MapDisplay from '@/components/search/MapDisplay';
+import MapSection from '@/components/search/MapSection';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { MAPBOX_TOKEN } from '@/config/environment';
+import { Printer, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,15 +26,19 @@ const SearchPage = () => {
     longitude: 2.3522,
     zoom: 12
   });
+  const [showRoutes, setShowRoutes] = useState(true);
   
   // Convert search results to places format for the map
-  const places = searchResults.map((result: any) => ({
-    id: result.id || `place-${Math.random().toString(36).substr(2, 9)}`,
+  const places: Result[] = searchResults.map((result: any, index: number) => ({
+    id: result.id || `place-${index}`,
     name: result.name,
-    lat: result.lat,
-    lon: result.lon,
+    latitude: result.lat,
+    longitude: result.lon,
     distance: result.distance,
-    duration: result.duration
+    duration: result.duration,
+    address: result.place_name || '',
+    category: result.category || '',
+    color: index % 2 === 0 ? '#0EA5E9' : '#8B5CF6' // Alternate colors
   }));
 
   // Handle location button click
@@ -96,8 +103,70 @@ const SearchPage = () => {
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
       toast.error('Erreur lors de la recherche. Vérifiez que le serveur Flask est démarré.');
+      
+      // Fallback to use Mapbox API directly if Flask server is not running
+      try {
+        await searchWithMapbox(query);
+      } catch (mapboxError) {
+        console.error('Erreur lors de la recherche avec Mapbox:', mapboxError);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fallback search method using Mapbox directly
+  const searchWithMapbox = async (query: string) => {
+    if (!MAPBOX_TOKEN) {
+      toast.error('Token Mapbox manquant');
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
+        {
+          params: {
+            access_token: MAPBOX_TOKEN,
+            proximity: `${userLocation[0]},${userLocation[1]}`,
+            types: 'poi',
+            limit: resultsCount,
+            language: 'fr'
+          }
+        }
+      );
+
+      if (response.data && response.data.features.length > 0) {
+        // Transform mapbox results to match our format
+        const formattedResults = response.data.features.map((feature: any) => ({
+          id: feature.id,
+          name: feature.text,
+          lat: feature.center[1],
+          lon: feature.center[0],
+          place_name: feature.place_name,
+          category: feature.properties?.category || '',
+          distance: 0, // Would need to calculate
+          duration: 0  // Would need to calculate
+        }));
+
+        setSearchResults(formattedResults);
+        
+        // Center map on first result
+        setViewport({
+          latitude: formattedResults[0].lat,
+          longitude: formattedResults[0].lon,
+          zoom: 13
+        });
+        
+        toast.success(`${formattedResults.length} résultats trouvés (via Mapbox)`);
+      } else {
+        setSearchResults([]);
+        toast.info('Aucun résultat trouvé');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche avec Mapbox:', error);
+      toast.error('Erreur lors de la recherche avec Mapbox');
+      setSearchResults([]);
     }
   };
 
@@ -134,6 +203,11 @@ const SearchPage = () => {
     }
   };
 
+  // Toggle route display
+  const toggleRoutes = () => {
+    setShowRoutes(!showRoutes);
+  };
+
   // Check if Flask server is running on component mount
   useEffect(() => {
     const checkFlaskServer = async () => {
@@ -150,6 +224,9 @@ const SearchPage = () => {
     };
     
     checkFlaskServer();
+    
+    // Attempt to get user location on mount
+    handleLocationClick();
   }, []);
 
   return (
@@ -160,20 +237,39 @@ const SearchPage = () => {
       />
       
       <div className="flex-grow relative">
-        <MapDisplay 
-          viewport={viewport}
-          setViewport={setViewport}
-          places={places}
-          resultsCount={resultsCount}
-          selectedPlaceId={selectedPlaceId}
-          popupInfo={popupInfo}
-          setPopupInfo={setPopupInfo}
-          handleResultClick={handleResultClick}
-          isLocationActive={isLocationActive}
-          userLocation={userLocation}
-          loading={loading}
-          handleLocationClick={handleLocationClick}
+        <MapSection 
+          results={places}
+          center={userLocation}
           transportMode={transportMode}
+          isLocationActive={isLocationActive}
+          loading={loading}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          isRecording={false}
+          onMicClick={() => {}}
+          onLocationClick={handleLocationClick}
+          showRoutes={showRoutes}
+          onSearch={() => performSearch(searchQuery)}
+          selectedResultId={selectedPlaceId}
+          onResultClick={handleResultClick}
+          selectedCategory={null}
+          onCategorySelect={() => {}}
+          searchHistory={[]}
+          savedSearches={[]}
+          onHistoryItemClick={() => {}}
+          onSaveSearch={() => {}}
+          onRemoveSavedSearch={() => {}}
+          resetSearch={() => {
+            setSearchQuery('');
+            setSearchResults([]);
+          }}
+          onTransportModeChange={setTransportMode}
+          userLocation={userLocation}
+          radius={5}
+          radiusUnit="km"
+          radiusType="distance"
+          duration={15}
+          timeUnit="minutes"
         />
         
         {/* Search Panel overlay */}
@@ -191,6 +287,21 @@ const SearchPage = () => {
           limit={resultsCount}
           setLimit={setResultsCount}
         />
+        
+        {/* Control buttons */}
+        <div className="absolute top-4 right-4 flex space-x-2 z-20">
+          <Button variant="outline" size="sm" onClick={generatePDF} className="bg-white">
+            <Printer className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={toggleRoutes} 
+            className={`${showRoutes ? 'bg-blue-100' : 'bg-white'}`}
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+        </div>
         
         {/* Results list */}
         {searchResults.length > 0 && (
