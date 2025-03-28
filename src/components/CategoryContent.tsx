@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useCategory } from './CategoryContext';
 import { CATEGORIES } from '@/types/categories';
@@ -6,7 +5,7 @@ import { AddressForm } from '@/components/AddressForm';
 import { SubCategoryList } from '@/components/SubCategoryList';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel } from 'lucide-react';
+import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel, Search } from 'lucide-react';
 import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -19,14 +18,12 @@ export const CategoryContent = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  // États pour les filtres
   const [radius, setRadius] = React.useState(5);
   const [transportMode, setTransportMode] = React.useState('driving');
   const [resultsCount, setResultsCount] = React.useState(3);
   const [duration, setDuration] = React.useState(15);
 
   if (!selectedCategory) {
-    // Affichage de la grille de catégories principales si aucune catégorie n'est sélectionnée
     const mainCategories = CATEGORIES.filter(cat => !cat.subCategories || cat.subCategories.length === 0);
     
     return (
@@ -63,7 +60,6 @@ export const CategoryContent = () => {
   const canAddAddress = currentAddresses.length < 10;
   const isMainAddress = selectedCategory === 'adresse-principale';
 
-  // Liste des catégories qui ne doivent pas avoir de filtres
   const categoriesWithoutFilters = [
     'alimentation',
     'achats',
@@ -182,7 +178,6 @@ export const CategoryContent = () => {
   );
 };
 
-// Helper function to get color class based on category ID
 const getCategoryColorClass = (categoryId: string) => {
   switch (categoryId) {
     case 'adresse-principale':
@@ -210,7 +205,6 @@ const getCategoryColorClass = (categoryId: string) => {
   }
 };
 
-// Helper function to get icon based on category ID
 const getCategoryIcon = (categoryId: string) => {
   const iconSize = "h-12 w-12";
   
