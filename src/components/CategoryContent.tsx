@@ -6,7 +6,7 @@ import { AddressForm } from '@/components/AddressForm';
 import { SubCategoryList } from '@/components/SubCategoryList';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Home, Search } from 'lucide-react';
+import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel } from 'lucide-react';
 import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +27,7 @@ export const CategoryContent = () => {
 
   if (!selectedCategory) {
     // Affichage de la grille de catégories principales si aucune catégorie n'est sélectionnée
-    const mainCategories = CATEGORIES.filter(cat => cat.parentId === null);
+    const mainCategories = CATEGORIES.filter(cat => !cat.subCategories || cat.subCategories.length === 0);
     
     return (
       <ScrollArea className="flex-1">
@@ -220,21 +220,21 @@ const getCategoryIcon = (categoryId: string) => {
     case 'famille':
       return <Home className={`${iconSize} text-secondary`} />;
     case 'travail':
-      return <Home className={`${iconSize} text-success`} />;
+      return <Briefcase className={`${iconSize} text-success`} />;
     case 'ecole':
-      return <Home className={`${iconSize} text-accent`} />;
+      return <BookOpen className={`${iconSize} text-accent`} />;
     case 'alimentation':
-      return <Home className={`${iconSize} text-green-500`} />;
+      return <Utensils className={`${iconSize} text-green-500`} />;
     case 'achats':
-      return <Home className={`${iconSize} text-blue-500`} />;
+      return <ShoppingBag className={`${iconSize} text-blue-500`} />;
     case 'services':
       return <Home className={`${iconSize} text-orange-500`} />;
     case 'sante':
-      return <Home className={`${iconSize} text-red-500`} />;
+      return <Heart className={`${iconSize} text-red-500`} />;
     case 'divertissement':
-      return <Home className={`${iconSize} text-purple-500`} />;
+      return <Film className={`${iconSize} text-purple-500`} />;
     case 'hebergement':
-      return <Home className={`${iconSize} text-pink-500`} />;
+      return <Hotel className={`${iconSize} text-pink-500`} />;
     default:
       return <Home className={`${iconSize} text-gray-500`} />;
   }
