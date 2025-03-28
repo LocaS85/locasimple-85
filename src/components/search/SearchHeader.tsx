@@ -11,9 +11,9 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   setResultsCount,
 }) => {
   return (
-    <div className="bg-white shadow-sm p-4">
+    <div className="bg-white shadow-sm p-2">
       <div className="container mx-auto flex items-center justify-between">
-        <h1 className="text-xl font-bold">Recherche de lieux</h1>
+        <h2 className="text-base font-normal">Recherche de lieux</h2>
       </div>
     </div>
   );
