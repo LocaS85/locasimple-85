@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useCategory } from './CategoryContext';
 import { CATEGORIES } from '@/types/categories';
 import { AddressForm } from '@/components/AddressForm';
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { motion } from 'framer-motion';
 
 export const CategoryContent = () => {
   const { selectedCategory, addresses } = useCategory();
@@ -19,16 +20,38 @@ export const CategoryContent = () => {
   const { t } = useLanguage();
   
   // États pour les filtres
-  const [radius, setRadius] = useState(5);
-  const [transportMode, setTransportMode] = useState('driving');
-  const [resultsCount, setResultsCount] = useState(3);
-  const [duration, setDuration] = useState(15);
+  const [radius, setRadius] = React.useState(5);
+  const [transportMode, setTransportMode] = React.useState('driving');
+  const [resultsCount, setResultsCount] = React.useState(3);
+  const [duration, setDuration] = React.useState(15);
 
   if (!selectedCategory) {
+    // Affichage de la grille de catégories principales si aucune catégorie n'est sélectionnée
+    const mainCategories = CATEGORIES.filter(cat => cat.parentId === null);
+    
     return (
-      <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold">{t('selectCategory')}</h1>
-      </div>
+      <ScrollArea className="flex-1">
+        <div className="p-6 space-y-6">
+          <h2 className="text-2xl font-semibold mb-4">{t('selectCategory')}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {mainCategories.map((category) => (
+              <motion.div
+                key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                className={`cursor-pointer rounded-lg shadow-md transition-all duration-300 overflow-hidden
+                  ${getCategoryColorClass(category.id)}`}
+                onClick={() => navigate(`/categories/${category.id}`)}
+              >
+                <div className="p-4 flex flex-col items-center justify-center h-full">
+                  {getCategoryIcon(category.id)}
+                  <span className="text-md font-medium mt-2">{category.name}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </ScrollArea>
     );
   }
 
@@ -68,31 +91,53 @@ export const CategoryContent = () => {
   return (
     <ScrollArea className="flex-1">
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex items-center justify-between"
+        >
           <h1 className="text-2xl font-bold">{category.name}</h1>
           {showAddressForm && (
             <span className="text-sm text-muted-foreground">
               {currentAddresses.length}/10 {t('addresses')}
             </span>
           )}
-        </div>
+        </motion.div>
 
         {isMainAddress && currentAddresses.length === 0 && (
-          <Alert>
-            <Home className="h-4 w-4" />
-            <AlertTitle>{t('mainAddress')}</AlertTitle>
-            <AlertDescription>
-              {t('mainAddressDescription')}
-            </AlertDescription>
-          </Alert>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
+            <Alert>
+              <Home className="h-4 w-4" />
+              <AlertTitle>{t('mainAddress')}</AlertTitle>
+              <AlertDescription>
+                {t('mainAddressDescription')}
+              </AlertDescription>
+            </Alert>
+          </motion.div>
         )}
         
         {showAddressForm && canAddAddress && (
-          <AddressForm categoryId={selectedCategory} />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            <AddressForm categoryId={selectedCategory} />
+          </motion.div>
         )}
 
         {showFilters && (
-          <div className="space-y-6">
+          <motion.div 
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
             <FilterPanel
               radius={radius}
               onRadiusChange={setRadius}
@@ -104,24 +149,93 @@ export const CategoryContent = () => {
               onDurationChange={setDuration}
             />
 
-            <Button 
-              onClick={handleSearch}
-              className="w-full"
-              size="lg"
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <Search className="w-4 h-4 mr-2" />
-              {t('search')}
-            </Button>
-          </div>
+              <Button 
+                onClick={handleSearch}
+                className="w-full"
+                size="lg"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                {t('search')}
+              </Button>
+            </motion.div>
+          </motion.div>
         )}
         
         {category.subCategories && (
-          <SubCategoryList 
-            subCategories={category.subCategories}
-            categoryId={selectedCategory}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+          >
+            <SubCategoryList 
+              subCategories={category.subCategories}
+              categoryId={selectedCategory}
+            />
+          </motion.div>
         )}
       </div>
     </ScrollArea>
   );
+};
+
+// Helper function to get color class based on category ID
+const getCategoryColorClass = (categoryId: string) => {
+  switch (categoryId) {
+    case 'adresse-principale':
+      return 'bg-primary/10 hover:bg-primary/20';
+    case 'famille':
+      return 'bg-secondary/10 hover:bg-secondary/20';
+    case 'travail':
+      return 'bg-success/10 hover:bg-success/20';
+    case 'ecole':
+      return 'bg-accent/10 hover:bg-accent/20';
+    case 'alimentation':
+      return 'bg-green-500/10 hover:bg-green-500/20';
+    case 'achats':
+      return 'bg-blue-500/10 hover:bg-blue-500/20';
+    case 'services':
+      return 'bg-orange-500/10 hover:bg-orange-500/20';
+    case 'sante':
+      return 'bg-red-500/10 hover:bg-red-500/20';
+    case 'divertissement':
+      return 'bg-purple-500/10 hover:bg-purple-500/20';
+    case 'hebergement':
+      return 'bg-pink-500/10 hover:bg-pink-500/20';
+    default:
+      return 'bg-gray-100 hover:bg-gray-200';
+  }
+};
+
+// Helper function to get icon based on category ID
+const getCategoryIcon = (categoryId: string) => {
+  const iconSize = "h-12 w-12";
+  
+  switch (categoryId) {
+    case 'adresse-principale':
+      return <Home className={`${iconSize} text-primary`} />;
+    case 'famille':
+      return <Home className={`${iconSize} text-secondary`} />;
+    case 'travail':
+      return <Home className={`${iconSize} text-success`} />;
+    case 'ecole':
+      return <Home className={`${iconSize} text-accent`} />;
+    case 'alimentation':
+      return <Home className={`${iconSize} text-green-500`} />;
+    case 'achats':
+      return <Home className={`${iconSize} text-blue-500`} />;
+    case 'services':
+      return <Home className={`${iconSize} text-orange-500`} />;
+    case 'sante':
+      return <Home className={`${iconSize} text-red-500`} />;
+    case 'divertissement':
+      return <Home className={`${iconSize} text-purple-500`} />;
+    case 'hebergement':
+      return <Home className={`${iconSize} text-pink-500`} />;
+    default:
+      return <Home className={`${iconSize} text-gray-500`} />;
+  }
 };
