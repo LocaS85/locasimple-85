@@ -57,19 +57,7 @@ export const SearchPanel: React.FC<SearchPanelProps> = ({
             />
           </div>
           
-          <Button 
-            type="submit"
-            variant="default"
-            size="icon"
-            className="bg-blue-500 hover:bg-blue-600"
-            disabled={loading}
-          >
-            {loading ? (
-              <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-            ) : (
-              <Search className="h-5 w-5" />
-            )}
-          </Button>
+          {/* The blue search button has been removed from here */}
         </div>
       </form>
     </div>
