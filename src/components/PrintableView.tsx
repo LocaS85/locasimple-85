@@ -35,8 +35,8 @@ const PrintableView: React.FC<PrintableViewProps> = ({
     onAfterPrint: () => {
       console.log('Print completed');
     },
-    // Fix: Use the correct property name
-    content: () => printRef.current,
+    // Use the correct property according to react-to-print API
+    contentRef: printRef,
   });
 
   return (
@@ -84,7 +84,7 @@ const PrintableView: React.FC<PrintableViewProps> = ({
         <div className="p-4 border-t">
           <Button 
             className="w-full" 
-            onClick={handlePrint}
+            onClick={() => handlePrint()}
           >
             {t('print') || 'Imprimer'}
           </Button>

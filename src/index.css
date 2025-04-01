@@ -91,3 +91,15 @@
 .map-ctrl-btn:last-child {
   border-bottom: none !important;
 }
+
+/* Add animation keyframes for the landing page */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
