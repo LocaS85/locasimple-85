@@ -44,7 +44,7 @@ const App = () => (
           <Route path="/plan" element={<Plan />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/categories" element={<Categories />} />
+          <Route path="/categories/*" element={<Categories />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
         <Route path="/login" element={<Login />} />

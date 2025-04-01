@@ -4,8 +4,15 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import * as mapboxgl from 'mapbox-gl';
 import { toast } from 'sonner';
-// Import events to provide EventEmitter
+// Import EventEmitter directly from events package
 import { EventEmitter } from 'events';
+
+// Define a global window interface extension
+declare global {
+  interface Window {
+    EventEmitter?: typeof EventEmitter;
+  }
+}
 
 // Patch global EventEmitter for MapboxGeocoder
 if (!window.EventEmitter) {
