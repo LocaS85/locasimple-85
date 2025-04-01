@@ -1,3 +1,4 @@
+
 // Utility to get category color based on category ID or type
 export const getCategoryColor = (category: string | null): string => {
   if (!category) return 'bg-gray-500';
@@ -39,4 +40,18 @@ export const getCategoryColorClass = (categoryId: string): string => {
   };
   
   return colorClasses[categoryType] || 'bg-gradient-to-br from-gray-400 to-gray-600';
+};
+
+// Utility to get hover color based on category
+export const getHoverColor = (category: string | null): string => {
+  if (!category) return 'hover:bg-gray-600';
+  
+  const hoverMap: Record<string, string> = {
+    'restaurants': 'hover:bg-app-secondary-dark',
+    'shopping': 'hover:bg-app-primary-dark',
+    'entertainment': 'hover:bg-purple-700',
+    // Can add more categories as needed
+  };
+
+  return hoverMap[category] || 'hover:bg-gray-600';
 };

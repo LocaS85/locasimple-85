@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, ExternalLink } from 'lucide-react';
 import { SearchResult } from '@/services/searchResultsService';
+import { getCategoryColor } from '@/utils/categoryColors';
 
 interface SearchResultItemProps {
   result: SearchResult;
@@ -24,9 +25,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result, onClick }) 
           }
         }
       }}
-      className="bg-white rounded-lg shadow-sm p-3 border border-gray-100 preserve-3d hover:shadow-md transition-all duration-300"
+      className="bg-white rounded-lg shadow-sm p-3 border border-gray-100 hover:shadow-md transition-all duration-300 transform-gpu preserve-3d cursor-pointer"
       whileHover={{
-        y: -2,
+        y: -3,
         scale: 1.01,
         boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
       }}
@@ -36,7 +37,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result, onClick }) 
         <div>
           <h3 className="font-medium text-sm">{result.name}</h3>
           <p className="text-xs text-gray-500 flex items-center mt-0.5">
-            <MapPin className="h-3 w-3 mr-1" />
+            <MapPin className="h-3 w-3 mr-1 text-app-primary/70" />
             {result.address}
           </p>
         </div>
@@ -60,10 +61,16 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result, onClick }) 
         {result.rating && (
           <div className="flex items-center">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400 mr-0.5" />
-            <span className="text-xs font-medium">{result.rating.toFixed(1)}</span>
+            <span className="text-xs font-medium">{(typeof result.rating === 'number') ? result.rating.toFixed(1) : result.rating}</span>
           </div>
         )}
       </div>
+      
+      {/* 3D effect elements */}
+      <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-gray-100 rounded-full opacity-70"></div>
+      <div className="absolute top-1 left-1 w-1.5 h-1.5 bg-gray-100 rounded-full opacity-70"></div>
+      <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent"></div>
+      <div className="absolute -bottom-px left-0 right-0 h-1 bg-gradient-to-t from-app-primary/10 to-transparent rounded-b-lg"></div>
     </motion.div>
   );
 };
