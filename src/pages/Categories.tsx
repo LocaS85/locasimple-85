@@ -160,7 +160,6 @@ const Categories = () => {
             center={[48.8566, 2.3522]} 
             zoom={12} 
             style={{ height: "100%", width: "100%" }}
-            ref={mapContainerRef}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

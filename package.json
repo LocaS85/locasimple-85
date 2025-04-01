@@ -57,6 +57,7 @@
     "framer-motion": "^12.6.2",
     "i18next": "^22.5.1",
     "input-otp": "^1.2.4",
+    "jspdf": "^3.0.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.479.0",
     "mapbox-gl": "^3.10.0",
