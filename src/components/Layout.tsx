@@ -12,7 +12,7 @@ interface LayoutProps {
 
 const Layout = ({ className, children }: LayoutProps) => {
   return (
-    <div className={cn("min-h-screen flex flex-col w-full", className)}>
+    <div className={cn("min-h-screen flex flex-col w-full font-sans bg-app-light", className)}>
       <Navbar />
       <main className="flex-1 w-full mt-16"> {/* Marge pour compenser la navbar fixe */}
         {children || <Outlet />}

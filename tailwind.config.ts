@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+        heading: ['Montserrat', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -43,6 +48,13 @@ export default {
         highlight: {
           DEFAULT: "#ec4899",
           foreground: "#ffffff",
+        },
+        app: {
+          dark: "#1a1a2e",
+          primary: "#0f3460",
+          secondary: "#e94560",
+          light: "#f5f5f5",
+          gray: "#16213e",
         },
       },
       borderRadius: {

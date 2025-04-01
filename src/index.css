@@ -3,6 +3,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 210 33% 98%;
+    --foreground: 224 71% 4%;
+    --border: 220 13% 91%;
+  }
+  
+  body {
+    @apply font-sans text-sm text-gray-800 bg-app-light;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-medium;
+  }
+}
+
 /* Add custom styles for Mapbox geocoder */
 .mapboxgl-ctrl-geocoder {
   width: 100% !important;
@@ -56,7 +72,7 @@
 }
 
 .category-button.active {
-  @apply bg-blue-500 text-white hover:bg-blue-600;
+  @apply bg-app-primary text-white hover:bg-app-primary/90;
 }
 
 /* Hover card styles for category sidebar */
@@ -127,4 +143,29 @@
 
 .leaflet-popup-tip {
   background-color: white;
+}
+
+/* Additional classes for our design system */
+.card-gradient {
+  @apply bg-gradient-to-br from-white to-gray-100;
+}
+
+.btn-primary {
+  @apply bg-app-primary hover:bg-app-primary/90 text-white transition-colors rounded-full;
+}
+
+.btn-secondary {
+  @apply bg-app-secondary hover:bg-app-secondary/90 text-white transition-colors rounded-full;
+}
+
+.input-search {
+  @apply pl-10 pr-4 py-2 w-full rounded-full border-gray-300 shadow-sm focus:border-app-primary focus:ring focus:ring-app-primary/20 focus:ring-opacity-50;
+}
+
+.category-card {
+  @apply rounded-2xl shadow-lg overflow-hidden aspect-square cursor-pointer transition-all hover:shadow-xl;
+}
+
+.glass-effect {
+  @apply backdrop-blur-sm bg-white/70;
 }
