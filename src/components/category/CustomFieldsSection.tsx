@@ -9,20 +9,16 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface CustomFieldsSectionProps {
-  categoryId: string;
-}
-
-const CustomFieldsSection: React.FC<CustomFieldsSectionProps> = ({ categoryId }) => {
+const CustomFieldsSection = ({ categoryId }: { categoryId: string }) => {
   const { customFields, addCustomField, updateCustomField, removeCustomField } = useCategory();
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [fieldName, setFieldName] = useState('');
   const [fieldValue, setFieldValue] = useState('');
-  
+
   const fields = customFields[categoryId] || [];
   const canAddMore = fields.length < 10;
-  
+
   const handleAddField = () => {
     if (fieldName && fieldValue) {
       addCustomField(categoryId, {
@@ -30,43 +26,41 @@ const CustomFieldsSection: React.FC<CustomFieldsSectionProps> = ({ categoryId })
         name: fieldName,
         value: fieldValue
       });
-      
       setFieldName('');
       setFieldValue('');
       setIsAddingNew(false);
     }
   };
-  
+
   const handleUpdateField = (fieldId: string) => {
     if (fieldName && fieldValue) {
       updateCustomField(categoryId, fieldId, {
         name: fieldName,
         value: fieldValue
       });
-      
       setFieldName('');
       setFieldValue('');
       setEditingId(null);
     }
   };
-  
+
   const startEditing = (field: { id: string, name: string, value: string }) => {
     setEditingId(field.id);
     setFieldName(field.name);
     setFieldValue(field.value);
   };
-  
+
   const cancelEditing = () => {
     setEditingId(null);
     setFieldName('');
     setFieldValue('');
     setIsAddingNew(false);
   };
-  
+
   return (
     <div className="space-y-4 py-4">
       <h2 className="text-xl font-semibold">Champs personnalisés</h2>
-      
+
       <AnimatePresence>
         {fields.map((field) => (
           <motion.div
@@ -99,7 +93,6 @@ const CustomFieldsSection: React.FC<CustomFieldsSectionProps> = ({ categoryId })
                       />
                     </div>
                   </div>
-                  
                   <div className="flex justify-end space-x-2 pt-2">
                     <Button variant="outline" onClick={cancelEditing}>
                       Annuler
@@ -133,7 +126,7 @@ const CustomFieldsSection: React.FC<CustomFieldsSectionProps> = ({ categoryId })
           </motion.div>
         ))}
       </AnimatePresence>
-      
+
       {isAddingNew ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
