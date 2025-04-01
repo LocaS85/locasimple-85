@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -31,7 +32,13 @@ export const useSearch = ({ initialCategory = null, initialQuery = '' }: UseSear
     try {
       // Record the search
       if (query.trim()) {
-        searchResultsService.saveRecentSearch(query);
+        // Store recent search in local storage instead of using a non-existent method
+        const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+        if (!recentSearches.includes(query)) {
+          recentSearches.unshift(query);
+          if (recentSearches.length > 10) recentSearches.pop(); // Keep only 10 recent searches
+        }
+        localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
       }
       
       // Update URL parameters
@@ -41,7 +48,8 @@ export const useSearch = ({ initialCategory = null, initialQuery = '' }: UseSear
       setSearchParams(params);
       
       // Get search results
-      const searchResults = await searchResultsService.search(query, category, sortBy);
+      // Using the mock data service instead of a non-existent search method
+      const searchResults = await fetchSearchResults(query, category, sortBy);
       setResults(searchResults);
       
       // Show toast with results count
@@ -59,6 +67,38 @@ export const useSearch = ({ initialCategory = null, initialQuery = '' }: UseSear
       setLoading(false);
     }
   }, [searchQuery, selectedCategory, sortBy, setSearchParams]);
+  
+  // Mock search function that uses the available service methods
+  const fetchSearchResults = async (query: string, category: string | null, sortBy: string) => {
+    // Using the getMockSearchResults method instead since 'search' doesn't exist
+    const results = await searchResultsService.getMockSearchResults();
+    
+    // Filter by query if provided
+    let filteredResults = results;
+    if (query) {
+      filteredResults = results.filter(result => 
+        result.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    
+    // Filter by category if provided
+    if (category) {
+      filteredResults = filteredResults.filter(result => 
+        result.category === category
+      );
+    }
+    
+    // Sort results
+    if (sortBy === 'distance') {
+      filteredResults.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+    } else if (sortBy === 'time') {
+      filteredResults.sort((a, b) => parseFloat(a.time) - parseFloat(b.time));
+    } else if (sortBy === 'rating') {
+      filteredResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    }
+    
+    return filteredResults;
+  };
   
   // Handle category toggle
   const handleCategoryToggle = useCallback((category: string) => {
@@ -107,6 +147,11 @@ export const useSearch = ({ initialCategory = null, initialQuery = '' }: UseSear
     }
   }, [categoryParam, queryParam]);
   
+  // Get recent searches from localStorage
+  const getRecentSearches = () => {
+    return JSON.parse(localStorage.getItem('recentSearches') || '[]');
+  };
+  
   return {
     // State
     searchQuery,
@@ -127,7 +172,7 @@ export const useSearch = ({ initialCategory = null, initialQuery = '' }: UseSear
     navigateToCategorySearch,
     
     // Data
-    recentSearches: searchResultsService.getRecentSearches(),
+    recentSearches: getRecentSearches(),
     categoryFilters: categoryService.getCategoryFilters(),
     mainCategoryTypes: categoryService.getMainCategoryTypes()
   };
