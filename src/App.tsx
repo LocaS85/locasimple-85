@@ -2,8 +2,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import GoogleMapsLoader from "@/components/GoogleMapsLoader";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
@@ -24,46 +23,37 @@ import Payment from "./pages/Payment";
 import Navigation from "./pages/Navigation";
 import Search from "./pages/Search";
 import Categories from "./pages/Categories";
-import { LanguageProvider } from "./contexts/LanguageContext";
-
-const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <TooltipProvider>
-        <BrowserRouter>
-          <GoogleMapsLoader>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Index />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/place/:id" element={<PlaceDetails />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/plan" element={<Plan />} />
-                <Route path="/payment" element={<Payment />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/navigation" element={<Navigation />} />
-            </Routes>
-          </GoogleMapsLoader>
-        </BrowserRouter>
-      </TooltipProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+  <TooltipProvider>
+    <GoogleMapsLoader>
+      <Toaster />
+      <Sonner />
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Index />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/place/:id" element={<PlaceDetails />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/plan" element={<Plan />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/navigation" element={<Navigation />} />
+      </Routes>
+    </GoogleMapsLoader>
+  </TooltipProvider>
 );
 
 export default App;

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -74,6 +75,7 @@ export const useSearch = ({ initialCategory = null, initialQuery = '' }: UseSear
       );
     }
     
+    // Add type assertion for sorting
     if (sortBy === 'distance') {
       filteredResults.sort((a, b) => parseFloat(a.distance as string) - parseFloat(b.distance as string));
     } else if (sortBy === 'time') {
