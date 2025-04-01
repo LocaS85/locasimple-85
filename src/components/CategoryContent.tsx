@@ -6,7 +6,7 @@ import { AddressForm } from '@/components/AddressForm';
 import { SubCategoryList } from '@/components/SubCategoryList';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel, Search, Printer } from 'lucide-react';
+import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel, Search, Printer, Grid, List, Loader } from 'lucide-react';
 import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +31,8 @@ export const CategoryContent = () => {
   const [resultsCount, setResultsCount] = React.useState(3);
   const [duration, setDuration] = React.useState(15);
   const [showPrintView, setShowPrintView] = useState(false);
+  const [listView, setListView] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!selectedCategory) {
     const mainCategories = CATEGORIES.filter(cat => !cat.subCategories || cat.subCategories.length === 0);
@@ -38,8 +40,14 @@ export const CategoryContent = () => {
     return (
       <ScrollArea className="flex-1">
         <div className="p-6 space-y-6">
-          <h2 className="text-2xl font-semibold mb-4">{t('selectCategory')}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">{t('selectCategory')}</h2>
+            <Button onClick={() => setListView(!listView)} variant="outline">
+              {listView ? <Grid className="w-4 h-4" /> : <List className="w-4 h-4" />}
+            </Button>
+          </div>
+
+          <div className={`grid ${listView ? 'grid-cols-1' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'} gap-4`}>
             {mainCategories.map((category) => (
               <motion.div
                 key={category.id}
@@ -50,7 +58,7 @@ export const CategoryContent = () => {
                 onClick={() => navigate(`/categories/${category.id}`)}
               >
                 <div className="p-4 flex flex-col items-center justify-center h-full">
-                  {getCategoryIcon(category.id)}
+                  {getCategoryIcon(category.id, listView ? "h-8 w-8" : "h-12 w-12")}
                   <span className="text-md font-medium mt-2">{category.name}</span>
                 </div>
               </motion.div>
@@ -82,11 +90,15 @@ export const CategoryContent = () => {
   const showFilters = !showAddressForm && !categoriesWithoutFilters.includes(selectedCategory);
 
   const handleSearch = () => {
+    // Show loading indicator
+    setLoading(true);
+    
     // Only include visible categories in search
     const visibleCategories = Object.keys(categoryVisibility)
       .filter(catId => categoryVisibility[catId]);
     
     if (visibleCategories.length === 0) {
+      setLoading(false);
       toast.error(t('noVisibleCategories') || 'Veuillez activer au moins une catégorie.');
       return;
     }
@@ -100,8 +112,12 @@ export const CategoryContent = () => {
       categories: visibleCategories.join(',')
     });
 
-    navigate(`/search?${searchParams.toString()}`);
-    toast.success(t('searchStarted'));
+    // Simulate a short delay to show loading state
+    setTimeout(() => {
+      setLoading(false);
+      navigate(`/search?${searchParams.toString()}`);
+      toast.success(t('searchStarted'));
+    }, 500);
   };
 
   // Mock data for printable view
@@ -229,10 +245,14 @@ export const CategoryContent = () => {
               >
                 <Button 
                   onClick={handleSearch}
-                  className="w-full"
+                  className="w-full flex items-center justify-center gap-2 rounded-xl transition-all hover:bg-blue-600 focus:ring focus:ring-blue-300"
                   size="lg"
+                  disabled={loading}
                 >
-                  <Search className="w-4 h-4 mr-2" />
+                  {loading ? 
+                    <Loader className="w-4 h-4 animate-spin" /> : 
+                    <Search className="w-4 h-4" />
+                  }
                   {t('search')}
                 </Button>
               </motion.div>
