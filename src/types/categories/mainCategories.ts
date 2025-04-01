@@ -1,3 +1,4 @@
+
 import { Category } from '../categoryTypes';
 
 export const MAIN_CATEGORIES: Category[] = [

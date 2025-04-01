@@ -1,21 +1,19 @@
 
 import React from 'react';
-import { useCategory } from '../CategoryContext';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import FilterPanel from '@/components/FilterPanel';
-import CategoryLegend from '@/components/CategoryLegend';
-import SearchButton from './SearchButton';
 
 interface FilterSectionProps {
   selectedCategory: string;
   radius: number;
-  setRadius: React.Dispatch<React.SetStateAction<number>>;
+  setRadius: (value: number) => void;
   transportMode: string;
-  setTransportMode: React.Dispatch<React.SetStateAction<string>>;
+  setTransportMode: (value: string) => void;
   resultsCount: number;
-  setResultsCount: React.Dispatch<React.SetStateAction<number>>;
+  setResultsCount: (value: number) => void;
   duration: number;
-  setDuration: React.Dispatch<React.SetStateAction<number>>;
+  setDuration: (value: number) => void;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
@@ -30,33 +28,28 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   setDuration
 }) => {
   return (
-    <motion.div 
-      className="space-y-6"
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, duration: 0.4 }}
-      exit={{ opacity: 0, y: -20 }}
     >
-      <FilterPanel
-        radius={radius}
-        onRadiusChange={setRadius}
-        transportMode={transportMode}
-        onTransportModeChange={setTransportMode}
-        resultsCount={resultsCount}
-        onResultsCountChange={setResultsCount}
-        duration={duration}
-        onDurationChange={setDuration}
-      />
-
-      <CategoryLegend />
-
-      <SearchButton 
-        selectedCategory={selectedCategory}
-        radius={radius}
-        transportMode={transportMode}
-        resultsCount={resultsCount}
-        duration={duration}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtres</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FilterPanel
+            radius={radius}
+            onRadiusChange={setRadius}
+            transportMode={transportMode}
+            onTransportModeChange={setTransportMode}
+            resultsCount={resultsCount}
+            onResultsCountChange={setResultsCount}
+            duration={duration}
+            onDurationChange={setDuration}
+          />
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };

@@ -23,4 +23,12 @@ export interface Address {
   transportMode: TransportMode;
 }
 
-export type TransportMode = 'car' | 'train' | 'bus' | 'public' | 'bike' | 'walk' | 'plane';
+export type TransportMode = 'car' | 'train' | 'bus' | 'public' | 'bike' | 'walk' | 'plane' | 'metro' | 'tram' | 'coach' | 'airport' | 'airstrip';
+
+// Transport Mode avec couleurs
+export interface TransportModeWithColor {
+  id: TransportMode;
+  name: string;
+  color: string;
+  defaultColor: string;
+}
