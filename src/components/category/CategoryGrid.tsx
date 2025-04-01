@@ -24,11 +24,11 @@ const CategoryGrid = () => {
             key={category.id}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer"
+            className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300"
             onClick={() => handleCategoryClick(category.id)}
           >
             <div className="p-6 flex flex-col items-center text-center">
-              <div className="mb-4">
+              <div className="mb-4 text-primary">
                 {getCategoryIcon(category.id)}
               </div>
               <h3 className="text-lg font-semibold">{t(category.name) || category.name}</h3>

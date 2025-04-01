@@ -50,11 +50,11 @@ const SubcategoryGrid = () => {
               key={subCategory.id}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer"
+              className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300"
               onClick={() => navigate(`/search?category=${subCategory.id}`)}
             >
               <div className="p-6 flex flex-col items-center text-center">
-                <div className="mb-4">
+                <div className="mb-4 text-primary">
                   {getCategoryIcon(subCategory.id)}
                 </div>
                 <h3 className="text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
