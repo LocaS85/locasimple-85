@@ -1,20 +1,28 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useCategory } from './CategoryContext';
 import { CATEGORIES } from '@/types/categories';
 import { AddressForm } from '@/components/AddressForm';
 import { SubCategoryList } from '@/components/SubCategoryList';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel, Search } from 'lucide-react';
+import { Home, ShoppingBag, Utensils, Heart, Briefcase, BookOpen, Film, Hotel, Search, Printer } from 'lucide-react';
 import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import CategoryNameEditor from './CategoryNameEditor';
+import CustomFieldsForm from './CustomFieldsForm';
+import CategoryLegend from './CategoryLegend';
+import PrintableView from './PrintableView';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 export const CategoryContent = () => {
-  const { selectedCategory, addresses } = useCategory();
+  const { selectedCategory, addresses, categoryVisibility, toggleCategoryVisibility } = useCategory();
   const navigate = useNavigate();
   const { t } = useLanguage();
   
@@ -22,6 +30,7 @@ export const CategoryContent = () => {
   const [transportMode, setTransportMode] = React.useState('driving');
   const [resultsCount, setResultsCount] = React.useState(3);
   const [duration, setDuration] = React.useState(15);
+  const [showPrintView, setShowPrintView] = useState(false);
 
   if (!selectedCategory) {
     const mainCategories = CATEGORIES.filter(cat => !cat.subCategories || cat.subCategories.length === 0);
@@ -55,10 +64,11 @@ export const CategoryContent = () => {
   const category = CATEGORIES.find(cat => cat.id === selectedCategory);
   if (!category) return null;
 
-  const showAddressForm = ['adresse-principale', 'famille', 'travail', 'ecole'].includes(selectedCategory);
+  const showAddressForm = ['adresse-principale', 'famille', 'travail', 'ecole', 'divers'].includes(selectedCategory);
   const currentAddresses = addresses[selectedCategory] || [];
   const canAddAddress = currentAddresses.length < 10;
   const isMainAddress = selectedCategory === 'adresse-principale';
+  const isDiversCategory = selectedCategory === 'divers';
 
   const categoriesWithoutFilters = [
     'alimentation',
@@ -72,17 +82,51 @@ export const CategoryContent = () => {
   const showFilters = !showAddressForm && !categoriesWithoutFilters.includes(selectedCategory);
 
   const handleSearch = () => {
+    // Only include visible categories in search
+    const visibleCategories = Object.keys(categoryVisibility)
+      .filter(catId => categoryVisibility[catId]);
+    
+    if (visibleCategories.length === 0) {
+      toast.error(t('noVisibleCategories') || 'Veuillez activer au moins une catégorie.');
+      return;
+    }
+
     const searchParams = new URLSearchParams({
       category: selectedCategory,
       radius: radius.toString(),
       transport: transportMode,
       duration: duration.toString(),
-      results: resultsCount.toString()
+      results: resultsCount.toString(),
+      categories: visibleCategories.join(',')
     });
 
     navigate(`/search?${searchParams.toString()}`);
     toast.success(t('searchStarted'));
   };
+
+  // Mock data for printable view
+  const mockResults = [
+    { 
+      id: '1', 
+      name: 'Résultat 1', 
+      address: '123 Rue Example', 
+      category: 'restaurant',
+      distance: 2.5,
+      duration: 15,
+      latitude: 48.856614,
+      longitude: 2.3522219
+    },
+    { 
+      id: '2', 
+      name: 'Résultat 2', 
+      address: '456 Avenue Sample', 
+      category: 'shopping',
+      distance: 1.8,
+      duration: 10,
+      latitude: 48.85,
+      longitude: 2.35
+    }
+  ];
 
   return (
     <ScrollArea className="flex-1">
@@ -93,12 +137,32 @@ export const CategoryContent = () => {
           transition={{ duration: 0.3 }}
           className="flex items-center justify-between"
         >
-          <h1 className="text-2xl font-bold">{category.name}</h1>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl font-bold">
+              <CategoryNameEditor categoryId={selectedCategory} />
+            </h1>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id={`toggle-${selectedCategory}`}
+                checked={categoryVisibility[selectedCategory]}
+                onCheckedChange={() => toggleCategoryVisibility(selectedCategory)}
+              />
+              <Label htmlFor={`toggle-${selectedCategory}`} className="text-sm">
+                {categoryVisibility[selectedCategory] ? t('visible') : t('hidden')}
+              </Label>
+            </div>
+          </div>
+          
           {showAddressForm && (
             <span className="text-sm text-muted-foreground">
               {currentAddresses.length}/10 {t('addresses')}
             </span>
           )}
+          
+          <Button variant="outline" size="sm" onClick={() => setShowPrintView(true)}>
+            <Printer className="h-4 w-4 mr-2" />
+            {t('print') || 'Imprimer'}
+          </Button>
         </motion.div>
 
         {isMainAddress && currentAddresses.length === 0 && (
@@ -127,39 +191,54 @@ export const CategoryContent = () => {
           </motion.div>
         )}
 
-        {showFilters && (
-          <motion.div 
-            className="space-y-6"
+        {isDiversCategory && (
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            <FilterPanel
-              radius={radius}
-              onRadiusChange={setRadius}
-              transportMode={transportMode}
-              onTransportModeChange={setTransportMode}
-              resultsCount={resultsCount}
-              onResultsCountChange={setResultsCount}
-              duration={duration}
-              onDurationChange={setDuration}
-            />
-
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button 
-                onClick={handleSearch}
-                className="w-full"
-                size="lg"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                {t('search')}
-              </Button>
-            </motion.div>
+            <CustomFieldsForm categoryId={selectedCategory} />
           </motion.div>
         )}
+
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <FilterPanel
+                radius={radius}
+                onRadiusChange={setRadius}
+                transportMode={transportMode}
+                onTransportModeChange={setTransportMode}
+                resultsCount={resultsCount}
+                onResultsCountChange={setResultsCount}
+                duration={duration}
+                onDurationChange={setDuration}
+              />
+
+              <CategoryLegend />
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  onClick={handleSearch}
+                  className="w-full"
+                  size="lg"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  {t('search')}
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         
         {category.subCategories && (
           <motion.div
@@ -174,10 +253,20 @@ export const CategoryContent = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Printable View Modal */}
+      {showPrintView && (
+        <PrintableView 
+          results={mockResults} 
+          mapUrl="https://via.placeholder.com/800x400?text=Map+Preview" 
+          onClose={() => setShowPrintView(false)} 
+        />
+      )}
     </ScrollArea>
   );
 };
 
+// Helper functions
 const getCategoryColorClass = (categoryId: string) => {
   switch (categoryId) {
     case 'adresse-principale':
@@ -200,36 +289,9 @@ const getCategoryColorClass = (categoryId: string) => {
       return 'bg-purple-500/10 hover:bg-purple-500/20';
     case 'hebergement':
       return 'bg-pink-500/10 hover:bg-pink-500/20';
+    case 'divers':
+      return 'bg-teal-500/10 hover:bg-teal-500/20';
     default:
       return 'bg-gray-100 hover:bg-gray-200';
-  }
-};
-
-const getCategoryIcon = (categoryId: string) => {
-  const iconSize = "h-12 w-12";
-  
-  switch (categoryId) {
-    case 'adresse-principale':
-      return <Home className={`${iconSize} text-primary`} />;
-    case 'famille':
-      return <Home className={`${iconSize} text-secondary`} />;
-    case 'travail':
-      return <Briefcase className={`${iconSize} text-success`} />;
-    case 'ecole':
-      return <BookOpen className={`${iconSize} text-accent`} />;
-    case 'alimentation':
-      return <Utensils className={`${iconSize} text-green-500`} />;
-    case 'achats':
-      return <ShoppingBag className={`${iconSize} text-blue-500`} />;
-    case 'services':
-      return <Home className={`${iconSize} text-orange-500`} />;
-    case 'sante':
-      return <Heart className={`${iconSize} text-red-500`} />;
-    case 'divertissement':
-      return <Film className={`${iconSize} text-purple-500`} />;
-    case 'hebergement':
-      return <Hotel className={`${iconSize} text-pink-500`} />;
-    default:
-      return <Home className={`${iconSize} text-gray-500`} />;
   }
 };
