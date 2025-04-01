@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, Moon, Sun, Save, Bookmark, Search } from 'lucide-react';
+import { ChevronLeft, Moon, Sun, Save, Bookmark, Search, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import L from 'leaflet';
@@ -84,6 +84,9 @@ const Categories = () => {
   const [searchSuggestions, setSearchSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [isLocationActive, setIsLocationActive] = useState(false);
   
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -93,15 +96,72 @@ const Categories = () => {
     localStorage.setItem('savedRoutes', JSON.stringify(routes));
   }, [routes]);
 
+  // Géolocalisation de l'utilisateur
+  const getUserLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("La géolocalisation n'est pas supportée par votre navigateur");
+      return;
+    }
+
+    setIsLocating(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation([longitude, latitude]);
+        setIsLocationActive(true);
+        
+        // Centrer la carte sur la position de l'utilisateur
+        if (mapRef.current) {
+          mapRef.current.setView([latitude, longitude], 14);
+        }
+        
+        toast.success("Position actuelle détectée");
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Erreur de géolocalisation:", error);
+        
+        let errorMessage = "Erreur lors de la géolocalisation";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Vous avez refusé l'accès à votre position";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Votre position n'est pas disponible";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "La demande de géolocalisation a expiré";
+            break;
+        }
+        
+        toast.error(errorMessage);
+        setIsLocating(false);
+        setIsLocationActive(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
+  };
+
   // Fonction pour rechercher un lieu avec Mapbox Places API
   const searchLocation = async () => {
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}`
-      );
+      // Construire la requête avec la proximité si l'utilisateur est localisé
+      let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}`;
+      
+      // Ajouter les coordonnées de l'utilisateur pour obtenir des résultats à proximité
+      if (userLocation) {
+        url += `&proximity=${userLocation[0]},${userLocation[1]}`;
+      }
+      
+      const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error('Erreur lors de la recherche');
@@ -136,7 +196,7 @@ const Categories = () => {
       setSearchSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, userLocation]);
 
   // Fonction pour ajouter un lieu depuis les suggestions
   const addSuggestionToMap = (suggestion: SearchSuggestion) => {
@@ -363,6 +423,16 @@ const Categories = () => {
               <Search className="h-5 w-5 mr-1" />
               {isSearching ? 'Recherche...' : 'Rechercher'}
             </Button>
+            {/* Bouton de géolocalisation */}
+            <Button 
+              onClick={getUserLocation} 
+              variant={isLocationActive ? "default" : "outline"}
+              disabled={isLocating}
+              className={isLocationActive ? "bg-blue-500 hover:bg-blue-600" : ""}
+            >
+              <MapPin className="h-5 w-5 mr-1" />
+              {isLocating ? 'Localisation...' : 'Ma position'}
+            </Button>
           </div>
         </div>
         
@@ -522,6 +592,19 @@ const Categories = () => {
                     />
                   ))
                 )}
+                
+                {/* Marqueur pour la position de l'utilisateur */}
+                {isLocationActive && userLocation && (
+                  <Marker 
+                    position={[userLocation[1], userLocation[0]]} 
+                    title="Ma position"
+                    icon={L.icon({
+                      iconUrl: 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234285F4" width="36px" height="36px"><circle cx="12" cy="12" r="8" fill-opacity=".25"/><circle cx="12" cy="12" r="3"/></svg>',
+                      iconSize: [36, 36],
+                      iconAnchor: [18, 18]
+                    })}
+                  />
+                )}
               </MapContainer>
             </div>
             
@@ -573,6 +656,9 @@ const Categories = () => {
                 <div className="px-3 py-2 rounded-md bg-blue-500 text-white">🔵 Travail</div>
                 <div className="px-3 py-2 rounded-md bg-green-500 text-white">🟢 École</div>
                 <div className="px-3 py-2 rounded-md bg-purple-500 text-white">🟣 Divers</div>
+                {isLocationActive && (
+                  <div className="px-3 py-2 rounded-md bg-blue-100 text-blue-800 border border-blue-300">📍 Ma position</div>
+                )}
               </div>
             </div>
           </div>
