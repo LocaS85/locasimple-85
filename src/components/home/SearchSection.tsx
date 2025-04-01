@@ -5,14 +5,14 @@ import CategorySelector from '@/components/CategorySelector';
 import FilterPanel from '@/components/FilterPanel';
 import ResultsList from '@/components/ResultsList';
 import Map from '@/components/Map';
-import type { Category } from '@/components/CategorySelector';
+import { categories as appCategories } from '@/data/categories';
 import type { Result } from '@/components/ResultsList';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Car, PersonStanding, Bike, Bus, Train } from 'lucide-react';
 
 interface SearchSectionProps {
-  categories: Category[];
+  categories: typeof appCategories;
   selectedCategories: string[];
   onCategorySelect: (categoryId: string) => void;
   radius: number;
