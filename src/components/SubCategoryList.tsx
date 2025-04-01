@@ -20,7 +20,6 @@ interface SubCategoryListProps {
 
 export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListProps) => {
   const navigate = useNavigate();
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     radius: 5,
     transportMode: 'driving',
@@ -45,7 +44,7 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
   const renderSubCategories = (categories: SubCategory[]) => {
     return categories.map((category) => (
       <AccordionItem key={category.id} value={category.id}>
-        <AccordionTrigger onClick={() => setSelectedSubCategory(category.id)}>
+        <AccordionTrigger>
           {category.name}
         </AccordionTrigger>
         <AccordionContent>
