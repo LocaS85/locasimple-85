@@ -1,4 +1,30 @@
 
+/* Ensure MapboxGeocoder looks good */
+.mapboxgl-ctrl-geocoder {
+  min-width: 100%;
+  width: 100%;
+  max-width: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mapboxgl-ctrl-geocoder--input {
+  height: 40px;
+  padding-left: 32px;
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+  top: 10px;
+  left: 10px;
+}
+
+.mapboxgl-ctrl-geocoder--button {
+  width: 24px;
+  height: 24px;
+  top: 8px;
+  right: 8px;
+}
+
 /* Mapbox popup customization */
 .mapboxgl-popup-content {
   padding: 12px;
@@ -57,47 +83,4 @@
   align-items: center !important;
   justify-content: center !important;
   margin: 0 !important;
-}
-
-/* Override button styling */
-.map-ctrl-btn:focus, 
-.map-ctrl-btn:active {
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-/* Style mapbox control group for our custom controls */
-.mapboxgl-ctrl-group {
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
-.mapboxgl-ctrl-group > button {
-  width: 30px;
-  height: 30px;
-  display: block;
-  padding: 0;
-  outline: none;
-  border: 0;
-  box-sizing: border-box;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: transparent;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-
-.mapboxgl-ctrl-group > button:last-child {
-  border-bottom: none;
-}
-
-/* Additional styling to better integrate with Mapbox controls */
-.mapboxgl-ctrl-top-right .mapboxgl-ctrl {
-  margin: 10px 10px 0 0;
-}
-
-.mapboxgl-ctrl-group button + button {
-  border-top: 1px solid #ddd;
 }

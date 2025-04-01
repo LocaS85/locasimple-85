@@ -6,6 +6,7 @@ import './index.css'
 import './styles/base.css'
 import './styles/components.css'
 import './styles/animations.css'
+import './styles/mapbox.css' // Add mapbox styles
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
