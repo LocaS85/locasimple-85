@@ -119,23 +119,31 @@ const Categories = () => {
           </motion.h1>
         </div>
         <div className="flex space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigate('/search')}
-            className="hover:scale-110 transition-transform"
+          <motion.div 
             whileHover={{ rotate: 10 }}
+            className="inline-block"
           >
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:scale-110 transition-transform"
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate('/search')}
+              className="hover:scale-110 transition-transform"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+          </motion.div>
+          <motion.div 
             whileHover={{ rotate: -10 }}
+            className="inline-block"
           >
-            <Menu className="h-5 w-5" />
-          </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="hover:scale-110 transition-transform"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
 
