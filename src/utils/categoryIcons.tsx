@@ -51,13 +51,13 @@ import {
   Music,
   Ticket,
   Gamepad2,
-  UmbrellaOff,
-  SwimmingPool,
-  PalmTree,
+  Umbrella,
+  Palmtree,
   Star,
   MapPin,
   CircleEllipsis,
-  Search
+  Search,
+  WaterDroplet
 } from 'lucide-react';
 
 export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => {
@@ -261,7 +261,7 @@ export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => 
     case 'clubs':
       return <Music className={`${className}`} />;
     case 'parcs':
-      return <UmbrellaOff className={`${className}`} />;
+      return <Umbrella className={`${className}`} />;
     case 'centres-loisirs':
       return <Gamepad2 className={`${className}`} />;
     case 'bowling':
@@ -269,9 +269,9 @@ export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => 
     case 'patinoires':
       return <Circle className={`${className}`} />;
     case 'piscines':
-      return <SwimmingPool className={`${className}`} />;
+      return <WaterDroplet className={`${className}`} />;
     case 'plages':
-      return <PalmTree className={`${className}`} />;
+      return <Palmtree className={`${className}`} />;
     
     // Accommodation subcategories
     case 'hotels':
@@ -281,7 +281,7 @@ export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => 
     case 'chambres-hotes':
       return <Hotel className={`${className}`} />;
     case 'camping':
-      return <UmbrellaOff className={`${className}`} />;
+      return <Umbrella className={`${className}`} />;
     case 'locations-vacances':
       return <Home className={`${className}`} />;
     
