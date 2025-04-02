@@ -13,33 +13,40 @@ import {
   BadgeDollarSign
 } from 'lucide-react';
 
-export const getServicesIcon = (categoryId: string, className: string) => {
+export const getServicesIcon = (categoryId: string, className: string, color?: string) => {
+  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
+    if (color) {
+      return <Icon className={className} style={{ color }} />;
+    }
+    return <Icon className={`${className} text-${defaultColor}`} />;
+  };
+
   switch (categoryId) {
     // Main services category
     case 'services':
-      return <Star className={`${className} text-orange-500`} />;
+      return getIcon(Star, "orange-500");
     
     // Services subcategories
     case 'poste':
-      return <Mail className={`${className}`} />;
+      return getIcon(Mail, "blue-600");
     case 'assurances':
-      return <Building className={`${className}`} />;
+      return getIcon(Building, "gray-700");
     case 'immobilier':
-      return <Building2 className={`${className}`} />;
+      return getIcon(Building2, "amber-600");
     case 'services-publics':
-      return <Landmark className={`${className}`} />;
+      return getIcon(Landmark, "blue-800");
     case 'mairie':
-      return <Landmark className={`${className}`} />;
+      return getIcon(Landmark, "blue-500");
     case 'police':
-      return <UserCheck className={`${className}`} />;
+      return getIcon(UserCheck, "blue-700");
     case 'pompiers':
-      return <Siren className={`${className}`} />;
+      return getIcon(Siren, "red-600");
     case 'ambassade':
-      return <Flag className={`${className}`} />;
+      return getIcon(Flag, "green-600");
     case 'emploi':
-      return <Briefcase className={`${className}`} />;
+      return getIcon(Briefcase, "purple-500");
     case 'impots':
-      return <BadgeDollarSign className={`${className}`} />;
+      return getIcon(BadgeDollarSign, "green-700");
     default:
       return null;
   }

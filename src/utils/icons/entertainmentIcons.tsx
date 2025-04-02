@@ -12,37 +12,44 @@ import {
   Palmtree
 } from 'lucide-react';
 
-export const getEntertainmentIcon = (categoryId: string, className: string) => {
+export const getEntertainmentIcon = (categoryId: string, className: string, color?: string) => {
+  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
+    if (color) {
+      return <Icon className={className} style={{ color }} />;
+    }
+    return <Icon className={`${className} text-${defaultColor}`} />;
+  };
+
   switch (categoryId) {
     // Main entertainment category
     case 'divertissement':
-      return <Film className={`${className} text-purple-500`} />;
+      return getIcon(Film, "purple-500");
     
     // Entertainment subcategories
     case 'cinemas':
-      return <Film className={`${className}`} />;
+      return getIcon(Film, "purple-600");
     case 'theatres':
-      return <Ticket className={`${className}`} />;
+      return getIcon(Ticket, "purple-400");
     case 'musees':
-      return <Landmark className={`${className}`} />;
+      return getIcon(Landmark, "yellow-700");
     case 'parcs-attractions':
-      return <Ticket className={`${className}`} />;
+      return getIcon(Ticket, "red-500");
     case 'salles-concert':
-      return <Music className={`${className}`} />;
+      return getIcon(Music, "blue-500");
     case 'clubs':
-      return <Music className={`${className}`} />;
+      return getIcon(Music, "indigo-500");
     case 'parcs':
-      return <Umbrella className={`${className}`} />;
+      return getIcon(Umbrella, "green-600");
     case 'centres-loisirs':
-      return <Gamepad2 className={`${className}`} />;
+      return getIcon(Gamepad2, "pink-500");
     case 'bowling':
-      return <Circle className={`${className}`} />;
+      return getIcon(Circle, "gray-700");
     case 'patinoires':
-      return <Circle className={`${className}`} />;
+      return getIcon(Circle, "blue-300");
     case 'piscines':
-      return <Droplets className={`${className}`} />;
+      return getIcon(Droplets, "blue-500");
     case 'plages':
-      return <Palmtree className={`${className}`} />;
+      return getIcon(Palmtree, "yellow-600");
     default:
       return null;
   }

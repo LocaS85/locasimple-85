@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 interface CategoryGridProps {
   onCategorySelect?: (category: string) => void;

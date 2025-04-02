@@ -1,109 +1,50 @@
 
 import React from 'react';
 import { 
-  ShoppingBag,
-  Shirt,
+  ShoppingBag, 
+  ShoppingCart, 
+  Shirt, 
+  Package, 
+  Gift, 
+  Palette,
   Smartphone,
-  Laptop,
-  Tv,
   BookOpen,
-  Baby,
-  Pill,
-  Sparkles,
-  Glasses,
-  Heart,
-  Scissors,
-  Car,
-  BatteryCharging,
-  Fuel,
-  CreditCard
+  Gem,
+  Flower
 } from 'lucide-react';
 
-export const getShoppingCategoryIcon = (categoryId: string, className: string) => {
+export const getShoppingCategoryIcon = (categoryId: string, className: string, color?: string) => {
+  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
+    if (color) {
+      return <Icon className={className} style={{ color }} />;
+    }
+    return <Icon className={`${className} text-${defaultColor}`} />;
+  };
+
   switch (categoryId) {
     // Main shopping category
-    case 'achats':
-      return <ShoppingBag className={`${className} text-blue-500`} />;
+    case 'shopping':
+      return getIcon(ShoppingBag, "pink-500");
     
     // Shopping subcategories
+    case 'centres-commerciaux':
+      return getIcon(ShoppingCart, "blue-500");
     case 'vetements':
-      return <Shirt className={`${className}`} />;
-    case 'pret-a-porter':
-      return <Shirt className={`${className}`} />;
-    case 'boutiques-luxe':
-      return <Shirt className={`${className}`} />;
+      return getIcon(Shirt, "purple-500");
     case 'chaussures':
-      return <ShoppingBag className={`${className}`} />;
-    case 'accessoires':
-      return <ShoppingBag className={`${className}`} />;
+      return getIcon(Package, "amber-600");
+    case 'cadeaux':
+      return getIcon(Gift, "red-500");
+    case 'art':
+      return getIcon(Palette, "teal-500");
     case 'electronique':
-      return <Smartphone className={`${className}`} />;
-    case 'telephonie':
-      return <Smartphone className={`${className}`} />;
-    case 'informatique':
-      return <Laptop className={`${className}`} />;
-    case 'electromenager':
-      return <Tv className={`${className}`} />;
-    case 'bibliotheques':
-      return <BookOpen className={`${className}`} />;
-    case 'generalistes':
-      return <BookOpen className={`${className}`} />;
-    case 'specialisees':
-      return <BookOpen className={`${className}`} />;
-    case 'occasion':
-      return <BookOpen className={`${className}`} />;
-    case 'jouets':
-      return <Baby className={`${className}`} />;
-    case 'pharmacies':
-      return <Pill className={`${className}`} />;
-    case 'parfumeries':
-      return <Sparkles className={`${className}`} />;
+      return getIcon(Smartphone, "gray-700");
+    case 'librairies':
+      return getIcon(BookOpen, "amber-800");
     case 'bijouteries':
-      return <Sparkles className={`${className}`} />;
-    case 'opticiens':
-      return <Glasses className={`${className}`} />;
-    case 'sport':
-      return <Heart className={`${className}`} />;
+      return getIcon(Gem, "yellow-500");
     case 'fleuristes':
-      return <Sparkles className={`${className}`} />;
-    case 'coiffeurs':
-      return <Scissors className={`${className}`} />;
-    case 'hommes':
-      return <Scissors className={`${className}`} />;
-    case 'femmes':
-      return <Scissors className={`${className}`} />;
-    case 'barbiers':
-      return <Scissors className={`${className}`} />;
-    case 'beaute':
-      return <Sparkles className={`${className}`} />;
-    case 'salon-beaute':
-      return <Sparkles className={`${className}`} />;
-    case 'esthetique':
-      return <Sparkles className={`${className}`} />;
-    case 'ongleries':
-      return <Scissors className={`${className}`} />;
-    case 'spa':
-      return <Heart className={`${className}`} />;
-    case 'pressing':
-      return <Shirt className={`${className}`} />;
-    case 'automobile':
-      return <Car className={`${className}`} />;
-    case 'lavage-auto':
-      return <Car className={`${className}`} />;
-    case 'reparation-auto':
-      return <Car className={`${className}`} />;
-    case 'localisation-auto':
-      return <Car className={`${className}`} />;
-    case 'garages':
-      return <Car className={`${className}`} />;
-    case 'parking':
-      return <Car className={`${className}`} />;
-    case 'bornes-recharge':
-      return <BatteryCharging className={`${className}`} />;
-    case 'stations-service':
-      return <Fuel className={`${className}`} />;
-    case 'banques':
-      return <CreditCard className={`${className}`} />;
+      return getIcon(Flower, "pink-400");
     default:
       return null;
   }
