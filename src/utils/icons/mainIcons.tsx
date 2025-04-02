@@ -9,19 +9,28 @@ import {
   CircleEllipsis 
 } from 'lucide-react';
 
-export const getMainCategoryIcon = (categoryId: string, className: string) => {
+export const getMainCategoryIcon = (categoryId: string, className: string, color?: string) => {
+  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
+    if (color) {
+      return <Icon className={className} style={{ color }} />;
+    }
+    return <Icon className={`${className} text-${defaultColor}`} />;
+  };
+
   switch (categoryId) {
     case 'adresse-principale':
-      return <Home className={`${className} text-primary`} />;
+      return getIcon(Home, "primary");
     case 'famille':
-      return <Users className={`${className} text-secondary`} />;
+      return getIcon(Users, "secondary");
     case 'travail':
-      return <Briefcase className={`${className} text-success`} />;
+      return getIcon(Briefcase, "success");
     case 'ecole':
-      return <BookOpen className={`${className} text-accent`} />;
+      return getIcon(BookOpen, "accent");
     case 'divers':
-      return <CircleEllipsis className={`${className} text-teal-500`} />;
+      return getIcon(CircleEllipsis, "teal-500");
     default:
-      return <MapPin className={`${className} text-gray-500`} />;
+      return color 
+        ? <MapPin className={className} style={{ color }} />
+        : <MapPin className={`${className} text-gray-500`} />;
   }
 };

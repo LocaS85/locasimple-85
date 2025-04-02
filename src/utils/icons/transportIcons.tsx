@@ -6,7 +6,6 @@ import {
   Bike, 
   Train, 
   Plane, 
-  Tram,
   Ship,
   Truck,
   Cable,
@@ -32,7 +31,7 @@ export const getTransportIcon = (categoryId: string, className: string) => {
     case 'plane':
       return <Plane className={`${className}`} />;
     case 'tram':
-      return <Tram className={`${className}`} />;
+      return <Train className={`${className}`} />; // Changed from Tram to Train
     case 'ship':
       return <Ship className={`${className}`} />;
     case 'truck':

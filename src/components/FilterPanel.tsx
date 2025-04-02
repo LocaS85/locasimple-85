@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, PersonStanding, Bike, Bus, Train, Plane, Tram } from 'lucide-react';
+import { Car, PersonStanding, Bike, Bus, Train, Plane } from 'lucide-react';
 
 interface FilterPanelProps {
   radius: number;
@@ -33,7 +32,7 @@ const FilterPanel = ({
     { value: 'transit', label: 'Transport en commun', icon: Bus },
     { value: 'train', label: 'Train', icon: Train },
     { value: 'plane', label: 'Avion', icon: Plane },
-    { value: 'tram', label: 'Tramway', icon: Tram },
+    { value: 'tram', label: 'Tramway', icon: Train },
   ];
 
   const distanceOptions = [1, 2, 3, 5, 7, 10];

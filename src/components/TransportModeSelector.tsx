@@ -69,7 +69,10 @@ export function TransportModeSelector({
                   }}
                 >
                   <div className="flex items-center gap-2">
-                    {getCategoryIcon(mode.id, "h-4 w-4") || (
+                    {getCategoryIcon(mode.id, { 
+                      className: "h-4 w-4", 
+                      color: mode.color 
+                    }) || (
                       <div 
                         className="w-3 h-3 rounded-full" 
                         style={{ backgroundColor: mode.color }}
