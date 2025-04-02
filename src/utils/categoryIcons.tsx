@@ -9,6 +9,7 @@ import { getHealthIcon } from './icons/healthIcons';
 import { getEntertainmentIcon } from './icons/entertainmentIcons';
 import { getAccommodationIcon } from './icons/accommodationIcons';
 import { getTransportIcon } from './icons/transportIcons';
+import { useIconTheme } from '@/hooks/useIconTheme';
 
 interface CategoryIconOptions {
   className?: string;
@@ -46,8 +47,8 @@ export const getCategoryIcon = (
   const accommodationIcon = getAccommodationIcon(categoryId, className, color);
   if (accommodationIcon) return accommodationIcon;
   
-  const transportIcon = getTransportIcon(categoryId, className);
-  if (transportIcon) return colorizeIcon(transportIcon, color);
+  const transportIcon = getTransportIcon(categoryId, className, color);
+  if (transportIcon) return transportIcon;
   
   // Default icon if no category matches
   return <MapPin className={`${className} ${color ? '' : 'text-gray-500'}`} style={color ? { color } : undefined} />;

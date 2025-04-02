@@ -13,45 +13,52 @@ import {
   Navigation
 } from 'lucide-react';
 
-export const getTransportIcon = (categoryId: string, className: string) => {
+export const getTransportIcon = (categoryId: string, className: string, color?: string) => {
+  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
+    if (color) {
+      return <Icon className={className} style={{ color }} />;
+    }
+    return <Icon className={`${className} text-${defaultColor}`} />;
+  };
+
   switch (categoryId) {
     // Main transport category
     case 'transport':
-      return <Bus className={`${className} text-indigo-500`} />;
+      return getIcon(Bus, "indigo-500");
     
     // Transport subcategories
     case 'bus':
-      return <Bus className={`${className}`} />;
+      return getIcon(Bus, "yellow-500");
     case 'car':
-      return <Car className={`${className}`} />;
+      return getIcon(Car, "blue-500");
     case 'bike':
-      return <Bike className={`${className}`} />;
+      return getIcon(Bike, "red-500");
     case 'train':
-      return <Train className={`${className}`} />;
+      return getIcon(Train, "gray-900");
     case 'plane':
-      return <Plane className={`${className}`} />;
+      return getIcon(Plane, "gray-500");
     case 'tram':
-      return <Train className={`${className}`} />; // Changed from Tram to Train
+      return getIcon(Train, "purple-500");
     case 'ship':
-      return <Ship className={`${className}`} />;
+      return getIcon(Ship, "cyan-500");
     case 'truck':
-      return <Truck className={`${className}`} />;
+      return getIcon(Truck, "amber-600");
     case 'cable-car':
-      return <Cable className={`${className}`} />;
+      return getIcon(Cable, "green-500");
     case 'metro':
-      return <Train className={`${className}`} />;
+      return getIcon(Train, "blue-700");
     case 'taxi':
-      return <Car className={`${className}`} />;
+      return getIcon(Car, "yellow-400");
     case 'airport':
-      return <Plane className={`${className}`} />;
+      return getIcon(Plane, "blue-300");
     case 'station':
-      return <Train className={`${className}`} />;
+      return getIcon(Train, "gray-700");
     case 'port':
-      return <Ship className={`${className}`} />;
+      return getIcon(Ship, "blue-400");
     case 'transport-hub':
-      return <LocateFixed className={`${className}`} />;
+      return getIcon(LocateFixed, "purple-400");
     case 'navigation':
-      return <Navigation className={`${className}`} />;
+      return getIcon(Navigation, "gray-800");
     default:
       return null;
   }

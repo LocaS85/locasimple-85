@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useRouteCalculation } from '@/hooks/useRouteCalculation';
 import { useRoutePopup } from '@/hooks/useRoutePopup';
 import { getTransportModeColor } from '@/data/transportModes';
+import { useIconTheme } from '@/hooks/useIconTheme';
 
 interface RouteLayerProps {
   map: mapboxgl.Map | null;
@@ -25,8 +26,11 @@ const RouteLayer: React.FC<RouteLayerProps> = ({
   showDistance = true,
   showDuration = true
 }) => {
+  // Get the color for the transport mode from the theme
+  const { getColor } = useIconTheme();
+  
   // Use the transportMode to determine the color
-  const modeColor = getTransportModeColor(transportMode);
+  const modeColor = getTransportModeColor(transportMode) || getColor(transportMode);
   const routeColor = modeColor || color;
   
   const sourceId = `route-${routeColor.replace('#', '')}-${transportMode}`;
