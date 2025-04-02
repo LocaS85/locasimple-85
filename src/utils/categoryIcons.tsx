@@ -8,6 +8,7 @@ import { getServicesIcon } from './icons/servicesIcons';
 import { getHealthIcon } from './icons/healthIcons';
 import { getEntertainmentIcon } from './icons/entertainmentIcons';
 import { getAccommodationIcon } from './icons/accommodationIcons';
+import { getTransportIcon } from './icons/transportIcons';
 
 export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => {
   // Try to get icon from each category module
@@ -31,6 +32,9 @@ export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => 
   
   const accommodationIcon = getAccommodationIcon(categoryId, className);
   if (accommodationIcon) return accommodationIcon;
+  
+  const transportIcon = getTransportIcon(categoryId, className);
+  if (transportIcon) return transportIcon;
   
   // Default icon if no category matches
   return <MapPin className={`${className} text-gray-500`} />;

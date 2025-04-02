@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/command';
 import { transportModesWithColors } from '@/data/transportModesWithColors';
 import { TransportMode } from '@/types/categoryTypes';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 interface TransportModeSelectorProps {
   value: TransportMode;
@@ -68,10 +69,12 @@ export function TransportModeSelector({
                   }}
                 >
                   <div className="flex items-center gap-2">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: mode.color }}
-                    />
+                    {getCategoryIcon(mode.id, "h-4 w-4") || (
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: mode.color }}
+                      />
+                    )}
                     <span>{mode.name}</span>
                   </div>
                   {value === mode.id && (
