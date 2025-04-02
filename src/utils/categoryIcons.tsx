@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Home, 
@@ -57,7 +56,7 @@ import {
   MapPin,
   CircleEllipsis,
   Search,
-  WaterDroplet
+  Droplets
 } from 'lucide-react';
 
 export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => {
@@ -269,7 +268,7 @@ export const getCategoryIcon = (categoryId: string, className = "h-12 w-12") => 
     case 'patinoires':
       return <Circle className={`${className}`} />;
     case 'piscines':
-      return <WaterDroplet className={`${className}`} />;
+      return <Droplets className={`${className}`} />;
     case 'plages':
       return <Palmtree className={`${className}`} />;
     
