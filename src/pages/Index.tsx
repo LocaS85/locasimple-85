@@ -5,6 +5,7 @@ import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import SearchSection from "@/components/home/SearchSection";
 import { categories } from "@/data/categories";
+import CategoriesGridCompact from "@/components/categories/CategoryGrid";
 import type { Result } from "@/components/ResultsList";
 
 const Index = () => {

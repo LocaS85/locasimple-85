@@ -7,6 +7,7 @@ import { categories } from '@/data/categories';
 import { CATEGORIES } from '@/types/categories';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import { getCategoryColorClass } from '@/utils/categoryColors';
+import { getCategoryTextColor } from '@/utils/categoryColorUtils';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -118,46 +119,6 @@ const SubcategoryGrid = () => {
       )}
     </div>
   );
-};
-
-// Helper function to get text color for each category
-const getCategoryTextColor = (categoryId: string): string => {
-  switch(categoryId) {
-    case 'alimentation': 
-    case 'restaurants':
-    case 'gastronomie':
-    case 'cafes':
-      return '#f97316'; // orange-500
-    case 'divertissement':
-    case 'cinemas':
-    case 'theatres':
-      return '#3b82f6'; // blue-500
-    case 'sante':
-    case 'hopitaux':
-    case 'pharmacies':
-      return '#ef4444'; // red-500
-    case 'travail':
-    case 'bureaux':
-      return '#8b5cf6'; // violet-500
-    case 'shopping':
-    case 'centres-commerciaux':
-    case 'vetements':
-      return '#22c55e'; // green-500
-    case 'education':
-    case 'ecoles':
-    case 'bibliotheques':
-      return '#eab308'; // yellow-500
-    case 'hebergement':
-    case 'hotels':
-    case 'auberges':
-      return '#06b6d4'; // cyan-500
-    case 'transport':
-    case 'stations':
-    case 'aeroports':
-      return '#a855f7'; // purple-500
-    default:
-      return '#f8fafc'; // slate-50
-  }
 };
 
 export default SubcategoryGrid;

@@ -5,12 +5,13 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
 import { getCategoryIcon } from '@/utils/categoryIcons';
+import { getCategoryColorClass } from '@/utils/categoryColors';
 
 interface CategoryGridProps {
   onCategorySelect?: (category: string) => void;
 }
 
-const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
+const CategoriesGridCompact: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   
@@ -40,7 +41,10 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
             onClick={() => handleCategoryClick(category.id)}
           >
             <div className="text-3xl mb-3">
-              <category.icon size={32} className={getCategoryIconColorClass(category.id)} />
+              {getCategoryIcon(category.id, {
+                className: `${getCategoryIconColorClass(category.id)}`,
+                size: 32
+              })}
             </div>
             <span className="font-bold text-sm">{t(category.name) || category.name}</span>
           </motion.div>
@@ -48,27 +52,6 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
       </div>
     </div>
   );
-};
-
-const getCategoryColorClass = (categoryId: string): string => {
-  switch (categoryId) {
-    case 'alimentation':
-      return 'hover:bg-orange-200';
-    case 'divertissement':
-      return 'hover:bg-blue-200';
-    case 'sante':
-      return 'hover:bg-red-200';
-    case 'travail':
-      return 'hover:bg-purple-200';
-    case 'education':
-      return 'hover:bg-yellow-200';
-    case 'shopping':
-      return 'hover:bg-green-200';
-    case 'hotel':
-      return 'hover:bg-cyan-200';
-    default:
-      return 'hover:bg-gray-200';
-  }
 };
 
 const getCategoryIconColorClass = (categoryId: string): string => {
@@ -92,4 +75,4 @@ const getCategoryIconColorClass = (categoryId: string): string => {
   }
 };
 
-export default CategoryGrid;
+export default CategoriesGridCompact;

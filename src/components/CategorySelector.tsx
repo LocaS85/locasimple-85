@@ -2,6 +2,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import { categories as appCategories } from '@/data/categories';
+import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 
 // Updated interface to match the structure from data/categories.ts
 export interface Category {
@@ -32,7 +33,7 @@ const CategorySelector = ({ categories, selectedCategories, onSelect }: Category
             onClick={() => onSelect(category.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${bgClass}`}
           >
-            {React.createElement(category.icon, { className: "h-4 w-4" })}
+            {React.createElement(category.icon, { className: `h-4 w-4 ${getCategoryIconColorClass(category.id)}` })}
             <span>{category.name}</span>
             {selectedCategories.includes(category.id) && (
               <Check className="w-4 h-4" />
