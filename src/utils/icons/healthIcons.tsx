@@ -8,7 +8,7 @@ import {
   Dog,
   Glasses,
   Pill,
-  FirstAid,
+  Activity,
   Flower2
 } from 'lucide-react';
 import clsx from 'clsx';
@@ -19,7 +19,7 @@ const healthIcons: Record<string, { icon: React.FC<any>; color: string }> = {
   sante: { icon: Heart, color: "text-red-500" },
   
   // Health subcategories
-  hopitaux: { icon: FirstAid, color: "text-red-600" },
+  hopitaux: { icon: Activity, color: "text-red-600" },
   cliniques: { icon: Heart, color: "text-pink-500" },
   dentistes: { icon: Stethoscope, color: "text-blue-500" },
   medecins: { icon: Stethoscope, color: "text-green-500" },
