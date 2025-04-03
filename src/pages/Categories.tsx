@@ -8,7 +8,7 @@ import SubcategoryGrid from '@/components/category/SubcategoryGrid';
 const Categories = () => {
   return (
     <motion.div 
-      className="min-h-[calc(100vh-4rem)] bg-gray-50"
+      className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
-import { MapPin } from 'lucide-react';
+import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 
 const CategoryGrid = () => {
   const navigate = useNavigate();
@@ -37,21 +37,6 @@ const CategoryGrid = () => {
     }
   };
 
-  // Function to get color based on category ID
-  const getCategoryColor = (categoryId: string): string => {
-    switch(categoryId) {
-      case 'alimentation': return 'text-orange-500';
-      case 'divertissement': return 'text-blue-500';
-      case 'sante': return 'text-red-500';
-      case 'travail': return 'text-purple-500';
-      case 'shopping': return 'text-green-500';
-      case 'education': return 'text-yellow-500';
-      case 'home': return 'text-pink-500';
-      case 'hotel': return 'text-cyan-500';
-      default: return 'text-gray-500';
-    }
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-center">
@@ -68,16 +53,19 @@ const CategoryGrid = () => {
           <motion.div
             key={category.id}
             variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+            }}
             whileTap={{ scale: 0.98 }}
-            className="bg-gray-900 rounded-xl overflow-hidden cursor-pointer shadow-lg"
+            className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-300"
             onClick={() => handleCategoryClick(category.id)}
           >
-            <div className="p-8 flex flex-col items-center text-center">
-              <div className={`mb-4 ${getCategoryColor(category.id)}`}>
-                <MapPin size={48} />
+            <div className="p-6 flex flex-col items-center text-center">
+              <div className={`mb-4 text-4xl ${getCategoryIconColorClass(category.id)}`}>
+                {React.createElement(category.icon, { size: 48 })}
               </div>
-              <h3 className="text-xl font-medium text-white">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 {t(category.name) || category.name}
               </h3>
             </div>
