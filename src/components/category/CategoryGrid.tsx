@@ -1,77 +1,79 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
-import { getCategoryIcon } from '@/utils/categoryIcons';
-import { getCategoryColorClass } from '@/utils/categoryColors';
+import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 
-interface CategoryGridProps {
-  onCategorySelect?: (category: string) => void;
-}
-
-const CategoriesGridCompact: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
+const CategoryGrid = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   
   const handleCategoryClick = (categoryId: string) => {
-    if (onCategorySelect) {
-      onCategorySelect(categoryId);
-    } else {
-      // Default behavior is to navigate
-      navigate(`/search?category=${categoryId}`);
+    navigate(`/categories/${categoryId}`);
+  };
+
+  // Animation variants for grid items
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto my-10">
-      <h1 className="text-2xl font-bold mb-5 text-center">Catégorie</h1>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">
+        {t('chooseCategory') || 'Choisissez une catégorie'}
+      </h1>
+      
+      <motion.div 
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {categories.map((category) => (
           <motion.div
             key={category.id}
-            whileHover={{ scale: 1.05 }}
+            variants={itemVariants}
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+            }}
             whileTap={{ scale: 0.98 }}
-            className={`
-              bg-white p-5 rounded-2xl flex flex-col items-center justify-center
-              shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer
-              hover:bg-opacity-90 ${getCategoryColorClass(category.id)}
-            `}
+            className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-300"
             onClick={() => handleCategoryClick(category.id)}
           >
-            <div className="text-3xl mb-3">
-              {getCategoryIcon(category.id, {
-                className: `${getCategoryIconColorClass(category.id)}`,
-                // Remove the 'size' property and use className to control size
-              })}
+            <div className="p-6 flex flex-col items-center text-center">
+              <div className={`mb-4 text-4xl ${getCategoryIconColorClass(category.id)}`}>
+                {React.createElement(category.icon, { size: 48 })}
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                {t(category.name) || category.name}
+              </h3>
             </div>
-            <span className="font-bold text-sm">{t(category.name) || category.name}</span>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };
 
-const getCategoryIconColorClass = (categoryId: string): string => {
-  switch (categoryId) {
-    case 'alimentation':
-      return 'text-orange-600';
-    case 'divertissement':
-      return 'text-blue-600';
-    case 'sante':
-      return 'text-red-600';
-    case 'travail':
-      return 'text-purple-600';
-    case 'education':
-      return 'text-yellow-600';
-    case 'shopping':
-      return 'text-green-600';
-    case 'hotel':
-      return 'text-cyan-600';
-    default:
-      return 'text-gray-600';
-  }
-};
-
-export default CategoriesGridCompact;
+export default CategoryGrid;
