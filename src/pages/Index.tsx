@@ -3,21 +3,14 @@ import React, { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
-import SearchSection from "@/components/home/SearchSection";
-import { categories } from "@/data/categories";
-import type { Result } from "@/components/ResultsList";
+import { motion } from "framer-motion";
 import { Hotel, Store, Heart, Briefcase, Utensils, Film, BookOpen, Home } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { t } = useLanguage();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [radius, setRadius] = useState(5);
-  const [transportMode, setTransportMode] = useState("driving");
-  const [resultsCount, setResultsCount] = useState(10);
   
-  // Mock results for the SearchSection
-  const mockResults: Result[] = [];
-
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategories((prevSelected) =>
       prevSelected.includes(categoryId)
@@ -29,59 +22,117 @@ const Index = () => {
   return (
     <div className="w-full">
       <HeroSection />
-      <SearchSection 
-        categories={categories}
-        selectedCategories={selectedCategories}
-        onCategorySelect={handleCategorySelect}
-        radius={radius}
-        onRadiusChange={setRadius}
-        transportMode={transportMode}
-        onTransportModeChange={setTransportMode}
-        resultsCount={resultsCount}
-        onResultsCountChange={setResultsCount}
-        results={mockResults}
+      
+      <CategoriesSection 
+        selectedCategories={selectedCategories} 
+        onCategorySelect={handleCategorySelect} 
       />
-      <CategoriesSection selectedCategories={selectedCategories} onCategorySelect={handleCategorySelect} />
+      
       <FeaturesSection />
+      
+      <DiscoverSection />
     </div>
   );
 };
 
-const CategoriesSection = ({ selectedCategories, onCategorySelect }: { selectedCategories: string[], onCategorySelect: (id: string) => void }) => {
+const CategoriesSection = ({ 
+  selectedCategories, 
+  onCategorySelect 
+}: { 
+  selectedCategories: string[], 
+  onCategorySelect: (id: string) => void 
+}) => {
   const { t } = useLanguage();
   
   const categoryIcons = {
-    alimentation: <Utensils size={48} className="text-orange-400" />,
-    divertissement: <Film size={48} className="text-blue-400" />,
-    sante: <Heart size={48} className="text-red-400" />,
-    travail: <Briefcase size={48} className="text-purple-400" />,
-    shopping: <Store size={48} className="text-green-400" />,
-    education: <BookOpen size={48} className="text-yellow-400" />,
-    home: <Home size={48} className="text-pink-400" />,
-    hotel: <Hotel size={48} className="text-cyan-400" />,
+    alimentation: <Utensils size={36} className="text-orange-500" />,
+    divertissement: <Film size={36} className="text-blue-500" />,
+    sante: <Heart size={36} className="text-red-500" />,
+    travail: <Briefcase size={36} className="text-purple-500" />,
+    shopping: <Store size={36} className="text-green-500" />,
+    education: <BookOpen size={36} className="text-yellow-500" />,
+    home: <Home size={36} className="text-pink-500" />,
+    hotel: <Hotel size={36} className="text-cyan-500" />,
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-12 px-4">
-      <h2 className="text-2xl font-bold mb-8 text-center">{t('exploreCategories') || 'Explore Categories'}</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        {Object.entries(categoryIcons).map(([category, icon]) => (
-          <button
-            key={category}
-            onClick={() => onCategorySelect(category)}
-            className={`relative flex flex-col items-center justify-center p-6 rounded-xl shadow-xl transition-all 
-              transform hover:scale-105 hover:-translate-y-2 
-              bg-gray-900 hover:bg-gradient-to-br hover:from-gray-800 hover:to-gray-900
-              ${selectedCategories.includes(category) ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900' : ''}`}
-          >
-            <div className="transition-all transform hover:rotate-12">
-              {icon}
-            </div>
-            <p className="mt-2 text-white uppercase tracking-wider text-sm">
-              {t(category) || category}
-            </p>
-          </button>
-        ))}
+    <div className="bg-white py-16 px-4">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <h2 className="text-3xl font-bold mb-10 text-center">
+            {t('exploreCategories')}
+          </h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {Object.entries(categoryIcons).map(([category, icon]) => (
+              <motion.div
+                key={category}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <button
+                  onClick={() => onCategorySelect(category)}
+                  className={`w-full flex flex-col items-center justify-center p-4 rounded-xl transition-all
+                    ${selectedCategories.includes(category) 
+                      ? 'bg-blue-50 border-2 border-blue-500' 
+                      : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'}`}
+                >
+                  <div className="mb-3">{icon}</div>
+                  <p className="text-sm font-medium">
+                    {t(category) || category}
+                  </p>
+                </button>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="mt-8 text-center">
+            <Link 
+              to="/categories" 
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {t('browseCategories')}
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+const DiscoverSection = () => {
+  const { t } = useLanguage();
+  
+  return (
+    <div className="bg-gray-50 py-16 px-4">
+      <div className="max-w-5xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h2 className="text-3xl font-bold mb-6">
+            {t('startExploring')}
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
+            Notre application vous permet de trouver facilement ce dont vous avez besoin, 
+            où que vous soyez. Essayez dès maintenant et découvrez les possibilités !
+          </p>
+          
+          <Link to="/search">
+            <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 rounded-full px-8"
+            >
+              {t('search')}
+            </Button>
+          </Link>
+        </motion.div>
       </div>
     </div>
   );

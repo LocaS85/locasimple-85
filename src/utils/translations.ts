@@ -23,6 +23,21 @@ export const translations = {
     'saved': 'Enregistrés',
     'settings': 'Paramètres',
     
+    // Home page
+    'discoverPlacesNearYou': 'Découvrez des lieux près de chez vous',
+    'findBestPlacesDesc': 'Trouvez facilement les meilleurs endroits à proximité avec notre service de localisation intelligent',
+    'startExploring': 'Commencer l\'exploration',
+    'browseCategories': 'Parcourir les catégories',
+    'exploreCategories': 'Explorer les catégories',
+    'key_features': 'Fonctionnalités clés',
+    'features_description': 'Découvrez ce qui rend notre service unique et comment il peut vous aider à trouver ce dont vous avez besoin',
+    'search_description': 'Trouvez ce dont vous avez besoin grâce à nos puissantes capacités de recherche',
+    'navigation': 'Navigation précise',
+    'navigation_description': 'Arrivez à destination avec des directions détaillées',
+    'categories_description': 'Parcourez par catégories pour découvrir de nouveaux lieux et services',
+    'start_exploring': 'Commencer l\'exploration',
+    'learnMore': 'En savoir plus',
+    
     // Categories
     'all': 'Tous',
     'restaurants': 'Restaurants',
@@ -35,6 +50,13 @@ export const translations = {
     'services': 'Services',
     'education': 'Éducation',
     'transport': 'Transport',
+    'alimentation': 'Alimentation',
+    'divertissement': 'Divertissement',
+    'sante': 'Santé',
+    'travail': 'Travail',
+    'education': 'Éducation',
+    'home': 'Maison',
+    'hotel': 'Hôtel',
     
     // Filters
     'filters': 'Filtres',
