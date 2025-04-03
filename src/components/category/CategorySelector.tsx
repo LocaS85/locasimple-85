@@ -21,7 +21,7 @@ const CategorySelector: React.FC = () => {
     <ScrollArea className="flex-1">
       <div className="p-6 space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">{t('selectCategory')}</h2>
+          <h2 className="text-2xl font-semibold">Catégorie</h2>
           <Button onClick={() => setListView(!listView)} variant="outline">
             {listView ? <Grid className="w-4 h-4" /> : <List className="w-4 h-4" />}
           </Button>
