@@ -68,7 +68,7 @@ const SubcategoryGrid = () => {
         Retour aux catégories
       </Button>
       
-      <h1 className="text-3xl font-bold mb-8 text-center text-3d">
+      <h1 className="text-3xl font-bold mb-8 text-center">
         {mainCategory ? (t(mainCategory.name) || mainCategory.name) : (t(category?.name || '') || category?.name || '')}
       </h1>
       
@@ -79,36 +79,37 @@ const SubcategoryGrid = () => {
           initial="hidden"
           animate="visible"
         >
-          {subCategories.map((subCategory) => (
-            <motion.div
-              key={subCategory.id}
-              variants={itemVariants}
-              whileHover={{ 
-                scale: 1.05,
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
-              }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-gray-900 text-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 shadow-xl"
-              onClick={() => navigate(`/search?category=${subCategory.id}`)}
-            >
-              <div className="p-8 flex flex-col items-center text-center relative h-full">
-                <div className="mb-6 transform translate-z-10 text-5xl">
-                  {getCategoryIcon(subCategory.id, {
-                    className: "w-16 h-16", 
-                    color: getCategoryTextColor(subCategory.id)
-                  })}
+          {subCategories.map((subCategory) => {
+            // Get the appropriate color and icon for each subcategory
+            const iconColor = getCategoryTextColor(subCategory.id);
+            
+            return (
+              <motion.div
+                key={subCategory.id}
+                variants={itemVariants}
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => navigate(`/search?category=${subCategory.id}`)}
+              >
+                <div className="p-6 flex flex-col items-center text-center">
+                  <div className="mb-4 text-5xl">
+                    {getCategoryIcon(subCategory.id, "w-16 h-16", iconColor)}
+                  </div>
+                  <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                    {t(subCategory.name) || subCategory.name}
+                  </h3>
                 </div>
-                <h3 className="text-xl font-semibold transform translate-z-10">
-                  {t(subCategory.name) || subCategory.name}
-                </h3>
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-800/50 to-gray-900/90"></div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </motion.div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-xl text-gray-500">Aucune sous-catégorie disponible.</p>
+          <p className="text-xl text-gray-500 dark:text-gray-400">Aucune sous-catégorie disponible.</p>
           <Button 
             className="mt-4 hover:scale-105 transform transition-all" 
             onClick={() => navigate(`/search?category=${categoryId}`)}
