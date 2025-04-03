@@ -23,37 +23,40 @@ import Payment from "./pages/Payment";
 import Navigation from "./pages/Navigation";
 import SearchPage from "./pages/SearchPage";
 import Categories from "./pages/Categories";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const App = () => (
-  <TooltipProvider>
-    <GoogleMapsLoader>
-      <Toaster />
-      <Sonner />
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Index />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/place/:id" element={<PlaceDetails />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/plan" element={<Plan />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/categories/*" element={<Categories />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/navigation" element={<Navigation />} />
-      </Routes>
-    </GoogleMapsLoader>
-  </TooltipProvider>
+  <LanguageProvider>
+    <TooltipProvider>
+      <GoogleMapsLoader>
+        <Toaster />
+        <Sonner />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Index />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/place/:id" element={<PlaceDetails />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/plan" element={<Plan />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/categories/*" element={<Categories />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/navigation" element={<Navigation />} />
+        </Routes>
+      </GoogleMapsLoader>
+    </TooltipProvider>
+  </LanguageProvider>
 );
 
 export default App;

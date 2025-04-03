@@ -4,9 +4,11 @@ import MapComponent from '@/components/map/MapComponent';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const NavigationPage = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
   return (
     <div className="flex flex-col h-screen">

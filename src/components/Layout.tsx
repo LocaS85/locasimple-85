@@ -1,21 +1,16 @@
 
-import React from "react";
-import { Outlet } from "react-router-dom";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
-interface LayoutProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-const Layout = ({ className, children }: LayoutProps) => {
+const Layout = () => {
   return (
-    <div className={cn("min-h-screen flex flex-col w-full font-sans bg-white", className)}>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1 w-full">
-        {children || <Outlet />}
+      <main className="flex-1">
+        <Outlet />
       </main>
       <Footer />
     </div>

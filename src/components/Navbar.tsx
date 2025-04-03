@@ -1,123 +1,203 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { MapPin, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Menu, X, Search, User, LogIn, Home, Info, HelpCircle, Map } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import LanguageSelector from './LanguageSelector';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useLanguage();
-  const location = useLocation();
-  const isMobile = useIsMobile();
-  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Check if a link is active
-  const isActive = (path: string) => location.pathname === path;
-
-  const navLinks = [
-    { path: '/', label: 'Accueil' },
-    { path: '/search', label: 'Recherche' },
-    { path: '/categories', label: 'Catégories' },
-    { path: '/about', label: 'À propos' }
-  ];
-  
-  // Component for navigation links - reused in desktop and mobile views
-  const NavLinks = ({ mobile = false, onClick = () => {} }) => (
-    <>
-      {navLinks.map((link) => (
-        <Link 
-          key={link.path}
-          to={link.path} 
-          className={`${mobile ? 'text-lg py-3 w-full' : 'text-sm'} transition-colors ${
-            isActive(link.path) 
-              ? 'text-blue-600 font-medium' 
-              : 'text-gray-600 hover:text-blue-600'
-          } ${mobile ? 'block border-b border-gray-100' : ''}`}
-          onClick={mobile ? onClick : undefined}
-        >
-          {link.label}
-        </Link>
-      ))}
-    </>
-  );
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
-    <header className="bg-white py-4 shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="text-blue-600">
-            <MapPin className="h-6 w-6" />
-          </div>
-          <span className="text-xl font-bold text-blue-600">
-            LocaSimple
-          </span>
-        </Link>
+    <nav className="sticky top-0 z-50 bg-white shadow-sm">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <Map className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold text-gray-900">LocaSimple</span>
+          </Link>
 
-        {isMobile ? (
-          // Mobile navigation with sheet component
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Menu">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[80vw] sm:w-[350px] p-0">
-              <div className="flex flex-col h-full">
-                <div className="p-4 border-b flex justify-between items-center">
-                  <Link to="/" className="flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
-                    <MapPin className="h-5 w-5 text-blue-600" />
-                    <span className="font-bold text-blue-600">LocaSimple</span>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>{t('discover')}</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <Link
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-500 to-blue-700 p-6 no-underline outline-none focus:shadow-md"
+                            to="/search"
+                          >
+                            <Search className="h-6 w-6 text-white" />
+                            <div className="mt-4 mb-2 text-lg font-medium text-white">
+                              {t('search')}
+                            </div>
+                            <p className="text-sm leading-tight text-white/90">
+                              {t('searchDescription')}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/categories"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">{t('categories')}</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              {t('browseCategories')}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to="/about"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">{t('about')}</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              {t('aboutDescription')}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/pricing">
+                    <NavigationMenuLink className={cn(
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                    )}>
+                      {t('pricing')}
+                    </NavigationMenuLink>
                   </Link>
-                  <Button variant="ghost" size="icon" onClick={() => setMenuOpen(false)}>
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                
-                <div className="flex flex-col p-4 space-y-1 flex-1">
-                  <NavLinks mobile onClick={() => setMenuOpen(false)} />
-                </div>
-                
-                <div className="p-4 border-t mt-auto">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-gray-500">Langue</span>
-                    <LanguageSelector variant="ghost" size="sm" />
-                  </div>
-                  <Link to="/login" onClick={() => setMenuOpen(false)}>
-                    <Button 
-                      variant="default" 
-                      size="default" 
-                      className="bg-blue-600 hover:bg-blue-700 w-full"
-                    >
-                      S'inscrire
-                    </Button>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/faq">
+                    <NavigationMenuLink className={cn(
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                    )}>
+                      {t('faq')}
+                    </NavigationMenuLink>
                   </Link>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : (
-          // Desktop navigation
-          <nav className="flex items-center space-x-6">
-            <NavLinks />
-            <LanguageSelector variant="ghost" size="sm" />
-            
-            <Link to="/login">
-              <Button 
-                variant="default" 
-                size="sm" 
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                S'inscrire
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/contact">
+                    <NavigationMenuLink className={cn(
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                    )}>
+                      {t('contactUs')}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            <div className="flex items-center space-x-2">
+              <LanguageSelector variant="outline" size="sm" />
+              <Link to="/search">
+                <Button variant="ghost" size="icon">
+                  <Search className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="outline" size="sm" className="hidden lg:flex">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  {t('login')}
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm" className="hidden lg:flex">
+                  {t('register')}
+                </Button>
+              </Link>
+              <Link to="/profile">
+                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden">
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex md:hidden items-center space-x-2">
+            <LanguageSelector variant="ghost" size="icon" className="p-0" />
+            <Link to="/search">
+              <Button variant="ghost" size="icon" className="p-0">
+                <Search className="h-5 w-5" />
               </Button>
             </Link>
-          </nav>
-        )}
+            <Button variant="ghost" size="icon" onClick={toggleMenu} className="p-0">
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
+        </div>
       </div>
-    </header>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t py-4">
+          <div className="container mx-auto px-4 space-y-4">
+            <Link to="/" className="flex items-center py-2" onClick={toggleMenu}>
+              <Home className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('home')}</span>
+            </Link>
+            <Link to="/categories" className="flex items-center py-2" onClick={toggleMenu}>
+              <Map className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('categories')}</span>
+            </Link>
+            <Link to="/pricing" className="flex items-center py-2" onClick={toggleMenu}>
+              <Info className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('pricing')}</span>
+            </Link>
+            <Link to="/faq" className="flex items-center py-2" onClick={toggleMenu}>
+              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('faq')}</span>
+            </Link>
+            <Link to="/contact" className="flex items-center py-2" onClick={toggleMenu}>
+              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
+              <span>{t('contactUs')}</span>
+            </Link>
+            <div className="pt-2 flex flex-col space-y-2">
+              <Link to="/login" onClick={toggleMenu}>
+                <Button variant="outline" className="w-full">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  {t('login')}
+                </Button>
+              </Link>
+              <Link to="/register" onClick={toggleMenu}>
+                <Button className="w-full">
+                  {t('register')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
   );
 };
 
