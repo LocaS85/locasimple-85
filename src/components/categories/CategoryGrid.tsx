@@ -43,7 +43,7 @@ const CategoriesGridCompact: React.FC<CategoryGridProps> = ({ onCategorySelect }
             <div className="text-3xl mb-3">
               {getCategoryIcon(category.id, {
                 className: `${getCategoryIconColorClass(category.id)}`,
-                size: 32
+                // Remove the 'size' property and use className to control size
               })}
             </div>
             <span className="font-bold text-sm">{t(category.name) || category.name}</span>
