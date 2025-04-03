@@ -11,6 +11,7 @@ import { getCategoryTextColor } from '@/utils/categoryColorUtils';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
+import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
 
 const SubcategoryGrid = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -58,6 +59,20 @@ const SubcategoryGrid = () => {
     }
   };
   
+  // Function to get the appropriate icon for a subcategory
+  const getSubcategoryIcon = (subCategoryId: string) => {
+    // For entertainment subcategories, use specific entertainment icons
+    if (categoryId === 'divertissement') {
+      return getEntertainmentIcon(subCategoryId, "w-16 h-16");
+    }
+    
+    // For other categories, use the regular category icon
+    return getCategoryIcon(subCategoryId, {
+      className: "w-16 h-16",
+      color: getCategoryTextColor(subCategoryId)
+    });
+  };
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <Button 
@@ -102,11 +117,7 @@ const SubcategoryGrid = () => {
               >
                 <div className="p-6 flex flex-col items-center text-center">
                   <div className="mb-4 text-5xl">
-                    {/* Using getCategoryIcon with improved className and color handling */}
-                    {getCategoryIcon(subCategory.id, {
-                      className: "w-16 h-16",
-                      color: iconColor
-                    })}
+                    {getSubcategoryIcon(subCategory.id)}
                   </div>
                   <h3 className="text-xl font-medium text-gray-900 dark:text-white">
                     {t(subCategory.name) || subCategory.name}
