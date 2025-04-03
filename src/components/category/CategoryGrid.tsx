@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
-import { getCategoryIcon } from '@/utils/categoryIcons';
-import { getCategoryColorClass } from '@/utils/categoryColors';
+import { MapPin } from 'lucide-react';
 
 const CategoryGrid = () => {
   const navigate = useNavigate();
@@ -38,9 +37,26 @@ const CategoryGrid = () => {
     }
   };
 
+  // Function to get color based on category ID
+  const getCategoryColor = (categoryId: string): string => {
+    switch(categoryId) {
+      case 'alimentation': return 'text-orange-500';
+      case 'divertissement': return 'text-blue-500';
+      case 'sante': return 'text-red-500';
+      case 'travail': return 'text-purple-500';
+      case 'shopping': return 'text-green-500';
+      case 'education': return 'text-yellow-500';
+      case 'home': return 'text-pink-500';
+      case 'hotel': return 'text-cyan-500';
+      default: return 'text-gray-500';
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center text-3d">{t('chooseCategory') || 'Choisissez une catégorie'}</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">
+        {t('chooseCategory') || 'Choisissez une catégorie'}
+      </h1>
       
       <motion.div 
         className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -52,46 +68,24 @@ const CategoryGrid = () => {
           <motion.div
             key={category.id}
             variants={itemVariants}
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
-            }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-gray-900 text-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 shadow-xl"
+            className="bg-gray-900 rounded-xl overflow-hidden cursor-pointer shadow-lg"
             onClick={() => handleCategoryClick(category.id)}
           >
-            <div className="p-8 flex flex-col items-center text-center relative h-full">
-              <div className="mb-6 transform translate-z-10 text-5xl">
-                {getCategoryIcon(category.id, {
-                  className: "w-16 h-16", 
-                  color: getCategoryTextColor(category.id)
-                })}
+            <div className="p-8 flex flex-col items-center text-center">
+              <div className={`mb-4 ${getCategoryColor(category.id)}`}>
+                <MapPin size={48} />
               </div>
-              <h3 className="text-xl font-semibold transform translate-z-10">
+              <h3 className="text-xl font-medium text-white">
                 {t(category.name) || category.name}
               </h3>
-              <div className="absolute inset-0 bg-gradient-to-b from-gray-800/50 to-gray-900/90"></div>
             </div>
           </motion.div>
         ))}
       </motion.div>
     </div>
   );
-};
-
-// Helper function to get text color for each category
-const getCategoryTextColor = (categoryId: string): string => {
-  switch(categoryId) {
-    case 'alimentation': return '#f97316'; // orange-500
-    case 'divertissement': return '#3b82f6'; // blue-500
-    case 'sante': return '#ef4444'; // red-500
-    case 'travail': return '#8b5cf6'; // violet-500
-    case 'shopping': return '#22c55e'; // green-500
-    case 'education': return '#eab308'; // yellow-500
-    case 'home': return '#ec4899'; // pink-500
-    case 'hotel': return '#06b6d4'; // cyan-500
-    default: return '#f8fafc'; // slate-50
-  }
 };
 
 export default CategoryGrid;
