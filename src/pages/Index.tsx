@@ -52,7 +52,7 @@ const CategoriesSection = ({
     travail: <Briefcase size={36} className="text-purple-500" />,
     shopping: <Store size={36} className="text-green-500" />,
     education: <BookOpen size={36} className="text-yellow-500" />,
-    home: <Home size={36} className="text-pink-500" />,
+    maison: <Home size={36} className="text-pink-500" />,
     hotel: <Hotel size={36} className="text-cyan-500" />,
   };
 
@@ -64,20 +64,27 @@ const CategoriesSection = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-3xl font-bold mb-10 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-center">
             {t('exploreCategories')}
           </h2>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {Object.entries(categoryIcons).map(([category, icon]) => (
+          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-10">
+            {t('categoriesDescription')}
+          </p>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            {Object.entries(categoryIcons).map(([category, icon], index) => (
               <motion.div
                 key={category}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 * index }}
               >
                 <button
                   onClick={() => onCategorySelect(category)}
-                  className={`w-full flex flex-col items-center justify-center p-4 rounded-xl transition-all
+                  className={`w-full h-32 flex flex-col items-center justify-center p-4 rounded-xl transition-all shadow-sm hover:shadow-md
                     ${selectedCategories.includes(category) 
                       ? 'bg-blue-50 border-2 border-blue-500' 
                       : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'}`}
@@ -91,15 +98,22 @@ const CategoriesSection = ({
             ))}
           </div>
           
-          <div className="mt-8 text-center">
-            <Link 
-              to="/categories" 
-              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
-            >
-              {t('browseCategories')}
-              <ArrowRight className="ml-1 h-4 w-4" />
+          <motion.div 
+            className="mt-10 text-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.6 }}
+          >
+            <Link to="/categories">
+              <Button 
+                variant="outline" 
+                className="rounded-full group"
+              >
+                <span>{t('browseCategories')}</span>
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
@@ -110,29 +124,41 @@ const DiscoverSection = () => {
   const { t } = useLanguage();
   
   return (
-    <div className="bg-gray-50 py-16 px-4">
+    <div className="bg-gradient-to-b from-gray-50 to-white py-16 px-4">
       <div className="max-w-5xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="bg-white p-8 rounded-2xl shadow-lg"
         >
-          <h2 className="text-3xl font-bold mb-6">
+          <h2 className="text-3xl font-bold mb-6 text-blue-600">
             {t('startExploring')}
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
-            Notre application vous permet de trouver facilement ce dont vous avez besoin, 
-            où que vous soyez. Essayez dès maintenant et découvrez les possibilités !
+            {t('exploreDescription')}
           </p>
           
-          <Link to="/search">
-            <Button 
-              size="lg" 
-              className="bg-blue-600 hover:bg-blue-700 rounded-full px-8"
-            >
-              {t('search')}
-            </Button>
-          </Link>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link to="/search">
+              <Button 
+                size="lg" 
+                className="bg-blue-600 hover:bg-blue-700 rounded-full px-8 shadow-md hover:shadow-lg transition-all"
+              >
+                {t('search')}
+              </Button>
+            </Link>
+            
+            <Link to="/categories">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="rounded-full px-8 border-blue-300 text-blue-600 hover:bg-blue-50"
+              >
+                {t('browseCategories')}
+              </Button>
+            </Link>
+          </div>
         </motion.div>
       </div>
     </div>

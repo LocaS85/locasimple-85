@@ -29,6 +29,8 @@ export const translations = {
     'startExploring': 'Commencer l\'exploration',
     'browseCategories': 'Parcourir les catégories',
     'exploreCategories': 'Explorer les catégories',
+    'categoriesDescription': 'Choisissez parmi nos catégories pour trouver exactement ce que vous cherchez',
+    'exploreDescription': 'Notre application vous permet de trouver facilement ce dont vous avez besoin, où que vous soyez. Essayez dès maintenant et découvrez les possibilités !',
     'key_features': 'Fonctionnalités clés',
     'features_description': 'Découvrez ce qui rend notre service unique et comment il peut vous aider à trouver ce dont vous avez besoin',
     'search_description': 'Trouvez ce dont vous avez besoin grâce à nos puissantes capacités de recherche',
