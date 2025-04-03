@@ -1,3 +1,4 @@
+
 export const translations = {
   'fr': {
     // Navigation
@@ -270,15 +271,18 @@ export const translations = {
     'questionsAboutPlans': 'Des questions sur nos plans ?',
 
     // Navbar
+    'navHome': 'Accueil',
+    'navAbout': 'À propos',
+    'navSearch': 'Recherche',
+    'navPricing': 'Tarifs',
+    'navFaq': 'FAQ',
+    'navContact': 'Contact',
+    'navLogin': 'Connexion',
+    'navRegister': 'Inscription',
+    'navProfile': 'Profil',
     'discover': 'Découvrir',
     'aboutDescription': 'À propos de LocaSimple',
     'searchDescription': 'Rechercher des lieux à proximité',
-    'pricing': 'Tarifs',
-    'faq': 'FAQ',
-    'contactUs': 'Contact',
-    'login': 'Connexion',
-    'register': 'Inscription',
-    'profile': 'Profil',
 
     // Footer
     'footerDescription': 'LocaSimple vous aide à explorer facilement les lieux qui vous entourent. Découvrez de nouveaux endroits, planifiez vos trajets et optimisez votre temps.',
@@ -290,7 +294,7 @@ export const translations = {
   },
   
   'en': {
-    // Navigation
+    // General
     'back': 'Back',
     'backToHome': 'Back to home',
     'search': 'Search',
@@ -520,15 +524,18 @@ export const translations = {
     'questionsAboutPlans': 'Questions about our plans?',
 
     // Navbar
+    'navHome': 'Home',
+    'navAbout': 'About',
+    'navSearch': 'Search',
+    'navPricing': 'Pricing',
+    'navFaq': 'FAQ',
+    'navContact': 'Contact',
+    'navLogin': 'Login',
+    'navRegister': 'Register',
+    'navProfile': 'Profile',
     'discover': 'Discover',
     'aboutDescription': 'About LocaSimple',
     'searchDescription': 'Search for nearby places',
-    'pricing': 'Pricing',
-    'faq': 'FAQ',
-    'contactUs': 'Contact',
-    'login': 'Connexion',
-    'register': 'Inscription',
-    'profile': 'Profil',
 
     // Footer
     'footerDescription': 'LocaSimple helps you easily explore places around you. Discover new places, plan your routes and optimize your time.',
@@ -552,3 +559,4 @@ export const translations = {
     // ... keep existing code (German translations)
   }
 };
+
