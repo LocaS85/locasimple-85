@@ -57,6 +57,15 @@
   }
 }
 
+@keyframes glowPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+  }
+}
+
 /* Animation Classes */
 .float-animation {
   animation: float 3s ease-in-out infinite;
@@ -76,6 +85,10 @@
 
 .rotate-in-3d {
   animation: rotateIn3d 0.8s forwards;
+}
+
+.glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
 }
 
 /* 3D Transform Utilities */
@@ -107,18 +120,24 @@
   transform: rotateX(5deg);
 }
 
-/* Card 3D effects */
-.card-3d {
+/* Futuristic Card Effects */
+.card-futuristic {
   position: relative;
   transform-style: preserve-3d;
-  transition: all 0.5s ease;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card-3d:hover {
-  transform: rotateX(5deg) rotateY(5deg) scale(1.05);
+.card-futuristic:hover {
+  transform: translateY(-5px) scale(1.03) rotateX(2deg);
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+    0 5px 10px -5px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-.card-3d::before {
+.card-futuristic::before {
   content: '';
   position: absolute;
   top: 0;
@@ -127,6 +146,26 @@
   bottom: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
   pointer-events: none;
+  z-index: 1;
+}
+
+.card-futuristic-icon {
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.card-futuristic:hover .card-futuristic-icon {
+  transform: translateY(-5px) scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.card-futuristic-title {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* 3D depth shadows */
@@ -152,4 +191,39 @@
     0 8px 8px rgba(0,0,0,0.1),
     0 16px 16px rgba(0,0,0,0.1),
     0 32px 32px rgba(0,0,0,0.1);
+}
+
+/* Holographic Effects */
+.holographic-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.holographic-glow::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 30%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg);
+  animation: holographicShine 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes holographicShine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(30deg);
+  }
 }
