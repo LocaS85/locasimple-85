@@ -80,7 +80,7 @@ const SubcategoryGrid = () => {
           animate="visible"
         >
           {subCategories.map((subCategory) => {
-            // Get the appropriate color and icon for each subcategory
+            // Get the appropriate color for the subcategory
             const iconColor = getCategoryTextColor(subCategory.id);
             
             return (
@@ -97,7 +97,10 @@ const SubcategoryGrid = () => {
               >
                 <div className="p-6 flex flex-col items-center text-center">
                   <div className="mb-4 text-5xl">
-                    {getCategoryIcon(subCategory.id, "w-16 h-16", iconColor)}
+                    {getCategoryIcon(subCategory.id, {
+                      className: "w-16 h-16",
+                      color: iconColor
+                    })}
                   </div>
                   <h3 className="text-xl font-medium text-gray-900 dark:text-white">
                     {t(subCategory.name) || subCategory.name}
