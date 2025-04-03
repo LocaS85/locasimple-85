@@ -54,8 +54,7 @@ export const translations = {
     'divertissement': 'Divertissement',
     'sante': 'Santé',
     'travail': 'Travail',
-    'education': 'Éducation',
-    'home': 'Maison',
+    'maison': 'Maison',
     'hotel': 'Hôtel',
     
     // Filters

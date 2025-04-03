@@ -4,8 +4,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import { motion } from "framer-motion";
-import { Hotel, Store, Heart, Briefcase, Utensils, Film, BookOpen, Home } from "lucide-react";
+import { Hotel, Store, Heart, Briefcase, Utensils, Film, BookOpen, Home, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { t } = useLanguage();
