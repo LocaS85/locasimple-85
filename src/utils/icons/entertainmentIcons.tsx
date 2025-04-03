@@ -2,14 +2,17 @@
 import React from 'react';
 import { 
   Film,
-  Ticket,
+  Theater,
   Landmark,
   Music,
-  Umbrella,
+  Palmtree,
   Gamepad2,
-  Circle,
-  Droplets,
-  Palmtree
+  Snowflake,
+  Waves,
+  PartyPopper,
+  Tent,
+  Microphone,
+  Trees
 } from 'lucide-react';
 
 export const getEntertainmentIcon = (categoryId: string, className: string, color?: string) => {
@@ -29,25 +32,25 @@ export const getEntertainmentIcon = (categoryId: string, className: string, colo
     case 'cinemas':
       return getIcon(Film, "purple-600");
     case 'theatres':
-      return getIcon(Ticket, "purple-400");
+      return getIcon(Theater, "purple-400");
     case 'musees':
       return getIcon(Landmark, "yellow-700");
     case 'parcs-attractions':
-      return getIcon(Ticket, "red-500");
+      return getIcon(PartyPopper, "red-500");
     case 'salles-concert':
       return getIcon(Music, "blue-500");
     case 'clubs':
-      return getIcon(Music, "indigo-500");
+      return getIcon(Microphone, "indigo-500");
     case 'parcs':
-      return getIcon(Umbrella, "green-600");
+      return getIcon(Trees, "green-600");
     case 'centres-loisirs':
       return getIcon(Gamepad2, "pink-500");
     case 'bowling':
-      return getIcon(Circle, "gray-700");
+      return getIcon(Tent, "gray-700");
     case 'patinoires':
-      return getIcon(Circle, "blue-300");
+      return getIcon(Snowflake, "blue-300");
     case 'piscines':
-      return getIcon(Droplets, "blue-500");
+      return getIcon(Waves, "blue-500");
     case 'plages':
       return getIcon(Palmtree, "yellow-600");
     default:
