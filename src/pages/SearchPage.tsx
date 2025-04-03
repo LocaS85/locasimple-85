@@ -6,12 +6,15 @@ import MapSection from '@/components/search/MapSection';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import { Printer, Settings } from 'lucide-react';
+import { Printer, Settings, ArrowLeft, Filter, X, MapPin, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Result } from '@/components/ResultsList';
 import SearchFooter from '@/components/search/SearchFooter';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const SearchPage = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [resultsCount, setResultsCount] = useState(3);
   const [searchResults, setSearchResults] = useState([]);
@@ -27,6 +30,30 @@ const SearchPage = () => {
     zoom: 12
   });
   const [showRoutes, setShowRoutes] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
+  const listVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 200, 
+        damping: 20 
+      }
+    }
+  };
   
   const places: Result[] = searchResults.map((result: any, index: number) => ({
     id: result.id || `place-${index}`,
@@ -64,6 +91,14 @@ const SearchPage = () => {
     );
   };
 
+  const handleCategoryToggle = (category: string) => {
+    if (selectedCategory === category) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(category);
+    }
+  };
+
   const performSearch = async (query: string) => {
     if (!query.trim()) {
       toast.error('Veuillez entrer un terme de recherche');
@@ -78,7 +113,8 @@ const SearchPage = () => {
           mode: transportMode,
           lat: userLocation[1],
           lon: userLocation[0],
-          limit: resultsCount
+          limit: resultsCount,
+          category: selectedCategory
         }
       });
 
@@ -196,6 +232,11 @@ const SearchPage = () => {
     setShowRoutes(!showRoutes);
   };
 
+  const clearFilters = () => {
+    setSelectedCategory(null);
+    toast.info('Tous les filtres ont été effacés');
+  };
+
   useEffect(() => {
     const checkFlaskServer = async () => {
       try {
@@ -211,16 +252,57 @@ const SearchPage = () => {
     };
     
     checkFlaskServer();
-    
     handleLocationClick();
   }, []);
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <SearchHeader 
-        resultsCount={resultsCount}
-        setResultsCount={setResultsCount}
-      />
+      <div className="bg-white py-3 px-4 shadow-sm flex items-center space-x-2">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-app-dark">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-lg font-semibold">Recherche</h1>
+      </div>
+      
+      <div className="bg-white px-3 py-2 flex space-x-2 overflow-x-auto scrollbar-hide border-b border-gray-100">
+        {['restaurants', 'shopping', 'entertainment'].map((category) => (
+          <motion.div
+            key={category}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              variant={selectedCategory === category ? "default" : "outline"}
+              className={`rounded-full text-xs py-1 px-3 h-auto ${
+                selectedCategory === category 
+                  ? `bg-app-${category === 'restaurants' ? 'secondary' : category === 'shopping' ? 'primary' : 'gray'}`
+                  : "border-gray-200 text-gray-600"
+              }`}
+              onClick={() => handleCategoryToggle(category)}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </Button>
+          </motion.div>
+        ))}
+        
+        {selectedCategory && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full text-xs py-1 px-2 h-auto text-gray-500 flex items-center"
+              onClick={clearFilters}
+            >
+              Effacer <X className="ml-1 h-3 w-3" />
+            </Button>
+          </motion.div>
+        )}
+      </div>
       
       <div className="flex-grow relative">
         <MapSection 
@@ -238,8 +320,8 @@ const SearchPage = () => {
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
           onResultClick={handleResultClick}
-          selectedCategory={null}
-          onCategorySelect={() => {}}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
           searchHistory={[]}
           savedSearches={[]}
           onHistoryItemClick={() => {}}
@@ -281,12 +363,18 @@ const SearchPage = () => {
         
         {searchResults.length > 0 && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-10 px-4">
-            <div className="bg-white rounded-lg shadow-lg p-2 max-h-60 overflow-y-auto">
+            <motion.div 
+              className="bg-white rounded-lg shadow-lg p-2 max-h-60 overflow-y-auto"
+              variants={listVariants}
+              initial="hidden"
+              animate="visible"
+            >
               <h3 className="text-sm font-medium px-3 py-1">Résultats</h3>
               <ul className="divide-y divide-gray-100">
                 {searchResults.map((result: any, index: number) => (
-                  <li 
-                    key={result.id || index} 
+                  <motion.li 
+                    key={result.id || index}
+                    variants={itemVariants}
                     className={`px-3 py-2 hover:bg-gray-50 cursor-pointer ${
                       selectedPlaceId === (result.id || `place-${index}`) ? 'bg-blue-50' : ''
                     }`}
@@ -302,11 +390,34 @@ const SearchPage = () => {
                       <span>{result.distance} km</span>
                       <span>{result.duration} min</span>
                     </div>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </div>
+        )}
+        
+        {searchResults.length === 0 && !loading && searchQuery.trim() !== '' && (
+          <motion.div 
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center py-10 text-gray-500 bg-white/80 rounded-lg p-6 shadow-sm z-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="text-sm">Aucun résultat trouvé</p>
+            <p className="text-xs mt-1">Essayez de modifier votre recherche ou vos filtres</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-3" 
+              onClick={() => {
+                setSearchQuery('');
+                clearFilters();
+              }}
+            >
+              Réinitialiser
+            </Button>
+          </motion.div>
         )}
       </div>
     </div>
