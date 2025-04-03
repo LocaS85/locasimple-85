@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchPageState } from '@/hooks/useSearchPageState';
 import SearchHeader from '@/components/search/SearchHeader';
@@ -5,12 +6,12 @@ import { SearchPanel } from '@/components/search/SearchPanel';
 import MapSection from '@/components/search/MapSection';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import { MAPBOX_TOKEN, API_BASE_URL } from '@/config/environment';
 import { Printer, Settings, ArrowLeft, Filter, X, MapPin, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Result } from '@/components/ResultsList';
 import SearchFooter from '@/components/search/SearchFooter';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const SearchPage = () => {
@@ -31,6 +32,7 @@ const SearchPage = () => {
   });
   const [showRoutes, setShowRoutes] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showNoMapboxTokenWarning, setShowNoMapboxTokenWarning] = useState(!MAPBOX_TOKEN);
   
   const listVariants = {
     hidden: { opacity: 0 },
@@ -107,7 +109,7 @@ const SearchPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/search`, {
+      const response = await axios.get(`${API_BASE_URL}/search`, {
         params: {
           query,
           mode: transportMode,
@@ -149,6 +151,7 @@ const SearchPage = () => {
   const searchWithMapbox = async (query: string) => {
     if (!MAPBOX_TOKEN) {
       toast.error('Token Mapbox manquant');
+      setShowNoMapboxTokenWarning(true);
       return;
     }
 
@@ -216,7 +219,7 @@ const SearchPage = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post('http://127.0.0.1:5000/generate_pdf', { places });
+      const response = await axios.post(`${API_BASE_URL}/generate_pdf`, { places });
       toast.success('PDF généré avec succès');
       
       window.open('resultats.pdf');
@@ -240,7 +243,7 @@ const SearchPage = () => {
   useEffect(() => {
     const checkFlaskServer = async () => {
       try {
-        await axios.get('http://127.0.0.1:5000/search', { 
+        await axios.get(`${API_BASE_URL}/search`, { 
           params: { query: 'test', mode: 'driving', lat: 48.8566, lon: 2.3522, limit: 1 },
           timeout: 2000
         });
@@ -265,7 +268,7 @@ const SearchPage = () => {
       </div>
       
       <div className="bg-white px-3 py-2 flex space-x-2 overflow-x-auto scrollbar-hide border-b border-gray-100">
-        {['restaurants', 'shopping', 'entertainment'].map((category) => (
+        {['restaurants', 'shopping', 'entertainment', 'culture', 'sports'].map((category) => (
           <motion.div
             key={category}
             whileHover={{ scale: 1.05 }}
@@ -305,6 +308,45 @@ const SearchPage = () => {
       </div>
       
       <div className="flex-grow relative">
+        {/* Avertissement Mapbox Token manquant */}
+        <AnimatePresence>
+          {showNoMapboxTokenWarning && (
+            <motion.div 
+              className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-50 border border-yellow-200 rounded-lg shadow-md p-4 max-w-sm"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-yellow-800">Token Mapbox manquant</h3>
+                  <div className="mt-2 text-sm text-yellow-700">
+                    <p>
+                      Vous devez définir un token Mapbox pour utiliser la carte. 
+                      Ajoutez <strong>VITE_MAPBOX_TOKEN</strong> dans votre fichier .env
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="text-yellow-800 bg-yellow-100 hover:bg-yellow-200 border-yellow-300"
+                      onClick={() => setShowNoMapboxTokenWarning(false)}
+                    >
+                      Compris
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
         <MapSection 
           results={places}
           center={userLocation}

@@ -21,7 +21,7 @@ import Help from "./pages/Help";
 import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
 import Navigation from "./pages/Navigation";
-import Search from "./pages/Search";
+import SearchPage from "./pages/SearchPage";
 import Categories from "./pages/Categories";
 
 const App = () => (
@@ -43,7 +43,7 @@ const App = () => (
           <Route path="/help" element={<Help />} />
           <Route path="/plan" element={<Plan />} />
           <Route path="/payment" element={<Payment />} />
-          <Route path="/search" element={<Search />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/categories/*" element={<Categories />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
