@@ -6,7 +6,7 @@ import FeaturesSection from "@/components/home/FeaturesSection";
 import SearchSection from "@/components/home/SearchSection";
 import { categories } from "@/data/categories";
 import type { Result } from "@/components/ResultsList";
-import { Hotel, Store, Heart, Car, Utensils } from "lucide-react";
+import { Hotel, Store, Heart, Briefcase, Utensils, Film, BookOpen, Home } from "lucide-react";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -52,9 +52,12 @@ const CategoriesSection = ({ selectedCategories, onCategorySelect }: { selectedC
   
   const categoryIcons = {
     alimentation: <Utensils size={48} className="text-orange-400" />,
-    shopping: <Store size={48} className="text-green-400" />,
+    divertissement: <Film size={48} className="text-blue-400" />,
     sante: <Heart size={48} className="text-red-400" />,
-    travail: <Car size={48} className="text-purple-400" />,
+    travail: <Briefcase size={48} className="text-purple-400" />,
+    shopping: <Store size={48} className="text-green-400" />,
+    education: <BookOpen size={48} className="text-yellow-400" />,
+    home: <Home size={48} className="text-pink-400" />,
     hotel: <Hotel size={48} className="text-cyan-400" />,
   };
 
