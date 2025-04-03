@@ -14,7 +14,7 @@ const Contact = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(t('messageSent'));
+    toast.success("Message envoyé");
   };
 
   return (
@@ -25,37 +25,37 @@ const Contact = () => {
         onClick={() => navigate(-1)}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t('back')}
+        Retour
       </Button>
 
-      <h1 className="text-4xl font-bold text-center mb-12">{t('contactUs')}</h1>
+      <h1 className="text-4xl font-bold text-center mb-12">Contactez-nous</h1>
 
       <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         <Card>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">{t('name')}</Label>
-                <Input id="name" placeholder={t('yourName')} required />
+                <Label htmlFor="name">Nom</Label>
+                <Input id="name" placeholder="Votre nom" required />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input id="email" type="email" placeholder={t('yourEmail')} required />
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="Votre email" required />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">{t('message')}</Label>
+                <Label htmlFor="message">Message</Label>
                 <textarea
                   id="message"
                   className="min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder={t('yourMessage')}
+                  placeholder="Votre message"
                   required
                 />
               </div>
 
               <Button type="submit" className="w-full">
-                {t('sendMessage')}
+                Envoyer le message
               </Button>
             </form>
           </CardContent>
@@ -65,7 +65,7 @@ const Contact = () => {
           <div className="flex items-center gap-4">
             <Mail className="w-6 h-6 text-primary" />
             <div>
-              <h3 className="font-semibold">{t('email')}</h3>
+              <h3 className="font-semibold">Email</h3>
               <p className="text-gray-600">contact@locasimple.com</p>
             </div>
           </div>
@@ -73,7 +73,7 @@ const Contact = () => {
           <div className="flex items-center gap-4">
             <Phone className="w-6 h-6 text-secondary" />
             <div>
-              <h3 className="font-semibold">{t('phone')}</h3>
+              <h3 className="font-semibold">Téléphone</h3>
               <p className="text-gray-600">+33 1 23 45 67 89</p>
             </div>
           </div>
@@ -81,8 +81,8 @@ const Contact = () => {
           <div className="flex items-center gap-4">
             <MessageSquare className="w-6 h-6 text-accent" />
             <div>
-              <h3 className="font-semibold">{t('support')}</h3>
-              <p className="text-gray-600">{t('supportAvailability')}</p>
+              <h3 className="font-semibold">Support</h3>
+              <p className="text-gray-600">Disponible 7j/7 de 9h à 18h</p>
             </div>
           </div>
         </div>

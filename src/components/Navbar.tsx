@@ -19,10 +19,10 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { path: '/', label: t('home') },
-    { path: '/search', label: t('search') },
-    { path: '/categories', label: t('categories') },
-    { path: '/about', label: t('about') }
+    { path: '/', label: 'Accueil' },
+    { path: '/search', label: 'Recherche' },
+    { path: '/categories', label: 'Catégories' },
+    { path: '/about', label: 'À propos' }
   ];
   
   // Component for navigation links - reused in desktop and mobile views
@@ -83,7 +83,7 @@ const Navbar = () => {
                 
                 <div className="p-4 border-t mt-auto">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-gray-500">{t('language')}</span>
+                    <span className="text-sm text-gray-500">Langue</span>
                     <LanguageSelector variant="ghost" size="sm" />
                   </div>
                   <Link to="/login" onClick={() => setMenuOpen(false)}>
@@ -92,7 +92,7 @@ const Navbar = () => {
                       size="default" 
                       className="bg-blue-600 hover:bg-blue-700 w-full"
                     >
-                      {t('register')}
+                      S'inscrire
                     </Button>
                   </Link>
                 </div>
@@ -111,7 +111,7 @@ const Navbar = () => {
                 size="sm" 
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                {t('register')}
+                S'inscrire
               </Button>
             </Link>
           </nav>

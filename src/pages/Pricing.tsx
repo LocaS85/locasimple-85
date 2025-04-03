@@ -20,18 +20,18 @@ const Pricing = () => {
   const getLocalizedFeatures = (planId: string) => {
     if (planId === 'premium') {
       return [
-        t('premiumFeature1') || 'Recherches illimitées',
-        t('premiumFeature2') || 'Rayon de recherche jusqu\'à 25 km',
-        t('premiumFeature3') || 'Filtres avancés (durée et distance)',
-        t('premiumFeature4') || 'Jusqu\'à 10 résultats par recherche'
+        'Recherches illimitées',
+        'Rayon de recherche jusqu\'à 25 km',
+        'Filtres avancés (durée et distance)',
+        'Jusqu\'à 10 résultats par recherche'
       ];
     } else {
       return [
-        t('proFeature1') || 'Toutes les fonctionnalités Premium',
-        t('proFeature2') || 'Rayon de recherche illimité',
-        t('proFeature3') || 'Filtres personnalisables',
-        t('proFeature4') || 'Résultats illimités par recherche',
-        t('proFeature5') || 'Support prioritaire'
+        'Toutes les fonctionnalités Premium',
+        'Rayon de recherche illimité',
+        'Filtres personnalisables',
+        'Résultats illimités par recherche',
+        'Support prioritaire'
       ];
     }
   };
@@ -39,18 +39,18 @@ const Pricing = () => {
   const plans = [
     {
       id: 'premium',
-      name: t('premium'),
+      name: 'Premium',
       price: '9,99€',
-      period: t('perMonth'),
-      description: t('forRegularUsers'),
+      period: 'par mois',
+      description: 'Pour les utilisateurs réguliers',
       features: getLocalizedFeatures('premium')
     },
     {
       id: 'pro',
-      name: t('pro'),
+      name: 'Pro',
       price: '19,99€',
-      period: t('perMonth'),
-      description: t('forProfessionals'),
+      period: 'par mois',
+      description: 'Pour les professionnels',
       features: getLocalizedFeatures('pro'),
       popular: true
     }
@@ -59,9 +59,9 @@ const Pricing = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('simplePricing')}</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">Tarification simple</h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          {t('choosePlan')}
+          Choisissez un plan
         </p>
       </div>
 
@@ -70,7 +70,7 @@ const Pricing = () => {
           <Card key={plan.id} className={`border ${plan.popular ? 'border-primary shadow-lg relative' : 'border-gray-200'}`}>
             {plan.popular && (
               <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium rounded-bl-lg rounded-tr-lg">
-                {t('popular')}
+                Populaire
               </div>
             )}
             <CardHeader>
@@ -96,7 +96,7 @@ const Pricing = () => {
                 className={`w-full ${plan.popular ? '' : 'bg-gray-800 hover:bg-gray-700'}`}
                 onClick={() => navigate(`/payment?plan=${plan.id}`)}
               >
-                {t('choosePlan')}
+                Choisir ce plan
               </Button>
             </CardFooter>
           </Card>
@@ -104,12 +104,12 @@ const Pricing = () => {
       </div>
 
       <div className="mt-16 text-center">
-        <h2 className="text-2xl font-bold mb-4">{t('specificNeeds')}</h2>
+        <h2 className="text-2xl font-bold mb-4">Besoins spécifiques ?</h2>
         <p className="text-lg text-gray-600 mb-6">
-          {t('contactForCustomPlan')}
+          Contactez-nous pour un plan personnalisé
         </p>
         <Button variant="outline" onClick={() => navigate('/contact')}>
-          {t('contactUs')}
+          Nous contacter
         </Button>
       </div>
     </div>

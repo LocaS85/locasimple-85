@@ -35,8 +35,8 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   // Translation function
   const t = (key: string): string => {
     if (!translations[language] || !translations[language][key]) {
-      // Fallback to English, then to the key itself
-      return translations['en']?.[key] || key;
+      // Fallback to French, then to the key itself
+      return translations['fr']?.[key] || key;
     }
     return translations[language][key];
   };

@@ -17,49 +17,49 @@ const Terms = () => {
         onClick={() => navigate(-1)}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t('back')}
+        Retour
       </Button>
 
       <div className="text-center mb-12">
         <FileText className="w-12 h-12 mx-auto text-primary mb-4" />
-        <h1 className="text-4xl font-bold mb-4">{t('termsConditions')}</h1>
+        <h1 className="text-4xl font-bold mb-4">Conditions d'utilisation</h1>
       </div>
 
       <div className="max-w-4xl mx-auto space-y-8">
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">1. {t('acceptTerms')?.split('.')[0] || 'Acceptation des Conditions'}</h2>
+            <h2 className="text-xl font-semibold mb-4">1. Acceptation des Conditions</h2>
             <p className="text-gray-600 mb-4">
-              {t('acceptTerms')}
+              En utilisant notre service, vous acceptez nos conditions d'utilisation.
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">2. {t('serviceDescription')?.split(' ')[0] || 'Description'}</h2>
+            <h2 className="text-xl font-semibold mb-4">2. Description</h2>
             <p className="text-gray-600 mb-4">
-              {t('serviceDescription')}
+              Notre service vous permet de trouver facilement des lieux à proximité.
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">3. {t('termsOfService')}</h2>
+            <h2 className="text-xl font-semibold mb-4">3. Conditions de service</h2>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
-              {(t('termsOfServiceDetails')?.split('\n') || []).map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
+              <li>Vous êtes responsable de vos actions sur la plateforme.</li>
+              <li>Vous ne devez pas utiliser nos services à des fins illégales.</li>
+              <li>Nous nous réservons le droit de modifier ces conditions.</li>
             </ul>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="pt-6">
-            <h2 className="text-xl font-semibold mb-4">4. {t('intellectualProperty')}</h2>
+            <h2 className="text-xl font-semibold mb-4">4. Propriété intellectuelle</h2>
             <p className="text-gray-600 mb-4">
-              {t('intellectualPropertyDetails')}
+              Tous les contenus présents sur notre plateforme sont protégés par le droit d'auteur.
             </p>
           </CardContent>
         </Card>

@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Info, Users, Building, Heart, Lightbulb, Shield, ArrowLeft } from "lucide-react";

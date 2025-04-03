@@ -40,7 +40,7 @@ const CategoryGrid = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-center">
-        {t('chooseCategory') || 'Choisissez une catégorie'}
+        Catégories
       </h1>
       
       <motion.div 
@@ -66,7 +66,7 @@ const CategoryGrid = () => {
                 {React.createElement(category.icon, { size: 48 })}
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                {t(category.name) || category.name}
+                {category.name}
               </h3>
             </div>
           </motion.div>

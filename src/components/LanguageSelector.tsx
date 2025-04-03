@@ -36,7 +36,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <DropdownMenuTrigger asChild>
         <Button variant={variant} size={size} className={className}>
           <Globe className="h-4 w-4 mr-2" />
-          {languages.find(lang => lang.code === language)?.name || t('language')}
+          {languages.find(lang => lang.code === language)?.name || 'Langue'}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-gray-100">

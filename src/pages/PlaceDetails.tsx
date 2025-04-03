@@ -10,8 +10,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 // Mock data for demonstration
 const mockPlace = {
   id: '1',
-  name: 'Restaurant Example',
-  address: '123 Rue Example, 75000 Paris',
+  name: 'Restaurant Exemple',
+  address: '123 Rue Exemple, 75000 Paris',
   description: 'Un excellent restaurant au cœur de Paris',
   category: 'Restaurant',
   rating: 4.5,
@@ -32,11 +32,11 @@ const PlaceDetails = () => {
   const { t } = useLanguage();
 
   const handleFavorite = () => {
-    toast.success(t('addedToFavorites') || "Ajouté aux favoris !");
+    toast.success("Ajouté aux favoris !");
   };
 
   const handleShare = () => {
-    toast.success(t('linkCopied') || "Lien copié dans le presse-papier !");
+    toast.success("Lien copié dans le presse-papier !");
   };
 
   return (
@@ -48,7 +48,7 @@ const PlaceDetails = () => {
           className="flex items-center hover:bg-gray-100"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t('back')}
+          Retour
         </Button>
         
         <div className="flex space-x-2">
@@ -110,14 +110,14 @@ const PlaceDetails = () => {
                   rel="noopener noreferrer"
                   className="hover:text-primary"
                 >
-                  {t('websiteLabel')}
+                  Visiter le site web
                 </a>
               </div>
             )}
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-2">{t('description')}</h2>
+            <h2 className="text-xl font-semibold mb-2">Description</h2>
             <p className="text-gray-600">{mockPlace.description}</p>
           </div>
 
@@ -132,12 +132,12 @@ const PlaceDetails = () => {
 
           <Button className="w-full">
             <Navigation className="mr-2 h-4 w-4" />
-            {t('getDirections')}
+            Obtenir l'itinéraire
           </Button>
           
           <div className="pt-4">
             <Link to="/search" className="text-sm text-blue-600 hover:underline">
-              {t('backToSearch')}
+              Retour à la recherche
             </Link>
           </div>
         </div>
@@ -151,7 +151,7 @@ const PlaceDetails = () => {
       </div>
       
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">{t('nearbyPlaces')}</h2>
+        <h2 className="text-xl font-semibold mb-4">Lieux à proximité</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <Link to={`/place/${i + 1}`} key={i} className="block">
