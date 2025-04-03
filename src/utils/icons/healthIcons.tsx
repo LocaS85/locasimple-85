@@ -7,44 +7,38 @@ import {
   Brain,
   Dog,
   Glasses,
-  Pill
+  Pill,
+  FirstAid,
+  Flower2
 } from 'lucide-react';
+import clsx from 'clsx';
 
-export const getHealthIcon = (categoryId: string, className: string, color?: string) => {
-  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
-    if (color) {
-      return <Icon className={className} style={{ color }} />;
-    }
-    return <Icon className={`${className} text-${defaultColor}`} />;
-  };
+// 🎨 Configuration of icons and associated colors
+const healthIcons: Record<string, { icon: React.FC<any>; color: string }> = {
+  // Main health category
+  sante: { icon: Heart, color: "text-red-500" },
+  
+  // Health subcategories
+  hopitaux: { icon: FirstAid, color: "text-red-600" },
+  cliniques: { icon: Heart, color: "text-pink-500" },
+  dentistes: { icon: Stethoscope, color: "text-blue-500" },
+  medecins: { icon: Stethoscope, color: "text-green-500" },
+  laboratoires: { icon: Microscope, color: "text-purple-500" },
+  radiologie: { icon: Microscope, color: "text-indigo-500" },
+  psychologues: { icon: Brain, color: "text-blue-600" },
+  veterinaires: { icon: Dog, color: "text-amber-500" },
+  opticiens: { icon: Glasses, color: "text-gray-700" },
+  pharmacies: { icon: Pill, color: "text-green-600" },
+};
 
-  switch (categoryId) {
-    // Main health category
-    case 'sante':
-      return getIcon(Heart, "red-500");
-    
-    // Health subcategories
-    case 'hopitaux':
-      return getIcon(Heart, "red-600");
-    case 'cliniques':
-      return getIcon(Heart, "pink-500");
-    case 'dentistes':
-      return getIcon(Stethoscope, "blue-500");
-    case 'medecins':
-      return getIcon(Stethoscope, "green-500");
-    case 'laboratoires':
-      return getIcon(Microscope, "purple-500");
-    case 'radiologie':
-      return getIcon(Microscope, "indigo-500");
-    case 'psychologues':
-      return getIcon(Brain, "blue-600");
-    case 'veterinaires':
-      return getIcon(Dog, "amber-500");
-    case 'opticiens':
-      return getIcon(Glasses, "gray-700");
-    case 'pharmacies':
-      return getIcon(Pill, "green-600");
-    default:
-      return null;
-  }
+// 🔥 Function to get the icon
+export const getHealthIcon = (categoryId: string, className: string, colorOverride?: string) => {
+  // Handle kebab-case keys
+  const category = healthIcons[categoryId];
+
+  if (!category) return null; // If the category doesn't exist, return null
+
+  const { icon: Icon, color } = category;
+
+  return <Icon className={clsx(className, colorOverride || color)} />;
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,6 +11,8 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
 import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
+import { getHealthIcon } from '@/utils/icons/healthIcons';
+import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
 
 const SubcategoryGrid = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -64,6 +65,16 @@ const SubcategoryGrid = () => {
     // For entertainment subcategories, use specific entertainment icons
     if (categoryId === 'divertissement') {
       return getEntertainmentIcon(subCategoryId, "w-16 h-16");
+    }
+    
+    // For health subcategories, use specific health icons
+    if (categoryId === 'sante') {
+      return getHealthIcon(subCategoryId, "w-16 h-16");
+    }
+    
+    // For food subcategories, use specific food icons
+    if (categoryId === 'alimentation') {
+      return getFoodCategoryIcon(subCategoryId, "w-16 h-16");
     }
     
     // For other categories, use the regular category icon

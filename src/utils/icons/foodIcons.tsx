@@ -8,60 +8,52 @@ import {
   Beer, 
   Map,
   ShoppingCart,
-  ShoppingBag
+  ShoppingBag,
+  Salad,
+  Apple,
+  Carrot,
+  Egg,
+  Sandwich,
+  Cherry,
+  Croissant,
+  Banana
 } from 'lucide-react';
+import clsx from 'clsx';
 
-export const getFoodCategoryIcon = (categoryId: string, className: string, color?: string) => {
-  const getIcon = (Icon: React.FC<any>, defaultColor: string) => {
-    if (color) {
-      return <Icon className={className} style={{ color }} />;
-    }
-    return <Icon className={`${className} text-${defaultColor}`} />;
-  };
+// 🎨 Configuration of icons and associated colors
+const foodIcons: Record<string, { icon: React.FC<any>; color: string }> = {
+  // Main food category
+  alimentation: { icon: Utensils, color: "text-orange-500" },
+  
+  // Food subcategories
+  restaurants: { icon: Utensils, color: "text-orange-400" },
+  gastronomie: { icon: Utensils, color: "text-red-600" },
+  rapide: { icon: Sandwich, color: "text-yellow-500" },
+  vegetariens: { icon: Salad, color: "text-green-400" },
+  pizza: { icon: Pizza, color: "text-orange-500" },
+  sushi: { icon: Utensils, color: "text-gray-700" },
+  'cuisine-monde': { icon: Map, color: "text-blue-500" },
+  bars: { icon: Beer, color: "text-amber-600" },
+  'bars-vin': { icon: Wine, color: "text-red-700" },
+  pubs: { icon: Beer, color: "text-yellow-700" },
+  'bars-cocktails': { icon: Wine, color: "text-purple-500" },
+  'cafes-salons': { icon: Coffee, color: "text-brown-500" },
+  cafes: { icon: Coffee, color: "text-amber-800" },
+  'salons-the': { icon: Coffee, color: "text-teal-700" },
+  boulangeries: { icon: Croissant, color: "text-yellow-600" },
+  supermarches: { icon: ShoppingCart, color: "text-blue-600" },
+  'vente-emporter': { icon: ShoppingBag, color: "text-orange-300" },
+  livraison: { icon: ShoppingBag, color: "text-red-400" },
+};
 
-  switch (categoryId) {
-    // Main food category
-    case 'alimentation':
-      return getIcon(Utensils, "green-500");
-    
-    // Food subcategories
-    case 'restaurants':
-      return getIcon(Utensils, "orange-400");
-    case 'gastronomie':
-      return getIcon(Utensils, "red-600");
-    case 'rapide':
-      return getIcon(Pizza, "yellow-500");
-    case 'vegetariens':
-      return getIcon(Utensils, "green-400");
-    case 'pizza':
-      return getIcon(Pizza, "orange-500");
-    case 'sushi':
-      return getIcon(Utensils, "gray-700");
-    case 'cuisine-monde':
-      return getIcon(Map, "blue-500");
-    case 'bars':
-      return getIcon(Beer, "amber-600");
-    case 'bars-vin':
-      return getIcon(Wine, "red-700");
-    case 'pubs':
-      return getIcon(Beer, "yellow-700");
-    case 'bars-cocktails':
-      return getIcon(Wine, "purple-500");
-    case 'cafes-salons':
-      return getIcon(Coffee, "brown-500");
-    case 'cafes':
-      return getIcon(Coffee, "amber-800");
-    case 'salons-the':
-      return getIcon(Coffee, "teal-700");
-    case 'boulangeries':
-      return getIcon(Utensils, "yellow-600");
-    case 'supermarches':
-      return getIcon(ShoppingCart, "blue-600");
-    case 'vente-emporter':
-      return getIcon(ShoppingBag, "orange-300");
-    case 'livraison':
-      return getIcon(ShoppingBag, "red-400");
-    default:
-      return null;
-  }
+// 🔥 Function to get the icon
+export const getFoodCategoryIcon = (categoryId: string, className: string, colorOverride?: string) => {
+  // Handle kebab-case keys
+  const category = foodIcons[categoryId];
+
+  if (!category) return null; // If the category doesn't exist, return null
+
+  const { icon: Icon, color } = category;
+
+  return <Icon className={clsx(className, colorOverride || color)} />;
 };
