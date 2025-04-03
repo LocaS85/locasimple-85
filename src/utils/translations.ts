@@ -345,7 +345,7 @@ export const translations = {
     'all': 'All',
     'restaurants': 'Restaurants',
     'bars': 'Bars',
-    'cafes': 'Cafes',
+    'cafes': 'Cafés',
     'shopping': 'Shopping',
     'hotels': 'Hotels',
     'entertainment': 'Entertainment',
@@ -526,9 +526,9 @@ export const translations = {
     'pricing': 'Pricing',
     'faq': 'FAQ',
     'contactUs': 'Contact',
-    'login': 'Login',
-    'register': 'Register',
-    'profile': 'Profile',
+    'login': 'Connexion',
+    'register': 'Inscription',
+    'profile': 'Profil',
 
     // Footer
     'footerDescription': 'LocaSimple helps you easily explore places around you. Discover new places, plan your routes and optimize your time.',
