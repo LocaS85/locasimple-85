@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Navigation } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LocationButtonProps {
   loading: boolean;
@@ -11,8 +13,6 @@ interface LocationButtonProps {
   onToggleTracking?: () => void;
 }
 
-// This component is not being rendered anymore, but we're keeping the file
-// for compatibility with other components that might still import it
 export const LocationButton: React.FC<LocationButtonProps> = ({ 
   loading, 
   isLocationActive, 
@@ -20,7 +20,30 @@ export const LocationButton: React.FC<LocationButtonProps> = ({
   onClick,
   onToggleTracking
 }) => {
-  return null; // Return null to render nothing
+  const { t } = useLanguage();
+  
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant={isLocationActive ? "default" : "outline"}
+          size="icon"
+          className={`h-10 w-10 ${isLocationActive ? 'bg-blue-500 text-white' : 'bg-white'}`}
+          onClick={onClick}
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          ) : (
+            <Navigation className={`h-4 w-4 ${isWatching ? 'animate-pulse text-blue-600' : ''}`} />
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{t('useMyLocation')}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
 };
 
 export default LocationButton;
