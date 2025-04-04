@@ -10,8 +10,17 @@ const CategoryGrid = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  const handleCategoryClick = (categoryId: string) => {
-    navigate(`/categories/${categoryId}`);
+  const handleCategoryClick = (categoryId: string, link?: string) => {
+    // If it's the 'quotidien' category, navigate to the dedicated page
+    if (categoryId === 'quotidien') {
+      navigate('/quotidien');
+    } else if (link) {
+      // For other categories with specific links
+      navigate(link);
+    } else {
+      // Default behavior
+      navigate(`/categories/${categoryId}`);
+    }
   };
 
   // Animation variants for grid items
@@ -59,7 +68,7 @@ const CategoryGrid = () => {
             }}
             whileTap={{ scale: 0.98 }}
             className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-300"
-            onClick={() => handleCategoryClick(category.id)}
+            onClick={() => handleCategoryClick(category.id, category.link)}
           >
             <div className="p-6 flex flex-col items-center text-center">
               <div className={`mb-4 text-4xl ${getCategoryIconColorClass(category.id)}`}>

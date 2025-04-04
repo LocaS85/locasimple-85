@@ -23,51 +23,56 @@ import Payment from "./pages/Payment";
 import Navigation from "./pages/Navigation";
 import SearchPage from "./pages/SearchPage";
 import Categories from "./pages/Categories";
+import DailyCategories from "./pages/DailyCategories";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { CategoryProvider } from "./components/CategoryContext";
 
 const App = () => (
   <LanguageProvider>
-    <TooltipProvider>
-      <GoogleMapsLoader>
-        <Toaster />
-        <Sonner />
-        <Routes>
-          {/* Main layout with navbar and footer */}
-          <Route element={<Layout />}>
-            {/* Home page */}
-            <Route path="/" element={<Index />} />
+    <CategoryProvider>
+      <TooltipProvider>
+        <GoogleMapsLoader>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            {/* Main layout with navbar and footer */}
+            <Route element={<Layout />}>
+              {/* Home page */}
+              <Route path="/" element={<Index />} />
+              
+              {/* User pages */}
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/place/:id" element={<PlaceDetails />} />
+              
+              {/* Information pages */}
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/help" element={<Help />} />
+              
+              {/* Feature pages */}
+              <Route path="/plan" element={<Plan />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/categories/*" element={<Categories />} />
+              <Route path="/quotidien" element={<DailyCategories />} />
+              
+              {/* Fallback - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
             
-            {/* User pages */}
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/place/:id" element={<PlaceDetails />} />
-            
-            {/* Information pages */}
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/help" element={<Help />} />
-            
-            {/* Feature pages */}
-            <Route path="/plan" element={<Plan />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/categories/*" element={<Categories />} />
-            
-            {/* Fallback - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-          
-          {/* Pages without the main layout */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/navigation" element={<Navigation />} />
-        </Routes>
-      </GoogleMapsLoader>
-    </TooltipProvider>
+            {/* Pages without the main layout */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/navigation" element={<Navigation />} />
+          </Routes>
+        </GoogleMapsLoader>
+      </TooltipProvider>
+    </CategoryProvider>
   </LanguageProvider>
 );
 

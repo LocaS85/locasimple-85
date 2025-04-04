@@ -22,18 +22,28 @@ export const getCategoryTextColor = (categoryId: string): string => {
     case 'shopping':
     case 'magasins':
       return '#22c55e'; // green-500
-    case 'education':
-    case 'ecoles':
-      return '#eab308'; // yellow-500
-    case 'home':
-    case 'maison':
-      return '#ec4899'; // pink-500
+    case 'quotidien':
+    case 'daily':
+      return '#06b6d4'; // cyan-500
     case 'hotel':
     case 'hebergement':
       return '#06b6d4'; // cyan-500
     case 'transport':
     case 'vehicules':
       return '#a855f7'; // purple-500
+      
+    // Quotidien subcategories
+    case 'adresse-principale':
+      return '#8B5CF6'; // violet-600
+    case 'famille':
+      return '#D946EF'; // pink-600
+    case 'amis':
+      return '#3B82F6'; // blue-600
+    case 'ecole':
+      return '#0EA5E9'; // sky-500
+    case 'activites':
+      return '#10B981'; // emerald-500
+      
     default:
       return '#f8fafc'; // slate-50
   }
@@ -54,9 +64,8 @@ export const getCategoryIconColorClass = (categoryId: string): string => {
     case 'travail':
     case 'bureaux':
       return 'text-purple-600';
-    case 'education':
-    case 'ecoles':
-      return 'text-yellow-600';
+    case 'quotidien':
+      return 'text-cyan-600';
     case 'shopping':
     case 'magasins':
       return 'text-green-600';
@@ -66,6 +75,19 @@ export const getCategoryIconColorClass = (categoryId: string): string => {
     case 'transport':
     case 'vehicules':
       return 'text-purple-600';
+      
+    // Quotidien subcategories
+    case 'adresse-principale':
+      return 'text-violet-600';
+    case 'famille':
+      return 'text-pink-600';
+    case 'amis':
+      return 'text-blue-600';
+    case 'ecole':
+      return 'text-sky-500';
+    case 'activites':
+      return 'text-emerald-500';
+      
     default:
       return 'text-gray-600';
   }
@@ -82,14 +104,27 @@ export const getCategoryHoverColorClass = (categoryId: string): string => {
       return 'hover:bg-red-200';
     case 'travail':
       return 'hover:bg-purple-200';
-    case 'education':
-      return 'hover:bg-yellow-200';
+    case 'quotidien':
+      return 'hover:bg-cyan-200';
     case 'shopping':
       return 'hover:bg-green-200';
     case 'hotel':
       return 'hover:bg-cyan-200';
     case 'transport':
       return 'hover:bg-purple-200';
+      
+    // Quotidien subcategories
+    case 'adresse-principale':
+      return 'hover:bg-violet-200';
+    case 'famille':
+      return 'hover:bg-pink-200';
+    case 'amis':
+      return 'hover:bg-blue-200';
+    case 'ecole':
+      return 'hover:bg-sky-200';
+    case 'activites':
+      return 'hover:bg-emerald-200';
+      
     default:
       return 'hover:bg-gray-200';
   }
