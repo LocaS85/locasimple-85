@@ -38,9 +38,9 @@ const Navbar = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>{t('discover')}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="hover:bg-blue-50">{t('discover')}</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 bg-white">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <Link
@@ -49,7 +49,7 @@ const Navbar = () => {
                           >
                             <Search className="h-6 w-6 text-white" />
                             <div className="mt-4 mb-2 text-lg font-medium text-white">
-                              {t('search')}
+                              {t('navSearch')}
                             </div>
                             <p className="text-sm leading-tight text-white/90">
                               {t('searchDescription')}
@@ -61,7 +61,7 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/categories"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">{t('categories')}</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -74,9 +74,9 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/about"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground"
                           >
-                            <div className="text-sm font-medium leading-none">{t('about')}</div>
+                            <div className="text-sm font-medium leading-none">{t('navAbout')}</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                               {t('aboutDescription')}
                             </p>
@@ -89,27 +89,27 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/pricing">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
-                      {t('pricing')}
+                      {t('navPricing')}
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link to="/faq">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
-                      {t('faq')}
+                      {t('navFaq')}
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link to="/contact">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
-                      {t('contactUs')}
+                      {t('navContact')}
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
@@ -119,23 +119,23 @@ const Navbar = () => {
             <div className="flex items-center space-x-2">
               <LanguageSelector variant="outline" size="sm" />
               <Link to="/search">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover:bg-blue-50">
                   <Search className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="sm" className="hidden lg:flex">
+                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-blue-50">
                   <LogIn className="mr-2 h-4 w-4" />
-                  {t('login')}
+                  {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register">
                 <Button size="sm" className="hidden lg:flex">
-                  {t('register')}
+                  {t('navRegister')}
                 </Button>
               </Link>
               <Link to="/profile">
-                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden">
+                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden hover:bg-blue-50">
                   <User className="h-5 w-5" />
                 </Button>
               </Link>
@@ -163,7 +163,7 @@ const Navbar = () => {
           <div className="container mx-auto px-4 space-y-4">
             <Link to="/" className="flex items-center py-2" onClick={toggleMenu}>
               <Home className="h-5 w-5 mr-3 text-primary" />
-              <span>{t('home')}</span>
+              <span>{t('navHome')}</span>
             </Link>
             <Link to="/categories" className="flex items-center py-2" onClick={toggleMenu}>
               <Map className="h-5 w-5 mr-3 text-primary" />
@@ -171,26 +171,26 @@ const Navbar = () => {
             </Link>
             <Link to="/pricing" className="flex items-center py-2" onClick={toggleMenu}>
               <Info className="h-5 w-5 mr-3 text-primary" />
-              <span>{t('pricing')}</span>
+              <span>{t('navPricing')}</span>
             </Link>
             <Link to="/faq" className="flex items-center py-2" onClick={toggleMenu}>
               <HelpCircle className="h-5 w-5 mr-3 text-primary" />
-              <span>{t('faq')}</span>
+              <span>{t('navFaq')}</span>
             </Link>
             <Link to="/contact" className="flex items-center py-2" onClick={toggleMenu}>
               <HelpCircle className="h-5 w-5 mr-3 text-primary" />
-              <span>{t('contactUs')}</span>
+              <span>{t('navContact')}</span>
             </Link>
             <div className="pt-2 flex flex-col space-y-2">
               <Link to="/login" onClick={toggleMenu}>
                 <Button variant="outline" className="w-full">
                   <LogIn className="mr-2 h-4 w-4" />
-                  {t('login')}
+                  {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register" onClick={toggleMenu}>
                 <Button className="w-full">
-                  {t('register')}
+                  {t('navRegister')}
                 </Button>
               </Link>
             </div>
