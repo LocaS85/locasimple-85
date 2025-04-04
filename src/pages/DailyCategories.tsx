@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -63,7 +62,12 @@ const DailyCategories = () => {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
-  const { userLocation } = useGeolocation();
+  
+  // Fix for the useGeolocation hook usage
+  const geolocation = useGeolocation();
+  // Use the lastPosition as userLocation
+  const userLocation: [number, number] = geolocation.lastPosition || [2.3522, 48.8566]; // Default to Paris
+  
   const [transportMode, setTransportMode] = useState('driving');
   const [searchRadius, setSearchRadius] = useState<number>(5);
   const [showMap, setShowMap] = useState(false);
@@ -284,6 +288,14 @@ const DailyCategories = () => {
     setShowMap(!showMap);
   };
 
+  // Calculate map center based on first contact or user location
+  const getMapCenter = () => {
+    if (filteredContacts.length > 0) {
+      return [filteredContacts[0].longitude, filteredContacts[0].latitude];
+    }
+    return userLocation;
+  };
+
   return (
     <motion.div 
       className="container mx-auto py-8 px-4"
@@ -339,14 +351,6 @@ const DailyCategories = () => {
             userLocation={userLocation}
             transportMode={transportMode}
             searchRadius={searchRadius}
-            mapCenter={[
-              filteredContacts.length > 0 ? 
-                filteredContacts[0].longitude : 
-                userLocation[0],
-              filteredContacts.length > 0 ? 
-                filteredContacts[0].latitude : 
-                userLocation[1]
-            ]}
           />
         </div>
       ) : null}

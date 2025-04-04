@@ -48,10 +48,10 @@ const CategoryGrid = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">
+      <h1 className="text-3xl font-bold mb-6 text-center">
         Explorer les catégories
       </h1>
-      <p className="text-center text-gray-600 mb-8">
+      <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
         Choisissez parmi nos catégories pour trouver exactement ce que vous cherchez
       </p>
       
