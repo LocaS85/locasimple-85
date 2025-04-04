@@ -10,7 +10,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { DailyCategoryType, DAILY_CATEGORIES, DailyContactInfo, RelationType, RELATION_TYPES, getRelationTypeLabel } from "@/types/dailyCategories";
 import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase } from "lucide-react";
 import EnhancedMapComponent from "@/components/map/EnhancedMapComponent";
-import { useGeolocation } from "@/hooks/useGeolocation";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -63,10 +62,10 @@ const DailyCategories = () => {
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   
-  // Fix for the useGeolocation hook usage
-  const geolocation = useGeolocation();
-  // Use the lastPosition as userLocation
-  const userLocation: [number, number] = geolocation.lastPosition || [2.3522, 48.8566]; // Default to Paris
+  // Create local state for geolocation functionality
+  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Default to Paris
+  const [isLocationActive, setIsLocationActive] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const [transportMode, setTransportMode] = useState('driving');
   const [searchRadius, setSearchRadius] = useState<number>(5);
@@ -88,6 +87,23 @@ const DailyCategories = () => {
   // Custom relation label state
   const [customRelationLabel, setCustomRelationLabel] = useState('');
   const [useCustomRelationLabel, setUseCustomRelationLabel] = useState(false);
+
+  useEffect(() => {
+    // Handle geolocation initialization if needed
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { longitude, latitude } = position.coords;
+          setUserLocation([longitude, latitude]);
+          setIsLocationActive(true);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          // Keep default Paris coordinates
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     let result = contacts;
@@ -289,7 +305,7 @@ const DailyCategories = () => {
   };
 
   // Calculate map center based on first contact or user location
-  const getMapCenter = () => {
+  const getMapCenter = (): [number, number] => {
     if (filteredContacts.length > 0) {
       return [filteredContacts[0].longitude, filteredContacts[0].latitude];
     }
@@ -351,6 +367,7 @@ const DailyCategories = () => {
             userLocation={userLocation}
             transportMode={transportMode}
             searchRadius={searchRadius}
+            center={getMapCenter()}
           />
         </div>
       ) : null}
