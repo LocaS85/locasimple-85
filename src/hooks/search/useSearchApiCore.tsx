@@ -5,6 +5,7 @@ import { searchService } from '@/services/search/searchService';
 import { searchMapper } from '@/services/search/searchMapper';
 import { Result } from '@/components/ResultsList';
 import axios from 'axios';
+import { API_BASE_URL } from '@/config/environment';
 
 interface UseSearchApiCoreProps {
   userLocation: [number, number];
@@ -29,7 +30,7 @@ export const useSearchApiCore = ({
     try {
       // Try to search using the Flask API first
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/search`, {
+        const response = await axios.get(`${API_BASE_URL}/search`, {
           params: {
             query: searchQuery,
             mode: transportMode,
@@ -49,8 +50,8 @@ export const useSearchApiCore = ({
             name: item.name,
             latitude: item.lat,
             longitude: item.lon,
-            address: '',
-            category: '',
+            address: item.place_name || '',
+            category: searchQuery,
             distance: item.distance,
             duration: item.duration
           }));
@@ -104,10 +105,16 @@ export const useSearchApiCore = ({
     setLoading(true);
     
     try {
-      const response = await axios.post('http://127.0.0.1:5000/generate_pdf', { places });
+      const response = await axios.post(`${API_BASE_URL}/generate_pdf`, { places });
       
       if (response.status === 200) {
         toast.success('PDF généré avec succès');
+        
+        // If there's a URL to download, open it in new window
+        if (response.data && response.data.url) {
+          window.open(`${API_BASE_URL}${response.data.url}`, '_blank');
+        }
+        
         return true;
       } else {
         throw new Error('Erreur lors de la génération du PDF');
@@ -121,9 +128,24 @@ export const useSearchApiCore = ({
     }
   }, [setLoading]);
 
+  /**
+   * Check if Flask server is available
+   */
+  const checkFlaskServer = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/health`, { timeout: 2000 });
+      console.log('Flask server health check:', response.data);
+      return true;
+    } catch (error) {
+      console.warn('Flask server is not available:', error);
+      return false;
+    }
+  }, []);
+
   return {
     searchPlacesNearLocation,
-    generatePDF
+    generatePDF,
+    checkFlaskServer
   };
 };
 

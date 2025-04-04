@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
 import { useRouteDisplay } from '@/hooks/useRouteDisplay';
 import MapSection from './MapSection';
 import SearchMenu from './SearchMenu';
+import { toast } from 'sonner';
+import useSearchApiCore from '@/hooks/search/useSearchApiCore';
 
 export const SearchContainer: React.FC = () => {
   const {
@@ -39,6 +41,31 @@ export const SearchContainer: React.FC = () => {
     selectedResultId: resultSelection.selectedResultId,
     transportMode: searchState.transportMode
   });
+  
+  // Use search API core for Flask server check
+  const searchApiCore = useSearchApiCore({
+    userLocation: searchState.userLocation,
+    setLoading: (loading: boolean) => {
+      // We don't need to set loading state here
+    }
+  });
+  
+  // Check Flask server connection on component mount
+  useEffect(() => {
+    const checkServer = async () => {
+      const isConnected = await searchApiCore.checkFlaskServer();
+      if (isConnected) {
+        console.log('Flask server is connected');
+      } else {
+        console.warn('Flask server is not connected');
+        toast.warning('Le serveur Flask n\'est pas accessible. Certaines fonctionnalités peuvent être limitées.', {
+          duration: 5000,
+        });
+      }
+    };
+    
+    checkServer();
+  }, []);
 
   return (
     <div className="relative w-full h-full">

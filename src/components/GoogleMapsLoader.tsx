@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import { MAPBOX_TOKEN, API_BASE_URL } from '@/config/environment';
 import { toast } from 'sonner';
 import mapboxgl from 'mapbox-gl';
+import axios from 'axios';
 
 interface MapLoaderProps {
   children: React.ReactNode;
@@ -16,7 +17,20 @@ const MapLoader: React.FC<MapLoaderProps> = ({ children }) => {
   useEffect(() => {
     const loadMaps = async () => {
       try {
-        // Initialize Mapbox
+        // First try to get token from Flask server
+        try {
+          const response = await axios.get(`${API_BASE_URL}/health`, { timeout: 2000 });
+          if (response.data && response.data.mapbox_token_available) {
+            console.log('Flask server is connected and Mapbox token is available');
+          } else {
+            console.warn('Flask server is connected but Mapbox token is not available');
+          }
+        } catch (flaskError) {
+          console.warn('Could not connect to Flask server:', flaskError);
+          toast.warning('Le serveur Flask n\'est pas accessible. Certaines fonctionnalités peuvent être limitées.');
+        }
+        
+        // Initialize Mapbox with token from env (fallback)
         if (MAPBOX_TOKEN) {
           try {
             mapboxgl.accessToken = MAPBOX_TOKEN;
