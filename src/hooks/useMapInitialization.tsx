@@ -5,6 +5,16 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 import type { MapStyle } from '@/components/map/MapStyleSelector';
 import { toast } from 'sonner';
 
+// Initialize Mapbox globally if token is available
+if (MAPBOX_TOKEN) {
+  try {
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    console.log('Mapbox token set globally in useMapInitialization');
+  } catch (error) {
+    console.error('Error setting Mapbox token:', error);
+  }
+}
+
 // Map style URLs for Mapbox
 const MAP_STYLE_URLS = {
   streets: 'mapbox://styles/mapbox/streets-v12',
@@ -37,6 +47,7 @@ export const useMapInitialization = ({
   const initializingRef = useRef(false);
   const navigationControlRef = useRef<mapboxgl.NavigationControl | null>(null);
   const [initializationAttempted, setInitializationAttempted] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -45,21 +56,29 @@ export const useMapInitialization = ({
     try {
       // Verify token
       if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
-        console.error('Mapbox token is missing or empty');
+        const errorMsg = 'Mapbox token is missing or empty';
+        console.error(errorMsg);
         toast.error('Token Mapbox manquant. Vérifiez votre fichier .env');
         setInitializationAttempted(true);
+        setError(new Error(errorMsg));
         return;
       }
       
       initializingRef.current = true;
-      console.log('Setting Mapbox access token...');
-      mapboxgl.accessToken = MAPBOX_TOKEN;
+      console.log('Ensuring Mapbox access token is set...');
+      
+      // Set token again just to be safe
+      if (mapboxgl.accessToken !== MAPBOX_TOKEN) {
+        mapboxgl.accessToken = MAPBOX_TOKEN;
+      }
       
       // Verify container
       if (!container.current) {
-        console.error('Map container not available');
+        const errorMsg = 'Map container not available';
+        console.error(errorMsg);
         initializingRef.current = false;
         setInitializationAttempted(true);
+        setError(new Error(errorMsg));
         return;
       }
       
@@ -81,6 +100,7 @@ export const useMapInitialization = ({
         toast.error('Erreur lors de la création de la carte');
         initializingRef.current = false;
         setInitializationAttempted(true);
+        setError(error as Error);
         return;
       }
 
@@ -91,6 +111,7 @@ export const useMapInitialization = ({
           setIsMapInitialized(true);
           initializingRef.current = false;
           setInitializationAttempted(true);
+          setError(null);
           
           // Only add navigation controls if not disabled
           if (!disableNavControls) {
@@ -124,11 +145,13 @@ export const useMapInitialization = ({
         toast.error('Erreur de chargement de la carte');
         initializingRef.current = false;
         setInitializationAttempted(true);
+        setError(e.error);
       });
     } catch (error) {
       console.error('Error initializing map:', error);
       initializingRef.current = false;
       setInitializationAttempted(true);
+      setError(error as Error);
       toast.error('Erreur lors de l\'initialisation de la carte');
     }
 

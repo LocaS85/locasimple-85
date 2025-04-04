@@ -3,6 +3,7 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { MAPBOX_TOKEN } from '@/config/environment';
 import { MapPin, Home, User } from 'lucide-react';
 
 // Fix Leaflet marker icon issue
@@ -49,6 +50,15 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
 }) => {
   // Default to user location if no center is provided
   const mapCenter = center || userLocation;
+  
+  // Mapbox tile layer URL with token
+  const mapboxTileUrl = MAPBOX_TOKEN 
+    ? `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${MAPBOX_TOKEN}`
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"; // Fallback to OSM if no token
+  
+  const attribution = MAPBOX_TOKEN
+    ? '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a>'
+    : '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
     <MapContainer
@@ -57,8 +67,8 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
       style={{ height: '100%', width: '100%' }}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution={attribution}
+        url={mapboxTileUrl}
       />
       
       {/* Update view when center changes */}

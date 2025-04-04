@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -34,6 +33,7 @@ interface MapDisplayProps {
   handleLocationClick: () => void;
   transportMode: string;
   setMap?: (map: mapboxgl.Map) => void;
+  mapboxToken?: string;
 }
 
 const MapDisplay: React.FC<MapDisplayProps> = ({
@@ -50,67 +50,74 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
   loading,
   handleLocationClick,
   transportMode,
-  setMap
+  setMap,
+  mapboxToken = MAPBOX_TOKEN
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
   const [userMarker, setUserMarker] = useState<mapboxgl.Marker | null>(null);
   const [popups, setPopups] = useState<mapboxgl.Popup[]>([]);
+  const [mapReady, setMapReady] = useState(false);
 
-  // Initialize map when component mounts
   useEffect(() => {
     if (!mapContainer.current) return;
     
-    if (!MAPBOX_TOKEN) {
+    const token = mapboxToken || MAPBOX_TOKEN;
+    
+    if (!token) {
       console.error('Mapbox token is missing');
       toast.error('Le token Mapbox est manquant, la carte ne peut pas être chargée');
       return;
     }
     
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    mapboxgl.accessToken = token;
     
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [viewport.longitude, viewport.latitude],
-      zoom: viewport.zoom
-    });
-    
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    
-    // Handle map move
-    map.current.on('moveend', () => {
-      if (!map.current) return;
-      
-      const center = map.current.getCenter();
-      setViewport({
-        latitude: center.lat,
-        longitude: center.lng,
-        zoom: map.current.getZoom()
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [viewport.longitude, viewport.latitude],
+        zoom: viewport.zoom
       });
-    });
-    
-    // Share map reference via prop if provided
-    if (setMap) {
-      setMap(map.current);
+      
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      
+      map.current.on('moveend', () => {
+        if (!map.current) return;
+        
+        const center = map.current.getCenter();
+        setViewport({
+          latitude: center.lat,
+          longitude: center.lng,
+          zoom: map.current.getZoom()
+        });
+      });
+      
+      map.current.on('load', () => {
+        setMapReady(true);
+        console.log('Map loaded successfully');
+      });
+      
+      if (setMap && map.current) {
+        setMap(map.current);
+      }
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      toast.error('Erreur lors de l\'initialisation de la carte');
     }
     
     return () => {
-      // Clean up markers and popups
       markers.forEach(marker => marker.remove());
       popups.forEach(popup => popup.remove());
       if (userMarker) userMarker.remove();
       
-      // Clean up map
       if (map.current) {
         map.current.remove();
       }
     };
-  }, []);
+  }, [mapboxToken]);
 
-  // Update map center when viewport changes
   useEffect(() => {
     if (!map.current) return;
     
@@ -121,16 +128,13 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     });
   }, [viewport]);
 
-  // Add user location marker
   useEffect(() => {
     if (!map.current || !userLocation) return;
     
-    // Remove previous user marker
     if (userMarker) {
       userMarker.remove();
     }
     
-    // Create user marker element
     const userEl = document.createElement('div');
     userEl.className = 'user-marker';
     userEl.innerHTML = `
@@ -140,7 +144,6 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
       </div>
     `;
     
-    // Create marker and add to map
     const marker = new mapboxgl.Marker(userEl)
       .setLngLat([userLocation[0], userLocation[1]])
       .addTo(map.current);
@@ -148,20 +151,16 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     setUserMarker(marker);
   }, [userLocation, map.current]);
 
-  // Add place markers and popups
   useEffect(() => {
     if (!map.current) return;
     
-    // Remove existing markers and popups
     markers.forEach(marker => marker.remove());
     popups.forEach(popup => popup.remove());
     
     const newMarkers: mapboxgl.Marker[] = [];
     const newPopups: mapboxgl.Popup[] = [];
     
-    // Create markers for each place
     places.forEach((place, index) => {
-      // Create marker element
       const el = document.createElement('div');
       el.className = `place-marker ${selectedPlaceId === place.id ? 'selected' : ''}`;
       el.innerHTML = `
@@ -170,7 +169,6 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
         </div>
       `;
       
-      // Create popup
       const popup = new mapboxgl.Popup({
         offset: 25,
         closeButton: false,
@@ -185,13 +183,11 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
         </div>
       `);
       
-      // Create marker and add to map
       const marker = new mapboxgl.Marker(el)
         .setLngLat([place.lon, place.lat])
         .setPopup(popup)
         .addTo(map.current!);
       
-      // Add click event to marker
       el.addEventListener('click', () => {
         handleResultClick(place);
       });
@@ -203,19 +199,15 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     setMarkers(newMarkers);
     setPopups(newPopups);
     
-    // Fit map bounds to include all markers if there are markers
     if (newMarkers.length > 0 && userLocation) {
       const bounds = new mapboxgl.LngLatBounds();
       
-      // Add user location to bounds
       bounds.extend(userLocation);
       
-      // Add all places to bounds
       places.forEach(place => {
         bounds.extend([place.lon, place.lat]);
       });
       
-      // Fit map to bounds with padding
       map.current.fitBounds(bounds, {
         padding: 50,
         maxZoom: 15
@@ -227,7 +219,6 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     <div className="relative w-full h-full">
       <div ref={mapContainer} className="w-full h-full" />
       
-      {/* Loading indicator */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/10 z-20">
           <div className="bg-white p-3 rounded-full shadow-lg">
@@ -236,10 +227,20 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
         </div>
       )}
       
-      {/* Map attribution */}
       <div className="absolute bottom-0 right-0 bg-white/80 text-xs p-1 rounded-tl">
         © <a href="https://www.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500">Mapbox</a>
       </div>
+      
+      {!mapboxToken && !MAPBOX_TOKEN && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-20">
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-md">
+            <h3 className="text-lg font-semibold text-red-600">Token Mapbox manquant</h3>
+            <p className="mt-2 text-sm text-gray-700">
+              Veuillez configurer votre token Mapbox dans le fichier .env pour afficher la carte.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

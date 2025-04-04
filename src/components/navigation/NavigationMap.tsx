@@ -4,6 +4,12 @@ import mapboxgl from 'mapbox-gl';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { getTransportModeColor } from '@/data/transportModes';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { toast } from 'sonner';
+
+// Set the token globally if available
+if (MAPBOX_TOKEN) {
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+}
 
 interface NavigationMapProps {
   start: [number, number];
@@ -25,86 +31,101 @@ const NavigationMap: React.FC<NavigationMapProps> = ({
   const routeSource = useRef<string>('navigation-route');
   const currentPositionSource = useRef<string>('current-position');
   const [mapReady, setMapReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Get transport mode color
   const routeColor = getTransportModeColor(transportMode);
 
   // Initialize map
   useEffect(() => {
-    if (!mapContainer.current || !MAPBOX_TOKEN) return;
+    if (!mapContainer.current) return;
     
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/navigation-night-v1',
-      center: start,
-      zoom: 14,
-      pitch: 45,
-      bearing: 0,
-      accessToken: MAPBOX_TOKEN
-    });
+    // Check for Mapbox token
+    if (!MAPBOX_TOKEN) {
+      console.error('Mapbox token is missing');
+      setError('Token Mapbox manquant. La carte de navigation ne peut pas être chargée.');
+      toast.error('Token Mapbox manquant');
+      return;
+    }
+    
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/navigation-night-v1',
+        center: start,
+        zoom: 14,
+        pitch: 45,
+        bearing: 0,
+        accessToken: MAPBOX_TOKEN
+      });
 
-    map.current.on('load', () => {
-      setMapReady(true);
-      
-      // Add user position marker (pulsing dot)
-      if (map.current) {
-        map.current.addSource(currentPositionSource.current, {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: start
-            },
-            properties: {}
-          }
-        });
+      map.current.on('load', () => {
+        setMapReady(true);
+        
+        // Add user position marker (pulsing dot)
+        if (map.current) {
+          map.current.addSource(currentPositionSource.current, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: start
+              },
+              properties: {}
+            }
+          });
 
-        map.current.addLayer({
-          id: 'current-position-outer',
-          type: 'circle',
-          source: currentPositionSource.current,
-          paint: {
-            'circle-radius': 12,
-            'circle-color': routeColor,
-            'circle-opacity': 0.4,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#FFFFFF'
-          }
-        });
+          map.current.addLayer({
+            id: 'current-position-outer',
+            type: 'circle',
+            source: currentPositionSource.current,
+            paint: {
+              'circle-radius': 12,
+              'circle-color': routeColor,
+              'circle-opacity': 0.4,
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#FFFFFF'
+            }
+          });
 
-        map.current.addLayer({
-          id: 'current-position-inner',
-          type: 'circle',
-          source: currentPositionSource.current,
-          paint: {
-            'circle-radius': 6,
-            'circle-color': routeColor,
-            'circle-opacity': 0.8
-          }
-        });
+          map.current.addLayer({
+            id: 'current-position-inner',
+            type: 'circle',
+            source: currentPositionSource.current,
+            paint: {
+              'circle-radius': 6,
+              'circle-color': routeColor,
+              'circle-opacity': 0.8
+            }
+          });
 
-        // Add animated pulse effect
-        let size = 12;
-        const pulseAnimation = () => {
-          if (!map.current) return;
-          
-          size = size + (size < 20 ? 0.3 : -10);
-          map.current.setPaintProperty('current-position-outer', 'circle-radius', size);
+          // Add animated pulse effect
+          let size = 12;
+          const pulseAnimation = () => {
+            if (!map.current) return;
+            
+            size = size + (size < 20 ? 0.3 : -10);
+            map.current.setPaintProperty('current-position-outer', 'circle-radius', size);
+            requestAnimationFrame(pulseAnimation);
+          };
+
           requestAnimationFrame(pulseAnimation);
-        };
+        }
+      });
 
-        requestAnimationFrame(pulseAnimation);
-      }
-    });
-
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl({
-        visualizePitch: true
-      }),
-      'top-right'
-    );
+      // Add navigation controls
+      map.current.addControl(
+        new mapboxgl.NavigationControl({
+          visualizePitch: true
+        }),
+        'top-right'
+      );
+    } catch (error) {
+      console.error('Error initializing navigation map:', error);
+      setError('Erreur lors de l\'initialisation de la carte de navigation');
+      toast.error('Erreur de carte de navigation');
+    }
 
     // Cleanup
     return () => {
@@ -285,6 +306,14 @@ const NavigationMap: React.FC<NavigationMapProps> = ({
   return (
     <div className="w-full h-full">
       <div ref={mapContainer} className="absolute inset-0" />
+      
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-20">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <p className="text-red-500 font-medium">{error}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

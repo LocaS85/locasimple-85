@@ -7,9 +7,15 @@ import MapControls from './MapControls';
 import MapResults from './MapResults';
 import useMapInitialization from '@/hooks/useMapInitialization';
 import useMarkerManagement from '@/hooks/useMarkerManagement';
+import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import MapDisplay from '../search/MapDisplay';
 import mapboxgl from 'mapbox-gl';
+
+// Set the mapboxgl access token globally at the module level
+if (MAPBOX_TOKEN) {
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+}
 
 interface MapContainerProps {
   results: Result[];
@@ -77,6 +83,14 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }));
   }, [center]);
 
+  // Check if Mapbox token is available on component mount
+  useEffect(() => {
+    if (!MAPBOX_TOKEN) {
+      console.warn('Mapbox token is not configured. Map functionality may be limited.');
+      toast.warning('Token Mapbox non configuré. Les fonctionnalités de carte peuvent être limitées.');
+    }
+  }, []);
+
   // Handle marker click
   const handleMarkerClick = (place: any) => {
     setPopupInfo(place);
@@ -116,6 +130,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         handleLocationClick={onLocationClick || (() => {})}
         transportMode={transportMode || 'driving'}
         setMap={setMap}
+        mapboxToken={MAPBOX_TOKEN}
       />
       
       {/* Map Results */}
