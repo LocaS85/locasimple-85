@@ -38,7 +38,6 @@ const Navigation = () => {
       const { start, end, placeName, transportMode: initialMode } = location.state;
       
       if (start && Array.isArray(start) && start.length === 2) {
-        // Fix the type issue by explicitly setting as [number, number]
         setUserLocation([start[0], start[1]]);
       }
       
@@ -72,6 +71,35 @@ const Navigation = () => {
       );
     }
   }, []);
+
+  // Fetch route and update estimated time when destination or mode changes
+  useEffect(() => {
+    if (destination && userLocation) {
+      // Calculate estimated time based on transport mode
+      const fetchRouteInformation = async () => {
+        try {
+          // This could be integrated with your actual API service
+          const response = await fetch(
+            `https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${userLocation[0]},${userLocation[1]};${destination.longitude},${destination.latitude}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`
+          );
+          
+          if (!response.ok) throw new Error('Failed to fetch route');
+          
+          const data = await response.json();
+          if (data.routes && data.routes.length > 0) {
+            // Convert seconds to minutes and round
+            const timeInMinutes = Math.round(data.routes[0].duration / 60);
+            setEstimatedTime(timeInMinutes);
+            setDirections(data.routes[0]);
+          }
+        } catch (error) {
+          console.error('Error fetching route:', error);
+        }
+      };
+      
+      fetchRouteInformation();
+    }
+  }, [destination, transportMode, userLocation]);
 
   // Handle radius change
   const handleRadiusChange = (value: number[]) => {
@@ -218,7 +246,9 @@ const Navigation = () => {
               {destination ? `Itinéraire vers ${destination.name}` : 'Navigation'}
             </h2>
             <p className="text-sm text-gray-500">
-              {destination ? 'Suivez les indications pour arriver à destination' : 'Sélectionnez une destination'}
+              {destination 
+                ? `${estimatedTime ? `${estimatedTime} min · ` : ''}Suivez les indications` 
+                : 'Sélectionnez une destination'}
             </p>
           </div>
           

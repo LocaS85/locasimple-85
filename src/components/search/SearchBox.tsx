@@ -36,7 +36,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
   return (
     <Card className="w-full shadow-md">
-      <CardContent className={isMobile ? "pt-3 px-3" : "pt-4"}>
+      <CardContent className={isMobile ? "pt-3 px-3 pb-4" : "pt-4 pb-4"}>
         <div className="space-y-4">
           <div className="relative">
             <AddressSearch 
@@ -49,7 +49,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
               className="absolute right-1 top-1 h-8 w-8"
               variant="ghost"
               onClick={() => {
-                // This would typically use geolocation to set current position
                 navigator.geolocation.getCurrentPosition(
                   (position) => {
                     onAddressSelect({
@@ -86,13 +85,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({
           
           <div>
             <span className="text-sm font-medium block mb-2">Mode de transport</span>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
               {transportModes.map(mode => (
                 <Button
                   key={mode.id}
                   variant={transportMode === mode.id ? "default" : "outline"}
-                  className="flex items-center gap-1"
-                  size={isMobile ? "sm" : "sm"}
+                  className="flex-1 min-w-0 flex items-center justify-center gap-1"
+                  size={isMobile ? "sm" : "default"}
                   onClick={() => onTransportModeChange(mode.id)}
                 >
                   <span>{mode.icon}</span>

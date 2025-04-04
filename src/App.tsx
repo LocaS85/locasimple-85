@@ -32,10 +32,16 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
+          {/* Main layout with navbar and footer */}
           <Route element={<Layout />}>
+            {/* Home page */}
             <Route path="/" element={<Index />} />
+            
+            {/* User pages */}
             <Route path="/profile" element={<Profile />} />
             <Route path="/place/:id" element={<PlaceDetails />} />
+            
+            {/* Information pages */}
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contact" element={<Contact />} />
@@ -43,12 +49,18 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/about" element={<About />} />
             <Route path="/help" element={<Help />} />
+            
+            {/* Feature pages */}
             <Route path="/plan" element={<Plan />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/categories/*" element={<Categories />} />
+            
+            {/* Fallback - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
+          
+          {/* Pages without the main layout */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<Admin />} />
