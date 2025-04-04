@@ -1,114 +1,133 @@
 
 import { useCallback } from 'react';
+import axios from 'axios';
 import { toast } from 'sonner';
-import { MAPBOX_TOKEN } from '@/config/environment';
-import { SearchResult } from '@/services/mapboxService';
+import { MAPBOX_TOKEN, API_BASE_URL } from '@/config/environment';
 
 export const useSearchOperations = (
   searchQuery: string,
   transportMode: string,
   userLocation: [number, number],
   resultsCount: number,
-  isLocationActive: boolean,
+  selectedCategory: string | null,
+  setSearchResults: (results: any[]) => void,
   setLoading: (loading: boolean) => void,
-  setPlaces: (places: any[]) => void,
-  setSearchHistory: (history: (prev: string[]) => string[]) => void,
-  setSelectedPlaceId: (id: string | null) => void
+  setViewport: (viewport: any) => void,
+  setShowNoMapboxTokenWarning: (show: boolean) => void
 ) => {
   const performSearch = useCallback(async (query: string = searchQuery) => {
-    if (!query.trim()) {
-      toast.error('Veuillez entrer une recherche');
+    if (!query.trim() && !selectedCategory) {
+      toast.error('Veuillez entrer un terme de recherche ou sélectionner une catégorie');
       return;
     }
 
     setLoading(true);
     try {
-      // Add to search history
-      setSearchHistory(prev => [query, ...prev.filter(q => q !== query)].slice(0, 10));
-      
-      // Connect to Flask API for search
-      const response = await fetch(`http://localhost:5000/search?query=${encodeURIComponent(query)}&mode=${transportMode}&lat=${userLocation[1]}&lon=${userLocation[0]}&limit=${resultsCount}`);
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors de la recherche');
-      }
-      
-      const results = await response.json();
-      console.log('API search results:', results);
-      
-      // Transform to Place objects
-      const places = results.map((result: any, index: number) => ({
-        id: `place-${index}`,
-        name: result.name,
-        lat: result.lat,
-        lon: result.lon,
-        duration: result.duration,
-        distance: result.distance
-      }));
-      
-      setPlaces(places);
-      
-      if (places.length === 0) {
-        toast.info('Aucun résultat trouvé');
-      } else {
-        toast.success(`${places.length} résultats trouvés`);
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      toast.error('Erreur lors de la recherche. Vérifiez que le serveur Flask est en cours d\'exécution.');
-    } finally {
-      setLoading(false);
-    }
-  }, [searchQuery, transportMode, userLocation, resultsCount, setLoading, setPlaces, setSearchHistory]);
-
-  const generatePDF = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('http://localhost:5000/generate_pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ places }),
+      const response = await axios.get(`${API_BASE_URL}/search`, {
+        params: {
+          query: query.trim() || 'places',
+          mode: transportMode,
+          lat: userLocation[1],
+          lon: userLocation[0],
+          limit: resultsCount,
+          category: selectedCategory
+        }
       });
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors de la génération du PDF');
+
+      if (response.data && response.data.length > 0) {
+        setSearchResults(response.data);
+        
+        setViewport({
+          latitude: response.data[0].lat,
+          longitude: response.data[0].lon,
+          zoom: 13
+        });
+        
+        toast.success(`${response.data.length} résultats trouvés`);
+      } else {
+        setSearchResults([]);
+        toast.info('Aucun résultat trouvé');
       }
-      
-      const result = await response.json();
-      toast.success('PDF généré avec succès');
-      console.log('PDF result:', result);
     } catch (error) {
-      console.error('PDF generation error:', error);
-      toast.error('Erreur lors de la génération du PDF');
+      console.error('Erreur lors de la recherche:', error);
+      toast.error('Erreur lors de la recherche. Vérifiez que le serveur Flask est démarré.');
+      
+      try {
+        await searchWithMapbox(query);
+      } catch (mapboxError) {
+        console.error('Erreur lors de la recherche avec Mapbox:', mapboxError);
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, transportMode, userLocation, resultsCount, selectedCategory, setSearchResults, setLoading, setViewport]);
 
-  const handleResultClick = (place: any) => {
-    setSelectedPlaceId(place.id);
-    
-    // Center map on selected place (this will be handled by the main hook)
-    return place;
-  };
+  const searchWithMapbox = useCallback(async (query: string) => {
+    if (!MAPBOX_TOKEN) {
+      toast.error('Token Mapbox manquant');
+      setShowNoMapboxTokenWarning(true);
+      return;
+    }
 
-  const resetSearch = () => {
-    // This will be handled by the main hook
-  };
+    try {
+      let mapboxQuery = query.trim();
+      if (!mapboxQuery && selectedCategory) {
+        mapboxQuery = selectedCategory;
+      }
 
-  // This will be set from the main hook
-  let places: any[] = [];
+      const response = await axios.get(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(mapboxQuery)}.json`,
+        {
+          params: {
+            access_token: MAPBOX_TOKEN,
+            proximity: `${userLocation[0]},${userLocation[1]}`,
+            types: 'poi',
+            limit: resultsCount,
+            language: 'fr'
+          }
+        }
+      );
+
+      if (response.data && response.data.features.length > 0) {
+        const formattedResults = response.data.features.map((feature: any) => ({
+          id: feature.id,
+          name: feature.text,
+          lat: feature.center[1],
+          lon: feature.center[0],
+          place_name: feature.place_name,
+          category: feature.properties?.category || selectedCategory || '',
+          distance: 0,
+          duration: 0
+        }));
+
+        setSearchResults(formattedResults);
+        
+        setViewport({
+          latitude: formattedResults[0].lat,
+          longitude: formattedResults[0].lon,
+          zoom: 13
+        });
+        
+        toast.success(`${formattedResults.length} résultats trouvés (via Mapbox)`);
+      } else {
+        setSearchResults([]);
+        toast.info('Aucun résultat trouvé');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche avec Mapbox:', error);
+      toast.error('Erreur lors de la recherche avec Mapbox');
+      setSearchResults([]);
+    }
+  }, [userLocation, resultsCount, selectedCategory, setSearchResults, setViewport, setShowNoMapboxTokenWarning]);
+
+  const resetSearch = useCallback(() => {
+    setSearchResults([]);
+  }, [setSearchResults]);
 
   return {
     performSearch,
-    generatePDF,
-    handleResultClick,
-    resetSearch,
-    _setData: (placesData: any[]) => {
-      places = placesData;
-    }
+    searchWithMapbox,
+    resetSearch
   };
 };
 
