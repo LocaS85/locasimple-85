@@ -25,7 +25,9 @@ export const useInitialization = (
     };
     
     // Check if Mapbox token is available
-    setShowNoMapboxTokenWarning(!MAPBOX_TOKEN);
+    if (setShowNoMapboxTokenWarning) {
+      setShowNoMapboxTokenWarning(!MAPBOX_TOKEN);
+    }
     
     checkFlaskServer();
     handleLocationClick();

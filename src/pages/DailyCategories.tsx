@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { DailyCategoryType, DAILY_CATEGORIES, DailyContactInfo, RelationType, RELATION_TYPES, getRelationTypeLabel } from "@/types/dailyCategories";
+import { DailyCategoryType, DAILY_CATEGORIES, DailyContactInfo, getRelationTypeLabel } from "@/types/dailyCategories";
 import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase } from "lucide-react";
 import EnhancedMapComponent from "@/components/map/EnhancedMapComponent";
 import { Badge } from "@/components/ui/badge";
@@ -79,14 +79,13 @@ const DailyCategories = () => {
     address: '',
     latitude: 0,
     longitude: 0,
-    relationType: undefined,
-    relationLabel: '',
+    relationType: '',
     category: 'adresse-principale',
   });
 
-  // Custom relation label state
-  const [customRelationLabel, setCustomRelationLabel] = useState('');
-  const [useCustomRelationLabel, setUseCustomRelationLabel] = useState(false);
+  // We don't need the custom relation label state anymore since we're directly entering the relation type
+  // Removed: const [customRelationLabel, setCustomRelationLabel] = useState('');
+  // Removed: const [useCustomRelationLabel, setUseCustomRelationLabel] = useState(false);
 
   useEffect(() => {
     // Handle geolocation initialization if needed
@@ -130,12 +129,9 @@ const DailyCategories = () => {
       address: '',
       latitude: userLocation[1] || 48.85,
       longitude: userLocation[0] || 2.35,
-      relationType: undefined,
-      relationLabel: '',
+      relationType: '',
       category: activeCategory || 'adresse-principale',
     });
-    setUseCustomRelationLabel(false);
-    setCustomRelationLabel('');
   };
 
   const handleEditContact = (contactId: string) => {
@@ -145,15 +141,6 @@ const DailyCategories = () => {
       setFormData({
         ...contact,
       });
-      
-      // Check if the contact has a custom relation label
-      if (contact.relationLabel && contact.relationLabel !== getRelationTypeLabel(contact.relationType)) {
-        setUseCustomRelationLabel(true);
-        setCustomRelationLabel(contact.relationLabel);
-      } else {
-        setUseCustomRelationLabel(false);
-        setCustomRelationLabel('');
-      }
     }
   };
 
@@ -183,18 +170,11 @@ const DailyCategories = () => {
       return;
     }
 
-    // Update form data with custom relation label if needed
-    let updatedFormData = { ...formData };
-    if (updatedFormData.relationType && useCustomRelationLabel && customRelationLabel) {
-      updatedFormData.relationLabel = customRelationLabel;
-    } else {
-      updatedFormData.relationLabel = undefined; // Use default label
-    }
-
+    // No need to handle custom relation label separately anymore
     if (isEditing) {
       // Update existing contact
       setContacts(contacts.map(contact => 
-        contact.id === isEditing ? { ...contact, ...updatedFormData } : contact
+        contact.id === isEditing ? { ...contact, ...formData } : contact
       ));
       toast({
         title: "Contact mis à jour",
@@ -205,15 +185,14 @@ const DailyCategories = () => {
       // Add new contact
       const newContact: DailyContactInfo = {
         id: Date.now().toString(),
-        firstName: updatedFormData.firstName!,
-        lastName: updatedFormData.lastName!,
-        companyName: updatedFormData.companyName,
-        address: updatedFormData.address!,
-        latitude: updatedFormData.latitude!,
-        longitude: updatedFormData.longitude!,
-        relationType: updatedFormData.relationType,
-        relationLabel: updatedFormData.relationLabel,
-        category: updatedFormData.category as DailyCategoryType,
+        firstName: formData.firstName!,
+        lastName: formData.lastName!,
+        companyName: formData.companyName,
+        address: formData.address!,
+        latitude: formData.latitude!,
+        longitude: formData.longitude!,
+        relationType: formData.relationType,
+        category: formData.category as DailyCategoryType,
         isFavorite: false
       };
       
@@ -232,19 +211,14 @@ const DailyCategories = () => {
       address: '',
       latitude: 0,
       longitude: 0,
-      relationType: undefined,
+      relationType: '',
       category: activeCategory || 'adresse-principale',
     });
-    
-    setUseCustomRelationLabel(false);
-    setCustomRelationLabel('');
   };
 
   const handleFormCancel = () => {
     setIsAddingNew(false);
     setIsEditing(null);
-    setUseCustomRelationLabel(false);
-    setCustomRelationLabel('');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -455,7 +429,7 @@ const DailyCategories = () => {
                   
                   {contact.relationType && (
                     <div className="text-sm text-gray-500 mt-1">
-                      Relation: {contact.relationLabel || getRelationTypeLabel(contact.relationType)}
+                      Relation: {getRelationTypeLabel(contact.relationType)}
                     </div>
                   )}
                   
@@ -574,44 +548,14 @@ const DailyCategories = () => {
             
             <div className="space-y-2 col-span-2">
               <Label htmlFor="relationType">Type de relation</Label>
-              <Select 
-                value={formData.relationType} 
-                onValueChange={(value: RelationType) => handleSelectChange('relationType', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un type de relation" />
-                </SelectTrigger>
-                <SelectContent>
-                  {RELATION_TYPES.map((type) => (
-                    <SelectItem key={type.id} value={type.id}>
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input 
+                id="relationType" 
+                name="relationType" 
+                value={formData.relationType || ''} 
+                onChange={handleInputChange}
+                placeholder="Entrez un type de relation" 
+              />
             </div>
-
-            {formData.relationType && (
-              <div className="space-y-2 col-span-2">
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor="customRelation">Personnaliser le type de relation</Label>
-                  <Checkbox 
-                    id="customRelation" 
-                    checked={useCustomRelationLabel}
-                    onCheckedChange={(checked) => setUseCustomRelationLabel(checked === true)}
-                  />
-                </div>
-
-                {useCustomRelationLabel && (
-                  <Input 
-                    id="relationLabel" 
-                    value={customRelationLabel} 
-                    onChange={(e) => setCustomRelationLabel(e.target.value)}
-                    placeholder="Nom personnalisé" 
-                  />
-                )}
-              </div>
-            )}
           </div>
 
           <DialogFooter>

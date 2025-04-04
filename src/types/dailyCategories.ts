@@ -1,4 +1,3 @@
-
 export interface DailyContactInfo {
   id: string;
   firstName: string;
@@ -7,8 +6,8 @@ export interface DailyContactInfo {
   address: string;
   latitude: number;
   longitude: number;
-  relationType?: RelationType;
-  relationLabel?: string; // Custom label for relation types
+  relationType?: string; // Changed from RelationType to string for free-form input
+  relationLabel?: string; 
   category: DailyCategoryType;
   isFavorite?: boolean;
 }
@@ -64,16 +63,14 @@ export const RELATION_TYPES: RelationTypeInfo[] = [
   { id: 'autre', name: 'Autre' }
 ];
 
-// Function to get relation type label
 export const getRelationTypeLabel = (
-  relationType: RelationType | undefined, 
-  customLabel?: string, 
-  relationTypes: RelationTypeInfo[] = RELATION_TYPES
+  relationType: string | undefined, 
+  customLabel?: string
 ): string => {
   if (!relationType) return '';
   
   if (customLabel) return customLabel;
   
-  const type = relationTypes.find(type => type.id === relationType);
-  return type ? type.name : '';
+  const type = RELATION_TYPES.find(type => type.id === relationType);
+  return type ? type.name : relationType;
 };
