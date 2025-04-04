@@ -1,738 +1,605 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  DAILY_CATEGORIES, 
-  DailyCategory, 
-  DailyContactInfo, 
-  RELATION_TYPES,
-  RelationTypeInfo,
-  getRelationTypeLabel
-} from '@/types/dailyCategories';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Star, Trash2, Edit2, MapPin, Edit } from 'lucide-react';
-import EnhancedMapComponent from '@/components/map/EnhancedMapComponent';
-import AddressSearch from '@/components/search/AddressSearch';
-import { useToast } from '@/components/ui/use-toast';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogFooter,
-  DialogTrigger,
-  DialogDescription
-} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { DailyCategoryType, DAILY_CATEGORIES, DailyContactInfo, RelationType, RELATION_TYPES, getRelationTypeLabel } from "@/types/dailyCategories";
+import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase } from "lucide-react";
+import EnhancedMapComponent from "@/components/map/EnhancedMapComponent";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// Mock data storage (would be replaced with real storage solution)
-const LOCAL_STORAGE_KEY = 'dailyContacts';
-const CUSTOM_RELATION_TYPES_KEY = 'customRelationTypes';
+// Mock data for demonstration
+const initialContacts: DailyContactInfo[] = [
+  {
+    id: '1',
+    firstName: 'John',
+    lastName: 'Doe',
+    address: '15 Rue de Paris, 75001 Paris',
+    latitude: 48.856614,
+    longitude: 2.3522219,
+    relationType: 'ami',
+    category: 'amis',
+    isFavorite: true
+  },
+  {
+    id: '2',
+    firstName: 'Marie',
+    lastName: 'Dupont',
+    address: '25 Avenue des Champs-Élysées, 75008 Paris',
+    latitude: 48.8698,
+    longitude: 2.3075,
+    relationType: 'mere',
+    category: 'famille',
+    isFavorite: false
+  },
+  {
+    id: '3',
+    firstName: 'Entreprise',
+    lastName: 'ABC',
+    companyName: 'ABC Corporation',
+    address: '5 Rue de Rivoli, 75004 Paris',
+    latitude: 48.8558,
+    longitude: 2.3581,
+    relationType: 'collegue',
+    category: 'travail',
+    isFavorite: true
+  }
+];
 
 const DailyCategories = () => {
-  const { t } = useLanguage();
+  const [activeCategory, setActiveCategory] = useState<DailyCategoryType | null>(null);
+  const [contacts, setContacts] = useState<DailyContactInfo[]>(initialContacts);
+  const [filteredContacts, setFilteredContacts] = useState<DailyContactInfo[]>([]);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
-  const isMobile = useIsMobile();
-  const [activeCategory, setActiveCategory] = useState<DailyCategory>(DAILY_CATEGORIES[0]);
-  const [view, setView] = useState('list');
-  const [contacts, setContacts] = useState<DailyContactInfo[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
+  const { userLocation } = useGeolocation();
+  const [transportMode, setTransportMode] = useState('driving');
+  const [searchRadius, setSearchRadius] = useState<number>(5);
+  const [showMap, setShowMap] = useState(false);
+
+  // New state for the form
+  const [formData, setFormData] = useState<Partial<DailyContactInfo>>({
+    firstName: '',
+    lastName: '',
+    companyName: '',
+    address: '',
+    latitude: 0,
+    longitude: 0,
+    relationType: undefined,
+    relationLabel: '',
+    category: 'adresse-principale',
   });
-  const [newContact, setNewContact] = useState<Partial<DailyContactInfo>>({
-    category: activeCategory.id,
-  });
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingContactId, setEditingContactId] = useState<string | null>(null);
-  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
-  const [centerCoordinates, setCenterCoordinates] = useState<[number, number]>([2.3522, 48.8566]); // Default: Paris
-  
-  // Custom relation type management
-  const [isRelationTypeDialogOpen, setIsRelationTypeDialogOpen] = useState(false);
-  const [customRelationTypes, setCustomRelationTypes] = useState<RelationTypeInfo[]>(() => {
-    const saved = localStorage.getItem(CUSTOM_RELATION_TYPES_KEY);
-    return saved ? JSON.parse(saved) : [...RELATION_TYPES];
-  });
-  const [editingRelationType, setEditingRelationType] = useState<RelationTypeInfo | null>(null);
-  const [relationTypeInput, setRelationTypeInput] = useState('');
-  
-  // Filter contacts by active category
-  const categoryContacts = contacts.filter(contact => contact.category === activeCategory.id);
-  
-  // User location
-  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
-  
-  // Get user's current location
-  React.useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation([position.coords.longitude, position.coords.latitude]);
-          setCenterCoordinates([position.coords.longitude, position.coords.latitude]);
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-        }
-      );
+
+  // Custom relation label state
+  const [customRelationLabel, setCustomRelationLabel] = useState('');
+  const [useCustomRelationLabel, setUseCustomRelationLabel] = useState(false);
+
+  useEffect(() => {
+    let result = contacts;
+
+    // Filter by active category if selected
+    if (activeCategory) {
+      result = result.filter(contact => contact.category === activeCategory);
     }
-  }, []);
 
-  // Save contacts to localStorage whenever they change
-  React.useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
-  }, [contacts]);
+    // Filter favorites if enabled
+    if (showOnlyFavorites) {
+      result = result.filter(contact => contact.isFavorite);
+    }
 
-  // Save custom relation types to localStorage whenever they change
-  React.useEffect(() => {
-    localStorage.setItem(CUSTOM_RELATION_TYPES_KEY, JSON.stringify(customRelationTypes));
-  }, [customRelationTypes]);
+    setFilteredContacts(result);
+  }, [contacts, activeCategory, showOnlyFavorites]);
 
-  // Handle address selection from the AddressSearch component
-  const handleAddressSelect = (location: { name: string; longitude: number; latitude: number }) => {
-    setNewContact({
-      ...newContact,
-      address: location.name,
-      latitude: location.latitude,
-      longitude: location.longitude
+  const handleAddNew = () => {
+    setIsAddingNew(true);
+    setFormData({
+      firstName: '',
+      lastName: '',
+      companyName: '',
+      address: '',
+      latitude: userLocation[1] || 48.85,
+      longitude: userLocation[0] || 2.35,
+      relationType: undefined,
+      relationLabel: '',
+      category: activeCategory || 'adresse-principale',
+    });
+    setUseCustomRelationLabel(false);
+    setCustomRelationLabel('');
+  };
+
+  const handleEditContact = (contactId: string) => {
+    const contact = contacts.find(c => c.id === contactId);
+    if (contact) {
+      setIsEditing(contactId);
+      setFormData({
+        ...contact,
+      });
+      
+      // Check if the contact has a custom relation label
+      if (contact.relationLabel && contact.relationLabel !== getRelationTypeLabel(contact.relationType)) {
+        setUseCustomRelationLabel(true);
+        setCustomRelationLabel(contact.relationLabel);
+      } else {
+        setUseCustomRelationLabel(false);
+        setCustomRelationLabel('');
+      }
+    }
+  };
+
+  const handleDeleteContact = (contactId: string) => {
+    setContacts(contacts.filter(c => c.id !== contactId));
+    toast({
+      title: "Contact supprimé",
+      description: "Le contact a été supprimé avec succès",
     });
   };
 
-  // Save contact (new or edited)
-  const handleSaveContact = () => {
-    if (!newContact.firstName || !newContact.address || !newContact.latitude || !newContact.longitude) {
+  const handleToggleFavorite = (contactId: string) => {
+    setContacts(contacts.map(contact => 
+      contact.id === contactId 
+        ? {...contact, isFavorite: !contact.isFavorite} 
+        : contact
+    ));
+  };
+
+  const handleFormSubmit = () => {
+    if (!formData.firstName || !formData.lastName || !formData.address) {
       toast({
-        title: "Information incomplète",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        title: "Information manquante",
+        description: "Veuillez remplir tous les champs obligatoires",
         variant: "destructive"
       });
       return;
     }
 
-    if (editingContactId) {
-      // Updating existing contact
+    // Update form data with custom relation label if needed
+    let updatedFormData = { ...formData };
+    if (updatedFormData.relationType && useCustomRelationLabel && customRelationLabel) {
+      updatedFormData.relationLabel = customRelationLabel;
+    } else {
+      updatedFormData.relationLabel = undefined; // Use default label
+    }
+
+    if (isEditing) {
+      // Update existing contact
       setContacts(contacts.map(contact => 
-        contact.id === editingContactId 
-          ? { ...contact, ...newContact, id: editingContactId } as DailyContactInfo 
-          : contact
+        contact.id === isEditing ? { ...contact, ...updatedFormData } : contact
       ));
       toast({
-        title: "Contact modifié",
-        description: `${newContact.firstName} ${newContact.lastName || ''} a été mis à jour.`
+        title: "Contact mis à jour",
+        description: "Les informations du contact ont été mises à jour",
       });
+      setIsEditing(null);
     } else {
-      // Adding new contact
-      const newId = `contact-${Date.now()}`;
-      const contactToAdd = { 
-        ...newContact, 
-        id: newId,
+      // Add new contact
+      const newContact: DailyContactInfo = {
+        id: Date.now().toString(),
+        firstName: updatedFormData.firstName!,
+        lastName: updatedFormData.lastName!,
+        companyName: updatedFormData.companyName,
+        address: updatedFormData.address!,
+        latitude: updatedFormData.latitude!,
+        longitude: updatedFormData.longitude!,
+        relationType: updatedFormData.relationType,
+        relationLabel: updatedFormData.relationLabel,
+        category: updatedFormData.category as DailyCategoryType,
         isFavorite: false
-      } as DailyContactInfo;
+      };
       
-      setContacts([...contacts, contactToAdd]);
+      setContacts([...contacts, newContact]);
       toast({
         title: "Contact ajouté",
-        description: `${newContact.firstName} ${newContact.lastName || ''} a été ajouté.`
+        description: "Le nouveau contact a été ajouté avec succès",
       });
+      setIsAddingNew(false);
     }
-
-    // Reset form and close dialog
-    setNewContact({ category: activeCategory.id });
-    setEditingContactId(null);
-    setIsAddDialogOpen(false);
-  };
-
-  // Edit existing contact
-  const handleEditContact = (contact: DailyContactInfo) => {
-    setNewContact({
-      firstName: contact.firstName,
-      lastName: contact.lastName,
-      companyName: contact.companyName,
-      address: contact.address,
-      latitude: contact.latitude,
-      longitude: contact.longitude,
-      relationType: contact.relationType,
-      relationLabel: contact.relationLabel,
-      category: contact.category,
-      isFavorite: contact.isFavorite
+    
+    setFormData({
+      firstName: '',
+      lastName: '',
+      companyName: '',
+      address: '',
+      latitude: 0,
+      longitude: 0,
+      relationType: undefined,
+      category: activeCategory || 'adresse-principale',
     });
-    setEditingContactId(contact.id);
-    setIsAddDialogOpen(true);
+    
+    setUseCustomRelationLabel(false);
+    setCustomRelationLabel('');
   };
 
-  // Delete contact
-  const handleDeleteContact = (id: string) => {
-    setContacts(contacts.filter(contact => contact.id !== id));
-    toast({
-      title: "Contact supprimé",
-      description: "Le contact a été supprimé avec succès."
-    });
+  const handleFormCancel = () => {
+    setIsAddingNew(false);
+    setIsEditing(null);
+    setUseCustomRelationLabel(false);
+    setCustomRelationLabel('');
   };
 
-  // Toggle favorite status
-  const handleToggleFavorite = (id: string) => {
-    setContacts(contacts.map(contact => 
-      contact.id === id 
-        ? { ...contact, isFavorite: !contact.isFavorite } 
-        : contact
-    ));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Toggle contact selection for map view
-  const handleToggleContactSelection = (id: string) => {
-    setSelectedContacts(prev => 
-      prev.includes(id) ? prev.filter(contactId => contactId !== id) : [...prev, id]
-    );
+  const handleSelectChange = (name: keyof DailyContactInfo, value: any) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Format contact for map display
-  const mapLocations = contacts
-    .filter(contact => selectedContacts.includes(contact.id) || contact.category === activeCategory.id)
-    .map(contact => ({
+  const handleToggleContactSelection = (contactId: string) => {
+    const newSelection = new Set(selectedContactIds);
+    if (newSelection.has(contactId)) {
+      newSelection.delete(contactId);
+    } else {
+      newSelection.add(contactId);
+    }
+    setSelectedContactIds(newSelection);
+  };
+
+  const getSelectedContactsForMap = () => {
+    if (selectedContactIds.size === 0) return filteredContacts;
+    return filteredContacts.filter(contact => selectedContactIds.has(contact.id));
+  };
+
+  const formatContactsForMap = () => {
+    return getSelectedContactsForMap().map(contact => ({
       id: contact.id,
-      name: `${contact.firstName} ${contact.lastName || ''}`,
+      name: `${contact.firstName} ${contact.lastName}`,
       latitude: contact.latitude,
       longitude: contact.longitude,
       category: contact.category,
       address: contact.address,
-      isFavorite: contact.isFavorite
+      isFavorite: contact.isFavorite,
     }));
+  };
 
-  // View contact details on the map
-  const handleViewOnMap = (contactId: string) => {
-    const contact = contacts.find(c => c.id === contactId);
-    if (contact) {
-      setCenterCoordinates([contact.longitude, contact.latitude]);
-      setView('map');
-      
-      // Ensure the contact is selected for display on the map
-      if (!selectedContacts.includes(contactId)) {
-        setSelectedContacts([...selectedContacts, contactId]);
-      }
+  const getCategoryIcon = (categoryId: DailyCategoryType) => {
+    switch(categoryId) {
+      case 'adresse-principale': return <Home className="h-4 w-4" />;
+      case 'famille': return <Users className="h-4 w-4" />;
+      case 'amis': return <User className="h-4 w-4" />;
+      case 'travail': return <Briefcase className="h-4 w-4" />;
+      case 'ecole': return <BookOpen className="h-4 w-4" />;
+      case 'activites': return <Star className="h-4 w-4" />;
+      default: return <MapPin className="h-4 w-4" />;
     }
   };
 
-  // Handle custom relation type editing
-  const handleEditRelationType = (type: RelationTypeInfo) => {
-    setEditingRelationType(type);
-    setRelationTypeInput(type.customLabel || type.name);
-    setIsRelationTypeDialogOpen(true);
+  const getCategoryColor = (categoryId: DailyCategoryType): string => {
+    const category = DAILY_CATEGORIES.find(cat => cat.id === categoryId);
+    return category?.color || '#888888';
   };
 
-  const handleSaveRelationType = () => {
-    if (!editingRelationType) return;
-    
-    // Update the custom relation types list
-    const updatedTypes = customRelationTypes.map(type => 
-      type.id === editingRelationType.id 
-        ? { ...type, customLabel: relationTypeInput !== type.name ? relationTypeInput : undefined }
-        : type
-    );
-    
-    setCustomRelationTypes(updatedTypes);
-    
-    // Update any contacts using this relation type
-    const updatedContacts = contacts.map(contact => 
-      contact.relationType === editingRelationType.id 
-        ? { ...contact, relationLabel: relationTypeInput !== editingRelationType.name ? relationTypeInput : undefined }
-        : contact
-    );
-    
-    setContacts(updatedContacts);
-    
-    toast({
-      title: "Type de relation mis à jour",
-      description: `"${editingRelationType.name}" a été renommé en "${relationTypeInput}".`
-    });
-    
-    setEditingRelationType(null);
-    setRelationTypeInput('');
-    setIsRelationTypeDialogOpen(false);
-  };
-
-  // Reset a custom relation type name to default
-  const handleResetRelationTypeName = (type: RelationTypeInfo) => {
-    // Update the custom relation types list
-    const updatedTypes = customRelationTypes.map(t => 
-      t.id === type.id ? { ...t, customLabel: undefined } : t
-    );
-    
-    setCustomRelationTypes(updatedTypes);
-    
-    // Update any contacts using this relation type
-    const updatedContacts = contacts.map(contact => 
-      contact.relationType === type.id ? { ...contact, relationLabel: undefined } : contact
-    );
-    
-    setContacts(updatedContacts);
-    
-    toast({
-      title: "Nom par défaut restauré",
-      description: `Le type de relation a été restauré à "${type.name}".`
-    });
+  const toggleMapView = () => {
+    setShowMap(!showMap);
   };
 
   return (
-    <div className="container mx-auto py-6 px-4 md:px-6 min-h-screen">
-      <motion.h1 
-        className="text-3xl font-bold mb-6 text-center"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        Quotidien
-      </motion.h1>
-
-      <Tabs value={view} onValueChange={setView} className="w-full">
-        <div className="flex justify-between items-center mb-6">
-          <TabsList>
-            <TabsTrigger value="list">Liste</TabsTrigger>
-            <TabsTrigger value="map">Carte</TabsTrigger>
-          </TabsList>
+    <motion.div 
+      className="container mx-auto py-8 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Quotidien</h1>
+        <div className="space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+          >
+            {showOnlyFavorites ? <StarOff className="h-4 w-4 mr-2" /> : <Star className="h-4 w-4 mr-2" />}
+            {showOnlyFavorites ? "Tous" : "Favoris"}
+          </Button>
+          
+          <Button 
+            variant={showMap ? "secondary" : "outline"} 
+            size="sm"
+            onClick={toggleMapView}
+          >
+            <MapPin className="h-4 w-4 mr-2" />
+            Carte
+          </Button>
         </div>
+      </div>
 
-        <TabsContent value="list" className="space-y-6">
-          {/* Category Tabs */}
-          <Card>
-            <CardContent className="p-2 overflow-x-auto">
-              <div className="flex space-x-2 py-2">
-                {DAILY_CATEGORIES.map(category => (
-                  <Button
-                    key={category.id}
-                    variant={activeCategory.id === category.id ? "default" : "outline"}
-                    className={cn(
-                      "flex items-center gap-2 whitespace-nowrap",
-                      activeCategory.id === category.id && "shadow-md"
-                    )}
-                    style={{
-                      backgroundColor: activeCategory.id === category.id ? category.color : undefined,
-                      borderColor: category.color,
-                      color: activeCategory.id === category.id ? "white" : undefined
-                    }}
-                    onClick={() => setActiveCategory(category)}
-                  >
-                    <span>{category.icon}</span>
-                    <span>{category.name}</span>
-                  </Button>
-                ))}
+      <Tabs defaultValue="all" className="mb-6">
+        <TabsList className="mb-4">
+          <TabsTrigger value="all" onClick={() => setActiveCategory(null)}>
+            Tous
+          </TabsTrigger>
+          
+          {DAILY_CATEGORIES.map((category) => (
+            <TabsTrigger 
+              key={category.id}
+              value={category.id}
+              onClick={() => setActiveCategory(category.id)}
+            >
+              {category.name}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {showMap ? (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 h-[500px]">
+          <EnhancedMapComponent 
+            selectedLocations={formatContactsForMap()}
+            userLocation={userLocation}
+            transportMode={transportMode}
+            searchRadius={searchRadius}
+            mapCenter={[
+              filteredContacts.length > 0 ? 
+                filteredContacts[0].longitude : 
+                userLocation[0],
+              filteredContacts.length > 0 ? 
+                filteredContacts[0].latitude : 
+                userLocation[1]
+            ]}
+          />
+        </div>
+      ) : null}
+
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">
+          {activeCategory ? 
+            DAILY_CATEGORIES.find(c => c.id === activeCategory)?.name || "Contacts" : 
+            "Tous les contacts"} 
+          ({filteredContacts.length})
+        </h2>
+        
+        <Button onClick={handleAddNew}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nouveau contact
+        </Button>
+      </div>
+
+      {filteredContacts.length === 0 ? (
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+          <p className="text-gray-500 dark:text-gray-400">Aucun contact trouvé dans cette catégorie.</p>
+          <Button variant="outline" className="mt-4" onClick={handleAddNew}>Ajouter un contact</Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredContacts.map((contact) => (
+            <div 
+              key={contact.id} 
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 relative"
+              style={{ borderLeft: `4px solid ${getCategoryColor(contact.category)}` }}
+            >
+              <div className="absolute top-3 right-3 flex space-x-1">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0" 
+                  onClick={() => handleToggleFavorite(contact.id)}
+                >
+                  {contact.isFavorite ? 
+                    <Star className="h-4 w-4 text-yellow-500" fill="#f59e0b" /> : 
+                    <Star className="h-4 w-4" />}
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0" 
+                  onClick={() => handleEditContact(contact.id)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700" 
+                  onClick={() => handleDeleteContact(contact.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Contact List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Add Contact Card */}
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-dashed border-2 hover:border-primary/50 transition-colors">
-                <CardContent className="p-6 flex items-center justify-center h-full">
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full h-full flex flex-col items-center gap-3 p-8"
-                      onClick={() => {
-                        setNewContact({ category: activeCategory.id });
-                        setEditingContactId(null);
-                      }}
-                    >
-                      <PlusCircle className="h-12 w-12 text-primary" />
-                      <span className="text-lg font-medium">Ajouter un contact</span>
-                    </Button>
-                  </DialogTrigger>
-                </CardContent>
-              </Card>
-  
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingContactId ? 'Modifier le contact' : 'Ajouter un nouveau contact'}
-                  </DialogTitle>
-                  <DialogDescription>
-                    Remplissez les informations du contact ci-dessous.
-                  </DialogDescription>
-                </DialogHeader>
-  
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">Prénom *</Label>
-                      <Input
-                        id="firstName"
-                        value={newContact.firstName || ''}
-                        onChange={(e) => setNewContact({...newContact, firstName: e.target.value})}
-                        placeholder="Prénom"
-                        required
-                      />
+              <div className="flex items-start mb-2">
+                <Checkbox 
+                  checked={selectedContactIds.has(contact.id)}
+                  onCheckedChange={() => handleToggleContactSelection(contact.id)}
+                  className="mr-2 mt-1"
+                />
+                
+                <div>
+                  <div className="flex items-center">
+                    <h3 className="font-bold text-lg">{contact.firstName} {contact.lastName}</h3>
+                    <Badge variant="outline" className="ml-2">
+                      {getCategoryIcon(contact.category)}
+                      <span className="ml-1">{DAILY_CATEGORIES.find(cat => cat.id === contact.category)?.name}</span>
+                    </Badge>
+                  </div>
+                  
+                  {contact.companyName && (
+                    <div className="flex items-center text-gray-600 mt-1">
+                      <Building className="h-4 w-4 mr-1" />
+                      <span>{contact.companyName}</span>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Nom</Label>
-                      <Input
-                        id="lastName"
-                        value={newContact.lastName || ''}
-                        onChange={(e) => setNewContact({...newContact, lastName: e.target.value})}
-                        placeholder="Nom"
-                      />
+                  )}
+                  
+                  {contact.relationType && (
+                    <div className="text-sm text-gray-500 mt-1">
+                      Relation: {contact.relationLabel || getRelationTypeLabel(contact.relationType)}
                     </div>
-                  </div>
-  
-                  <div className="space-y-2">
-                    <Label htmlFor="companyName">Société / Organisation</Label>
-                    <Input
-                      id="companyName"
-                      value={newContact.companyName || ''}
-                      onChange={(e) => setNewContact({...newContact, companyName: e.target.value})}
-                      placeholder="Société (optionnel)"
-                    />
-                  </div>
-  
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Adresse *</Label>
-                    <AddressSearch 
-                      onAddressSelect={handleAddressSelect}
-                      placeholder="Rechercher une adresse" 
-                      userLocation={userLocation}
-                    />
-                    {newContact.address && (
-                      <div className="text-sm text-muted-foreground mt-1">
-                        Adresse sélectionnée: {newContact.address}
-                      </div>
-                    )}
-                  </div>
-  
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label htmlFor="relationType">Type de relation</Label>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-7 text-xs"
-                        onClick={() => setIsRelationTypeDialogOpen(true)}
-                      >
-                        <Edit className="h-3 w-3 mr-1" />
-                        Gérer les types
-                      </Button>
-                    </div>
-                    <Select 
-                      value={newContact.relationType || ''} 
-                      onValueChange={(value) => setNewContact({
-                        ...newContact, 
-                        relationType: value as any
-                      })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {customRelationTypes.map(type => (
-                          <SelectItem key={type.id} value={type.id}>
-                            {type.customLabel || type.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-  
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Catégorie</Label>
-                    <Select 
-                      value={newContact.category} 
-                      onValueChange={(value) => setNewContact({
-                        ...newContact, 
-                        category: value as any
-                      })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner une catégorie" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DAILY_CATEGORIES.map(category => (
-                          <SelectItem key={category.id} value={category.id}>
-                            <div className="flex items-center gap-2">
-                              <span>{category.icon}</span>
-                              <span>{category.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  )}
+                  
+                  <div className="flex items-start mt-2 text-gray-600">
+                    <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm">{contact.address}</p>
                   </div>
                 </div>
-  
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Annuler</Button>
-                  <Button onClick={handleSaveContact}>
-                    {editingContactId ? 'Mettre à jour' : 'Ajouter'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add/Edit Contact Dialog */}
+      <Dialog open={isAddingNew || isEditing !== null} onOpenChange={(open) => {
+        if (!open) handleFormCancel();
+      }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{isEditing ? "Modifier le contact" : "Ajouter un contact"}</DialogTitle>
+            <DialogDescription>
+              {isEditing ? 
+                "Mettez à jour les informations du contact ci-dessous." : 
+                "Entrez les détails du nouveau contact ci-dessous."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">Prénom *</Label>
+              <Input 
+                id="firstName" 
+                name="firstName" 
+                value={formData.firstName || ''} 
+                onChange={handleInputChange}
+                placeholder="Prénom" 
+              />
+            </div>
             
-            {/* Contact Cards */}
-            {categoryContacts.length > 0 ? (
-              categoryContacts.map((contact) => (
-                <Card 
-                  key={contact.id}
-                  className={cn(
-                    "overflow-hidden transition-all hover:shadow-md",
-                    contact.isFavorite && "border-yellow-400 border-2"
-                  )}
-                >
-                  <CardHeader 
-                    className="p-4 pb-2"
-                    style={{
-                      backgroundColor: DAILY_CATEGORIES.find(cat => cat.id === contact.category)?.color + '20'
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">
-                          {DAILY_CATEGORIES.find(cat => cat.id === contact.category)?.icon}
-                        </span>
-                        <CardTitle className="text-lg">
-                          {contact.firstName} {contact.lastName}
-                        </CardTitle>
-                      </div>
-                      <div className="flex space-x-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className={cn(
-                            "rounded-full h-7 w-7",
-                            contact.isFavorite && "text-yellow-500"
-                          )}
-                          onClick={() => handleToggleFavorite(contact.id)}
-                        >
-                          <Star className={cn(
-                            "h-4 w-4",
-                            contact.isFavorite && "fill-yellow-500"
-                          )} />
-                        </Button>
-                      </div>
-                    </div>
-                    {contact.companyName && (
-                      <div className="text-sm text-muted-foreground">{contact.companyName}</div>
-                    )}
-                  </CardHeader>
-                  <CardContent className="p-4 pt-2 space-y-2">
-                    <div className="flex items-start">
-                      <MapPin className="h-4 w-4 mt-1 mr-2 flex-shrink-0" />
-                      <div className="text-sm">{contact.address}</div>
-                    </div>
-                    {contact.relationType && (
-                      <div className="text-xs text-muted-foreground">
-                        Relation: {getRelationTypeLabel(contact.relationType, contact.relationLabel, customRelationTypes)}
-                      </div>
-                    )}
-                    <div className="flex justify-between pt-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-xs" 
-                        onClick={() => handleViewOnMap(contact.id)}
-                      >
-                        <MapPin className="h-3 w-3 mr-1" />
-                        Voir sur la carte
-                      </Button>
-                      <div className="space-x-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => handleEditContact(contact)}
-                        >
-                          <Edit2 className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          className="h-8 w-8 text-destructive hover:text-destructive"
-                          onClick={() => handleDeleteContact(contact.id)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className="col-span-full p-8 text-center text-muted-foreground">
-                <p>Aucun contact dans cette catégorie.</p>
-                <p>Cliquez sur "Ajouter un contact" pour commencer.</p>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Nom *</Label>
+              <Input 
+                id="lastName" 
+                name="lastName" 
+                value={formData.lastName || ''} 
+                onChange={handleInputChange}
+                placeholder="Nom" 
+              />
+            </div>
+            
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="companyName">Nom de société</Label>
+              <Input 
+                id="companyName" 
+                name="companyName" 
+                value={formData.companyName || ''} 
+                onChange={handleInputChange}
+                placeholder="Nom de la société (optionnel)" 
+              />
+            </div>
+            
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="address">Adresse *</Label>
+              <Input 
+                id="address" 
+                name="address" 
+                value={formData.address || ''} 
+                onChange={handleInputChange}
+                placeholder="Adresse complète" 
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="latitude">Latitude</Label>
+              <Input 
+                id="latitude" 
+                name="latitude" 
+                type="number" 
+                value={formData.latitude || ''} 
+                onChange={handleInputChange}
+                placeholder="Latitude" 
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="longitude">Longitude</Label>
+              <Input 
+                id="longitude" 
+                name="longitude" 
+                type="number" 
+                value={formData.longitude || ''} 
+                onChange={handleInputChange}
+                placeholder="Longitude" 
+              />
+            </div>
+            
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="category">Catégorie *</Label>
+              <Select 
+                value={formData.category} 
+                onValueChange={(value: DailyCategoryType) => handleSelectChange('category', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionnez une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DAILY_CATEGORIES.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2 col-span-2">
+              <Label htmlFor="relationType">Type de relation</Label>
+              <Select 
+                value={formData.relationType} 
+                onValueChange={(value: RelationType) => handleSelectChange('relationType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionnez un type de relation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {RELATION_TYPES.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.relationType && (
+              <div className="space-y-2 col-span-2">
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="customRelation">Personnaliser le type de relation</Label>
+                  <Checkbox 
+                    id="customRelation" 
+                    checked={useCustomRelationLabel}
+                    onCheckedChange={(checked) => setUseCustomRelationLabel(checked === true)}
+                  />
+                </div>
+
+                {useCustomRelationLabel && (
+                  <Input 
+                    id="relationLabel" 
+                    value={customRelationLabel} 
+                    onChange={(e) => setCustomRelationLabel(e.target.value)}
+                    placeholder="Nom personnalisé" 
+                  />
+                )}
               </div>
             )}
           </div>
-        </TabsContent>
-
-        <TabsContent value="map" className="space-y-4">
-          <Card>
-            <CardContent className="p-4 h-[70vh]">
-              <EnhancedMapComponent 
-                selectedLocations={mapLocations}
-                userLocation={userLocation}
-                transportMode="driving"
-                searchRadius={5}
-                center={centerCoordinates}
-              />
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="text-lg">Contacts sélectionnés</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <ScrollArea className="h-48">
-                {contacts.length > 0 ? (
-                  <div className="space-y-2">
-                    {contacts.map(contact => (
-                      <div 
-                        key={contact.id} 
-                        className="flex items-center justify-between border-b pb-2"
-                      >
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedContacts.includes(contact.id)}
-                            onChange={() => handleToggleContactSelection(contact.id)}
-                            className="checkbox"
-                          />
-                          <span>{DAILY_CATEGORIES.find(cat => cat.id === contact.category)?.icon}</span>
-                          <span>{contact.firstName} {contact.lastName}</span>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleViewOnMap(contact.id)}
-                        >
-                          <MapPin className="h-3 w-3 mr-1" />
-                          Centrer
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-muted-foreground">
-                    <p>Aucun contact disponible.</p>
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Dialog for editing relation type names */}
-      <Dialog open={isRelationTypeDialogOpen} onOpenChange={setIsRelationTypeDialogOpen}>
-        <DialogContent className="sm:max-w-[450px]">
-          <DialogHeader>
-            <DialogTitle>Gérer les types de relations</DialogTitle>
-            <DialogDescription>
-              Vous pouvez renommer les types de relation selon vos besoins.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-4">
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="space-y-4">
-                {customRelationTypes.map(type => (
-                  <div key={type.id} className="flex items-center justify-between border-b pb-2">
-                    <div>
-                      <div className="font-medium">{type.name}</div>
-                      {type.customLabel && (
-                        <div className="text-sm text-muted-foreground">
-                          Renommé en: {type.customLabel}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      {type.customLabel && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleResetRelationTypeName(type)}
-                        >
-                          Réinitialiser
-                        </Button>
-                      )}
-                      <Button 
-                        variant="secondary"
-                        size="sm" 
-                        onClick={() => handleEditRelationType(type)}
-                      >
-                        <Edit className="h-3 w-3 mr-1" />
-                        {type.customLabel ? 'Modifier' : 'Renommer'}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRelationTypeDialogOpen(false)}>
-              Fermer
-            </Button>
+            <Button variant="outline" onClick={handleFormCancel}>Annuler</Button>
+            <Button onClick={handleFormSubmit}>{isEditing ? "Mettre à jour" : "Ajouter"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Dialog for editing a specific relation type */}
-      {editingRelationType && (
-        <Dialog 
-          open={!!editingRelationType} 
-          onOpenChange={(open) => {
-            if (!open) {
-              setEditingRelationType(null);
-              setRelationTypeInput('');
-            }
-          }}
-        >
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle>Renommer le type de relation</DialogTitle>
-              <DialogDescription>
-                Personnalisez le nom du type "{editingRelationType.name}".
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="py-4">
-              <div className="space-y-2">
-                <Label htmlFor="relationName">Nouveau nom</Label>
-                <Input
-                  id="relationName"
-                  value={relationTypeInput}
-                  onChange={(e) => setRelationTypeInput(e.target.value)}
-                  placeholder="Entrer un nouveau nom"
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => {
-                setEditingRelationType(null);
-                setRelationTypeInput('');
-              }}>
-                Annuler
-              </Button>
-              <Button 
-                onClick={handleSaveRelationType}
-                disabled={!relationTypeInput.trim()}
-              >
-                Enregistrer
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
-    </div>
+    </motion.div>
   );
 };
 

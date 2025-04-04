@@ -7,6 +7,6 @@ export const categories = [
   { id: 'sante', name: 'Santé', icon: Heart, link: '/search?category=sante' },
   { id: 'travail', name: 'Travail', icon: Briefcase, link: '/search?category=travail' },
   { id: 'shopping', name: 'Shopping', icon: ShoppingBag, link: '/search?category=shopping' },
-  { id: 'quotidien', name: 'Quotidien', icon: Users, link: '/categories/quotidien' },
+  { id: 'quotidien', name: 'Quotidien', icon: Users, link: '/quotidien' },
   { id: 'hotel', name: 'Hôtels', icon: Hotel, link: '/search?category=hotel' }
 ];
