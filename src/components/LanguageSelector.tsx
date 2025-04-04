@@ -34,17 +34,17 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className={className}>
+        <Button variant={variant} size={size} className={`${className} text-blue-600`}>
           <Globe className="h-4 w-4 mr-2" />
-          {languages.find(lang => lang.code === language)?.name || 'Langue'}
+          {size !== 'icon' && (languages.find(lang => lang.code === language)?.name || 'Langue')}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-gray-100">
+      <DropdownMenuContent align="end" className="bg-white shadow-lg border border-gray-100 rounded-lg">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
-            className={language === lang.code ? 'bg-accent text-accent-foreground' : ''}
+            className={`${language === lang.code ? 'bg-blue-50 text-blue-600' : ''} hover:bg-blue-50`}
           >
             {lang.name}
           </DropdownMenuItem>

@@ -11,7 +11,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Menu, X, Search, User, LogIn, Home, Info, HelpCircle, Map } from 'lucide-react';
+import { Menu, X, Search, User, LogIn, Home, Info, HelpCircle, Map, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LanguageSelector from './LanguageSelector';
 
@@ -24,13 +24,15 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <Map className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-gray-900">LocaSimple</span>
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-1.5 rounded-lg shadow-sm transition-transform group-hover:scale-110">
+              <Map className="h-5 w-5" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">LocaSimple</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -38,13 +40,13 @@ const Navbar = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="hover:bg-blue-50">{t('discover')}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="hover:bg-blue-50 font-medium">{t('discover')}</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 bg-white">
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 bg-white rounded-xl shadow-lg border border-gray-100">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <Link
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-500 to-blue-700 p-6 no-underline outline-none focus:shadow-md"
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-500 to-blue-700 p-6 no-underline outline-none focus:shadow-md transition-all hover:shadow-lg"
                             to="/search"
                           >
                             <Search className="h-6 w-6 text-white" />
@@ -73,12 +75,12 @@ const Navbar = () => {
                       <li>
                         <NavigationMenuLink asChild>
                           <Link
-                            to="/about"
+                            to="/quotidien"
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground"
                           >
-                            <div className="text-sm font-medium leading-none">{t('navAbout')}</div>
+                            <div className="text-sm font-medium leading-none">Quotidien</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              {t('aboutDescription')}
+                              Gérez vos lieux du quotidien
                             </p>
                           </Link>
                         </NavigationMenuLink>
@@ -117,20 +119,20 @@ const Navbar = () => {
             </NavigationMenu>
 
             <div className="flex items-center space-x-2">
-              <LanguageSelector variant="outline" size="sm" />
+              <LanguageSelector variant="ghost" size="sm" />
               <Link to="/search">
-                <Button variant="ghost" size="icon" className="hover:bg-blue-50">
+                <Button variant="ghost" size="icon" className="hover:bg-blue-50 text-blue-700">
                   <Search className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-blue-50">
+                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-blue-50 border-blue-200">
                   <LogIn className="mr-2 h-4 w-4" />
                   {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="sm" className="hidden lg:flex">
+                <Button size="sm" className="hidden lg:flex bg-blue-600 hover:bg-blue-700">
                   {t('navRegister')}
                 </Button>
               </Link>
@@ -159,37 +161,41 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t py-4">
+        <div className="md:hidden bg-white border-t py-4 animate-fade-in">
           <div className="container mx-auto px-4 space-y-4">
             <Link to="/" className="flex items-center py-2" onClick={toggleMenu}>
-              <Home className="h-5 w-5 mr-3 text-primary" />
+              <Home className="h-5 w-5 mr-3 text-blue-600" />
               <span>{t('navHome')}</span>
             </Link>
             <Link to="/categories" className="flex items-center py-2" onClick={toggleMenu}>
-              <Map className="h-5 w-5 mr-3 text-primary" />
+              <Map className="h-5 w-5 mr-3 text-blue-600" />
               <span>{t('categories')}</span>
             </Link>
+            <Link to="/quotidien" className="flex items-center py-2" onClick={toggleMenu}>
+              <Home className="h-5 w-5 mr-3 text-blue-600" />
+              <span>Quotidien</span>
+            </Link>
             <Link to="/pricing" className="flex items-center py-2" onClick={toggleMenu}>
-              <Info className="h-5 w-5 mr-3 text-primary" />
+              <Info className="h-5 w-5 mr-3 text-blue-600" />
               <span>{t('navPricing')}</span>
             </Link>
             <Link to="/faq" className="flex items-center py-2" onClick={toggleMenu}>
-              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
+              <HelpCircle className="h-5 w-5 mr-3 text-blue-600" />
               <span>{t('navFaq')}</span>
             </Link>
             <Link to="/contact" className="flex items-center py-2" onClick={toggleMenu}>
-              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
+              <HelpCircle className="h-5 w-5 mr-3 text-blue-600" />
               <span>{t('navContact')}</span>
             </Link>
             <div className="pt-2 flex flex-col space-y-2">
               <Link to="/login" onClick={toggleMenu}>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-blue-200">
                   <LogIn className="mr-2 h-4 w-4" />
                   {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register" onClick={toggleMenu}>
-                <Button className="w-full">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700">
                   {t('navRegister')}
                 </Button>
               </Link>
