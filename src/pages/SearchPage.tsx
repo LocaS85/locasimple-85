@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import SearchHeader from '@/components/search/SearchHeader';
 import MapSection from '@/components/search/MapSection';
 import CategoryTabs from '@/components/search/CategoryTabs';
@@ -10,6 +11,10 @@ import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 
 const SearchPage = () => {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const categoryFromUrl = searchParams.get('category');
+
   const {
     searchQuery,
     setSearchQuery,
@@ -24,6 +29,7 @@ const SearchPage = () => {
     selectedPlaceId,
     showRoutes,
     selectedCategory,
+    setSelectedCategory,
     showNoMapboxTokenWarning,
     setShowNoMapboxTokenWarning,
     places,
@@ -36,6 +42,15 @@ const SearchPage = () => {
     toggleRoutes,
     resetSearch
   } = useSearchPageStateManager();
+
+  // Récupérer la catégorie depuis l'URL si elle existe
+  useEffect(() => {
+    if (categoryFromUrl && categoryFromUrl !== selectedCategory) {
+      setSelectedCategory(categoryFromUrl);
+      // Effectuer une recherche automatique avec la catégorie sélectionnée
+      performSearch(searchQuery || categoryFromUrl);
+    }
+  }, [categoryFromUrl, performSearch, searchQuery, selectedCategory, setSelectedCategory]);
 
   const handleSearchFromHeader = (query: string) => {
     setSearchQuery(query);

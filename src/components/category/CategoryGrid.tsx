@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
@@ -8,18 +8,19 @@ import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 
 const CategoryGrid = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useLanguage();
   
   const handleCategoryClick = (categoryId: string, link?: string) => {
-    // If it's the 'quotidien' category, navigate to the dedicated page
+    // Si c'est la catégorie 'quotidien', naviguer vers la page dédiée
     if (categoryId === 'quotidien') {
       navigate('/quotidien');
-    } else if (link) {
-      // For other categories with specific links
+    } else if (link && link.includes('/search')) {
+      // Si le lien contient '/search', naviguer directement vers la page de recherche
       navigate(link);
     } else {
-      // Default behavior
-      navigate(`/categories/${categoryId}`);
+      // Sinon, naviguer vers la page des sous-catégories ou la page de recherche avec la catégorie sélectionnée
+      navigate(`/search?category=${categoryId}`);
     }
   };
 

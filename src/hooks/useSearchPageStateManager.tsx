@@ -73,8 +73,8 @@ export const useSearchPageStateManager = () => {
   }, []);
 
   const performSearch = useCallback(async (query: string = searchQuery) => {
-    if (!query.trim()) {
-      toast.error('Veuillez entrer un terme de recherche');
+    if (!query.trim() && !selectedCategory) {
+      toast.error('Veuillez entrer un terme de recherche ou sélectionner une catégorie');
       return;
     }
 
@@ -82,7 +82,7 @@ export const useSearchPageStateManager = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/search`, {
         params: {
-          query,
+          query: query.trim() || 'places',
           mode: transportMode,
           lat: userLocation[1],
           lon: userLocation[0],
@@ -127,8 +127,13 @@ export const useSearchPageStateManager = () => {
     }
 
     try {
+      let mapboxQuery = query.trim();
+      if (!mapboxQuery && selectedCategory) {
+        mapboxQuery = selectedCategory;
+      }
+
       const response = await axios.get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(mapboxQuery)}.json`,
         {
           params: {
             access_token: MAPBOX_TOKEN,
@@ -147,7 +152,7 @@ export const useSearchPageStateManager = () => {
           lat: feature.center[1],
           lon: feature.center[0],
           place_name: feature.place_name,
-          category: feature.properties?.category || '',
+          category: feature.properties?.category || selectedCategory || '',
           distance: 0,
           duration: 0
         }));
@@ -170,7 +175,7 @@ export const useSearchPageStateManager = () => {
       toast.error('Erreur lors de la recherche avec Mapbox');
       setSearchResults([]);
     }
-  }, [userLocation, resultsCount]);
+  }, [userLocation, resultsCount, selectedCategory]);
 
   const handleResultClick = useCallback((place: any) => {
     setSelectedPlaceId(place.id);
@@ -248,6 +253,7 @@ export const useSearchPageStateManager = () => {
     viewport,
     showRoutes,
     selectedCategory,
+    setSelectedCategory,
     showNoMapboxTokenWarning,
     setShowNoMapboxTokenWarning,
     places,
