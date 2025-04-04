@@ -16,10 +16,5 @@ export const MAIN_CATEGORIES: Category[] = [
     id: 'travail',
     name: 'Travail',
     icon: '💼',
-  },
-  {
-    id: 'ecole',
-    name: 'École',
-    icon: '🏫',
   }
 ];
