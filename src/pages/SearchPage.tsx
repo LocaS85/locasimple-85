@@ -37,9 +37,26 @@ const SearchPage = () => {
     resetSearch
   } = useSearchPageStateManager();
 
+  const handleSearchFromHeader = (query: string) => {
+    setSearchQuery(query);
+    performSearch(query);
+  };
+
+  const handleResultSelect = (result: any) => {
+    setSearchQuery(result.place_name);
+    performSearch(result.place_name);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
-      <SearchHeader />
+      <SearchHeader 
+        title="Recherche"
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onSearch={handleSearchFromHeader}
+        onResultSelect={handleResultSelect}
+        userLocation={userLocation}
+      />
       
       <CategoryTabs 
         selectedCategory={selectedCategory}

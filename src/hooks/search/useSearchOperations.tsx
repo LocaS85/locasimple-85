@@ -12,7 +12,7 @@ export const useSearchOperations = (
   isLocationActive: boolean,
   setLoading: (loading: boolean) => void,
   setPlaces: (places: any[]) => void,
-  setSearchHistory: (history: string[]) => void,
+  setSearchHistory: (history: (prev: string[]) => string[]) => void,
   setSelectedPlaceId: (id: string | null) => void
 ) => {
   const performSearch = useCallback(async (query: string = searchQuery) => {
