@@ -8,6 +8,7 @@ export interface DailyContactInfo {
   latitude: number;
   longitude: number;
   relationType?: RelationType;
+  relationLabel?: string; // Custom label for relation types
   category: DailyCategoryType;
   isFavorite?: boolean;
 }
@@ -37,6 +38,12 @@ export interface DailyCategory {
   color: string;
 }
 
+export interface RelationTypeInfo {
+  id: RelationType;
+  name: string;
+  customLabel?: string;
+}
+
 export const DAILY_CATEGORIES: DailyCategory[] = [
   { id: 'adresse-principale', name: 'Adresse principale', icon: '🏠', color: '#8B5CF6' },
   { id: 'famille', name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D946EF' },
@@ -46,7 +53,7 @@ export const DAILY_CATEGORIES: DailyCategory[] = [
   { id: 'activites', name: 'Activités', icon: '🎭', color: '#10B981' }
 ];
 
-export const RELATION_TYPES = [
+export const RELATION_TYPES: RelationTypeInfo[] = [
   { id: 'pere', name: 'Père' },
   { id: 'mere', name: 'Mère' },
   { id: 'frere', name: 'Frère' },
@@ -56,3 +63,17 @@ export const RELATION_TYPES = [
   { id: 'collegue', name: 'Collègue' },
   { id: 'autre', name: 'Autre' }
 ];
+
+// Function to get relation type label
+export const getRelationTypeLabel = (
+  relationType: RelationType | undefined, 
+  customLabel?: string, 
+  relationTypes: RelationTypeInfo[] = RELATION_TYPES
+): string => {
+  if (!relationType) return '';
+  
+  if (customLabel) return customLabel;
+  
+  const type = relationTypes.find(type => type.id === relationType);
+  return type ? type.name : '';
+};

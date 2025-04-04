@@ -2,14 +2,21 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { DAILY_CATEGORIES, DailyCategory, DailyContactInfo, RELATION_TYPES } from '@/types/dailyCategories';
+import { 
+  DAILY_CATEGORIES, 
+  DailyCategory, 
+  DailyContactInfo, 
+  RELATION_TYPES,
+  RelationTypeInfo,
+  getRelationTypeLabel
+} from '@/types/dailyCategories';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Star, Trash2, Edit2, MapPin } from 'lucide-react';
+import { PlusCircle, Star, Trash2, Edit2, MapPin, Edit } from 'lucide-react';
 import EnhancedMapComponent from '@/components/map/EnhancedMapComponent';
 import AddressSearch from '@/components/search/AddressSearch';
 import { useToast } from '@/components/ui/use-toast';
@@ -22,11 +29,13 @@ import {
   DialogHeader, 
   DialogTitle, 
   DialogFooter,
-  DialogTrigger
+  DialogTrigger,
+  DialogDescription
 } from '@/components/ui/dialog';
 
 // Mock data storage (would be replaced with real storage solution)
 const LOCAL_STORAGE_KEY = 'dailyContacts';
+const CUSTOM_RELATION_TYPES_KEY = 'customRelationTypes';
 
 const DailyCategories = () => {
   const { t } = useLanguage();
@@ -44,7 +53,16 @@ const DailyCategories = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
-  const [mapCenter, setMapCenter] = useState<[number, number]>([2.3522, 48.8566]); // Default: Paris
+  const [centerCoordinates, setCenterCoordinates] = useState<[number, number]>([2.3522, 48.8566]); // Default: Paris
+  
+  // Custom relation type management
+  const [isRelationTypeDialogOpen, setIsRelationTypeDialogOpen] = useState(false);
+  const [customRelationTypes, setCustomRelationTypes] = useState<RelationTypeInfo[]>(() => {
+    const saved = localStorage.getItem(CUSTOM_RELATION_TYPES_KEY);
+    return saved ? JSON.parse(saved) : [...RELATION_TYPES];
+  });
+  const [editingRelationType, setEditingRelationType] = useState<RelationTypeInfo | null>(null);
+  const [relationTypeInput, setRelationTypeInput] = useState('');
   
   // Filter contacts by active category
   const categoryContacts = contacts.filter(contact => contact.category === activeCategory.id);
@@ -58,7 +76,7 @@ const DailyCategories = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation([position.coords.longitude, position.coords.latitude]);
-          setMapCenter([position.coords.longitude, position.coords.latitude]);
+          setCenterCoordinates([position.coords.longitude, position.coords.latitude]);
         },
         (error) => {
           console.error("Error getting user location:", error);
@@ -71,6 +89,11 @@ const DailyCategories = () => {
   React.useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
   }, [contacts]);
+
+  // Save custom relation types to localStorage whenever they change
+  React.useEffect(() => {
+    localStorage.setItem(CUSTOM_RELATION_TYPES_KEY, JSON.stringify(customRelationTypes));
+  }, [customRelationTypes]);
 
   // Handle address selection from the AddressSearch component
   const handleAddressSelect = (location: { name: string; longitude: number; latitude: number }) => {
@@ -136,6 +159,7 @@ const DailyCategories = () => {
       latitude: contact.latitude,
       longitude: contact.longitude,
       relationType: contact.relationType,
+      relationLabel: contact.relationLabel,
       category: contact.category,
       isFavorite: contact.isFavorite
     });
@@ -185,7 +209,7 @@ const DailyCategories = () => {
   const handleViewOnMap = (contactId: string) => {
     const contact = contacts.find(c => c.id === contactId);
     if (contact) {
-      setMapCenter([contact.longitude, contact.latitude]);
+      setCenterCoordinates([contact.longitude, contact.latitude]);
       setView('map');
       
       // Ensure the contact is selected for display on the map
@@ -193,6 +217,66 @@ const DailyCategories = () => {
         setSelectedContacts([...selectedContacts, contactId]);
       }
     }
+  };
+
+  // Handle custom relation type editing
+  const handleEditRelationType = (type: RelationTypeInfo) => {
+    setEditingRelationType(type);
+    setRelationTypeInput(type.customLabel || type.name);
+    setIsRelationTypeDialogOpen(true);
+  };
+
+  const handleSaveRelationType = () => {
+    if (!editingRelationType) return;
+    
+    // Update the custom relation types list
+    const updatedTypes = customRelationTypes.map(type => 
+      type.id === editingRelationType.id 
+        ? { ...type, customLabel: relationTypeInput !== type.name ? relationTypeInput : undefined }
+        : type
+    );
+    
+    setCustomRelationTypes(updatedTypes);
+    
+    // Update any contacts using this relation type
+    const updatedContacts = contacts.map(contact => 
+      contact.relationType === editingRelationType.id 
+        ? { ...contact, relationLabel: relationTypeInput !== editingRelationType.name ? relationTypeInput : undefined }
+        : contact
+    );
+    
+    setContacts(updatedContacts);
+    
+    toast({
+      title: "Type de relation mis à jour",
+      description: `"${editingRelationType.name}" a été renommé en "${relationTypeInput}".`
+    });
+    
+    setEditingRelationType(null);
+    setRelationTypeInput('');
+    setIsRelationTypeDialogOpen(false);
+  };
+
+  // Reset a custom relation type name to default
+  const handleResetRelationTypeName = (type: RelationTypeInfo) => {
+    // Update the custom relation types list
+    const updatedTypes = customRelationTypes.map(t => 
+      t.id === type.id ? { ...t, customLabel: undefined } : t
+    );
+    
+    setCustomRelationTypes(updatedTypes);
+    
+    // Update any contacts using this relation type
+    const updatedContacts = contacts.map(contact => 
+      contact.relationType === type.id ? { ...contact, relationLabel: undefined } : contact
+    );
+    
+    setContacts(updatedContacts);
+    
+    toast({
+      title: "Nom par défaut restauré",
+      description: `Le type de relation a été restauré à "${type.name}".`
+    });
   };
 
   return (
@@ -269,6 +353,9 @@ const DailyCategories = () => {
                   <DialogTitle>
                     {editingContactId ? 'Modifier le contact' : 'Ajouter un nouveau contact'}
                   </DialogTitle>
+                  <DialogDescription>
+                    Remplissez les informations du contact ci-dessous.
+                  </DialogDescription>
                 </DialogHeader>
   
                 <div className="grid gap-4 py-4">
@@ -319,7 +406,18 @@ const DailyCategories = () => {
                   </div>
   
                   <div className="space-y-2">
-                    <Label htmlFor="relationType">Type de relation</Label>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="relationType">Type de relation</Label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs"
+                        onClick={() => setIsRelationTypeDialogOpen(true)}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Gérer les types
+                      </Button>
+                    </div>
                     <Select 
                       value={newContact.relationType || ''} 
                       onValueChange={(value) => setNewContact({
@@ -331,9 +429,9 @@ const DailyCategories = () => {
                         <SelectValue placeholder="Sélectionner un type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {RELATION_TYPES.map(type => (
+                        {customRelationTypes.map(type => (
                           <SelectItem key={type.id} value={type.id}>
-                            {type.name}
+                            {type.customLabel || type.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -428,7 +526,7 @@ const DailyCategories = () => {
                     </div>
                     {contact.relationType && (
                       <div className="text-xs text-muted-foreground">
-                        Relation: {RELATION_TYPES.find(type => type.id === contact.relationType)?.name}
+                        Relation: {getRelationTypeLabel(contact.relationType, contact.relationLabel, customRelationTypes)}
                       </div>
                     )}
                     <div className="flex justify-between pt-2">
@@ -480,7 +578,7 @@ const DailyCategories = () => {
                 userLocation={userLocation}
                 transportMode="driving"
                 searchRadius={5}
-                mapCenter={mapCenter}
+                center={centerCoordinates}
               />
             </CardContent>
           </Card>
@@ -529,6 +627,111 @@ const DailyCategories = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Dialog for editing relation type names */}
+      <Dialog open={isRelationTypeDialogOpen} onOpenChange={setIsRelationTypeDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>Gérer les types de relations</DialogTitle>
+            <DialogDescription>
+              Vous pouvez renommer les types de relation selon vos besoins.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="space-y-4">
+                {customRelationTypes.map(type => (
+                  <div key={type.id} className="flex items-center justify-between border-b pb-2">
+                    <div>
+                      <div className="font-medium">{type.name}</div>
+                      {type.customLabel && (
+                        <div className="text-sm text-muted-foreground">
+                          Renommé en: {type.customLabel}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {type.customLabel && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleResetRelationTypeName(type)}
+                        >
+                          Réinitialiser
+                        </Button>
+                      )}
+                      <Button 
+                        variant="secondary"
+                        size="sm" 
+                        onClick={() => handleEditRelationType(type)}
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        {type.customLabel ? 'Modifier' : 'Renommer'}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsRelationTypeDialogOpen(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog for editing a specific relation type */}
+      {editingRelationType && (
+        <Dialog 
+          open={!!editingRelationType} 
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingRelationType(null);
+              setRelationTypeInput('');
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle>Renommer le type de relation</DialogTitle>
+              <DialogDescription>
+                Personnalisez le nom du type "{editingRelationType.name}".
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-4">
+              <div className="space-y-2">
+                <Label htmlFor="relationName">Nouveau nom</Label>
+                <Input
+                  id="relationName"
+                  value={relationTypeInput}
+                  onChange={(e) => setRelationTypeInput(e.target.value)}
+                  placeholder="Entrer un nouveau nom"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setEditingRelationType(null);
+                setRelationTypeInput('');
+              }}>
+                Annuler
+              </Button>
+              <Button 
+                onClick={handleSaveRelationType}
+                disabled={!relationTypeInput.trim()}
+              >
+                Enregistrer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
