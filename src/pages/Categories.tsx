@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import CategoryGrid from '@/components/category/CategoryGrid';
 import SubcategoryGrid from '@/components/category/SubcategoryGrid';
@@ -10,9 +10,11 @@ import SearchBox from '@/components/search/SearchBox';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
-import AddressSearch from '@/components/search/AddressSearch';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Download, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 
-// Mock data for demo purposes
+// Mock data for demo purposes (you should replace this with your actual data source)
 const mockLocations = [
   {
     id: '1',
@@ -74,12 +76,15 @@ const mockLocations = [
 
 const Categories = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const [activeView, setActiveView] = useState('grid');
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
   const [transportMode, setTransportMode] = useState('driving');
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Default to Paris
   const [searchRadius, setSearchRadius] = useState<number>(5);
+  const [isMapFullscreen, setIsMapFullscreen] = useState(false);
 
   // Get user location
   useEffect(() => {
@@ -90,6 +95,7 @@ const Categories = () => {
         },
         (error) => {
           console.error("Error getting user location:", error);
+          toast.error("Impossible d'obtenir votre position actuelle");
         }
       );
     }
@@ -104,19 +110,77 @@ const Categories = () => {
     }
   }, [location.pathname]);
 
+  // Handle radius change
   const handleRadiusChange = (value: number[]) => {
     setSearchRadius(value[0]);
   };
 
+  // Handle address select
   const handleAddressSelect = (location: { name: string; longitude: number; latitude: number }) => {
     setUserLocation([location.longitude, location.latitude]);
+    toast.success(`Position définie: ${location.name}`);
   };
 
+  // Handle search
   const handleSearch = () => {
     // This would typically filter locations based on radius, but for demo we'll just log
     console.log(`Searching within ${searchRadius}km of [${userLocation}] using ${transportMode} mode`);
+    toast.success(`Recherche effectuée dans un rayon de ${searchRadius}km`);
   };
 
+  // Export routes as PDF (mock function)
+  const handleExportRoutes = () => {
+    if (selectedLocations.length === 0) {
+      toast.error("Aucun lieu sélectionné à exporter");
+      return;
+    }
+    toast.success(`Export de ${selectedLocations.length} itinéraires en PDF`);
+    // Here you would integrate with a PDF generation library like jsPDF
+  };
+
+  // Share routes
+  const handleShareRoutes = () => {
+    if (selectedLocations.length === 0) {
+      toast.error("Aucun lieu sélectionné à partager");
+      return;
+    }
+
+    // Create a simple shareable text with locations
+    const locationsText = selectedLocations
+      .map((loc, index) => `${index + 1}. ${loc.name}: ${loc.address}`)
+      .join('\n');
+    
+    const shareText = `Mes lieux sélectionnés:\n${locationsText}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Mes lieux sélectionnés',
+        text: shareText
+      }).catch(err => {
+        console.error('Error sharing:', err);
+        // Fallback
+        navigator.clipboard.writeText(shareText);
+        toast.success("Texte copié dans le presse-papier");
+      });
+    } else {
+      // Fallback
+      navigator.clipboard.writeText(shareText);
+      toast.success("Texte copié dans le presse-papier");
+    }
+  };
+
+  // Start navigation to selected location
+  const handleNavigateTo = (location: any) => {
+    navigate('/navigation', {
+      state: {
+        start: userLocation,
+        end: [location.longitude, location.latitude],
+        placeName: location.name,
+        transportMode: transportMode
+      }
+    });
+  };
+  
   return (
     <motion.div 
       className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900"
@@ -141,51 +205,75 @@ const Categories = () => {
           </TabsContent>
           
           <TabsContent value="map" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="space-y-6">
-                <SearchBox 
-                  searchRadius={searchRadius}
-                  onRadiusChange={handleRadiusChange}
-                  transportMode={transportMode}
-                  onTransportModeChange={setTransportMode}
-                  onAddressSelect={handleAddressSelect}
-                  userLocation={userLocation}
-                  onSearch={handleSearch}
-                />
-                
-                <LocationSelector 
-                  locations={mockLocations}
-                  selectedLocations={selectedLocations}
-                  onSelectionChange={setSelectedLocations}
-                />
-              </div>
-              
-              <div className="lg:col-span-2">
-                <div className="bg-white rounded-lg shadow-lg overflow-hidden h-[600px]">
-                  <EnhancedMapComponent 
-                    selectedLocations={selectedLocations}
-                    userLocation={userLocation}
-                    transportMode={transportMode}
+            <div className={`grid grid-cols-1 ${isMapFullscreen ? '' : 'lg:grid-cols-3'} gap-6`}>
+              {/* Search and filter panel - hidden in fullscreen mode */}
+              {!isMapFullscreen && (
+                <div className="space-y-6">
+                  <SearchBox 
                     searchRadius={searchRadius}
+                    onRadiusChange={handleRadiusChange}
+                    transportMode={transportMode}
+                    onTransportModeChange={setTransportMode}
+                    onAddressSelect={handleAddressSelect}
+                    userLocation={userLocation}
+                    onSearch={handleSearch}
+                  />
+                  
+                  <LocationSelector 
+                    locations={mockLocations}
+                    selectedLocations={selectedLocations}
+                    onSelectionChange={setSelectedLocations}
                   />
                 </div>
+              )}
+              
+              <div className={isMapFullscreen ? 'w-full' : 'lg:col-span-2'}>
+                <div className="relative">
+                  <div className="bg-white rounded-lg shadow-lg overflow-hidden h-[600px]">
+                    <EnhancedMapComponent 
+                      selectedLocations={selectedLocations}
+                      userLocation={userLocation}
+                      transportMode={transportMode}
+                      searchRadius={searchRadius}
+                    />
+                  </div>
+                  
+                  {/* Fullscreen toggle button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm z-10"
+                    onClick={() => setIsMapFullscreen(!isMapFullscreen)}
+                  >
+                    {isMapFullscreen ? 'Quitter le mode plein écran' : 'Plein écran'}
+                  </Button>
+                </div>
                 
+                {/* Routes list */}
                 <div className="mt-4 bg-white p-4 rounded-lg shadow">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium mb-0">Itinéraires ({selectedLocations.length})</h3>
                     {selectedLocations.length > 0 && (
-                      <Button variant="outline" size="sm">
-                        Exporter les itinéraires
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={handleExportRoutes}>
+                          <Download className="h-4 w-4 mr-1" /> PDF
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleShareRoutes}>
+                          <Share2 className="h-4 w-4 mr-1" /> Partager
+                        </Button>
+                      </div>
                     )}
                   </div>
                   
                   {selectedLocations.length === 0 ? (
                     <p className="text-gray-500 my-2">Sélectionnez des lieux pour voir les itinéraires</p>
                   ) : (
-                    <ul className="space-y-2 mt-3">
+                    <ul className="space-y-2 mt-3 max-h-60 overflow-y-auto pr-2">
                       {selectedLocations.map((location, index) => (
-                        <li key={location.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                        <li 
+                          key={location.id} 
+                          className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
                           <span className="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
                             {index + 1}
                           </span>
@@ -200,6 +288,14 @@ const Categories = () => {
                             {/* For demo purposes only. Real durations would come from routing API */}
                             {Math.round(Math.random() * 30 + 5)} min
                           </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="ml-2"
+                            onClick={() => handleNavigateTo(location)}
+                          >
+                            Y aller
+                          </Button>
                         </li>
                       ))}
                     </ul>

@@ -4,6 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import AddressSearch from '@/components/search/AddressSearch';
 import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Search, MapPin } from 'lucide-react';
 
 interface SearchBoxProps {
   searchRadius: number;
@@ -24,6 +26,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   userLocation,
   onSearch
 }) => {
+  const isMobile = useIsMobile();
   const transportModes = [
     { id: 'driving', name: 'Voiture', icon: '🚗' },
     { id: 'walking', name: 'À pied', icon: '🚶' },
@@ -33,13 +36,38 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
   return (
     <Card className="w-full shadow-md">
-      <CardContent className="pt-4">
+      <CardContent className={isMobile ? "pt-3 px-3" : "pt-4"}>
         <div className="space-y-4">
-          <AddressSearch 
-            onAddressSelect={onAddressSelect}
-            placeholder="Rechercher une adresse..." 
-            userLocation={userLocation}
-          />
+          <div className="relative">
+            <AddressSearch 
+              onAddressSelect={onAddressSelect}
+              placeholder="Rechercher une adresse..." 
+              userLocation={userLocation}
+            />
+            <Button 
+              size="icon" 
+              className="absolute right-1 top-1 h-8 w-8"
+              variant="ghost"
+              onClick={() => {
+                // This would typically use geolocation to set current position
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    onAddressSelect({
+                      name: "Ma position actuelle",
+                      longitude: position.coords.longitude,
+                      latitude: position.coords.latitude
+                    });
+                  },
+                  (error) => {
+                    console.error("Error getting location:", error);
+                  }
+                );
+              }}
+              title="Utiliser ma position actuelle"
+            >
+              <MapPin className="h-4 w-4" />
+            </Button>
+          </div>
           
           <div>
             <div className="flex justify-between items-center mb-2">
@@ -64,11 +92,11 @@ const SearchBox: React.FC<SearchBoxProps> = ({
                   key={mode.id}
                   variant={transportMode === mode.id ? "default" : "outline"}
                   className="flex items-center gap-1"
-                  size="sm"
+                  size={isMobile ? "sm" : "sm"}
                   onClick={() => onTransportModeChange(mode.id)}
                 >
                   <span>{mode.icon}</span>
-                  <span>{mode.name}</span>
+                  <span className={isMobile ? "text-xs" : "text-sm"}>{mode.name}</span>
                 </Button>
               ))}
             </div>
@@ -78,6 +106,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
             className="w-full" 
             onClick={onSearch}
           >
+            <Search className="h-4 w-4 mr-2" />
             Rechercher
           </Button>
         </div>

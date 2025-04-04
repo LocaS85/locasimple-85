@@ -1,9 +1,11 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { Feature, FeatureCollection, GeoJSON, Geometry } from 'geojson';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Location {
   id: string;
@@ -34,6 +36,7 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const radiusCircleRef = useRef<mapboxgl.GeoJSONSource | null>(null);
   const routeLayerRef = useRef<string[]>([]);
+  const isMobile = useIsMobile();
 
   // Initialize map
   useEffect(() => {
@@ -57,9 +60,18 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
 
     map.current.on('load', () => {
       // Add radius circle source
+      const circleData: GeoJSON = {
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Polygon' as const,
+          coordinates: [createGeoJSONCircle(userLocation, searchRadius)]
+        },
+        properties: {}
+      };
+      
       map.current?.addSource('radius-circle', {
         type: 'geojson',
-        data: createGeoJSONCircle(userLocation, searchRadius)
+        data: circleData
       });
       
       // Add radius circle layer
@@ -130,7 +142,16 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
     
     // Update radius circle if it exists
     if (radiusCircleRef.current) {
-      radiusCircleRef.current.setData(createGeoJSONCircle(userLocation, searchRadius));
+      const circleData: GeoJSON = {
+        type: 'Feature' as const,
+        geometry: {
+          type: 'Polygon' as const,
+          coordinates: [createGeoJSONCircle(userLocation, searchRadius)]
+        },
+        properties: {}
+      };
+      
+      radiusCircleRef.current.setData(circleData);
     }
   }, [userLocation]);
 
@@ -138,7 +159,16 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
   useEffect(() => {
     if (!map.current || !radiusCircleRef.current) return;
     
-    radiusCircleRef.current.setData(createGeoJSONCircle(userLocation, searchRadius));
+    const circleData: GeoJSON = {
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Polygon' as const,
+        coordinates: [createGeoJSONCircle(userLocation, searchRadius)]
+      },
+      properties: {}
+    };
+    
+    radiusCircleRef.current.setData(circleData);
   }, [searchRadius, userLocation]);
 
   // Update location markers and routes
@@ -195,10 +225,10 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
   }, [selectedLocations, transportMode]);
   
   // Function to generate GeoJSON circle for search radius
-  const createGeoJSONCircle = (center: [number, number], radiusInKm: number) => {
+  const createGeoJSONCircle = (center: [number, number], radiusInKm: number): [number, number][] => {
     const points = 64;
     const km = radiusInKm;
-    const ret = [];
+    const ret: [number, number][] = [];
     const distanceX = km / (111.32 * Math.cos((center[1] * Math.PI) / 180));
     const distanceY = km / 110.574;
 
@@ -211,14 +241,7 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
     }
     ret.push(ret[0]); // Close the circle
     
-    return {
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [ret]
-      },
-      properties: {}
-    };
+    return ret;
   };
 
   // Function to draw routes between user location and all selected locations
@@ -258,7 +281,7 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
           map.current.addSource(sourceId, {
             type: 'geojson',
             data: {
-              type: 'Feature',
+              type: 'Feature' as const,
               properties: {},
               geometry: route.geometry
             }
@@ -322,7 +345,7 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
     
     // Fit map to bounds with padding
     map.current.fitBounds(bounds, {
-      padding: 50,
+      padding: isMobile ? 30 : 50,
       maxZoom: 15
     });
   };
