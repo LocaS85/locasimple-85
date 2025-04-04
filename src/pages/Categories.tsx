@@ -6,9 +6,11 @@ import CategoryGrid from '@/components/category/CategoryGrid';
 import SubcategoryGrid from '@/components/category/SubcategoryGrid';
 import EnhancedMapComponent from '@/components/map/EnhancedMapComponent';
 import LocationSelector from '@/components/LocationSelector';
+import SearchBox from '@/components/search/SearchBox';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
+import AddressSearch from '@/components/search/AddressSearch';
 
 // Mock data for demo purposes
 const mockLocations = [
@@ -70,14 +72,6 @@ const mockLocations = [
   }
 ];
 
-// Transport mode options
-const transportModes = [
-  { id: 'driving', name: 'Voiture', icon: '🚗' },
-  { id: 'walking', name: 'À pied', icon: '🚶' },
-  { id: 'cycling', name: 'Vélo', icon: '🚲' },
-  { id: 'driving-traffic', name: 'Trafic', icon: '🚦' }
-];
-
 const Categories = () => {
   const location = useLocation();
   const { t } = useLanguage();
@@ -85,6 +79,7 @@ const Categories = () => {
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
   const [transportMode, setTransportMode] = useState('driving');
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Default to Paris
+  const [searchRadius, setSearchRadius] = useState<number>(5);
 
   // Get user location
   useEffect(() => {
@@ -108,6 +103,19 @@ const Categories = () => {
       setActiveView('grid');
     }
   }, [location.pathname]);
+
+  const handleRadiusChange = (value: number[]) => {
+    setSearchRadius(value[0]);
+  };
+
+  const handleAddressSelect = (location: { name: string; longitude: number; latitude: number }) => {
+    setUserLocation([location.longitude, location.latitude]);
+  };
+
+  const handleSearch = () => {
+    // This would typically filter locations based on radius, but for demo we'll just log
+    console.log(`Searching within ${searchRadius}km of [${userLocation}] using ${transportMode} mode`);
+  };
 
   return (
     <motion.div 
@@ -134,48 +142,64 @@ const Categories = () => {
           
           <TabsContent value="map" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <EnhancedMapComponent 
-                  selectedLocations={selectedLocations}
-                  userLocation={userLocation}
+              <div className="space-y-6">
+                <SearchBox 
+                  searchRadius={searchRadius}
+                  onRadiusChange={handleRadiusChange}
                   transportMode={transportMode}
+                  onTransportModeChange={setTransportMode}
+                  onAddressSelect={handleAddressSelect}
+                  userLocation={userLocation}
+                  onSearch={handleSearch}
                 />
                 
-                <div className="mt-4 bg-white p-4 rounded-lg shadow flex flex-wrap gap-3">
-                  <p className="w-full font-medium mb-2">Mode de transport:</p>
-                  {transportModes.map(mode => (
-                    <Button
-                      key={mode.id}
-                      variant={transportMode === mode.id ? "default" : "outline"}
-                      onClick={() => setTransportMode(mode.id)}
-                      className="flex items-center gap-2"
-                    >
-                      <span>{mode.icon}</span>
-                      <span>{mode.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
                 <LocationSelector 
                   locations={mockLocations}
                   selectedLocations={selectedLocations}
                   onSelectionChange={setSelectedLocations}
                 />
+              </div>
+              
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden h-[600px]">
+                  <EnhancedMapComponent 
+                    selectedLocations={selectedLocations}
+                    userLocation={userLocation}
+                    transportMode={transportMode}
+                    searchRadius={searchRadius}
+                  />
+                </div>
                 
                 <div className="mt-4 bg-white p-4 rounded-lg shadow">
-                  <h3 className="text-lg font-medium mb-3">Itinéraires ({selectedLocations.length})</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium mb-0">Itinéraires ({selectedLocations.length})</h3>
+                    {selectedLocations.length > 0 && (
+                      <Button variant="outline" size="sm">
+                        Exporter les itinéraires
+                      </Button>
+                    )}
+                  </div>
+                  
                   {selectedLocations.length === 0 ? (
-                    <p className="text-gray-500">Sélectionnez des lieux pour voir les itinéraires</p>
+                    <p className="text-gray-500 my-2">Sélectionnez des lieux pour voir les itinéraires</p>
                   ) : (
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 mt-3">
                       {selectedLocations.map((location, index) => (
-                        <li key={location.id} className="flex items-center gap-2">
-                          <span className="bg-gray-100 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
+                        <li key={location.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                          <span className="bg-blue-100 text-blue-800 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium">
                             {index + 1}
                           </span>
-                          <span>{location.name}</span>
+                          <div className="flex-grow">
+                            <span className="font-medium">{location.name}</span>
+                            <div className="text-xs text-gray-500">{location.address}</div>
+                          </div>
+                          <div className="text-xs text-gray-600 whitespace-nowrap">
+                            {transportMode === 'driving' && '🚗'}
+                            {transportMode === 'walking' && '🚶'}
+                            {transportMode === 'cycling' && '🚲'}
+                            {/* For demo purposes only. Real durations would come from routing API */}
+                            {Math.round(Math.random() * 30 + 5)} min
+                          </div>
                         </li>
                       ))}
                     </ul>

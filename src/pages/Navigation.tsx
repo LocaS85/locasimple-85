@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EnhancedMapComponent from '@/components/map/EnhancedMapComponent';
+import { Slider } from '@/components/ui/slider';
 
 const transportModes = [
   { id: 'driving', name: 'Voiture', icon: '🚗' },
@@ -20,6 +21,7 @@ const Navigation = () => {
   const [transportMode, setTransportMode] = useState('driving');
   const [destination, setDestination] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Default to Paris
+  const [searchRadius, setSearchRadius] = useState<number>(5); // Default 5km radius
   
   // Get location data from navigation state, if available
   useEffect(() => {
@@ -27,7 +29,8 @@ const Navigation = () => {
       const { start, end, placeName, transportMode: initialMode } = location.state;
       
       if (start && Array.isArray(start) && start.length === 2) {
-        setUserLocation(start);
+        // Fix the type issue by explicitly setting as [number, number]
+        setUserLocation([start[0], start[1]]);
       }
       
       if (end && Array.isArray(end) && end.length === 2 && placeName) {
@@ -59,6 +62,11 @@ const Navigation = () => {
       );
     }
   }, []);
+
+  // Handle radius change
+  const handleRadiusChange = (value: number[]) => {
+    setSearchRadius(value[0]);
+  };
   
   return (
     <div className="flex flex-col h-screen">
@@ -96,12 +104,13 @@ const Navigation = () => {
           selectedLocations={destination ? [destination] : []}
           userLocation={userLocation}
           transportMode={transportMode}
+          searchRadius={searchRadius}
         />
       </div>
       
-      {/* Bottom sheet with navigation instructions */}
+      {/* Bottom sheet with navigation instructions and radius slider */}
       <div className="bg-white p-4 shadow-md border-t">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="font-medium">
               {destination ? `Itinéraire vers ${destination.name}` : 'Navigation'}
@@ -119,6 +128,22 @@ const Navigation = () => {
               <Share2 className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+        
+        {/* Radius slider */}
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium">Rayon de recherche</span>
+            <span className="text-sm text-blue-600 font-medium">{searchRadius} km</span>
+          </div>
+          <Slider 
+            defaultValue={[5]} 
+            max={50} 
+            step={1} 
+            value={[searchRadius]}
+            onValueChange={handleRadiusChange}
+            className="w-full"
+          />
         </div>
       </div>
     </div>
