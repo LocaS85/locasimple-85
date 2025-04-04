@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export const useSearchHistoryState = () => {
   const [showHistory, setShowHistory] = useState(false);
