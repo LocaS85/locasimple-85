@@ -17,7 +17,7 @@ const HeroSection = () => {
   };
   
   return (
-    <div className="relative bg-gradient-to-r from-primary/80 to-primary min-h-[85vh] flex items-center">
+    <div className="relative bg-gradient-to-br from-primary/90 via-primary/80 to-primary min-h-[85vh] flex items-center">
       <div className="absolute inset-0 bg-grid-white/[0.1] bg-[length:20px_20px]" />
       <div className="absolute inset-0 bg-[url('/background-pattern.svg')] bg-cover opacity-10" />
       
@@ -29,7 +29,7 @@ const HeroSection = () => {
           className="max-w-3xl"
         >
           <motion.h1 
-            className="text-4xl md:text-6xl font-bold mb-6 text-center"
+            className="text-4xl md:text-6xl font-bold mb-6 text-center font-heading"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
@@ -64,9 +64,9 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-white text-amber-300 hover:bg-white/20 rounded-full font-medium"
+                className="border-white text-orange-300 hover:bg-white/20 rounded-full font-medium"
               >
-                <MapPin className="mr-2 h-5 w-5 text-amber-300" />
+                <MapPin className="mr-2 h-5 w-5 text-orange-300" />
                 {t('browseCategories')}
               </Button>
             </Link>
@@ -84,7 +84,7 @@ const HeroSection = () => {
             className="text-white flex flex-col items-center hover:opacity-80 transition-opacity"
           >
             <span className="text-sm mb-2 font-medium">Découvrir plus</span>
-            <ChevronDown className="h-5 w-5 animate-bounce" />
+            <ChevronDown className="h-5 w-5 animate-bounce text-orange-300" />
           </button>
         </motion.div>
       </div>

@@ -37,8 +37,9 @@ export const useResultHandling = (
   }, [selectedResult]);
 
   const toggleRoutes = useCallback(() => {
-    setRouteDisplayed(prev => !prev);
-  }, [setRouteDisplayed]);
+    // Fix: Pass a direct boolean value instead of a function
+    setRouteDisplayed(!selectedResult ? false : true);
+  }, [selectedResult, setRouteDisplayed]);
   
   return {
     selectedResult,

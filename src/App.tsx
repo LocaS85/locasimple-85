@@ -29,51 +29,54 @@ import { CategoryProvider } from "./components/CategoryContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { IconThemeProvider } from "./hooks/useIconTheme";
 
+// Compose the App with all providers and routes
 const App = () => (
-  <ThemeProvider>
+  <ThemeProvider defaultTheme="system">
     <LanguageProvider>
       <CategoryProvider>
         <IconThemeProvider>
           <TooltipProvider>
             <GoogleMapsLoader>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                {/* Main layout with navbar and footer */}
-                <Route element={<Layout />}>
-                  {/* Home page */}
-                  <Route path="/" element={<Index />} />
+              <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+                <Toaster />
+                <Sonner position="top-right" />
+                <Routes>
+                  {/* Main layout with navbar and footer */}
+                  <Route element={<Layout />}>
+                    {/* Home page */}
+                    <Route path="/" element={<Index />} />
+                    
+                    {/* User pages */}
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/place/:id" element={<PlaceDetails />} />
+                    
+                    {/* Information pages */}
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/help" element={<Help />} />
+                    
+                    {/* Feature pages */}
+                    <Route path="/plan" element={<Plan />} />
+                    <Route path="/payment" element={<Payment />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/categories/*" element={<Categories />} />
+                    <Route path="/quotidien" element={<DailyCategories />} />
+                    
+                    {/* Fallback - redirect to home */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Route>
                   
-                  {/* User pages */}
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/place/:id" element={<PlaceDetails />} />
-                  
-                  {/* Information pages */}
-                  <Route path="/pricing" element={<Pricing />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/help" element={<Help />} />
-                  
-                  {/* Feature pages */}
-                  <Route path="/plan" element={<Plan />} />
-                  <Route path="/payment" element={<Payment />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/categories/*" element={<Categories />} />
-                  <Route path="/quotidien" element={<DailyCategories />} />
-                  
-                  {/* Fallback - redirect to home */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Route>
-                
-                {/* Pages without the main layout */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/navigation" element={<Navigation />} />
-              </Routes>
+                  {/* Pages without the main layout */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/navigation" element={<Navigation />} />
+                </Routes>
+              </div>
             </GoogleMapsLoader>
           </TooltipProvider>
         </IconThemeProvider>

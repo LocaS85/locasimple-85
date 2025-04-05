@@ -63,13 +63,18 @@ const SearchPage = () => {
     performSearch(result.place_name);
   };
   
-  // Create adapter function to handle type incompatibility
+  // Fix: Create a properly typed adapter function that converts MapSection Result to ResultsList Result
   const adaptedHandleResultClick = (result: Result) => {
-    // If the result doesn't have latitude and longitude, add default values
-    const adaptedResult: any = {
+    // Make sure the result has all required properties from ResultsList.Result type
+    const adaptedResult: Result = {
       ...result,
-      latitude: result.latitude || 0,
-      longitude: result.longitude || 0
+      // Ensure these properties exist
+      latitude: result.latitude,
+      longitude: result.longitude,
+      // Add any missing required properties with defaults
+      distance: result.distance || 0,
+      duration: result.duration || 0,
+      id: result.id || `result-${Math.random().toString(36).substr(2, 9)}`
     };
     
     handleResultClick(adaptedResult);

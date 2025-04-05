@@ -49,7 +49,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
   return (
     <div className="relative w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-gray-200 px-2">
+        <div className="relative flex items-center gap-2 bg-background/80 dark:bg-card/80 backdrop-blur-md rounded-full shadow-md border border-border px-2">
           <Button
             type="button"
             variant="ghost"
@@ -62,7 +62,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
           </Button>
           
           <div className="relative flex-grow">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 z-10">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground z-10">
               <Search className="h-5 w-5" />
             </div>
             
@@ -72,7 +72,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Rechercher un lieu, une entreprise..."
-              className="pl-10 pr-2 py-2 h-10 border-0 shadow-none bg-transparent focus:ring-0 w-full text-gray-800"
+              className="pl-10 pr-2 py-2 h-10 border-0 shadow-none bg-transparent focus:ring-0 w-full text-foreground"
             />
             
             {searchQuery && (
@@ -80,7 +80,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-gray-600 hover:text-gray-800"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                 onClick={handleClearSearch}
                 aria-label="Clear search"
               >
@@ -93,7 +93,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
             type="button"
             variant="ghost" 
             size="icon" 
-            className={`h-10 w-10 flex-shrink-0 rounded-full ${isRecording ? 'text-red-500 bg-red-50' : 'text-orange-500 hover:bg-orange-50'}`}
+            className={`h-10 w-10 flex-shrink-0 rounded-full ${isRecording ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : 'text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20'}`}
             onClick={onMicClick}
             aria-label="Voice search"
           >

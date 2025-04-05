@@ -64,7 +64,7 @@ const CategoriesSection = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-3xl font-bold mb-4 text-center text-foreground">
+          <h2 className="text-3xl font-bold mb-4 text-center text-foreground font-heading">
             {t('exploreCategories')}
           </h2>
           
@@ -107,10 +107,10 @@ const CategoriesSection = ({
             <Link to="/categories">
               <Button 
                 variant="outline" 
-                className="rounded-full group text-amber-400 border-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                className="rounded-full group text-orange-400 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/20"
               >
                 <span>{t('browseCategories')}</span>
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-amber-400" />
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-orange-400" />
               </Button>
             </Link>
           </motion.div>
@@ -132,7 +132,7 @@ const DiscoverSection = () => {
           transition={{ duration: 0.5 }}
           className="bg-card p-8 rounded-2xl shadow-lg"
         >
-          <h2 className="text-3xl font-bold mb-6 text-primary">
+          <h2 className="text-3xl font-bold mb-6 text-primary font-heading">
             {t('startExploring')}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
@@ -153,7 +153,7 @@ const DiscoverSection = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="rounded-full px-8 border-amber-300 text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                className="rounded-full px-8 border-orange-300 text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
               >
                 {t('browseCategories')}
               </Button>
