@@ -63,23 +63,6 @@ const SearchPage = () => {
     performSearch(result.place_name);
   };
   
-  // Fix: Create a properly typed adapter function that converts MapSection Result to ResultsList Result
-  const adaptedHandleResultClick = (result: Result) => {
-    // Make sure the result has all required properties from ResultsList.Result type
-    const adaptedResult: Result = {
-      ...result,
-      // Ensure these properties exist
-      latitude: result.latitude,
-      longitude: result.longitude,
-      // Add any missing required properties with defaults
-      distance: result.distance || 0,
-      duration: result.duration || 0,
-      id: result.id || `result-${Math.random().toString(36).substr(2, 9)}`
-    };
-    
-    handleResultClick(adaptedResult);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       <SearchHeader 
@@ -117,7 +100,7 @@ const SearchPage = () => {
           showRoutes={showRoutes}
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
-          onResultClick={adaptedHandleResultClick}
+          onResultClick={handleResultClick}
           selectedCategory={selectedCategory}
           onCategorySelect={clearFilters}
           searchHistory={[]}
@@ -138,7 +121,7 @@ const SearchPage = () => {
         <ResultsPopup 
           results={searchResults}
           selectedPlaceId={selectedPlaceId}
-          handleResultClick={adaptedHandleResultClick}
+          handleResultClick={handleResultClick}
         />
         
         <NoResultsMessage 

@@ -31,7 +31,7 @@ import { IconThemeProvider } from "./hooks/useIconTheme";
 
 // Compose the App with all providers and routes
 const App = () => (
-  <ThemeProvider defaultTheme="system">
+  <ThemeProvider>
     <LanguageProvider>
       <CategoryProvider>
         <IconThemeProvider>

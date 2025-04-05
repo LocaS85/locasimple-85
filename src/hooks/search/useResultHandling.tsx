@@ -30,16 +30,14 @@ export const useResultHandling = (
     setRouteDisplayed(false);
   }, [setSelectedPlace, setRouteDisplayed]);
   
-  // Adding these functions to fix the build errors
   const generatePDF = useCallback(() => {
     // Implementation would go here in a real app
     console.log('Generating PDF for', selectedResult);
   }, [selectedResult]);
 
   const toggleRoutes = useCallback(() => {
-    // Fix: Pass a direct boolean value instead of a function
-    setRouteDisplayed(!selectedResult ? false : true);
-  }, [selectedResult, setRouteDisplayed]);
+    setRouteDisplayed(prev => !prev);
+  }, [setRouteDisplayed]);
   
   return {
     selectedResult,
