@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,35 +14,58 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Menu, X, Search, User, LogIn, Home, Info, HelpCircle, Map, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LanguageSelector from './LanguageSelector';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { t } = useLanguage();
+
+  // Add scroll detection for navbar styling
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrolled]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
+    <nav className={cn(
+      "sticky top-0 z-50 w-full backdrop-blur-sm transition-all duration-300",
+      "border-b border-border",
+      scrolled 
+        ? "bg-background/95 shadow-sm" 
+        : "bg-background/80"
+    )}>
+      <div className="container mx-auto px-4 py-2">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-1.5 rounded-lg shadow-sm transition-transform group-hover:scale-110">
+            <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-1.5 rounded-lg shadow-sm transition-transform group-hover:scale-110">
               <Map className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">LocaSimple</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">LocaSimple</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-4">
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="hover:bg-blue-50 font-medium">{t('discover')}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="hover:bg-accent/80 font-medium">{t('discover')}</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 bg-white rounded-xl shadow-lg border border-gray-100">
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 rounded-xl shadow-lg border border-border">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <Link
@@ -63,7 +86,7 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/categories"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">{t('categories')}</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -76,7 +99,7 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/quotidien"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground"
                           >
                             <div className="text-sm font-medium leading-none">Quotidien</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -91,7 +114,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/pricing">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
                       {t('navPricing')}
                     </NavigationMenuLink>
@@ -100,7 +123,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/faq">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
                       {t('navFaq')}
                     </NavigationMenuLink>
@@ -109,7 +132,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/contact">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-blue-50 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
                       {t('navContact')}
                     </NavigationMenuLink>
@@ -119,25 +142,26 @@ const Navbar = () => {
             </NavigationMenu>
 
             <div className="flex items-center space-x-2">
+              <ThemeToggle />
               <LanguageSelector variant="ghost" size="sm" />
               <Link to="/search">
-                <Button variant="ghost" size="icon" className="hover:bg-blue-50 text-blue-700">
+                <Button variant="ghost" size="icon" className="hover:bg-accent text-foreground">
                   <Search className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-blue-50 border-blue-200">
+                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-accent border-border">
                   <LogIn className="mr-2 h-4 w-4" />
                   {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="sm" className="hidden lg:flex bg-blue-600 hover:bg-blue-700">
+                <Button size="sm" className="hidden lg:flex bg-primary hover:bg-primary/90">
                   {t('navRegister')}
                 </Button>
               </Link>
               <Link to="/profile">
-                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden hover:bg-blue-50">
+                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden hover:bg-accent">
                   <User className="h-5 w-5" />
                 </Button>
               </Link>
@@ -146,6 +170,7 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center space-x-2">
+            <ThemeToggle />
             <LanguageSelector variant="ghost" size="icon" className="p-0" />
             <Link to="/search">
               <Button variant="ghost" size="icon" className="p-0">
@@ -161,41 +186,41 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t py-4 animate-fade-in">
+        <div className="md:hidden bg-background border-t border-border py-4 animate-fade-in">
           <div className="container mx-auto px-4 space-y-4">
             <Link to="/" className="flex items-center py-2" onClick={toggleMenu}>
-              <Home className="h-5 w-5 mr-3 text-blue-600" />
+              <Home className="h-5 w-5 mr-3 text-primary" />
               <span>{t('navHome')}</span>
             </Link>
             <Link to="/categories" className="flex items-center py-2" onClick={toggleMenu}>
-              <Map className="h-5 w-5 mr-3 text-blue-600" />
+              <Map className="h-5 w-5 mr-3 text-primary" />
               <span>{t('categories')}</span>
             </Link>
             <Link to="/quotidien" className="flex items-center py-2" onClick={toggleMenu}>
-              <Home className="h-5 w-5 mr-3 text-blue-600" />
+              <Home className="h-5 w-5 mr-3 text-primary" />
               <span>Quotidien</span>
             </Link>
             <Link to="/pricing" className="flex items-center py-2" onClick={toggleMenu}>
-              <Info className="h-5 w-5 mr-3 text-blue-600" />
+              <Info className="h-5 w-5 mr-3 text-primary" />
               <span>{t('navPricing')}</span>
             </Link>
             <Link to="/faq" className="flex items-center py-2" onClick={toggleMenu}>
-              <HelpCircle className="h-5 w-5 mr-3 text-blue-600" />
+              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
               <span>{t('navFaq')}</span>
             </Link>
             <Link to="/contact" className="flex items-center py-2" onClick={toggleMenu}>
-              <HelpCircle className="h-5 w-5 mr-3 text-blue-600" />
+              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
               <span>{t('navContact')}</span>
             </Link>
             <div className="pt-2 flex flex-col space-y-2">
               <Link to="/login" onClick={toggleMenu}>
-                <Button variant="outline" className="w-full border-blue-200">
+                <Button variant="outline" className="w-full border-border">
                   <LogIn className="mr-2 h-4 w-4" />
                   {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register" onClick={toggleMenu}>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button className="w-full bg-primary hover:bg-primary/90">
                   {t('navRegister')}
                 </Button>
               </Link>

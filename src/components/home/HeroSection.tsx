@@ -17,7 +17,7 @@ const HeroSection = () => {
   };
   
   return (
-    <div className="relative bg-gradient-to-r from-blue-600 to-indigo-700 min-h-[85vh] flex items-center">
+    <div className="relative bg-gradient-to-r from-primary/80 to-primary min-h-[85vh] flex items-center">
       <div className="absolute inset-0 bg-grid-white/[0.1] bg-[length:20px_20px]" />
       <div className="absolute inset-0 bg-[url('/background-pattern.svg')] bg-cover opacity-10" />
       
@@ -53,8 +53,8 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.6 }}
           >
             <Link to="/search">
-              <Button size="lg" className="bg-white text-blue-700 hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl transition-all">
-                <Search className="mr-2 h-5 w-5 text-blue-700" />
+              <Button size="lg" className="bg-white text-primary hover:bg-gray-100 dark:bg-white/90 dark:text-primary dark:hover:bg-white/80 rounded-full shadow-lg hover:shadow-xl transition-all">
+                <Search className="mr-2 h-5 w-5 text-primary" />
                 <span className="font-medium">
                   {t('startExploring')}
                 </span>
@@ -64,9 +64,9 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-white text-orange-300 hover:bg-white/20 rounded-full font-medium"
+                className="border-white text-amber-300 hover:bg-white/20 rounded-full font-medium"
               >
-                <MapPin className="mr-2 h-5 w-5 text-orange-300" />
+                <MapPin className="mr-2 h-5 w-5 text-amber-300" />
                 {t('browseCategories')}
               </Button>
             </Link>
@@ -91,10 +91,8 @@ const HeroSection = () => {
       
       {/* Curved bottom shape */}
       <div className="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80" className="w-full h-auto">
-          <path 
-            fill="#ffffff" 
-            fillOpacity="1" 
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80" className="w-full h-auto fill-background">
+          <path
             d="M0,32L80,42.7C160,53,320,75,480,74.7C640,75,800,53,960,42.7C1120,32,1280,32,1360,32L1440,32L1440,80L1360,80C1280,80,1120,80,960,80C800,80,640,80,480,80C320,80,160,80,80,80L0,80Z"
           />
         </svg>

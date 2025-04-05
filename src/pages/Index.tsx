@@ -57,18 +57,18 @@ const CategoriesSection = ({
   };
 
   return (
-    <div className="bg-white py-16 px-4 categories-section">
+    <div className="bg-background py-16 px-4 categories-section">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <h2 className="text-3xl font-bold mb-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-center text-foreground">
             {t('exploreCategories')}
           </h2>
           
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-10">
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-10">
             {t('categoriesDescription')}
           </p>
           
@@ -86,11 +86,11 @@ const CategoriesSection = ({
                   onClick={() => onCategorySelect(category)}
                   className={`w-full h-32 flex flex-col items-center justify-center p-4 rounded-xl transition-all shadow-sm hover:shadow-md
                     ${selectedCategories.includes(category) 
-                      ? 'bg-blue-50 border-2 border-blue-500' 
-                      : 'bg-gray-50 hover:bg-gray-100 border border-gray-200'}`}
+                      ? 'bg-primary/10 border-2 border-primary' 
+                      : 'bg-card hover:bg-accent border border-border'}`}
                 >
                   <div className="mb-3">{icon}</div>
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-medium text-foreground">
                     {t(category) || category}
                   </p>
                 </button>
@@ -107,10 +107,10 @@ const CategoriesSection = ({
             <Link to="/categories">
               <Button 
                 variant="outline" 
-                className="rounded-full group text-orange-400 border-orange-300 hover:bg-orange-50"
+                className="rounded-full group text-amber-400 border-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <span>{t('browseCategories')}</span>
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-orange-400" />
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-amber-400" />
               </Button>
             </Link>
           </motion.div>
@@ -124,18 +124,18 @@ const DiscoverSection = () => {
   const { t } = useLanguage();
   
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white py-16 px-4">
+    <div className="bg-gradient-to-b from-accent/30 to-background py-16 px-4">
       <div className="max-w-5xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white p-8 rounded-2xl shadow-lg"
+          className="bg-card p-8 rounded-2xl shadow-lg"
         >
-          <h2 className="text-3xl font-bold mb-6 text-blue-600">
+          <h2 className="text-3xl font-bold mb-6 text-primary">
             {t('startExploring')}
           </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
             {t('exploreDescription')}
           </p>
           
@@ -143,7 +143,7 @@ const DiscoverSection = () => {
             <Link to="/search">
               <Button 
                 size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 rounded-full px-8 shadow-md hover:shadow-lg transition-all"
+                className="bg-primary hover:bg-primary/90 rounded-full px-8 shadow-md hover:shadow-lg transition-all"
               >
                 {t('search')}
               </Button>
@@ -153,7 +153,7 @@ const DiscoverSection = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="rounded-full px-8 border-orange-300 text-orange-400 hover:bg-orange-50"
+                className="rounded-full px-8 border-amber-300 text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 {t('browseCategories')}
               </Button>

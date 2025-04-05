@@ -9,6 +9,7 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
+import type { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const location = useLocation();
@@ -61,9 +62,21 @@ const SearchPage = () => {
     setSearchQuery(result.place_name);
     performSearch(result.place_name);
   };
+  
+  // Create adapter function to handle type incompatibility
+  const adaptedHandleResultClick = (result: Result) => {
+    // If the result doesn't have latitude and longitude, add default values
+    const adaptedResult: any = {
+      ...result,
+      latitude: result.latitude || 0,
+      longitude: result.longitude || 0
+    };
+    
+    handleResultClick(adaptedResult);
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-background text-foreground">
       <SearchHeader 
         title="Recherche"
         searchQuery={searchQuery}
@@ -99,7 +112,7 @@ const SearchPage = () => {
           showRoutes={showRoutes}
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
-          onResultClick={handleResultClick}
+          onResultClick={adaptedHandleResultClick}
           selectedCategory={selectedCategory}
           onCategorySelect={clearFilters}
           searchHistory={[]}
@@ -120,7 +133,7 @@ const SearchPage = () => {
         <ResultsPopup 
           results={searchResults}
           selectedPlaceId={selectedPlaceId}
-          handleResultClick={handleResultClick}
+          handleResultClick={adaptedHandleResultClick}
         />
         
         <NoResultsMessage 
