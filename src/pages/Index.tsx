@@ -57,7 +57,7 @@ const CategoriesSection = ({
   };
 
   return (
-    <div className="bg-white py-16 px-4">
+    <div className="bg-white py-16 px-4 categories-section">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -107,10 +107,10 @@ const CategoriesSection = ({
             <Link to="/categories">
               <Button 
                 variant="outline" 
-                className="rounded-full group"
+                className="rounded-full group text-orange-400 border-orange-300 hover:bg-orange-50"
               >
                 <span>{t('browseCategories')}</span>
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-orange-400" />
               </Button>
             </Link>
           </motion.div>
@@ -153,7 +153,7 @@ const DiscoverSection = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="rounded-full px-8 border-blue-300 text-blue-600 hover:bg-blue-50"
+                className="rounded-full px-8 border-orange-300 text-orange-400 hover:bg-orange-50"
               >
                 {t('browseCategories')}
               </Button>

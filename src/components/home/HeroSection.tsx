@@ -29,7 +29,7 @@ const HeroSection = () => {
           className="max-w-3xl"
         >
           <motion.h1 
-            className="text-4xl md:text-6xl font-bold mb-6"
+            className="text-4xl md:text-6xl font-bold mb-6 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
@@ -64,9 +64,9 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-white text-white hover:bg-white/20 rounded-full font-medium"
+                className="border-white text-orange-300 hover:bg-white/20 rounded-full font-medium"
               >
-                <MapPin className="mr-2 h-5 w-5" />
+                <MapPin className="mr-2 h-5 w-5 text-orange-300" />
                 {t('browseCategories')}
               </Button>
             </Link>

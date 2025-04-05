@@ -44,16 +44,9 @@ export const useSearchPageStateManager = () => {
     searchState.setSelectedCategory(null);
   }, [searchState.setSelectedCategory]);
   
-  // Result handling operations
+  // Result handling operations - Fixed to match the expected parameters
   const resultHandling = useResultHandling(
-    searchState.setSelectedPlaceId ? 
-      (place) => {
-        if (searchState.setSelectedPlaceId) {
-          searchState.setSelectedPlaceId(place ? place.id : null);
-        }
-        searchState.setPopupInfo(place);
-      } : 
-      () => {},
+    searchState.setPopupInfo || (() => {}), // Provide a default function if setPopupInfo is undefined
     searchState.setViewport,
     searchState.setShowRoutes
   );
