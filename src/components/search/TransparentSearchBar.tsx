@@ -62,7 +62,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
           </Button>
           
           <div className="relative flex-grow">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 z-10">
               <Search className="h-5 w-5" />
             </div>
             
@@ -80,7 +80,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-gray-500 hover:text-gray-700"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-gray-600 hover:text-gray-800"
                 onClick={handleClearSearch}
                 aria-label="Clear search"
               >

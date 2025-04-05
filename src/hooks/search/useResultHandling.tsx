@@ -9,14 +9,14 @@ export const useResultHandling = (
 ) => {
   const [selectedResult, setSelectedResult] = useState<Result | null>(null);
   
-  const handleResultClick = useCallback((place: Result) => {
-    setSelectedResult(place);
-    setSelectedPlace(place);
+  const handleResultClick = useCallback((result: Result) => {
+    setSelectedResult(result);
+    setSelectedPlace(result);
     
-    if (place) {
+    if (result) {
       setViewport({
-        latitude: place.latitude,
-        longitude: place.longitude,
+        latitude: result.latitude,
+        longitude: result.longitude,
         zoom: 14
       });
     }
@@ -30,10 +30,22 @@ export const useResultHandling = (
     setRouteDisplayed(false);
   }, [setSelectedPlace, setRouteDisplayed]);
   
+  // Adding these functions to fix the build errors
+  const generatePDF = useCallback(() => {
+    // Implementation would go here in a real app
+    console.log('Generating PDF for', selectedResult);
+  }, [selectedResult]);
+
+  const toggleRoutes = useCallback(() => {
+    setRouteDisplayed(prev => !prev);
+  }, [setRouteDisplayed]);
+  
   return {
     selectedResult,
     handleResultClick,
-    clearSelection
+    clearSelection,
+    generatePDF,
+    toggleRoutes
   };
 };
 

@@ -53,9 +53,11 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.6 }}
           >
             <Link to="/search">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl transition-all">
-                <Search className="mr-2 h-5 w-5" />
-                <span className="font-medium">{t('startExploring')}</span>
+              <Button size="lg" className="bg-white text-blue-700 hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl transition-all">
+                <Search className="mr-2 h-5 w-5 text-blue-700" />
+                <span className="font-medium">
+                  {t('startExploring')}
+                </span>
               </Button>
             </Link>
             <Link to="/categories">

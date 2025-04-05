@@ -46,11 +46,15 @@ export const useSearchPageStateManager = () => {
   
   // Result handling operations
   const resultHandling = useResultHandling(
-    places,
-    searchState.setSelectedPlaceId,
-    searchState.setPopupInfo,
+    searchState.setSelectedPlaceId ? 
+      (place) => {
+        if (searchState.setSelectedPlaceId) {
+          searchState.setSelectedPlaceId(place ? place.id : null);
+        }
+        searchState.setPopupInfo(place);
+      } : 
+      () => {},
     searchState.setViewport,
-    searchState.setLoading,
     searchState.setShowRoutes
   );
   
