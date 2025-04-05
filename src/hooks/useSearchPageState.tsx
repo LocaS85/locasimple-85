@@ -1,136 +1,170 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
-import { MAPBOX_TOKEN } from '@/config/environment';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { useVoiceRecording } from '@/hooks/useVoiceRecording';
-import { useSearchState, Place } from './search/useSearchState';
-import { useSearchInputState } from './search/useSearchInputState';
-import { useSearchHistoryState } from './search/useSearchHistoryState';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocationHandling } from './search/useLocationHandling';
 import { useSearchOperations } from './search/useSearchOperations';
-import { useMapViewport } from './search/useMapViewport';
+import { useResultHandling } from './search/useResultHandling';
+import { useResultMapping } from './search/useResultMapping';
+import { useInitialization } from './search/useInitialization';
+import { MAPBOX_TOKEN } from '@/config/environment';
+import { toast } from 'sonner';
 
 export const useSearchPageState = () => {
-  // Use smaller hooks for state management
-  const searchState = useSearchState();
-  const inputState = useSearchInputState();
-  const historyState = useSearchHistoryState();
-  
-  // Use geolocation hook
-  const { activateGeolocation } = useGeolocation({
-    setLoading: inputState.setLoading,
-    setIsLocationActive: inputState.setIsLocationActive,
-    setUserLocation: inputState.setUserLocation
+  // State for search parameters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [transportMode, setTransportMode] = useState('driving');
+  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // State for search results and UI
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showNoMapboxTokenWarning, setShowNoMapboxTokenWarning] = useState(false);
+  const [isLocationActive, setIsLocationActive] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [viewport, setViewport] = useState({
+    latitude: 48.8566,
+    longitude: 2.3522,
+    zoom: 12
   });
+  const [routeDisplayed, setRouteDisplayed] = useState(false);
+  const [resultsCount, setResultsCount] = useState(5);
 
-  // Use voice recording hook
-  const { handleMicClick } = useVoiceRecording({
-    isRecording: inputState.isRecording,
-    setIsRecording: inputState.setIsRecording,
-    onTextResult: (text) => {
-      inputState.setSearchQuery(text);
-    }
-  });
-  
-  // Search operations hook
-  const operations = useSearchOperations(
-    inputState.searchQuery,
-    inputState.transportMode,
-    inputState.userLocation,
-    searchState.resultsCount,
-    inputState.isLocationActive,
-    inputState.setLoading,
-    searchState.setPlaces,
-    historyState.setSearchHistory,
-    searchState.setSelectedPlaceId
-  );
-  
-  // Pass data to operations hook
-  operations._setData(searchState.places);
-  
-  // Connect history functions
-  historyState._setFunctions(
-    inputState.setSearchQuery,
-    operations.performSearch
-  );
-  
-  // Use map viewport hook
-  useMapViewport(
-    inputState.isLocationActive,
-    inputState.userLocation,
-    searchState.setViewport
-  );
+  // Router hooks
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Handle location button click
-  const handleLocationClick = () => {
-    activateGeolocation();
-    
-    // If already active, toggle off
-    if (inputState.isLocationActive) {
-      inputState.setIsLocationActive(false);
-    }
-  };
-
-  // Handle menu button click
-  const handleMenuClick = () => {
-    inputState.setShowMenu(!inputState.showMenu);
-  };
-
-  // Handle result click
-  const handleResultClick = (place: Place) => {
-    searchState.setSelectedPlaceId(place.id);
-    searchState.setPopupInfo(place);
-    
-    // Center map on selected place
-    searchState.setViewport({
-      latitude: place.lat,
-      longitude: place.lon,
-      zoom: 14
-    });
-  };
-
-  // Reset search
-  const resetSearch = () => {
-    inputState.setSearchQuery('');
-    searchState.setPlaces([]);
-    searchState.setSearchResults([]);
-    searchState.setPopupInfo(null);
-  };
-
-  // Update places based on resultsCount
+  // Extract search params from URL
   useEffect(() => {
-    searchState.setPlaces(prev => prev.slice(0, searchState.resultsCount));
-  }, [searchState.resultsCount]);
+    const searchParams = new URLSearchParams(location.search);
+    const query = searchParams.get('query');
+    const category = searchParams.get('category');
+    
+    if (query) setSearchQuery(query);
+    if (category) setSelectedCategory(category);
+    
+  }, [location.search]);
 
-  // Check Mapbox token on component mount
+  // Custom hooks
+  const { places } = useResultMapping(searchResults);
+  
+  const { handleLocationClick } = useLocationHandling(
+    setLoading,
+    setUserLocation,
+    setViewport,
+    setIsLocationActive
+  );
+  
+  const { 
+    performSearch, 
+    searchWithMapbox, 
+    resetSearch 
+  } = useSearchOperations(
+    searchQuery,
+    transportMode,
+    userLocation,
+    resultsCount,
+    selectedCategory,
+    setSearchResults,
+    setLoading,
+    setViewport,
+    setShowNoMapboxTokenWarning
+  );
+  
+  const { 
+    selectedResult, 
+    handleResultClick, 
+    clearSelection 
+  } = useResultHandling(
+    setSelectedPlace,
+    setViewport,
+    setRouteDisplayed
+  );
+  
+  useInitialization(
+    handleLocationClick,
+    setShowNoMapboxTokenWarning
+  );
+
+  // Effect to trigger search when category is selected from URL
   useEffect(() => {
-    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
-      toast.error('Token Mapbox manquant. La carte ne fonctionnera pas correctement.');
+    if (selectedCategory) {
+      performSearch();
+    }
+  }, [selectedCategory]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // Update URL parameters
+    const searchParams = new URLSearchParams();
+    if (query) searchParams.set('query', query);
+    if (selectedCategory) searchParams.set('category', selectedCategory);
+    
+    navigate(`/search?${searchParams.toString()}`);
+    performSearch(query);
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(prev => !prev);
+  };
+
+  const handleTransportModeChange = (mode: string) => {
+    setTransportMode(mode);
+    if (selectedResult) {
+      performSearch();
+    }
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(prevCategory => 
+      prevCategory === categoryId ? null : categoryId
+    );
+    
+    // Update URL with the selected category
+    const searchParams = new URLSearchParams(location.search);
+    if (categoryId && categoryId !== selectedCategory) {
+      searchParams.set('category', categoryId);
     } else {
-      console.log('SearchPage loaded with Mapbox token available');
+      searchParams.delete('category');
     }
-  }, []);
+    
+    navigate(`/search?${searchParams.toString()}`);
+    performSearch();
+  };
 
   return {
-    // Return all properties and methods from all hooks
-    ...searchState,
-    searchQuery: inputState.searchQuery,
-    setSearchQuery: inputState.setSearchQuery,
-    loading: inputState.loading,
-    isLocationActive: inputState.isLocationActive,
-    userLocation: inputState.userLocation,
-    isRecording: inputState.isRecording,
-    transportMode: inputState.transportMode,
-    setTransportMode: inputState.setTransportMode,
-    showMenu: inputState.showMenu,
-    ...historyState,
-    performSearch: operations.performSearch,
+    // Search state
+    searchQuery,
+    setSearchQuery,
+    transportMode,
+    selectedCategory,
+    loading,
+    showNoMapboxTokenWarning,
+    isLocationActive,
+    menuOpen,
+    places,
+    viewport,
+    setViewport,
+    routeDisplayed,
+    resultsCount,
+    setResultsCount,
+    
+    // Actions and handlers
+    handleSearch,
     handleLocationClick,
-    handleMenuClick,
+    toggleMenu,
+    handleTransportModeChange,
+    handleCategorySelect,
     handleResultClick,
-    resetSearch,
-    handleMicClick,
-    generatePDF: operations.generatePDF
+    clearSelection,
+    
+    // API methods
+    searchOperations: {
+      performSearch,
+      searchWithMapbox,
+      resetSearch
+    }
   };
 };
 

@@ -62,7 +62,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
           </Button>
           
           <div className="relative flex-grow">
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10">
               <Search className="h-5 w-5" />
             </div>
             
@@ -72,7 +72,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Rechercher un lieu, une entreprise..."
-              className="pl-10 pr-2 py-2 h-10 border-0 shadow-none bg-transparent focus:ring-0 w-full"
+              className="pl-10 pr-2 py-2 h-10 border-0 shadow-none bg-transparent focus:ring-0 w-full text-gray-800"
             />
             
             {searchQuery && (
@@ -80,7 +80,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-gray-400 hover:text-gray-600"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-gray-500 hover:text-gray-700"
                 onClick={handleClearSearch}
                 aria-label="Clear search"
               >

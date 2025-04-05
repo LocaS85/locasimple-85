@@ -55,14 +55,14 @@ const HeroSection = () => {
             <Link to="/search">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 rounded-full shadow-lg hover:shadow-xl transition-all">
                 <Search className="mr-2 h-5 w-5" />
-                {t('startExploring')}
+                <span className="font-medium">{t('startExploring')}</span>
               </Button>
             </Link>
             <Link to="/categories">
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-white text-white hover:bg-white/20 rounded-full"
+                className="border-white text-white hover:bg-white/20 rounded-full font-medium"
               >
                 <MapPin className="mr-2 h-5 w-5" />
                 {t('browseCategories')}
@@ -81,7 +81,7 @@ const HeroSection = () => {
             onClick={scrollToCategories}
             className="text-white flex flex-col items-center hover:opacity-80 transition-opacity"
           >
-            <span className="text-sm mb-2">Découvrir plus</span>
+            <span className="text-sm mb-2 font-medium">Découvrir plus</span>
             <ChevronDown className="h-5 w-5 animate-bounce" />
           </button>
         </motion.div>
