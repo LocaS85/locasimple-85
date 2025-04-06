@@ -44,7 +44,6 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
         icon: <ShoppingCart />,
         apiKey: 'supermarket'
       }
-      // Add more subcategories as needed
     ]
   },
   {

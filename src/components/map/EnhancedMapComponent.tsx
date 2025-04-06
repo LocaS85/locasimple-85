@@ -4,7 +4,6 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-le
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import { MapPin, Home, User } from 'lucide-react';
 import { SearchFilters } from '@/types/dailySearchCategories';
 
 // Fix Leaflet marker icon issue

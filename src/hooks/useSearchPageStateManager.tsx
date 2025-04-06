@@ -44,7 +44,7 @@ export const useSearchPageStateManager = () => {
     searchState.setSelectedCategory(null);
   }, [searchState.setSelectedCategory]);
   
-  // Result handling operations - Fixed to match the expected parameters
+  // Result handling operations
   const resultHandling = useResultHandling(
     searchState.setPopupInfo,
     searchState.setViewport,
@@ -56,10 +56,7 @@ export const useSearchPageStateManager = () => {
 
   // Set temporary API key (for manual entry)
   const setTemporaryApiKey = useCallback((key: string) => {
-    // We could store this in localStorage but it would be better to 
-    // encourage proper configuration via environment variables
     try {
-      // This won't persist across page reloads, but it will work for the current session
       (window as any).TEMPORARY_MAPBOX_TOKEN = key;
       return true;
     } catch (error) {
