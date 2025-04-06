@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -34,6 +35,7 @@ interface MapDisplayProps {
   handleLocationClick: () => void;
   transportMode: string;
   setMap?: (map: mapboxgl.Map) => void;
+  mapboxToken?: string;
 }
 
 const MapDisplay: React.FC<MapDisplayProps> = ({
@@ -50,13 +52,14 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
   loading,
   handleLocationClick,
   transportMode,
-  setMap
+  setMap,
+  mapboxToken = MAPBOX_TOKEN
 }) => {
   const mapRef = useRef<any>(null);
   const geocoderContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!mapRef.current || !geocoderContainerRef.current || !MAPBOX_TOKEN) return;
+    if (!mapRef.current || !geocoderContainerRef.current || !mapboxToken) return;
     
     // Clean up any existing geocoder
     if (geocoderContainerRef.current.firstChild) {
@@ -65,7 +68,7 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
     
     // Create the geocoder control
     const geocoder = new MapboxGeocoder({
-      accessToken: MAPBOX_TOKEN,
+      accessToken: mapboxToken,
       mapboxgl: mapboxgl as any,
       placeholder: 'Rechercher un lieu, une entreprise...',
       countries: 'fr', // Filtre sur la France
@@ -106,11 +109,11 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
         geocoderContainerRef.current.removeChild(geocoderContainerRef.current.firstChild);
       }
     };
-  }, [mapRef.current, MAPBOX_TOKEN]);
+  }, [mapRef.current, mapboxToken]);
 
   return (
     <>
-      {MAPBOX_TOKEN ? (
+      {mapboxToken ? (
         <div className="relative w-full h-full">
           <div ref={geocoderContainerRef} className="geocoder-container" />
           
@@ -119,9 +122,14 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
             {...viewport}
             style={{ width: "100%", height: "100%" }}
             mapStyle="mapbox://styles/mapbox/streets-v11"
-            mapboxAccessToken={MAPBOX_TOKEN}
+            mapboxAccessToken={mapboxToken}
             onMove={evt => setViewport(evt.viewState)}
             reuseMaps
+            onLoad={() => {
+              if (setMap && mapRef.current) {
+                setMap(mapRef.current.getMap());
+              }
+            }}
           >
             <GeolocateControl position="top-right" />
             <NavigationControl position="top-right" />

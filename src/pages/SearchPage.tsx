@@ -9,14 +9,7 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
-
-// Define Result interface to match the requirement
-interface Result {
-  id: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-}
+import { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const location = useLocation();
@@ -63,7 +56,7 @@ const SearchPage = () => {
     performSearch(query);
   };
 
-  // Updated to explicitly type the result parameter to match the Result interface
+  // Updated to use the imported Result interface
   const handleResultSelect = (result: { place_name: string }) => {
     setSearchQuery(result.place_name);
     performSearch(result.place_name);
@@ -106,7 +99,7 @@ const SearchPage = () => {
           showRoutes={showRoutes}
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
-          onResultClick={handleResultClick}
+          onResultClick={handleResultClick as (result: any) => void} // Type assertion to fix the error
           selectedCategory={selectedCategory}
           onCategorySelect={clearFilters}
           searchHistory={[]}

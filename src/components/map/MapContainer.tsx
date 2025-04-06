@@ -1,15 +1,8 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import type { Result } from '../ResultsList';
-import RadiusCircle from './RadiusCircle';
-import MapMarkers from './MapMarkers';
-import { MapStyle } from './MapStyleSelector';
-import MapControls from './MapControls';
-import MapResults from './MapResults';
-import useMapInitialization from '@/hooks/useMapInitialization';
-import useMarkerManagement from '@/hooks/useMarkerManagement';
+import MapDisplay from '../map/MapDisplay';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import { toast } from 'sonner';
-import MapDisplay from '../search/MapDisplay';
 import mapboxgl from 'mapbox-gl';
 
 // Set the mapboxgl access token globally at the module level
@@ -64,8 +57,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
   userLocation,
   onMapInitialized
 }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const [mapStyle, setMapStyle] = useState<MapStyle>('streets');
   const [viewport, setViewport] = useState({
     latitude: center[1],
     longitude: center[0],
@@ -83,19 +74,22 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }));
   }, [center]);
 
-  // Check if Mapbox token is available on component mount
-  useEffect(() => {
-    if (!MAPBOX_TOKEN) {
-      console.warn('Mapbox token is not configured. Map functionality may be limited.');
-      toast.warning('Token Mapbox non configuré. Les fonctionnalités de carte peuvent être limitées.');
-    }
-  }, []);
-
   // Handle marker click
   const handleMarkerClick = (place: any) => {
     setPopupInfo(place);
     if (onResultClick) {
-      onResultClick(place);
+      // Convert place to Result format if needed
+      const resultPlace = {
+        id: place.id,
+        name: place.name,
+        latitude: place.lat,
+        longitude: place.lon,
+        address: place.address,
+        category: place.category,
+        distance: place.distance || 0,
+        duration: place.duration || 0
+      };
+      onResultClick(resultPlace as Result);
     }
   };
 
@@ -130,11 +124,15 @@ const MapContainer: React.FC<MapContainerProps> = ({
         handleLocationClick={onLocationClick || (() => {})}
         transportMode={transportMode || 'driving'}
         setMap={setMap}
-        mapboxToken={MAPBOX_TOKEN}
       />
       
       {/* Map Results */}
-      <MapResults results={results} />
+      <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-80 p-2 text-center text-sm">
+        {results.length > 0 ? 
+          `${results.length} résultats trouvés` : 
+          loading ? 'Recherche en cours...' : 'Aucun résultat'
+        }
+      </div>
     </div>
   );
 };
