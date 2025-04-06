@@ -24,6 +24,7 @@ import Navigation from "./pages/Navigation";
 import SearchPage from "./pages/SearchPage";
 import Categories from "./pages/Categories";
 import DailyCategories from "./pages/DailyCategories";
+import DesignSystemShowcase from "./components/DesignSystemShowcase";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { CategoryProvider } from "./components/CategoryContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -58,6 +59,7 @@ const App = () => (
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/help" element={<Help />} />
+                    <Route path="/design-system" element={<DesignSystemShowcase />} />
                     
                     {/* Feature pages */}
                     <Route path="/plan" element={<Plan />} />
