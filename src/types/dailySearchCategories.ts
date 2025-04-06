@@ -29,19 +29,19 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
   {
     id: 'achat',
     name: 'Achat',
-    icon: <ShoppingCart />,
+    icon: React.createElement(ShoppingCart),
     color: '#3B82F6',
     subcategories: [
       {
         id: 'vetements',
         name: 'Vêtements',
-        icon: <Shirt />,
+        icon: React.createElement(Shirt),
         apiKey: 'clothing_stores'
       },
       {
         id: 'supermarche',
         name: 'Supermarchés',
-        icon: <ShoppingCart />,
+        icon: React.createElement(ShoppingCart),
         apiKey: 'supermarket'
       }
     ]
@@ -49,25 +49,25 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
   {
     id: 'alimentation',
     name: 'Alimentation',
-    icon: <Utensils />,
+    icon: React.createElement(Utensils),
     color: '#F59E0B',
     subcategories: [
       {
         id: 'restaurants',
         name: 'Restaurants',
-        icon: <Utensils />,
+        icon: React.createElement(Utensils),
         apiKey: 'restaurants'
       },
       {
         id: 'cafes',
         name: 'Cafés',
-        icon: <Coffee />,
+        icon: React.createElement(Coffee),
         apiKey: 'cafes'
       },
       {
         id: 'bars',
         name: 'Bars',
-        icon: <Beer />,
+        icon: React.createElement(Beer),
         apiKey: 'bars'
       }
     ]
@@ -75,19 +75,19 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
   {
     id: 'services',
     name: 'Services',
-    icon: <Briefcase />,
+    icon: React.createElement(Briefcase),
     color: '#10B981',
     subcategories: [
       {
         id: 'banques',
         name: 'Banques',
-        icon: <Bank />,
+        icon: React.createElement(Bank),
         apiKey: 'banks'
       },
       {
         id: 'administrations',
         name: 'Administrations',
-        icon: <Landmark />,
+        icon: React.createElement(Landmark),
         apiKey: 'local_government_office'
       }
     ]
@@ -95,25 +95,25 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
   {
     id: 'loisirs',
     name: 'Loisirs',
-    icon: <Music />,
+    icon: React.createElement(Music),
     color: '#8B5CF6',
     subcategories: [
       {
         id: 'cinema',
         name: 'Cinémas',
-        icon: <Film />,
+        icon: React.createElement(Film),
         apiKey: 'movie_theaters'
       },
       {
         id: 'jeux',
         name: 'Jeux vidéo',
-        icon: <Gamepad />,
+        icon: React.createElement(Gamepad),
         apiKey: 'video_game_stores'
       },
       {
         id: 'sport',
         name: 'Sport',
-        icon: <Dumbbell />,
+        icon: React.createElement(Dumbbell),
         apiKey: 'gym'
       }
     ]
