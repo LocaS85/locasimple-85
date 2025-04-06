@@ -87,7 +87,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
         address: place.address,
         category: place.category,
         distance: place.distance || 0,
-        duration: place.duration || 0
+        duration: place.duration || 0,
+        color: place.color || ''  // Add any other required properties with defaults
       };
       onResultClick(resultPlace);
     }
@@ -109,7 +110,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
     address: result.address,
     category: result.category,
     distance: result.distance,
-    duration: result.duration
+    duration: result.duration,
+    color: result.color || ''
   }));
 
   return (

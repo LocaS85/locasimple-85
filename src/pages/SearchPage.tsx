@@ -1,13 +1,14 @@
+
 import React from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { motion } from 'framer-motion';
 import ResultsList, { Result } from '@/components/ResultsList';
 import MapContainer from '@/components/map/MapContainer';
 import SearchBox from '@/components/search/SearchBox';
-import CategoriesFilter from '@/components/search/CategoriesFilter';
-import TransportModeFilter from '@/components/search/TransportModeFilter';
-import DistanceFilter from '@/components/search/DistanceFilter';
-import DurationFilter from '@/components/search/DurationFilter';
+import { CategoriesFilter } from '@/components/search/CategoriesFilter';
+import { TransportModeFilter } from '@/components/search/TransportModeFilter';
+import { DistanceFilter } from '@/components/search/DistanceFilter';
+import { DurationFilter } from '@/components/search/DurationFilter';
 import { Button } from '@/components/ui/button';
 import FlaskServerStatus from '@/components/search/FlaskServerStatus';
 import { Toaster } from '@/components/ui/toaster';

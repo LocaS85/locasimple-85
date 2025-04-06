@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ShoppingCart, Shirt, Coffee, Utensils, Beer, Book, Landmark, Bank, Briefcase, GraduationCap, Music, Film, Gamepad, Dumbbell, Users, Heart, Home } from 'lucide-react';
+import { ShoppingCart, Shirt, Coffee, Utensils, Beer, Book, Landmark, Building, Briefcase, GraduationCap, Music, Film, Gamepad, Dumbbell, Users, Heart, Home } from 'lucide-react';
 
 export interface SubCategoryType {
   id: string;
@@ -81,7 +81,7 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
       {
         id: 'banques',
         name: 'Banques',
-        icon: React.createElement(Bank),
+        icon: React.createElement(Building), // Changed from Bank to Building which exists in lucide-react
         apiKey: 'banks'
       },
       {
