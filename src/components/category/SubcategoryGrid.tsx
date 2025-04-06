@@ -62,7 +62,7 @@ const SubcategoryGrid = () => {
               subCategory={subCategory}
               categoryId={categoryId || ''}
               onNavigate={navigate}
-              t={t}
+              t={t as (key: string) => string}
             />
           ))}
         </motion.div>

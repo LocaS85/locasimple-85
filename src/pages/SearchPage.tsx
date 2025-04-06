@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import SearchHeader from '@/components/search/SearchHeader';
@@ -9,6 +10,7 @@ import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 
+// Define Result interface to match the requirement
 interface Result {
   id: string;
   name: string;
@@ -61,7 +63,8 @@ const SearchPage = () => {
     performSearch(query);
   };
 
-  const handleResultSelect = (result: any) => {
+  // Updated to explicitly type the result parameter to match the Result interface
+  const handleResultSelect = (result: { place_name: string }) => {
     setSearchQuery(result.place_name);
     performSearch(result.place_name);
   };

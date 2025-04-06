@@ -11,13 +11,12 @@ import { getHealthIcon } from '@/utils/icons/healthIcons';
 import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
 import { SubCategory } from '@/types/categories';
 import { NavigateFunction } from 'react-router-dom';
-import { TFunction } from 'i18next';
 
 interface SubcategoryCardProps {
   subCategory: SubCategory;
   categoryId: string;
   onNavigate: NavigateFunction;
-  t: TFunction;
+  t: (key: string) => string;
 }
 
 const SubcategoryCard: React.FC<SubcategoryCardProps> = ({ 
