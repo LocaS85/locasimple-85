@@ -2,25 +2,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import type { MapStyle } from '@/components/map/MapStyleSelector';
+import { MAP_STYLE_URLS, MapStyle } from '@/constants/mapStyles';
+import { 
+  setMapboxToken, 
+  verifyMapboxToken, 
+  addNavigationControls, 
+  addAttributionControl 
+} from '@/utils/mapInitializationUtils';
 import { toast } from 'sonner';
 
 // Initialize Mapbox globally if token is available
-if (MAPBOX_TOKEN) {
-  try {
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    console.log('Mapbox token set globally in useMapInitialization');
-  } catch (error) {
-    console.error('Error setting Mapbox token:', error);
-  }
-}
-
-// Map style URLs for Mapbox
-const MAP_STYLE_URLS = {
-  streets: 'mapbox://styles/mapbox/streets-v12',
-  satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
-  terrain: 'mapbox://styles/mapbox/outdoors-v12'
-};
+setMapboxToken();
 
 interface UseMapInitializationOptions {
   container: React.RefObject<HTMLDivElement>;
@@ -55,12 +47,9 @@ export const useMapInitialization = ({
 
     try {
       // Verify token
-      if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
-        const errorMsg = 'Mapbox token is missing or empty';
-        console.error(errorMsg);
-        toast.error('Token Mapbox manquant. Vérifiez votre fichier .env');
+      if (!verifyMapboxToken()) {
         setInitializationAttempted(true);
-        setError(new Error(errorMsg));
+        setError(new Error('Mapbox token is missing or empty'));
         return;
       }
       
@@ -113,26 +102,11 @@ export const useMapInitialization = ({
           setInitializationAttempted(true);
           setError(null);
           
-          // Only add navigation controls if not disabled
-          if (!disableNavControls) {
-            // Create NavigationControl instance
-            const navControl = new mapboxgl.NavigationControl({
-              showCompass: true,
-              showZoom: true,
-              visualizePitch: true
-            });
-            
-            navigationControlRef.current = navControl;
-            
-            // Add controls to map
-            map.current.addControl(navControl, 'top-right');
-          }
+          // Add navigation controls
+          navigationControlRef.current = addNavigationControls(map.current, disableNavControls);
           
-          // Always add attribution control
-          map.current.addControl(
-            new mapboxgl.AttributionControl({ compact: true }),
-            'bottom-right'
-          );
+          // Add attribution control
+          addAttributionControl(map.current);
 
           console.log('Map initialized successfully');
           toast.success('Carte chargée avec succès');
@@ -199,33 +173,11 @@ export const useMapInitialization = ({
       // Re-attach style.load event handler
       map.current.once('style.load', () => {
         if (map.current && map.current.getContainer()) {
-          // Add new controls after style change only if not disabled
-          if (!disableNavControls) {
-            try {
-              // Create new controls
-              const navControl = new mapboxgl.NavigationControl({
-                showCompass: true,
-                showZoom: true,
-                visualizePitch: true
-              });
-              
-              // Add to map
-              map.current.addControl(navControl, 'top-right');
-              navigationControlRef.current = navControl;
-            } catch (error) {
-              console.error('Error adding controls after style change:', error);
-            }
-          }
+          // Add new controls after style change
+          navigationControlRef.current = addNavigationControls(map.current, disableNavControls);
           
-          // Always add attribution control after style change
-          try {
-            map.current.addControl(
-              new mapboxgl.AttributionControl({ compact: true }),
-              'bottom-right'
-            );
-          } catch (error) {
-            console.error('Error adding attribution control after style change:', error);
-          }
+          // Add attribution control after style change
+          addAttributionControl(map.current);
         }
       });
     } catch (error) {
