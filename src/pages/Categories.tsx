@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import CategoryGrid from '@/components/category/CategoryGrid';
 import SubcategoryGrid from '@/components/category/SubcategoryGrid';
 
 const Categories = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   
   return (
     <motion.div 

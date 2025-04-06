@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/categories';
 import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
+import CategoryCard from '@/components/category/CategoryCard';
 
 const CategoryGrid = () => {
   const navigate = useNavigate();
@@ -62,26 +63,11 @@ const CategoryGrid = () => {
         animate="visible"
       >
         {categories.map((category) => (
-          <motion.div
-            key={category.id}
-            variants={itemVariants}
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
-            }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-300"
-            onClick={() => handleCategoryClick(category.id, category.link)}
-          >
-            <div className="p-6 flex flex-col items-center text-center">
-              <div className={`mb-4 text-4xl ${getCategoryIconColorClass(category.id)}`}>
-                {React.createElement(category.icon, { size: 48 })}
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                {category.name}
-              </h3>
-            </div>
-          </motion.div>
+          <CategoryCard 
+            key={category.id} 
+            category={category} 
+            onClick={handleCategoryClick}
+          />
         ))}
       </motion.div>
     </div>

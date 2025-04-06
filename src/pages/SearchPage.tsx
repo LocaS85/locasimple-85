@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import SearchHeader from '@/components/search/SearchHeader';
@@ -9,6 +8,13 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
+
+interface Result {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+}
 
 const SearchPage = () => {
   const location = useLocation();
@@ -43,11 +49,9 @@ const SearchPage = () => {
     resetSearch
   } = useSearchPageStateManager();
 
-  // Récupérer la catégorie depuis l'URL si elle existe
   useEffect(() => {
     if (categoryFromUrl && categoryFromUrl !== selectedCategory) {
       setSelectedCategory(categoryFromUrl);
-      // Effectuer une recherche automatique avec la catégorie sélectionnée
       performSearch(searchQuery || categoryFromUrl);
     }
   }, [categoryFromUrl, performSearch, searchQuery, selectedCategory, setSelectedCategory]);
@@ -57,12 +61,11 @@ const SearchPage = () => {
     performSearch(query);
   };
 
-  // Fix the type issue by adding the necessary properties to the parameter type
   const handleResultSelect = (result: any) => {
     setSearchQuery(result.place_name);
     performSearch(result.place_name);
   };
-  
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       <SearchHeader 
