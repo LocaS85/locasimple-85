@@ -15,11 +15,13 @@ import { Menu, X, Search, User, LogIn, Home, Info, HelpCircle, Map, Globe } from
 import { cn } from '@/lib/utils';
 import LanguageSelector from './LanguageSelector';
 import ThemeToggle from './ThemeToggle';
+import { useIconTheme } from '@/hooks/useIconTheme';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { t } = useLanguage();
+  const { getColor } = useIconTheme();
 
   // Add scroll detection for navbar styling
   useEffect(() => {
@@ -52,10 +54,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-1.5 rounded-lg shadow-sm transition-transform group-hover:scale-110">
+            <div className="bg-gradient-to-r from-electricblue to-electricblue/80 text-white p-1.5 rounded-lg shadow-sm transition-transform group-hover:scale-110">
               <Map className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">LocaSimple</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-slateblue to-slateblue/80 bg-clip-text text-transparent">LocaSimple</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -63,13 +65,13 @@ const Navbar = () => {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="hover:bg-accent/80 font-medium">{t('discover')}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="hover:bg-sagegreen/20 font-medium">{t('discover')}</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 rounded-xl shadow-lg border border-border">
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 rounded-xl shadow-lg border border-border bg-white dark:bg-slateblue/30">
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <Link
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-blue-500 to-blue-700 p-6 no-underline outline-none focus:shadow-md transition-all hover:shadow-lg"
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-electricblue to-electricblue/80 p-6 no-underline outline-none focus:shadow-md transition-all hover:shadow-lg"
                             to="/search"
                           >
                             <Search className="h-6 w-6 text-white" />
@@ -86,9 +88,9 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/categories"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-sagegreen/20 focus:bg-accent focus:text-accent-foreground"
                           >
-                            <div className="text-sm font-medium leading-none">{t('categories')}</div>
+                            <div className="text-sm font-medium leading-none text-copper">{t('categories')}</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                               {t('browseCategories')}
                             </p>
@@ -99,9 +101,9 @@ const Navbar = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/quotidien"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-sagegreen/20 focus:bg-accent focus:text-accent-foreground"
                           >
-                            <div className="text-sm font-medium leading-none">Quotidien</div>
+                            <div className="text-sm font-medium leading-none text-copper">Quotidien</div>
                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                               Gérez vos lieux du quotidien
                             </p>
@@ -114,7 +116,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/pricing">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-sagegreen/20 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
                       {t('navPricing')}
                     </NavigationMenuLink>
@@ -123,7 +125,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/faq">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-sagegreen/20 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
                       {t('navFaq')}
                     </NavigationMenuLink>
@@ -132,7 +134,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/contact">
                     <NavigationMenuLink className={cn(
-                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+                      "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-sagegreen/20 focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                     )}>
                       {t('navContact')}
                     </NavigationMenuLink>
@@ -145,23 +147,23 @@ const Navbar = () => {
               <ThemeToggle />
               <LanguageSelector variant="ghost" size="sm" />
               <Link to="/search">
-                <Button variant="ghost" size="icon" className="hover:bg-accent text-foreground">
+                <Button variant="ghost" size="icon" className="hover:bg-sagegreen/20 text-foreground">
                   <Search className="h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-accent border-border">
+                <Button variant="outline" size="sm" className="hidden lg:flex hover:bg-sagegreen/20 border-border">
                   <LogIn className="mr-2 h-4 w-4" />
                   {t('navLogin')}
                 </Button>
               </Link>
               <Link to="/register">
-                <Button size="sm" className="hidden lg:flex bg-primary hover:bg-primary/90">
+                <Button size="sm" className="hidden lg:flex bg-electricblue hover:bg-electricblue/90 text-white">
                   {t('navRegister')}
                 </Button>
               </Link>
               <Link to="/profile">
-                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden hover:bg-accent">
+                <Button variant="ghost" size="icon" className="hidden sm:flex lg:hidden hover:bg-sagegreen/20">
                   <User className="h-5 w-5" />
                 </Button>
               </Link>
@@ -186,30 +188,30 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-background border-t border-border py-4 animate-fade-in">
+        <div className="md:hidden bg-background/95 backdrop-blur-sm border-t border-border py-4 animate-fade-in">
           <div className="container mx-auto px-4 space-y-4">
             <Link to="/" className="flex items-center py-2" onClick={toggleMenu}>
-              <Home className="h-5 w-5 mr-3 text-primary" />
+              <Home className="h-5 w-5 mr-3 text-electricblue" />
               <span>{t('navHome')}</span>
             </Link>
             <Link to="/categories" className="flex items-center py-2" onClick={toggleMenu}>
-              <Map className="h-5 w-5 mr-3 text-primary" />
-              <span>{t('categories')}</span>
+              <Map className="h-5 w-5 mr-3 text-electricblue" />
+              <span className="text-copper">{t('categories')}</span>
             </Link>
             <Link to="/quotidien" className="flex items-center py-2" onClick={toggleMenu}>
-              <Home className="h-5 w-5 mr-3 text-primary" />
+              <Home className="h-5 w-5 mr-3 text-electricblue" />
               <span>Quotidien</span>
             </Link>
             <Link to="/pricing" className="flex items-center py-2" onClick={toggleMenu}>
-              <Info className="h-5 w-5 mr-3 text-primary" />
+              <Info className="h-5 w-5 mr-3 text-electricblue" />
               <span>{t('navPricing')}</span>
             </Link>
             <Link to="/faq" className="flex items-center py-2" onClick={toggleMenu}>
-              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
+              <HelpCircle className="h-5 w-5 mr-3 text-electricblue" />
               <span>{t('navFaq')}</span>
             </Link>
             <Link to="/contact" className="flex items-center py-2" onClick={toggleMenu}>
-              <HelpCircle className="h-5 w-5 mr-3 text-primary" />
+              <HelpCircle className="h-5 w-5 mr-3 text-electricblue" />
               <span>{t('navContact')}</span>
             </Link>
             <div className="pt-2 flex flex-col space-y-2">
@@ -220,7 +222,7 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link to="/register" onClick={toggleMenu}>
-                <Button className="w-full bg-primary hover:bg-primary/90">
+                <Button className="w-full bg-electricblue hover:bg-electricblue/90 text-white">
                   {t('navRegister')}
                 </Button>
               </Link>
