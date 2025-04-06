@@ -36,7 +36,7 @@ export const useResultHandling = (
   }, [selectedResult]);
 
   const toggleRoutes = useCallback(() => {
-    setRouteDisplayed(prev => !prev);
+    setRouteDisplayed((prev: boolean) => !prev);
   }, [setRouteDisplayed]);
   
   return {

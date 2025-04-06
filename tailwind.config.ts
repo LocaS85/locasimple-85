@@ -20,8 +20,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
-        heading: ['Montserrat', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Text', 'Manrope', 'sans-serif'],
+        heading: ['Inter', 'SF Pro Display', 'Manrope', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -29,6 +29,15 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        
+        // New color palette
+        offwhite: "#F9F9F9",
+        velvetgray: "#EAEAEA",
+        slateblue: "#273647",
+        sagegreen: "#A9B7AC",
+        copper: "#C7956D",
+        electricblue: "#5B9CF6",
+        
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -67,10 +76,10 @@ export default {
         },
         app: {
           dark: "#1a1a2e",
-          primary: "#0f3460",
-          secondary: "#e94560",
-          light: "#f5f5f5",
-          gray: "#16213e",
+          primary: "#273647",    // Slate blue
+          secondary: "#C7956D",  // Copper
+          light: "#F9F9F9",      // Off-white
+          gray: "#EAEAEA",       // Velvet gray
         },
       },
       borderRadius: {
@@ -90,13 +99,22 @@ export default {
         "fade-in": {
           "0%": { opacity: "0", transform: "translateY(10px)" },
           "100%": { opacity: "1", transform: "translateY(0)" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.3s ease-out",
+        "float": "float 3s ease-in-out infinite"
       },
+      boxShadow: {
+        "neu-light": "5px 5px 10px rgba(0, 0, 0, 0.03), -5px -5px 10px rgba(255, 255, 255, 0.8)",
+        "neu-dark": "3px 3px 8px rgba(0, 0, 0, 0.3), -3px -3px 8px rgba(255, 255, 255, 0.05)",
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -49,13 +49,13 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
   return (
     <div className="relative w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex items-center gap-2 bg-background/80 dark:bg-card/80 backdrop-blur-md rounded-full shadow-md border border-border px-2">
+        <div className="relative flex items-center gap-2 bg-background/80 dark:bg-card/80 backdrop-blur-md rounded-full shadow-md border border-border px-2 neu-input">
           <Button
             type="button"
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
-            className="h-10 w-10 flex-shrink-0 text-primary hover:bg-primary/10 rounded-full"
+            className="h-10 w-10 flex-shrink-0 text-slateblue hover:bg-muted/50 rounded-full"
             aria-label="Menu"
           >
             <Menu className="h-5 w-5" />
@@ -80,7 +80,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted/50"
                 onClick={handleClearSearch}
                 aria-label="Clear search"
               >
@@ -93,7 +93,7 @@ export const TransparentSearchBar: React.FC<TransparentSearchBarProps> = ({
             type="button"
             variant="ghost" 
             size="icon" 
-            className={`h-10 w-10 flex-shrink-0 rounded-full ${isRecording ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : 'text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20'}`}
+            className={`h-10 w-10 flex-shrink-0 rounded-full hover-lift ${isRecording ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : 'text-copper hover:bg-muted/50'}`}
             onClick={onMicClick}
             aria-label="Voice search"
           >

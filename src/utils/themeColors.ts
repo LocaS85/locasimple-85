@@ -1,29 +1,29 @@
 
-// Default theme colors for icons
+// Default theme colors for icons based on our premium palette
 export const defaultThemeColors = {
-  primary: '#2563eb',    // blue-600
-  secondary: '#ea580c',  // orange-600
-  success: '#22c55e',    // green-500
-  accent: '#8b5cf6',     // purple-500
-  error: '#ef4444',      // red-500
-  warning: '#f59e0b',    // amber-500
-  info: '#3b82f6',       // blue-500
+  primary: '#5B9CF6',    // Electric blue
+  secondary: '#C7956D',  // Copper
+  success: '#22c55e',    // Green (kept)
+  accent: '#A9B7AC',     // Sage green
+  error: '#ef4444',      // Red (kept)
+  warning: '#f59e0b',    // Amber (kept)
+  info: '#5B9CF6',       // Electric blue
   
   // Transport modes
-  bus: '#eab308',        // yellow-500
-  car: '#3b82f6',        // blue-500
-  bike: '#ef4444',       // red-500
-  train: '#000000',      // black
-  plane: '#6b7280',      // gray-500
-  ship: '#06b6d4',       // cyan-500
+  bus: '#C7956D',        // Copper
+  car: '#5B9CF6',        // Electric blue
+  bike: '#A9B7AC',       // Sage green
+  train: '#273647',      // Slate blue
+  plane: '#EAEAEA',      // Velvet gray
+  ship: '#5B9CF6',       // Electric blue
   
   // Category specific
-  food: '#f97316',       // orange-500
-  shopping: '#ec4899',   // pink-500
-  health: '#10b981',     // emerald-500
-  entertainment: '#8b5cf6', // purple-500
-  accommodation: '#f59e0b', // amber-500
-  services: '#6366f1',   // indigo-500
+  food: '#C7956D',       // Copper
+  shopping: '#5B9CF6',   // Electric blue
+  health: '#A9B7AC',     // Sage green
+  entertainment: '#5B9CF6', // Electric blue
+  accommodation: '#C7956D', // Copper
+  services: '#273647',   // Slate blue
 };
 
 // Get a theme color with fallback

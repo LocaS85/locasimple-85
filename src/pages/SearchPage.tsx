@@ -100,7 +100,7 @@ const SearchPage = () => {
           showRoutes={showRoutes}
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
-          onResultClick={handleResultClick}
+          onResultClick={(result: Result) => handleResultClick(result)}
           selectedCategory={selectedCategory}
           onCategorySelect={clearFilters}
           searchHistory={[]}
@@ -121,7 +121,7 @@ const SearchPage = () => {
         <ResultsPopup 
           results={searchResults}
           selectedPlaceId={selectedPlaceId}
-          handleResultClick={handleResultClick}
+          handleResultClick={(result: Result) => handleResultClick(result)}
         />
         
         <NoResultsMessage 
