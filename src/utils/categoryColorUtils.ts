@@ -1,131 +1,108 @@
 
-// Common utility functions for category colors
-
-// Text color for category icons and text based on category ID
+/**
+ * Returns the appropriate text color class for a category
+ */
 export const getCategoryTextColor = (categoryId: string): string => {
-  switch(categoryId) {
-    case 'alimentation': 
-    case 'restaurants':
-    case 'cafes':
-      return '#f97316'; // orange-500
-    case 'divertissement':
-    case 'cinemas':
-    case 'theatres':
-      return '#3b82f6'; // blue-500
-    case 'sante':
-    case 'hopitaux':
-    case 'pharmacies':
-      return '#ef4444'; // red-500
-    case 'travail':
-    case 'bureaux':
-      return '#8b5cf6'; // violet-500
-    case 'shopping':
-    case 'magasins':
-      return '#22c55e'; // green-500
-    case 'quotidien':
-    case 'daily':
-      return '#06b6d4'; // cyan-500
-    case 'hotel':
-    case 'hebergement':
-      return '#06b6d4'; // cyan-500
-    case 'transport':
-    case 'vehicules':
-      return '#a855f7'; // purple-500
-      
-    // Quotidien subcategories
-    case 'adresse-principale':
-      return '#8B5CF6'; // violet-600
-    case 'famille':
-      return '#D946EF'; // pink-600
-    case 'amis':
-      return '#3B82F6'; // blue-600
-    case 'ecole':
-      return '#0EA5E9'; // sky-500
-    case 'activites':
-      return '#10B981'; // emerald-500
-      
-    default:
-      return '#f8fafc'; // slate-50
+  // Shopping & sub-categories
+  if (categoryId === 'shopping' || 
+      categoryId === 'vetements' || 
+      categoryId === 'electronique' || 
+      categoryId === 'librairies') {
+    return "#27ae60"; // Green
   }
+  
+  // Food & sub-categories
+  if (categoryId === 'alimentation' || 
+      categoryId === 'restaurants' || 
+      categoryId === 'cafes-salons' || 
+      categoryId === 'boulangeries') {
+    return "#e67e22"; // Orange
+  }
+  
+  // Health & sub-categories
+  if (categoryId === 'sante' || 
+      categoryId === 'hopitaux' || 
+      categoryId === 'pharmacies' || 
+      categoryId === 'medecins') {
+    return "#e74c3c"; // Red
+  }
+  
+  // Entertainment & sub-categories
+  if (categoryId === 'divertissement' || 
+      categoryId === 'cinemas' || 
+      categoryId === 'theatres' || 
+      categoryId === 'parcs') {
+    return "#3498db"; // Blue
+  }
+  
+  // Accommodation & sub-categories
+  if (categoryId === 'hebergement' || 
+      categoryId === 'hotels' || 
+      categoryId === 'auberges') {
+    return "#9b59b6"; // Purple
+  }
+  
+  // Services
+  if (categoryId === 'services' || 
+      categoryId === 'banques' || 
+      categoryId === 'poste') {
+    return "#f39c12"; // Yellow
+  }
+  
+  // Default color
+  return "#34495e"; // Dark blue
 };
 
-// Tailwind CSS class for category icon color
+/**
+ * Returns the appropriate icon color class for a category 
+ */
 export const getCategoryIconColorClass = (categoryId: string): string => {
-  switch (categoryId) {
-    case 'alimentation':
-    case 'restaurants': 
-      return 'text-orange-600';
-    case 'divertissement':
-    case 'cinemas':
-      return 'text-blue-600';
-    case 'sante':
-    case 'hopitaux':
-      return 'text-red-600';
-    case 'travail':
-    case 'bureaux':
-      return 'text-purple-600';
-    case 'quotidien':
-      return 'text-cyan-600';
-    case 'shopping':
-    case 'magasins':
-      return 'text-green-600';
-    case 'hotel':
-    case 'hebergement':
-      return 'text-cyan-600';
-    case 'transport':
-    case 'vehicules':
-      return 'text-purple-600';
-      
-    // Quotidien subcategories
-    case 'adresse-principale':
-      return 'text-violet-600';
-    case 'famille':
-      return 'text-pink-600';
-    case 'amis':
-      return 'text-blue-600';
-    case 'ecole':
-      return 'text-sky-500';
-    case 'activites':
-      return 'text-emerald-500';
-      
-    default:
-      return 'text-gray-600';
+  // Shopping & sub-categories
+  if (categoryId === 'shopping' || 
+      categoryId.includes('vetements') || 
+      categoryId.includes('electronique') || 
+      categoryId.includes('magasin')) {
+    return "text-green-600";
   }
-};
-
-// Function to get Tailwind hover background color class for each category
-export const getCategoryHoverColorClass = (categoryId: string): string => {
-  switch (categoryId) {
-    case 'alimentation':
-      return 'hover:bg-orange-200';
-    case 'divertissement':
-      return 'hover:bg-blue-200';
-    case 'sante':
-      return 'hover:bg-red-200';
-    case 'travail':
-      return 'hover:bg-purple-200';
-    case 'quotidien':
-      return 'hover:bg-cyan-200';
-    case 'shopping':
-      return 'hover:bg-green-200';
-    case 'hotel':
-      return 'hover:bg-cyan-200';
-    case 'transport':
-      return 'hover:bg-purple-200';
-      
-    // Quotidien subcategories
-    case 'adresse-principale':
-      return 'hover:bg-violet-200';
-    case 'famille':
-      return 'hover:bg-pink-200';
-    case 'amis':
-      return 'hover:bg-blue-200';
-    case 'ecole':
-      return 'hover:bg-sky-200';
-    case 'activites':
-      return 'hover:bg-emerald-200';
-      
-    default:
-      return 'hover:bg-gray-200';
+  
+  // Food & sub-categories
+  if (categoryId === 'alimentation' || 
+      categoryId.includes('restaurant') || 
+      categoryId.includes('cafe') || 
+      categoryId.includes('boulangerie')) {
+    return "text-orange-600";
   }
+  
+  // Health & sub-categories
+  if (categoryId === 'sante' || 
+      categoryId.includes('hopital') || 
+      categoryId.includes('pharmacie') || 
+      categoryId.includes('medecin')) {
+    return "text-red-600";
+  }
+  
+  // Entertainment & sub-categories
+  if (categoryId === 'divertissement' || 
+      categoryId.includes('cinema') || 
+      categoryId.includes('theatre') || 
+      categoryId.includes('parc')) {
+    return "text-blue-600";
+  }
+  
+  // Accommodation & sub-categories
+  if (categoryId === 'hebergement' || 
+      categoryId.includes('hotel') || 
+      categoryId.includes('auberge')) {
+    return "text-purple-600";
+  }
+  
+  // Services
+  if (categoryId === 'services' || 
+      categoryId.includes('banque') || 
+      categoryId.includes('poste')) {
+    return "text-yellow-600";
+  }
+  
+  // Default color
+  return "text-gray-600";
 };

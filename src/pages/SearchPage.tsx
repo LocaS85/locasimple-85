@@ -9,8 +9,6 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
-// Use the Result type consistently
-import type { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const location = useLocation();
@@ -59,6 +57,7 @@ const SearchPage = () => {
     performSearch(query);
   };
 
+  // Fix the type issue by adding the necessary properties to the parameter type
   const handleResultSelect = (result: any) => {
     setSearchQuery(result.place_name);
     performSearch(result.place_name);

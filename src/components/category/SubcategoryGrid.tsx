@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,13 +7,16 @@ import { categories } from '@/data/categories';
 import { CATEGORIES } from '@/types/categories';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import { getCategoryColorClass } from '@/utils/categoryColors';
-import { getCategoryTextColor } from '@/utils/categoryColorUtils';
+import { getCategoryIconColorClass, getCategoryTextColor } from '@/utils/categoryColorUtils';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import clsx from 'clsx';
 import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
 import { getHealthIcon } from '@/utils/icons/healthIcons';
 import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
+import { SubCategory } from '@/types/categories';
 
 const SubcategoryGrid = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -84,6 +88,61 @@ const SubcategoryGrid = () => {
     });
   };
   
+  // Helper function to render subcategories with their children
+  const renderSubCategoryCard = (subCategory: SubCategory) => {
+    const hasChildren = subCategory.children && subCategory.children.length > 0;
+    const iconColor = getCategoryTextColor(subCategory.id);
+    const bgColorClass = getCategoryColorClass(subCategory.id);
+    
+    return (
+      <motion.div
+        key={subCategory.id}
+        variants={itemVariants}
+        whileHover={{ 
+          scale: 1.02,
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full"
+      >
+        <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300">
+          <div 
+            className={`p-6 flex flex-col h-full ${
+              hasChildren ? 'cursor-default' : 'cursor-pointer'
+            }`}
+            onClick={!hasChildren ? () => navigate(`/search?category=${subCategory.id}`) : undefined}
+          >
+            <div className="flex items-center mb-4">
+              <div className={`mr-3 text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
+                {getSubcategoryIcon(subCategory.id)}
+              </div>
+              <h3 className="text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
+            </div>
+            
+            {hasChildren && (
+              <>
+                <Separator className="my-3" />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {subCategory.children.map(child => (
+                    <Button
+                      key={child.id}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs rounded-full hover:bg-primary hover:text-white transition-colors"
+                      onClick={() => navigate(`/search?category=${child.id}`)}
+                    >
+                      {t(child.name) || child.name}
+                    </Button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </Card>
+      </motion.div>
+    );
+  };
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <Button 
@@ -101,42 +160,12 @@ const SubcategoryGrid = () => {
       
       {subCategories.length > 0 ? (
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {subCategories.map((subCategory) => {
-            // Get the appropriate color for the subcategory
-            const iconColor = getCategoryTextColor(subCategory.id);
-            const bgColorClass = getCategoryColorClass(subCategory.id);
-            
-            return (
-              <motion.div
-                key={subCategory.id}
-                variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                }}
-                whileTap={{ scale: 0.98 }}
-                className={clsx(
-                  "bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer",
-                  "shadow-lg hover:shadow-xl transition-all duration-300"
-                )}
-                onClick={() => navigate(`/search?category=${subCategory.id}`)}
-              >
-                <div className="p-6 flex flex-col items-center text-center">
-                  <div className="mb-4 text-5xl">
-                    {getSubcategoryIcon(subCategory.id)}
-                  </div>
-                  <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-                    {t(subCategory.name) || subCategory.name}
-                  </h3>
-                </div>
-              </motion.div>
-            );
-          })}
+          {subCategories.map(renderSubCategoryCard)}
         </motion.div>
       ) : (
         <div className="text-center py-10">

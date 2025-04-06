@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,15 +11,15 @@ const CategoryGrid = () => {
   const { t } = useLanguage();
   
   const handleCategoryClick = (categoryId: string, link?: string) => {
-    // Si c'est la catégorie 'quotidien', naviguer vers la page dédiée
+    // If it's the 'quotidien' category, navigate to the dedicated page
     if (categoryId === 'quotidien') {
       navigate('/quotidien');
     } else if (link && link.includes('/search')) {
-      // Si le lien contient '/search', naviguer directement vers la page de recherche
+      // If the link contains '/search', navigate directly to the search page
       navigate(link);
     } else {
-      // Sinon, naviguer vers la page des sous-catégories ou la page de recherche avec la catégorie sélectionnée
-      navigate(`/search?category=${categoryId}`);
+      // Otherwise, navigate to the subcategories page
+      navigate(`/categories/${categoryId}`);
     }
   };
 
@@ -49,10 +48,10 @@ const CategoryGrid = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <h1 className="text-3xl font-bold mb-6 text-center font-heading">
         Explorer les catégories
       </h1>
-      <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
+      <p className="text-center text-gray-600 dark:text-gray-300 mb-8 font-worksans">
         Choisissez parmi nos catégories pour trouver exactement ce que vous cherchez
       </p>
       
