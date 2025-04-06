@@ -9,6 +9,7 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
+// Use the same Result type consistently
 import type { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
@@ -100,7 +101,7 @@ const SearchPage = () => {
           showRoutes={showRoutes}
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
-          onResultClick={(result: Result) => handleResultClick(result)}
+          onResultClick={(result: Result) => handleResultClick(result as Result)}
           selectedCategory={selectedCategory}
           onCategorySelect={clearFilters}
           searchHistory={[]}
