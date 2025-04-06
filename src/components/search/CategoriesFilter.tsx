@@ -13,11 +13,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface CategoriesFilterProps {
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
+  onCategoryToggle?: (categoryId: string) => void;
 }
 
 export const CategoriesFilter: React.FC<CategoriesFilterProps> = ({
   selectedCategory,
-  onCategorySelect
+  onCategorySelect,
+  onCategoryToggle = (id) => onCategorySelect(id === selectedCategory ? null : id)
 }) => {
   const { t } = useLanguage();
 
@@ -60,7 +62,13 @@ export const CategoriesFilter: React.FC<CategoriesFilterProps> = ({
                     ? "bg-blue-500 text-white hover:bg-blue-600" 
                     : "text-black hover:bg-gray-100"
                 }`}
-                onClick={() => onCategorySelect(category.id)}
+                onClick={() => {
+                  if (onCategoryToggle) {
+                    onCategoryToggle(category.id);
+                  } else {
+                    onCategorySelect(category.id);
+                  }
+                }}
               >
                 <div className="flex items-center gap-2">
                   {category.icon}

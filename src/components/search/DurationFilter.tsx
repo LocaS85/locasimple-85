@@ -1,114 +1,48 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger 
-} from '@/components/ui/popover';
-import { Clock } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface DurationFilterProps {
-  selectedDuration: number | null;
-  onDurationChange: (duration: number) => void;
+export interface DurationFilterProps {
+  selectedDuration: number;
+  timeUnit?: 'minutes' | 'hours';
+  onDurationChange: (value: number) => void;
+  onTimeUnitChange?: (value: 'minutes' | 'hours') => void;
 }
 
 export const DurationFilter: React.FC<DurationFilterProps> = ({
-  selectedDuration,
-  onDurationChange
+  selectedDuration = 15,
+  timeUnit = 'minutes',
+  onDurationChange = () => {},
+  onTimeUnitChange = () => {}
 }) => {
-  const { t } = useLanguage();
-
-  const generateMinutesDurations = () => {
-    return Array.from({ length: 11 }, (_, i) => i * 5 + 5);
-  };
-  
-  const generateHoursDurations = () => {
-    return Array.from({ length: 10 }, (_, i) => i + 1);
-  };
-
-  // Helper to determine if the selected duration is in minutes (< 60) or hours
-  const isMinutesDuration = selectedDuration !== null && selectedDuration < 60;
-
-  // Get active button color based on whether it's minutes or hours
-  const getButtonColor = () => {
-    if (!selectedDuration) return "border-black bg-gray-50 text-black hover:bg-gray-100";
-    return isMinutesDuration
-      ? "border-orange-500 bg-orange-500 text-white hover:bg-orange-600"
-      : "border-green-500 bg-green-500 text-white hover:bg-green-600";
-  };
-
-  // Format duration for display
-  const formatSelectedDuration = () => {
-    if (!selectedDuration) return "";
-    
-    if (selectedDuration < 60) {
-      return `${selectedDuration} min`;
-    } else {
-      const hours = Math.floor(selectedDuration / 60);
-      const minutes = selectedDuration % 60;
-      
-      if (minutes === 0) {
-        return `${hours} h`;
-      } else {
-        return `${hours} h ${minutes} min`;
-      }
-    }
-  };
-
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button 
-          className={`w-full rounded-full border text-xs h-7 px-2 ${getButtonColor()} justify-between`}
-        >
-          <div className="flex items-center gap-1">
-            <span className="text-xs">{t('duration')}:</span>
-            <span className="text-xs font-medium">{formatSelectedDuration() || "-"}</span>
-          </div>
-          <Clock className="h-3 w-3 ml-1" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-60 p-0 bg-white">
-        <div className="p-2">
-          <h3 className="font-bold mb-1 text-sm">{t('minutes')}</h3>
-          <div className="grid grid-cols-3 gap-1 mb-3">
-            {generateMinutesDurations().map((min) => (
-              <Button 
-                key={`min-${min}`} 
-                className={cn(
-                  "text-xs py-0 h-6",
-                  selectedDuration === min 
-                    ? "bg-orange-500 text-white border-orange-500 hover:bg-orange-600" 
-                    : "bg-white text-black border border-gray-200 hover:bg-gray-100"
-                )}
-                onClick={() => onDurationChange(min)}
-              >
-                {min} min
-              </Button>
-            ))}
-          </div>
-          <h3 className="font-bold mb-1 text-sm">{t('hours')}</h3>
-          <div className="grid grid-cols-5 gap-1">
-            {generateHoursDurations().map((hour) => (
-              <Button 
-                key={`hour-${hour}`} 
-                className={cn(
-                  "text-xs py-0 h-6",
-                  selectedDuration === hour * 60 
-                    ? "bg-green-500 text-white border-green-500 hover:bg-green-600" 
-                    : "bg-white text-black border border-gray-200 hover:bg-gray-100"
-                )}
-                onClick={() => onDurationChange(hour * 60)}
-              >
-                {hour} h
-              </Button>
-            ))}
-          </div>
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <Label className="text-sm font-medium text-gray-700">Durée maximale</Label>
+        <div className="flex items-center gap-1">
+          <span className="text-sm font-medium text-gray-600">{selectedDuration}</span>
+          <span className="text-xs text-gray-600">
+            {timeUnit === 'minutes' ? 'min' : 'h'}
+          </span>
         </div>
-      </PopoverContent>
-    </Popover>
+      </div>
+      
+      <Slider
+        value={[selectedDuration]}
+        min={timeUnit === 'minutes' ? 5 : 1}
+        max={timeUnit === 'minutes' ? 120 : 8}
+        step={timeUnit === 'minutes' ? 5 : 0.5}
+        onValueChange={(values) => onDurationChange(values[0])}
+      />
+      
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>{timeUnit === 'minutes' ? '5 min' : '1 h'}</span>
+        <span>{timeUnit === 'minutes' ? '120 min' : '8 h'}</span>
+      </div>
+    </div>
   );
 };
+
+export default DurationFilter;

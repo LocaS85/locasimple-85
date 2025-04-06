@@ -1,151 +1,57 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger 
-} from '@/components/ui/popover';
-import { 
-  Tabs, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
-import { Navigation } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface DistanceFilterProps {
-  selectedDistance: number | null;
-  distanceUnit: 'km' | 'miles';
-  onDistanceChange: (distance: number) => void;
-  onDistanceUnitChange: (unit: 'km' | 'miles') => void;
+export interface DistanceFilterProps {
+  selectedDistance: number;
+  distanceUnit: 'km' | 'mi';
+  onDistanceChange: (value: number) => void;
+  onDistanceUnitChange: (value: 'km' | 'mi') => void;
 }
 
 export const DistanceFilter: React.FC<DistanceFilterProps> = ({
-  selectedDistance,
-  distanceUnit,
-  onDistanceChange,
-  onDistanceUnitChange
+  selectedDistance = 5,
+  distanceUnit = 'km',
+  onDistanceChange = () => {},
+  onDistanceUnitChange = () => {}
 }) => {
-  const { t } = useLanguage();
-
-  const meterDistances = [100, 200, 300, 400, 500, 600, 700, 800, 900];
-  
-  const generateKilometerDistances = () => {
-    return Array.from({ length: 100 }, (_, i) => i + 1);
-  };
-
-  // Function to get the active color based on distance unit
-  const getUnitColor = (unit: 'km' | 'miles') => {
-    return unit === 'km' ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-purple-500 text-white hover:bg-purple-600';
-  };
-
-  // Format distance for display
-  const formatSelectedDistance = () => {
-    if (!selectedDistance) return "";
-    
-    if (selectedDistance < 1) {
-      // Convert to meters
-      return `${selectedDistance * 1000} m`;
-    } else if (distanceUnit === 'km') {
-      return `${selectedDistance} ${t('km')}`;
-    } else {
-      return `${(selectedDistance * 0.621371).toFixed(1)} ${t('miles')}`;
-    }
-  };
-
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button 
-          className={`w-full rounded-full border text-xs h-7 px-2 ${
-            selectedDistance 
-              ? distanceUnit === 'km' 
-                ? "border-blue-500 bg-blue-500 text-white hover:bg-blue-600" 
-                : "border-purple-500 bg-purple-500 text-white hover:bg-purple-600"
-              : "border-black bg-gray-50 text-black hover:bg-gray-100"
-          } justify-between`}
-        >
-          <div className="flex items-center gap-1">
-            <span className="text-xs">{t('distance')}:</span>
-            <span className="text-xs font-medium">{formatSelectedDistance() || "-"}</span>
-          </div>
-          <div className="flex items-center">
-            <Navigation className="h-3 w-3 mr-1" />
-            <Tabs 
-              value={distanceUnit} 
-              onValueChange={(value) => onDistanceUnitChange(value as 'km' | 'miles')} 
-              className="ml-1"
-            >
-              <TabsList className="h-4 px-0.5 bg-transparent">
-                <TabsTrigger 
-                  value="km" 
-                  className={cn(
-                    "px-1 text-[10px] h-3",
-                    distanceUnit === 'km' ? "bg-blue-500 text-white" : "bg-transparent text-gray-600"
-                  )}
-                >
-                  {t('km')}
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="miles" 
-                  className={cn(
-                    "px-1 text-[10px] h-3",
-                    distanceUnit === 'miles' ? "bg-purple-500 text-white" : "bg-transparent text-gray-600"
-                  )}
-                >
-                  {t('miles')}
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-60 p-0 bg-white">
-        <div className="p-2">
-          <h3 className="font-bold mb-1 text-sm">Mètres</h3>
-          <div className="grid grid-cols-3 gap-1 mb-3">
-            {meterDistances.map((meter) => (
-              <Button 
-                key={`meter-${meter}`} 
-                variant="outline"
-                className={cn(
-                  "text-xs py-0 h-6",
-                  selectedDistance === meter / 1000 && (
-                    distanceUnit === 'km' 
-                      ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600" 
-                      : "bg-purple-500 text-white border-purple-500 hover:bg-purple-600"
-                  )
-                )}
-                onClick={() => onDistanceChange(meter / 1000)}
-              >
-                {meter} m
-              </Button>
-            ))}
-          </div>
-          <h3 className="font-bold mb-1 text-sm">{distanceUnit === 'km' ? 'Kilomètres' : 'Miles'}</h3>
-          <div className="grid grid-cols-4 gap-1 h-36 overflow-y-auto">
-            {generateKilometerDistances().map((km) => (
-              <Button 
-                key={`km-${km}`} 
-                variant="outline"
-                className={cn(
-                  "text-xs py-0 h-6",
-                  selectedDistance === km && (
-                    distanceUnit === 'km' 
-                      ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600" 
-                      : "bg-purple-500 text-white border-purple-500 hover:bg-purple-600"
-                  )
-                )}
-                onClick={() => onDistanceChange(km)}
-              >
-                {distanceUnit === 'km' ? `${km} ${t('km')}` : `${(km * 0.621371).toFixed(1)} ${t('miles')}`}
-              </Button>
-            ))}
-          </div>
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <Label className="text-sm font-medium text-gray-700">Distance maximale</Label>
+        <div className="flex items-center gap-1">
+          <span className="text-sm font-medium text-gray-600">{selectedDistance}</span>
+          <Select 
+            value={distanceUnit} 
+            onValueChange={(value: 'km' | 'mi') => onDistanceUnitChange(value)}
+          >
+            <SelectTrigger className="h-6 w-14 text-xs border-none">
+              <SelectValue placeholder={distanceUnit} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="km">km</SelectItem>
+              <SelectItem value="mi">mi</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </PopoverContent>
-    </Popover>
+      </div>
+      
+      <Slider
+        value={[selectedDistance]}
+        min={1}
+        max={50}
+        step={1}
+        onValueChange={(values) => onDistanceChange(values[0])}
+      />
+      
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>1 {distanceUnit}</span>
+        <span>50 {distanceUnit}</span>
+      </div>
+    </div>
   );
 };
+
+export default DistanceFilter;

@@ -144,7 +144,6 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
       {isApiKeyValid(MAPBOX_TOKEN) && mapInitialized && (
         <>
           <CategoryScroller 
-            categories={CATEGORIES} 
             selectedCategory={selectedCategory}
             onCategorySelect={handleCategorySelect}
           />
@@ -152,11 +151,13 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
           <MapMarkers
             map={mapRef.current}
             places={places}
-            selectedPlaceId={selectedPlaceId}
+            center={userLocation || [viewport.longitude, viewport.latitude]}
+            selectedPlaceId={selectedPlaceId || null}
             popupInfo={popupInfo}
             setPopupInfo={setPopupInfo}
             handleMarkerClick={handleResultClick}
             userLocation={isLocationActive ? userLocation : undefined}
+            transportMode={transportMode}
           />
           
           {showRoutes && userLocation && (
@@ -169,6 +170,11 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
           )}
           
           <MapControls
+            mapStyle="streets"
+            onStyleChange={(style) => console.log(`Map style changed to: ${style}`)}
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+            map={mapRef.current}
             isLocationActive={isLocationActive}
             handleLocationClick={handleLocationClick}
             loading={loading}

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Car, Walking, Bike, Train } from 'lucide-react';
+import { Car, PersonStanding, Bike, Train } from 'lucide-react';
 
 export interface TransportModeFilterProps {
   selectedMode?: string;
@@ -14,7 +14,7 @@ export const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
 }) => {
   const transportModes = [
     { id: 'driving', icon: <Car className="h-4 w-4" />, label: 'Voiture' },
-    { id: 'walking', icon: <Walking className="h-4 w-4" />, label: 'À pied' },
+    { id: 'walking', icon: <PersonStanding className="h-4 w-4" />, label: 'À pied' },
     { id: 'bicycling', icon: <Bike className="h-4 w-4" />, label: 'Vélo' },
     { id: 'transit', icon: <Train className="h-4 w-4" />, label: 'Transport' }
   ];

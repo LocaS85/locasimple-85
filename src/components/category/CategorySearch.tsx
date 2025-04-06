@@ -23,7 +23,6 @@ interface MapLocation {
 const CategorySearch = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { getUserLocation } = useGeolocation();
   
   const [searchParams] = useState(new URLSearchParams(location.search));
   const categoryId = searchParams.get('category') || '';
@@ -39,6 +38,14 @@ const CategorySearch = () => {
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<MapLocation[]>([]);
+
+  // Get geolocation hook with correct typing
+  const { activateGeolocation, isWatching } = useGeolocation({
+    setLoading: setLoading,
+    setIsLocationActive: () => {}, // Placeholder
+    setUserLocation: (location) => setUserLocation(location),
+    onLocationUpdate: (location) => setUserLocation(location)
+  });
   
   // Find the current category and subcategory
   const currentCategory = DAILY_SEARCH_CATEGORIES.find(cat => cat.id === categoryId);
@@ -48,11 +55,13 @@ const CategorySearch = () => {
   useEffect(() => {
     const getLocation = async () => {
       try {
-        const position = await getUserLocation();
-        setUserLocation([position.coords.longitude, position.coords.latitude]);
+        setLoading(true);
+        // Use the proper method from useGeolocation
+        activateGeolocation();
       } catch (error) {
         console.error('Error getting user location:', error);
         toast.error('Impossible d\'obtenir votre position');
+        setLoading(false);
       }
     };
     

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { motion } from 'framer-motion';
 import ResultsList, { Result } from '@/components/ResultsList';
@@ -30,7 +30,7 @@ const SearchPage: React.FC = () => {
     showRoutes,
     selectedCategory,
     showNoMapboxTokenWarning,
-    places,
+    places: rawPlaces,
     handleLocationClick,
     handleCategoryToggle,
     performSearch,
@@ -44,9 +44,45 @@ const SearchPage: React.FC = () => {
   // Use React state hook for menu collapse state
   const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(false);
   
+  // Create state for distance and duration filters with default values
+  const [distanceFilter, setDistanceFilter] = useState({
+    distance: 5,
+    unit: 'km' as 'km' | 'mi'
+  });
+  
+  const [durationFilter, setDurationFilter] = useState({
+    duration: 15,
+    timeUnit: 'minutes' as 'minutes' | 'hours'
+  });
+  
   const handleToggleMenu = () => {
     setIsMenuCollapsed(!isMenuCollapsed);
   };
+
+  const handleDistanceChange = (value: number) => {
+    setDistanceFilter(prev => ({ ...prev, distance: value }));
+  };
+
+  const handleUnitChange = (value: 'km' | 'mi') => {
+    setDistanceFilter(prev => ({ ...prev, unit: value }));
+  };
+
+  const handleDurationChange = (value: number) => {
+    setDurationFilter(prev => ({ ...prev, duration: value }));
+  };
+
+  // Convert the place objects to the Result type expected by the components
+  const places: Result[] = rawPlaces.map(place => ({
+    id: place.id,
+    name: place.name,
+    latitude: place.lat,
+    longitude: place.lon,
+    address: place.address || '',
+    category: place.category || '',
+    distance: place.distance || 0,
+    duration: place.duration || 0,
+    color: place.color || ''
+  }));
 
   return (
     <div className="max-w-screen min-h-screen bg-background">
@@ -91,7 +127,7 @@ const SearchPage: React.FC = () => {
                 
                 <CategoriesFilter 
                   selectedCategory={selectedCategory} 
-                  onCategoryToggle={handleCategoryToggle} 
+                  onCategorySelect={handleCategoryToggle}
                 />
                 
                 <TransportModeFilter
@@ -99,9 +135,17 @@ const SearchPage: React.FC = () => {
                   onModeChange={setTransportMode}
                 />
                 
-                <DistanceFilter />
+                <DistanceFilter
+                  selectedDistance={distanceFilter.distance}
+                  distanceUnit={distanceFilter.unit}
+                  onDistanceChange={handleDistanceChange}
+                  onDistanceUnitChange={handleUnitChange}
+                />
                 
-                <DurationFilter />
+                <DurationFilter
+                  selectedDuration={durationFilter.duration}
+                  onDurationChange={handleDurationChange}
+                />
                 
                 <div className="pt-2 grid grid-cols-2 gap-2">
                   <Button 

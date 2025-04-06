@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
@@ -9,31 +8,46 @@ import useMapBounds from '@/hooks/useMapBounds';
 import { getColorForResult } from '@/utils/mapColors';
 import { getTransportModeColor } from '@/data/transportModes';
 
-interface MapMarkersProps {
+export interface MapMarkersProps {
   map: mapboxgl.Map | null;
-  results: Result[];
+  places?: any[];
+  results?: Result[];
   center: [number, number];
-  transportMode: string;
+  transportMode?: string;
   onMarkersReady?: () => void;
   showRoutes?: boolean;
+  selectedPlaceId?: string;
   selectedResultId?: string;
   onResultClick?: (result: Result) => void;
+  popupInfo?: any;
+  setPopupInfo?: (info: any) => void;
+  handleMarkerClick?: (place: any) => void;
+  userLocation?: [number, number];
 }
 
 const MapMarkers: React.FC<MapMarkersProps> = ({ 
   map, 
-  results, 
+  results = [], 
+  places = [],
   center,
-  transportMode,
+  transportMode = 'driving',
   onMarkersReady,
   showRoutes = false,
   selectedResultId,
-  onResultClick
+  selectedPlaceId,
+  onResultClick,
+  popupInfo,
+  setPopupInfo,
+  handleMarkerClick,
+  userLocation
 }) => {
   const navigate = useNavigate();
   const [mapReady, setMapReady] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [userMarker, setUserMarker] = useState<mapboxgl.Marker | null>(null);
+
+  // Use results if provided, otherwise use places
+  const itemsToDisplay = results.length > 0 ? results : places;
 
   // Vérifier quand la carte est prête à recevoir des marqueurs
   useEffect(() => {

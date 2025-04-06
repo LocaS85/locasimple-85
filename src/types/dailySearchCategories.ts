@@ -81,7 +81,7 @@ export const DAILY_SEARCH_CATEGORIES: CategoryType[] = [
       {
         id: 'banques',
         name: 'Banques',
-        icon: React.createElement(Building), // Changed from Bank to Building which exists in lucide-react
+        icon: React.createElement(Building),
         apiKey: 'banks'
       },
       {

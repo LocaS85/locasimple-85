@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Layers, Map as MapIcon, Plus, Minus, CompassIcon, Filter, Navigation } from 'lucide-react';
@@ -8,26 +7,34 @@ import { cn } from '@/lib/utils';
 import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
 import mapboxgl from 'mapbox-gl';
 
-interface MapControlsProps {
-  mapStyle: string;
-  onStyleChange: (style: string) => void;
-  selectedCategory: string | null;
-  onCategorySelect: (categoryId: string | null) => void;
-  map: mapboxgl.Map | null;
-  minimal?: boolean; // Add minimal as an optional prop
+export interface MapControlsProps {
+  mapStyle?: string;
+  onStyleChange?: (style: string) => void;
+  selectedCategory?: string | null;
+  onCategorySelect?: (categoryId: string | null) => void;
+  map?: mapboxgl.Map | null;
+  minimal?: boolean; 
   onTransportModeClick?: () => void;
   onFiltersClick?: () => void;
+  isLocationActive?: boolean;
+  handleLocationClick?: () => void;
+  loading?: boolean;
+  resultsCount?: number;
 }
 
 const MapControls: React.FC<MapControlsProps> = ({
-  mapStyle,
-  onStyleChange,
-  selectedCategory,
-  onCategorySelect,
-  map,
-  minimal = false, // Default to false
-  onTransportModeClick,
-  onFiltersClick
+  mapStyle = 'streets',
+  onStyleChange = () => {},
+  selectedCategory = null,
+  onCategorySelect = () => {},
+  map = null,
+  minimal = false,
+  onTransportModeClick = () => {},
+  onFiltersClick = () => {},
+  isLocationActive = false,
+  handleLocationClick = () => {},
+  loading = false,
+  resultsCount = 0
 }) => {
   // Function to handle zoom in
   const handleZoomIn = () => {
@@ -111,11 +118,18 @@ const MapControls: React.FC<MapControlsProps> = ({
           variant="outline"
           size="icon"
           className="map-ctrl-btn"
-          onClick={handleFindMyLocation}
+          onClick={isLocationActive ? handleLocationClick : handleFindMyLocation}
         >
           <Navigation className="h-4 w-4" />
         </Button>
       </div>
+      
+      {/* Show count of results */}
+      {resultsCount > 0 && (
+        <div className="mt-2 bg-white px-2 py-1 rounded text-xs text-center">
+          {resultsCount} résultats
+        </div>
+      )}
       
       {/* Gap between control groups */}
       <div className="h-4"></div>
