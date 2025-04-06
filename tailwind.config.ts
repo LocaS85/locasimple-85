@@ -20,8 +20,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'SF Pro Text', 'Manrope', 'sans-serif'],
+        sans: ['Work Sans', 'Inter', 'SF Pro Text', 'Manrope', 'sans-serif'],
         heading: ['Inter', 'SF Pro Display', 'Manrope', 'sans-serif'],
+        worksans: ['Work Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -30,20 +31,44 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // New color palette
-        offwhite: "#F9F9F9",
-        velvetgray: "#EAEAEA",
-        slateblue: "#273647",
-        sagegreen: "#A9B7AC",
-        copper: "#C7956D",
-        electricblue: "#5B9CF6",
+        // Updated color palette from Figma
+        slateblue: {
+          DEFAULT: "#273647",  // Bleu ardoise profond
+          light: "#3A4D61",
+          dark: "#1A2430"
+        },
+        sagegreen: {
+          DEFAULT: "#A9B7AC",  // Vert sauge doux
+          light: "#C5D0C8",
+          dark: "#8A9690"
+        },
+        copper: {
+          DEFAULT: "#C7956D",  // Cuivré doux
+          light: "#D8B292",
+          dark: "#A77A55"
+        },
+        electricblue: {
+          DEFAULT: "#5B9CF6",  // Bleu électrique léger
+          light: "#83B5F8",
+          dark: "#3D7FD8"
+        },
+        offwhite: {
+          DEFAULT: "#F9F9F9",  // Blanc cassé
+          light: "#FFFFFF",
+          dark: "#F0F0F0"
+        },
+        velvetgray: {
+          DEFAULT: "#EAEAEA",  // Gris velours
+          light: "#F5F5F5",
+          dark: "#D0D0D0"
+        },
         
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "#273647",  // slateblue
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "#C7956D",  // copper
           foreground: "hsl(var(--secondary-foreground))",
         },
         success: {
@@ -51,15 +76,15 @@ export default {
           foreground: "hsl(var(--success-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
+          DEFAULT: "#A9B7AC",  // sagegreen
           foreground: "hsl(var(--accent-foreground))",
         },
         highlight: {
-          DEFAULT: "hsl(var(--highlight))",
+          DEFAULT: "#5B9CF6",  // electricblue 
           foreground: "hsl(var(--highlight-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
+          DEFAULT: "#EAEAEA",  // velvetgray
           foreground: "hsl(var(--muted-foreground))",
         },
         popover: {
@@ -78,6 +103,8 @@ export default {
           dark: "#1a1a2e",
           primary: "#273647",    // Slate blue
           secondary: "#C7956D",  // Copper
+          accent: "#A9B7AC",     // Sage green  
+          highlight: "#5B9CF6",  // Electric blue
           light: "#F9F9F9",      // Off-white
           gray: "#EAEAEA",       // Velvet gray
         },
@@ -103,13 +130,17 @@ export default {
         "float": {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-5px)" }
+        },
+        "shimmer": {
+          "100%": { transform: "translateX(100%)" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.3s ease-out",
-        "float": "float 3s ease-in-out infinite"
+        "float": "float 3s ease-in-out infinite",
+        "shimmer": "shimmer 2s infinite"
       },
       boxShadow: {
         "neu-light": "5px 5px 10px rgba(0, 0, 0, 0.03), -5px -5px 10px rgba(255, 255, 255, 0.8)",
