@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { motion } from 'framer-motion';
@@ -41,10 +40,8 @@ const SearchPage: React.FC = () => {
     setTemporaryApiKey
   } = useSearchPageStateManager();
 
-  // Use React state hook for menu collapse state
   const [isMenuCollapsed, setIsMenuCollapsed] = React.useState(false);
   
-  // Create state for distance and duration filters with default values
   const [distanceFilter, setDistanceFilter] = useState({
     distance: 5,
     unit: 'km' as 'km' | 'mi'
@@ -71,7 +68,6 @@ const SearchPage: React.FC = () => {
     setDurationFilter(prev => ({ ...prev, duration: value }));
   };
 
-  // Convert the place objects to the Result type expected by the components
   const places: Result[] = rawPlaces.map(place => ({
     id: place.id,
     name: place.name,
@@ -99,7 +95,6 @@ const SearchPage: React.FC = () => {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Left sidebar with filters */}
           <motion.div 
             className={`bg-white rounded-lg shadow-md p-4 ${isMenuCollapsed ? 'md:col-span-1' : 'md:col-span-1'}`}
             initial={{ opacity: 0, y: 20 }}
@@ -168,7 +163,6 @@ const SearchPage: React.FC = () => {
             )}
           </motion.div>
           
-          {/* Main content area */}
           <motion.div 
             className="md:col-span-2"
             initial={{ opacity: 0 }}

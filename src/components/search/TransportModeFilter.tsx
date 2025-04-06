@@ -42,3 +42,5 @@ export const TransportModeFilter: React.FC<TransportModeFilterProps> = ({
     </div>
   );
 };
+
+export default TransportModeFilter;

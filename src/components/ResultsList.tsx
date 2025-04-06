@@ -15,7 +15,7 @@ export interface Result {
   durationInSeconds?: number;
   rating?: number;
   openingHours?: string;
-  color?: string;
+  color?: string;  // Add color property to the interface
   phoneNumber?: string;
   website?: string;
   isFavorite?: boolean;
@@ -30,13 +30,24 @@ interface ResultsListProps {
   selectedDuration?: number;
   selectedDistance?: number;
   transportMode?: string;
+  loading?: boolean;  // Add loading property to the interface
+  userLocation?: [number, number];  // Add userLocation property
 }
 
 export const ResultsList: React.FC<ResultsListProps> = ({
   results,
   onResultClick,
-  selectedResultId
+  selectedResultId,
+  loading = false  // Default value for loading
 }) => {
+  if (loading) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        Chargement des résultats...
+      </div>
+    );
+  }
+
   if (results.length === 0) {
     return (
       <div className="p-4 text-center text-gray-500">
