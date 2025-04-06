@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { MapPin, Home, User } from 'lucide-react';
+import { SearchFilters } from '@/types/dailySearchCategories';
 
 // Fix Leaflet marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -25,11 +26,13 @@ interface MapLocation {
 }
 
 interface EnhancedMapComponentProps {
-  selectedLocations: MapLocation[];
-  userLocation: [number, number];
-  transportMode: string;
-  searchRadius: number;
+  selectedLocations?: MapLocation[];
+  userLocation?: [number, number];
+  transportMode?: string;
+  searchRadius?: number;
   center?: [number, number];
+  filters?: SearchFilters;
+  selectedCategory?: string | null;
 }
 
 // Helper component to adjust the map view
@@ -42,14 +45,20 @@ const MapViewUpdater = ({ center }: { center: [number, number] }) => {
 };
 
 const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
-  selectedLocations,
-  userLocation,
-  transportMode,
-  searchRadius,
+  selectedLocations = [],
+  userLocation = [2.3522, 48.8566], // Default to Paris
+  transportMode = 'driving',
+  searchRadius = 5,
   center,
+  filters,
+  selectedCategory
 }) => {
   // Default to user location if no center is provided
   const mapCenter = center || userLocation;
+  
+  // If filters are provided, use them
+  const radius = filters?.radius || searchRadius;
+  const transport = filters?.transport || transportMode;
   
   // Mapbox tile layer URL with token
   const mapboxTileUrl = MAPBOX_TOKEN 
@@ -86,7 +95,7 @@ const EnhancedMapComponent: React.FC<EnhancedMapComponentProps> = ({
       {/* Search radius circle */}
       <Circle
         center={userLocation}
-        radius={searchRadius * 1000} // Convert km to meters
+        radius={radius * 1000} // Convert km to meters
         pathOptions={{
           fillColor: '#1e90ff',
           fillOpacity: 0.1,

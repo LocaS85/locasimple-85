@@ -1,21 +1,17 @@
 
-import React, { useRef, useEffect, useState } from 'react';
-import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl';
+import React, { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MAPBOX_TOKEN, isApiKeyValid } from '@/config/environment';
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import * as mapboxgl from 'mapbox-gl';
-import { toast } from 'sonner';
+import { isApiKeyValid, MAPBOX_TOKEN } from '@/config/environment';
+import { Category } from '@/types/categories';
+import { CATEGORIES } from '@/types/categories';
+import MapMarkers from './MapMarkers';
+import CategoryScroller from './CategoryScroller';
+import RouteLayer from './RouteLayer';
+import MapControls from './MapControls';
+import MultiRouteDisplay from './MultiRouteDisplay';
 
-interface Place {
-  id: string;
-  name: string;
-  lat: number;
-  lon: number;
-  address?: string;
-  category?: string;
-}
+// Don't set token globally here - we'll set it in the component
 
 interface MapDisplayProps {
   viewport: {
@@ -24,223 +20,163 @@ interface MapDisplayProps {
     zoom: number;
   };
   setViewport: (viewport: any) => void;
-  places: Place[];
-  resultsCount: number;
-  selectedPlaceId: string | null;
-  popupInfo: Place | null;
-  setPopupInfo: (place: Place | null) => void;
-  handleResultClick: (place: Place) => void;
-  isLocationActive: boolean;
+  places: any[];
+  resultsCount?: number;
+  selectedPlaceId?: string | null;
+  popupInfo?: any;
+  setPopupInfo: (info: any) => void;
+  handleResultClick?: (result: any) => void;
+  isLocationActive?: boolean;
   userLocation?: [number, number];
-  loading: boolean;
-  handleLocationClick: () => void;
-  transportMode: string;
-  setMap?: (map: mapboxgl.Map) => void;
-  mapboxToken?: string;
+  loading?: boolean;
+  handleLocationClick?: () => void;
+  transportMode?: string;
+  showRoutes?: boolean;
+  setMap?: (map: mapboxgl.Map | null) => void;
+  customStyle?: string;
 }
 
 const MapDisplay: React.FC<MapDisplayProps> = ({
   viewport,
   setViewport,
-  places,
-  resultsCount,
-  selectedPlaceId,
+  places = [],
+  resultsCount = 0,
+  selectedPlaceId = null,
   popupInfo,
   setPopupInfo,
   handleResultClick,
-  isLocationActive,
+  isLocationActive = false,
   userLocation,
-  loading,
-  handleLocationClick,
-  transportMode,
+  loading = false,
+  handleLocationClick = () => {},
+  transportMode = 'driving',
+  showRoutes = false,
   setMap,
-  mapboxToken = MAPBOX_TOKEN
+  customStyle
 }) => {
-  const mapRef = useRef<any>(null);
-  const geocoderContainerRef = useRef<HTMLDivElement>(null);
-  const [tokenAvailable, setTokenAvailable] = useState<boolean>(isApiKeyValid(mapboxToken));
-
-  // Verify token and set it if it's valid
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
   useEffect(() => {
-    try {
-      if (isApiKeyValid(mapboxToken) && mapboxgl.accessToken !== mapboxToken) {
-        mapboxgl.accessToken = mapboxToken;
-        setTokenAvailable(true);
-        console.log('Mapbox token is valid and set');
-      } else if (!isApiKeyValid(mapboxToken)) {
-        setTokenAvailable(false);
-        console.warn('Invalid Mapbox token');
-      }
-    } catch (error) {
-      console.error('Error setting Mapbox token:', error);
-      setTokenAvailable(false);
-    }
-  }, [mapboxToken]);
-
-  useEffect(() => {
-    if (!mapRef.current || !geocoderContainerRef.current || !tokenAvailable || !mapboxToken) {
-      return;
-    }
+    // Check if map is already initialized or container isn't ready
+    if (mapInitialized || !mapContainerRef.current) return;
     
-    try {
-      // Clean up any existing geocoder
-      if (geocoderContainerRef.current.firstChild) {
-        geocoderContainerRef.current.removeChild(geocoderContainerRef.current.firstChild);
-      }
+    // Set token correctly
+    if (isApiKeyValid(MAPBOX_TOKEN)) {
+      // Set mapbox token - use the correct property
+      mapboxgl.accessToken = MAPBOX_TOKEN;
       
-      // Create the geocoder control
-      const geocoder = new MapboxGeocoder({
-        accessToken: mapboxToken,
-        mapboxgl: mapboxgl as any,
-        placeholder: 'Rechercher un lieu, une entreprise...',
-        countries: 'fr', // Filtre sur la France
-        types: 'poi,place,address', // Recherche d'adresses et de points d'intérêt
-        marker: false, // Désactiver le marqueur automatique
-        language: 'fr'
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: customStyle || 'mapbox://styles/mapbox/streets-v11',
+        center: [viewport.longitude, viewport.latitude],
+        zoom: viewport.zoom
       });
-
-      // Add geocoder to the container
-      geocoderContainerRef.current.appendChild(geocoder.onAdd(mapRef.current.getMap()));
       
-      // Handle geocoder results
-      geocoder.on('result', (e: any) => {
-        const result = e.result;
-        // Set viewport to the selected location
+      map.on('load', () => {
+        setMapInitialized(true);
+        if (setMap) setMap(map);
+      });
+      
+      map.on('move', () => {
+        const center = map.getCenter();
         setViewport({
-          latitude: result.center[1],
-          longitude: result.center[0],
-          zoom: 14
+          latitude: center.lat,
+          longitude: center.lng,
+          zoom: map.getZoom()
         });
-        
-        // Create a place object from the result
-        const place: Place = {
-          id: result.id,
-          name: result.text,
-          lat: result.center[1],
-          lon: result.center[0],
-          address: result.place_name
-        };
-        
-        // Handle the selected place
-        handleResultClick(place);
       });
-    } catch (error) {
-      console.error('Error initializing geocoder:', error);
-      toast.error('Erreur lors de l\'initialisation de la recherche');
+      
+      mapRef.current = map;
+      
+      // Add navigation controls
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      
+      // Cleanup on unmount
+      return () => {
+        map.remove();
+        if (setMap) setMap(null);
+      };
+    } else {
+      console.error('Invalid Mapbox token. Map will not initialize.');
     }
-
-    return () => {
-      // Clean up geocoder when component unmounts
-      if (geocoderContainerRef.current?.firstChild) {
-        geocoderContainerRef.current.removeChild(geocoderContainerRef.current.firstChild);
-      }
-    };
-  }, [mapRef.current, tokenAvailable, mapboxToken]);
-
+  }, [viewport.longitude, viewport.latitude, viewport.zoom, mapInitialized, customStyle, setMap]);
+  
+  // Update map when viewport changes
+  useEffect(() => {
+    if (mapRef.current && mapInitialized) {
+      mapRef.current.setCenter([viewport.longitude, viewport.latitude]);
+      mapRef.current.setZoom(viewport.zoom);
+    }
+  }, [viewport.longitude, viewport.latitude, viewport.zoom, mapInitialized]);
+  
+  // Update user location marker when it changes
+  useEffect(() => {
+    if (!mapRef.current || !mapInitialized || !isLocationActive || !userLocation) return;
+    
+    // Add or update user location marker logic here
+  }, [userLocation, isLocationActive, mapInitialized]);
+  
+  // Handle category selection
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+  };
+  
   return (
-    <>
-      {tokenAvailable ? (
-        <div className="relative w-full h-full">
-          <div ref={geocoderContainerRef} className="geocoder-container" />
-          
-          <Map
-            ref={mapRef}
-            {...viewport}
-            style={{ width: "100%", height: "100%" }}
-            mapStyle="mapbox://styles/mapbox/streets-v11"
-            mapboxAccessToken={mapboxToken}
-            onMove={evt => setViewport(evt.viewState)}
-            reuseMaps
-            onLoad={() => {
-              if (setMap && mapRef.current) {
-                setMap(mapRef.current.getMap());
-              }
-            }}
-          >
-            <GeolocateControl position="top-right" />
-            <NavigationControl position="top-right" />
-            
-            {places.slice(0, resultsCount).map((place) => (
-              <Marker 
-                key={place.id} 
-                latitude={place.lat} 
-                longitude={place.lon} 
-                anchor="bottom"
-                onClick={e => {
-                  e.originalEvent.stopPropagation();
-                  handleResultClick(place);
-                }}
-              >
-                <div className={`bg-blue-500 text-white px-2 py-1 rounded-md text-sm shadow-md cursor-pointer ${selectedPlaceId === place.id ? 'ring-2 ring-yellow-400' : ''}`}>
-                  {place.name}
-                </div>
-              </Marker>
-            ))}
-            
-            {popupInfo && (
-              <Popup
-                latitude={popupInfo.lat}
-                longitude={popupInfo.lon}
-                anchor="bottom"
-                onClose={() => setPopupInfo(null)}
-                closeButton={true}
-                closeOnClick={false}
-                className="z-20"
-              >
-                <div className="p-2">
-                  <h3 className="font-bold">{popupInfo.name}</h3>
-                  {popupInfo.address && (
-                    <p className="text-sm text-gray-600">{popupInfo.address}</p>
-                  )}
-                  {popupInfo.category && (
-                    <p className="text-xs text-gray-500 mt-1">Catégorie: {popupInfo.category}</p>
-                  )}
-                  <div className="mt-2 flex space-x-2">
-                    <button 
-                      className="bg-blue-500 text-white text-xs px-3 py-1 rounded"
-                      onClick={() => {
-                        alert(`Itinéraire vers ${popupInfo.name} (${transportMode})`);
-                      }}
-                    >
-                      Itinéraire
-                    </button>
-                    <button 
-                      className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded"
-                      onClick={() => {
-                        alert(`Partage de ${popupInfo.name}`);
-                      }}
-                    >
-                      Partager
-                    </button>
-                  </div>
-                </div>
-              </Popup>
-            )}
-            
-            {/* User location marker */}
-            {isLocationActive && userLocation && (
-              <Marker 
-                latitude={userLocation[1]} 
-                longitude={userLocation[0]} 
-                anchor="center"
-              >
-                <div className="relative">
-                  <div className="absolute w-12 h-12 bg-blue-500/20 rounded-full animate-ping" />
-                  <div className="relative bg-blue-500 border-2 border-white w-6 h-6 rounded-full" />
-                </div>
-              </Marker>
-            )}
-          </Map>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-full bg-gray-100">
-          <p className="text-red-500 mb-2">Token Mapbox manquant ou invalide</p>
-          <p className="text-sm text-gray-600 max-w-md text-center px-4">
-            Pour utiliser la carte, ajoutez une clé API Mapbox valide dans votre fichier .env avec la variable VITE_MAPBOX_TOKEN
-          </p>
+    <div className="relative w-full h-full">
+      <div 
+        ref={mapContainerRef} 
+        className="absolute inset-0 map-container"
+        data-testid="map-container"
+      />
+      
+      {!isApiKeyValid(MAPBOX_TOKEN) && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80 z-50">
+          <div className="bg-white p-4 rounded-md shadow-lg max-w-md text-center">
+            <p className="text-red-500 font-semibold">Mapbox token is missing or invalid</p>
+            <p className="mt-2 text-sm">Please add a valid Mapbox token in your environment variables.</p>
+          </div>
         </div>
       )}
-    </>
+      
+      {isApiKeyValid(MAPBOX_TOKEN) && mapInitialized && (
+        <>
+          <CategoryScroller 
+            categories={CATEGORIES} 
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+          />
+          
+          <MapMarkers
+            map={mapRef.current}
+            places={places}
+            selectedPlaceId={selectedPlaceId}
+            popupInfo={popupInfo}
+            setPopupInfo={setPopupInfo}
+            handleMarkerClick={handleResultClick}
+            userLocation={isLocationActive ? userLocation : undefined}
+          />
+          
+          {showRoutes && userLocation && (
+            <MultiRouteDisplay
+              map={mapRef.current}
+              userLocation={userLocation}
+              destinations={places}
+              transportMode={transportMode}
+            />
+          )}
+          
+          <MapControls
+            isLocationActive={isLocationActive}
+            handleLocationClick={handleLocationClick}
+            loading={loading}
+            resultsCount={resultsCount}
+          />
+        </>
+      )}
+    </div>
   );
 };
 
