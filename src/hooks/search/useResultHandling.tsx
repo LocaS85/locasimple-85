@@ -1,51 +1,83 @@
 
-import { useState, useCallback } from 'react';
-import type { Result } from '@/components/ResultsList';
+import { useCallback } from 'react';
+import { Result } from '@/components/ResultsList';
+import { toast } from 'sonner';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+
+interface UseResultHandlingProps {
+  setPopupInfo?: (info: any) => void;
+  setViewport?: (viewport: any) => void;
+  setShowRoutes?: (show: boolean) => void;
+}
 
 export const useResultHandling = (
-  setSelectedPlace: (place: Result | null) => void,
-  setViewport: (viewport: any) => void,
-  setRouteDisplayed: (displayed: boolean) => void
+  setPopupInfo?: (info: any) => void,
+  setViewport?: (viewport: any) => void,
+  setShowRoutes?: (show: boolean) => void
 ) => {
-  const [selectedResult, setSelectedResult] = useState<Result | null>(null);
-  
   const handleResultClick = useCallback((result: Result) => {
-    setSelectedResult(result);
-    setSelectedPlace(result);
-    
-    if (result) {
-      setViewport({
-        latitude: result.latitude,
-        longitude: result.longitude,
-        zoom: 14
+    if (setPopupInfo) {
+      setPopupInfo({
+        id: result.id,
+        name: result.name,
+        lat: result.latitude,
+        lon: result.longitude,
+        address: result.address,
+        category: result.category
       });
     }
     
-    setRouteDisplayed(true);
-  }, [setSelectedPlace, setViewport, setRouteDisplayed]);
-  
-  const clearSelection = useCallback(() => {
-    setSelectedResult(null);
-    setSelectedPlace(null);
-    setRouteDisplayed(false);
-  }, [setSelectedPlace, setRouteDisplayed]);
-  
-  const generatePDF = useCallback(() => {
-    // Implementation would go here in a real app
-    console.log('Generating PDF for', selectedResult);
-  }, [selectedResult]);
+    if (setViewport) {
+      setViewport({
+        latitude: result.latitude,
+        longitude: result.longitude,
+        zoom: 14,
+      });
+    }
+  }, [setPopupInfo, setViewport]);
 
   const toggleRoutes = useCallback(() => {
-    // Fix: Pass boolean directly instead of a function
-    setRouteDisplayed(!selectedResult ? false : true);
-  }, [selectedResult, setRouteDisplayed]);
-  
+    if (setShowRoutes) {
+      setShowRoutes(prev => !prev);
+    }
+  }, [setShowRoutes]);
+
+  const generatePDF = useCallback(async () => {
+    try {
+      const mapElement = document.querySelector('.mapboxgl-map');
+      if (!mapElement) {
+        toast.error('La carte n\'a pas pu être capturée');
+        return;
+      }
+      
+      toast.info('Création du PDF en cours...');
+      
+      const canvas = await html2canvas(mapElement as HTMLElement, { 
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      const pdf = new jsPDF('l', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
+      const imgWidth = 280;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      pdf.save('carte.pdf');
+      
+      toast.success('PDF créé avec succès');
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+      toast.error('Erreur lors de la génération du PDF');
+    }
+  }, []);
+
   return {
-    selectedResult,
     handleResultClick,
-    clearSelection,
-    generatePDF,
-    toggleRoutes
+    toggleRoutes,
+    generatePDF
   };
 };
 

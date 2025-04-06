@@ -78,8 +78,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const handleMarkerClick = (place: any) => {
     setPopupInfo(place);
     if (onResultClick) {
-      // Convert place to Result format if needed
-      const resultPlace = {
+      // Ensure we convert place to match the Result type expected by onResultClick
+      const resultPlace: Result = {
         id: place.id,
         name: place.name,
         latitude: place.lat,
@@ -89,7 +89,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         distance: place.distance || 0,
         duration: place.duration || 0
       };
-      onResultClick(resultPlace as Result);
+      onResultClick(resultPlace);
     }
   };
 

@@ -1,26 +1,25 @@
 
 import { useMemo } from 'react';
-import type { Result } from '@/components/ResultsList';
+import { Result } from '@/components/ResultsList';
 
-export const useResultMapping = (searchResults: any[]) => {
-  // Transform search results to places
-  const places: Result[] = useMemo(() => {
-    return searchResults.map((result: any, index: number) => ({
-      id: result.id || `place-${index}`,
-      name: result.name,
-      latitude: result.lat,
-      longitude: result.lon,
-      distance: result.distance,
-      duration: result.duration,
-      address: result.place_name || '',
+/**
+ * Hook pour convertir les résultats de recherche en format utilisable par les marqueurs de carte
+ */
+export const useResultMapping = (searchResults: Result[]) => {
+  const places = useMemo(() => {
+    return searchResults.map(result => ({
+      id: result.id,
+      name: result.name || 'Sans nom',
+      lat: result.latitude,
+      lon: result.longitude,
+      address: result.address || '',
       category: result.category || '',
-      color: index % 2 === 0 ? '#0EA5E9' : '#8B5CF6' // Alternate colors
+      distance: result.distance,
+      duration: result.duration
     }));
   }, [searchResults]);
 
-  return {
-    places
-  };
+  return { places };
 };
 
 export default useResultMapping;

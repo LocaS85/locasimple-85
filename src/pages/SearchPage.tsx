@@ -9,7 +9,6 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
-import { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const location = useLocation();
@@ -56,8 +55,8 @@ const SearchPage = () => {
     performSearch(query);
   };
 
-  // Updated to use the imported Result interface
-  const handleResultSelect = (result: { place_name: string }) => {
+  // Make sure we use a compatible type for result
+  const handleResultSelect = (result: any) => {
     setSearchQuery(result.place_name);
     performSearch(result.place_name);
   };
@@ -88,18 +87,23 @@ const SearchPage = () => {
         <MapSection 
           results={places}
           center={userLocation}
+          radius={5}
+          radiusUnit="km"
+          radiusType="distance"
+          duration={15}
+          timeUnit="minutes"
           transportMode={transportMode}
+          isRecording={false}
+          onMicClick={() => {}}
+          onLocationClick={handleLocationClick}
           isLocationActive={isLocationActive}
           loading={loading}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          isRecording={false}
-          onMicClick={() => {}}
-          onLocationClick={handleLocationClick}
           showRoutes={showRoutes}
           onSearch={() => performSearch(searchQuery)}
           selectedResultId={selectedPlaceId}
-          onResultClick={handleResultClick as (result: any) => void} // Type assertion to fix the error
+          onResultClick={handleResultClick}
           selectedCategory={selectedCategory}
           onCategorySelect={clearFilters}
           searchHistory={[]}
@@ -110,11 +114,6 @@ const SearchPage = () => {
           resetSearch={resetSearch}
           onTransportModeChange={setTransportMode}
           userLocation={userLocation}
-          radius={5}
-          radiusUnit="km"
-          radiusType="distance"
-          duration={15}
-          timeUnit="minutes"
         />
         
         <ResultsPopup 
