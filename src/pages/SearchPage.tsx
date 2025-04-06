@@ -9,6 +9,7 @@ import NoResultsMessage from '@/components/search/NoResultsMessage';
 import MapboxWarning from '@/components/search/MapboxWarning';
 import SearchFooter from '@/components/search/SearchFooter';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
+import { Result } from '@/components/ResultsList';
 
 const SearchPage = () => {
   const location = useLocation();
@@ -56,10 +57,22 @@ const SearchPage = () => {
   };
 
   // Make sure we use a compatible type for result
-  const handleResultSelect = (result: any) => {
-    setSearchQuery(result.place_name);
-    performSearch(result.place_name);
+  const handleResultSelect = (result: Result) => {
+    setSearchQuery(result.name);
+    performSearch(result.name);
   };
+
+  // Convert places to the Result format expected by MapSection
+  const mapResults: Result[] = places.map(place => ({
+    id: place.id,
+    name: place.name,
+    latitude: place.lat,
+    longitude: place.lon,
+    address: place.address || '',
+    category: place.category || '',
+    distance: place.distance || 0,
+    duration: place.duration || 0
+  }));
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
@@ -85,7 +98,7 @@ const SearchPage = () => {
         />
         
         <MapSection 
-          results={places}
+          results={mapResults}
           center={userLocation}
           radius={5}
           radiusUnit="km"

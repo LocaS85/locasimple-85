@@ -39,7 +39,8 @@ export const useResultHandling = (
 
   const toggleRoutes = useCallback(() => {
     if (setShowRoutes) {
-      setShowRoutes(prev => !prev);
+      // Fix: Pass a boolean value directly instead of a function
+      setShowRoutes(true);
     }
   }, [setShowRoutes]);
 
@@ -74,10 +75,20 @@ export const useResultHandling = (
     }
   }, []);
 
+  // Add selected result and clear selection functions to match expected interface
+  const selectedResult = null;
+  const clearSelection = useCallback(() => {
+    if (setPopupInfo) {
+      setPopupInfo(null);
+    }
+  }, [setPopupInfo]);
+
   return {
     handleResultClick,
     toggleRoutes,
-    generatePDF
+    generatePDF,
+    selectedResult,
+    clearSelection
   };
 };
 

@@ -46,13 +46,27 @@ export const useSearchPageStateManager = () => {
   
   // Result handling operations - Fixed to match the expected parameters
   const resultHandling = useResultHandling(
-    searchState.setPopupInfo || (() => {}), // Provide a default function if setPopupInfo is undefined
+    searchState.setPopupInfo,
     searchState.setViewport,
     searchState.setShowRoutes
   );
   
   // Initialization
   useInitialization(handleLocationClick, searchState.setShowNoMapboxTokenWarning);
+
+  // Set temporary API key (for manual entry)
+  const setTemporaryApiKey = useCallback((key: string) => {
+    // We could store this in localStorage but it would be better to 
+    // encourage proper configuration via environment variables
+    try {
+      // This won't persist across page reloads, but it will work for the current session
+      (window as any).TEMPORARY_MAPBOX_TOKEN = key;
+      return true;
+    } catch (error) {
+      console.error('Error setting temporary API key:', error);
+      return false;
+    }
+  }, []);
 
   return {
     // Basic state
@@ -82,7 +96,8 @@ export const useSearchPageStateManager = () => {
     handleResultClick: resultHandling.handleResultClick,
     generatePDF: resultHandling.generatePDF,
     toggleRoutes: resultHandling.toggleRoutes,
-    resetSearch
+    resetSearch,
+    setTemporaryApiKey
   };
 };
 

@@ -78,7 +78,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
   const handleMarkerClick = (place: any) => {
     setPopupInfo(place);
     if (onResultClick) {
-      // Ensure we convert place to match the Result type expected by onResultClick
+      // Convert place to Result type for consistency
       const resultPlace: Result = {
         id: place.id,
         name: place.name,
@@ -100,19 +100,24 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }
   }, [map, onMapInitialized]);
 
+  // Map Result type to the format expected by MapDisplay
+  const placesForMapDisplay = results.map(result => ({
+    id: result.id,
+    name: result.name,
+    lat: result.latitude,
+    lon: result.longitude,
+    address: result.address,
+    category: result.category,
+    distance: result.distance,
+    duration: result.duration
+  }));
+
   return (
     <div className="relative w-full h-full">
       <MapDisplay 
         viewport={viewport}
         setViewport={setViewport}
-        places={results.map(r => ({
-          id: r.id,
-          name: r.name,
-          lat: r.latitude,
-          lon: r.longitude,
-          address: r.address,
-          category: r.category
-        }))}
+        places={placesForMapDisplay}
         resultsCount={results.length}
         selectedPlaceId={selectedResultId || null}
         popupInfo={popupInfo}

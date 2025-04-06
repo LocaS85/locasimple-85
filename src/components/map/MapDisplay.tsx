@@ -1,11 +1,12 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import { MAPBOX_TOKEN, isApiKeyValid } from '@/config/environment';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import * as mapboxgl from 'mapbox-gl';
+import { toast } from 'sonner';
 
 interface Place {
   id: string;
@@ -57,51 +58,76 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
 }) => {
   const mapRef = useRef<any>(null);
   const geocoderContainerRef = useRef<HTMLDivElement>(null);
+  const [tokenAvailable, setTokenAvailable] = useState<boolean>(isApiKeyValid(mapboxToken));
+
+  // Verify token and set it if it's valid
+  useEffect(() => {
+    try {
+      if (isApiKeyValid(mapboxToken) && mapboxgl.accessToken !== mapboxToken) {
+        mapboxgl.accessToken = mapboxToken;
+        setTokenAvailable(true);
+        console.log('Mapbox token is valid and set');
+      } else if (!isApiKeyValid(mapboxToken)) {
+        setTokenAvailable(false);
+        console.warn('Invalid Mapbox token');
+      }
+    } catch (error) {
+      console.error('Error setting Mapbox token:', error);
+      setTokenAvailable(false);
+    }
+  }, [mapboxToken]);
 
   useEffect(() => {
-    if (!mapRef.current || !geocoderContainerRef.current || !mapboxToken) return;
-    
-    // Clean up any existing geocoder
-    if (geocoderContainerRef.current.firstChild) {
-      geocoderContainerRef.current.removeChild(geocoderContainerRef.current.firstChild);
+    if (!mapRef.current || !geocoderContainerRef.current || !tokenAvailable || !mapboxToken) {
+      return;
     }
     
-    // Create the geocoder control
-    const geocoder = new MapboxGeocoder({
-      accessToken: mapboxToken,
-      mapboxgl: mapboxgl as any,
-      placeholder: 'Rechercher un lieu, une entreprise...',
-      countries: 'fr', // Filtre sur la France
-      types: 'poi,place,address', // Recherche d'adresses et de points d'intérêt
-      marker: false, // Désactiver le marqueur automatique
-      language: 'fr'
-    });
-
-    // Add geocoder to the container
-    geocoderContainerRef.current.appendChild(geocoder.onAdd(mapRef.current.getMap()));
-    
-    // Handle geocoder results
-    geocoder.on('result', (e: any) => {
-      const result = e.result;
-      // Set viewport to the selected location
-      setViewport({
-        latitude: result.center[1],
-        longitude: result.center[0],
-        zoom: 14
+    try {
+      // Clean up any existing geocoder
+      if (geocoderContainerRef.current.firstChild) {
+        geocoderContainerRef.current.removeChild(geocoderContainerRef.current.firstChild);
+      }
+      
+      // Create the geocoder control
+      const geocoder = new MapboxGeocoder({
+        accessToken: mapboxToken,
+        mapboxgl: mapboxgl as any,
+        placeholder: 'Rechercher un lieu, une entreprise...',
+        countries: 'fr', // Filtre sur la France
+        types: 'poi,place,address', // Recherche d'adresses et de points d'intérêt
+        marker: false, // Désactiver le marqueur automatique
+        language: 'fr'
       });
+
+      // Add geocoder to the container
+      geocoderContainerRef.current.appendChild(geocoder.onAdd(mapRef.current.getMap()));
       
-      // Create a place object from the result
-      const place: Place = {
-        id: result.id,
-        name: result.text,
-        lat: result.center[1],
-        lon: result.center[0],
-        address: result.place_name
-      };
-      
-      // Handle the selected place
-      handleResultClick(place);
-    });
+      // Handle geocoder results
+      geocoder.on('result', (e: any) => {
+        const result = e.result;
+        // Set viewport to the selected location
+        setViewport({
+          latitude: result.center[1],
+          longitude: result.center[0],
+          zoom: 14
+        });
+        
+        // Create a place object from the result
+        const place: Place = {
+          id: result.id,
+          name: result.text,
+          lat: result.center[1],
+          lon: result.center[0],
+          address: result.place_name
+        };
+        
+        // Handle the selected place
+        handleResultClick(place);
+      });
+    } catch (error) {
+      console.error('Error initializing geocoder:', error);
+      toast.error('Erreur lors de l\'initialisation de la recherche');
+    }
 
     return () => {
       // Clean up geocoder when component unmounts
@@ -109,11 +135,11 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
         geocoderContainerRef.current.removeChild(geocoderContainerRef.current.firstChild);
       }
     };
-  }, [mapRef.current, mapboxToken]);
+  }, [mapRef.current, tokenAvailable, mapboxToken]);
 
   return (
     <>
-      {mapboxToken ? (
+      {tokenAvailable ? (
         <div className="relative w-full h-full">
           <div ref={geocoderContainerRef} className="geocoder-container" />
           
@@ -207,8 +233,11 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
           </Map>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-full bg-gray-100">
-          <p className="text-red-500">Token Mapbox manquant</p>
+        <div className="flex flex-col items-center justify-center h-full bg-gray-100">
+          <p className="text-red-500 mb-2">Token Mapbox manquant ou invalide</p>
+          <p className="text-sm text-gray-600 max-w-md text-center px-4">
+            Pour utiliser la carte, ajoutez une clé API Mapbox valide dans votre fichier .env avec la variable VITE_MAPBOX_TOKEN
+          </p>
         </div>
       )}
     </>

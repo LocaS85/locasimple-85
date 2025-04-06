@@ -30,6 +30,9 @@ export const useSearchPageState = () => {
   });
   const [routeDisplayed, setRouteDisplayed] = useState(false);
   const [resultsCount, setResultsCount] = useState(5);
+  const [popupInfo, setPopupInfo] = useState(null);
+  const [showRoutes, setShowRoutes] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string | undefined>(undefined);
 
   // Router hooks
   const navigate = useNavigate();
@@ -73,13 +76,14 @@ export const useSearchPageState = () => {
   );
   
   const { 
-    selectedResult, 
-    handleResultClick, 
-    clearSelection 
+    handleResultClick,
+    toggleRoutes,
+    generatePDF,
+    clearSelection
   } = useResultHandling(
-    setSelectedPlace,
+    setPopupInfo,
     setViewport,
-    setRouteDisplayed
+    setShowRoutes
   );
   
   useInitialization(
@@ -111,7 +115,7 @@ export const useSearchPageState = () => {
 
   const handleTransportModeChange = (mode: string) => {
     setTransportMode(mode);
-    if (selectedResult) {
+    if (selectedPlace) {
       performSearch();
     }
   };
@@ -133,6 +137,17 @@ export const useSearchPageState = () => {
     performSearch();
   };
 
+  // Check MAPBOX_TOKEN at initialization
+  useEffect(() => {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+      setShowNoMapboxTokenWarning(true);
+      toast.error('Token Mapbox manquant ou invalide. Vérifiez votre fichier .env');
+      console.error('MAPBOX_TOKEN is missing or invalid');
+    } else {
+      console.log('MAPBOX_TOKEN is valid');
+    }
+  }, []);
+
   return {
     // Search state
     searchQuery,
@@ -149,6 +164,11 @@ export const useSearchPageState = () => {
     routeDisplayed,
     resultsCount,
     setResultsCount,
+    popupInfo,
+    setPopupInfo,
+    showRoutes,
+    setShowRoutes,
+    selectedPlaceId,
     
     // Actions and handlers
     handleSearch,
@@ -158,6 +178,8 @@ export const useSearchPageState = () => {
     handleCategorySelect,
     handleResultClick,
     clearSelection,
+    toggleRoutes,
+    generatePDF,
     
     // API methods
     searchOperations: {
