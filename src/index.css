@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -94,6 +93,7 @@
     @apply font-sans text-sm text-foreground bg-background;
     font-family: 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
     transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -109,6 +109,27 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border-radius: 999px !important;
   margin: 10px 0 !important;
+}
+
+/* Improved responsiveness for mobile devices */
+@media (max-width: 640px) {
+  .mapboxgl-ctrl-geocoder {
+    font-size: 14px !important;
+  }
+  
+  .mapboxgl-ctrl-geocoder--input {
+    height: 40px !important;
+  }
+  
+  .mapboxgl-popup-content {
+    max-width: 200px !important;
+    padding: 10px !important;
+  }
+  
+  .mapboxgl-ctrl-group {
+    transform: scale(0.9);
+    transform-origin: top right;
+  }
 }
 
 .mapboxgl-ctrl-geocoder--input {
@@ -151,18 +172,55 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
+/* Improved mobile touch targets */
 .category-button {
-  @apply flex items-center justify-between w-full px-3 py-2 text-sm hover:bg-muted/50 transition-colors rounded-md;
+  @apply flex items-center justify-between w-full px-3 py-3 md:py-2 text-sm hover:bg-muted/50 transition-colors rounded-md;
 }
 
 .category-button.active {
   @apply bg-primary text-white hover:bg-primary/90;
 }
 
-/* Hover card styles for category sidebar */
-.category-hover-card {
-  @apply p-3 bg-white rounded-lg shadow-lg border border-border backdrop-blur-sm;
-  min-width: 220px;
+/* New responsive styles for better mobile experience */
+@media (max-width: 768px) {
+  .bottom-sheet {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pull-indicator {
+    width: 36px;
+    height: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    margin: 8px auto;
+  }
+  
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+}
+
+/* Improved scrollbar for desktop */
+@media (min-width: 769px) {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
 }
 
 /* Subcategory item hover effect */

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -164,6 +165,7 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
               map={mapRef.current}
               start={userLocation}
               end={places.length > 0 ? [places[0].lon, places[0].lat] : userLocation}
+              color="#3b82f6" // Adding the missing color property
               transportMode={transportMode}
             />
           )}

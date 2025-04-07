@@ -102,13 +102,13 @@ export const SearchContainer: React.FC = () => {
         userLocation={searchState.userLocation}
       />
 
-      {/* Bottom slide-up menu */}
+      {/* Bottom slide-up menu - improved for better responsiveness */}
       <SearchMenu
         show={searchMenu.menuOpen}
         onClose={() => searchMenu.setMenuOpen(false)}
         selectedDuration={searchState.selectedDuration}
         selectedDistance={searchState.selectedDistance}
-        distanceUnit={searchState.distanceUnit as 'km' | 'mi'}
+        distanceUnit={searchState.distanceUnit as 'km' | 'miles'}
         transportMode={searchState.transportMode}
         resultsCount={searchState.resultsCount}
         selectedCategory={searchState.selectedCategory}
@@ -117,7 +117,7 @@ export const SearchContainer: React.FC = () => {
         onTransportModeChange={searchState.setTransportMode}
         onDurationChange={searchState.setSelectedDuration}
         onDistanceChange={searchState.setSelectedDistance}
-        onDistanceUnitChange={(unit: 'km' | 'mi') => searchState.setDistanceUnit(unit as any)}
+        onDistanceUnitChange={(unit: 'km' | 'miles') => searchState.setDistanceUnit(unit as any)}
         results={searchState.searchResults}
         onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
         selectedResultId={resultSelection.selectedResultId}
@@ -130,7 +130,7 @@ export const SearchContainer: React.FC = () => {
         onReset={resetSearch}
       />
 
-      {/* Route display when a result is selected */}
+      {/* Route display when a result is selected - improved layout */}
       <RouteDisplayContainer
         selectedResultId={resultSelection.selectedResultId}
         from={from}

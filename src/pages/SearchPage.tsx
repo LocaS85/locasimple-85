@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { motion } from 'framer-motion';
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import FlaskServerStatus from '@/components/search/FlaskServerStatus';
 import { Toaster } from '@/components/ui/toaster';
 import MapKeyWarning from '@/components/search/MapKeyWarning';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, Menu, X } from 'lucide-react';
 
 const SearchPage: React.FC = () => {
   const {
@@ -77,7 +78,7 @@ const SearchPage: React.FC = () => {
     category: place.category || '',
     distance: place.distance || 0,
     duration: place.duration || 0,
-    color: place.color || ''  // Make sure color property is included and has a default value
+    color: place.color || ''  // Ensure color property is included
   }));
 
   return (
@@ -87,23 +88,40 @@ const SearchPage: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Recherche avancée</h1>
-          <FlaskServerStatus className="mr-2" />
+          <div className="flex items-center">
+            <FlaskServerStatus className="mr-2" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="md:hidden"
+              onClick={handleToggleMenu}
+            >
+              {isMenuCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
       
         {showNoMapboxTokenWarning && (
           <MapKeyWarning setTemporaryApiKey={setTemporaryApiKey} />
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           <motion.div 
-            className={`bg-white rounded-lg shadow-md p-4 ${isMenuCollapsed ? 'md:col-span-1' : 'md:col-span-1'}`}
+            className={`bg-white rounded-lg shadow-md p-4 transition-all duration-300 ${
+              isMenuCollapsed ? 'md:col-span-3 lg:col-span-2' : 'md:col-span-4 lg:col-span-3'
+            } ${isMenuCollapsed && 'md:hidden'}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Filtres</h2>
-              <Button variant="ghost" size="sm" onClick={handleToggleMenu} className="md:hidden">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleToggleMenu} 
+                className="md:hidden"
+              >
                 {isMenuCollapsed ? <ArrowDown className="h-4 w-4" /> : <ArrowUp className="h-4 w-4" />}
               </Button>
             </div>
@@ -164,13 +182,13 @@ const SearchPage: React.FC = () => {
           </motion.div>
           
           <motion.div 
-            className="md:col-span-2"
+            className="md:col-span-8 lg:col-span-9"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
-              <div className="h-[500px]">
+              <div className="h-[60vh] md:h-[500px]">
                 <MapContainer 
                   results={places}
                   center={userLocation || [2.3488, 48.8534]}
@@ -192,6 +210,7 @@ const SearchPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.4 }}
+              className="mb-16 md:mb-6"
             >
               <ResultsList 
                 results={places}
