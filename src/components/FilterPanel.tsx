@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Car, PersonStanding, Bike, Bus, Train, Plane } from 'lucide-react';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface FilterPanelProps {
   radius: number;
@@ -13,6 +15,7 @@ interface FilterPanelProps {
   onResultsCountChange: (value: number) => void;
   duration?: number;
   onDurationChange?: (value: number) => void;
+  distanceUnit?: DistanceUnit;
 }
 
 const FilterPanel = ({
@@ -24,6 +27,7 @@ const FilterPanel = ({
   onResultsCountChange,
   duration = 15,
   onDurationChange = () => {},
+  distanceUnit = 'km',
 }: FilterPanelProps) => {
   const transportModes = [
     { value: 'driving', label: 'Voiture', icon: Car },
@@ -41,7 +45,7 @@ const FilterPanel = ({
   return (
     <div className="space-y-6 p-4 bg-white rounded-lg shadow-sm">
       <div className="space-y-2">
-        <Label>Distance ({radius} km)</Label>
+        <Label>Distance ({radius} {distanceUnit})</Label>
         <Select 
           value={radius.toString()} 
           onValueChange={(value) => onRadiusChange(parseInt(value))}
@@ -52,7 +56,7 @@ const FilterPanel = ({
           <SelectContent>
             {distanceOptions.map((km) => (
               <SelectItem key={km} value={km.toString()}>
-                {km} km
+                {km} {distanceUnit}
               </SelectItem>
             ))}
           </SelectContent>

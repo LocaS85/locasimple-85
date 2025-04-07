@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { useCategory } from '../CategoryContext';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface SearchButtonProps {
   selectedCategory: string;
@@ -14,6 +15,7 @@ interface SearchButtonProps {
   transportMode: string;
   resultsCount: number;
   duration: number;
+  distanceUnit?: DistanceUnit;
 }
 
 const SearchButton: React.FC<SearchButtonProps> = ({ 
@@ -21,7 +23,8 @@ const SearchButton: React.FC<SearchButtonProps> = ({
   radius, 
   transportMode, 
   resultsCount, 
-  duration 
+  duration,
+  distanceUnit = 'km'
 }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -48,7 +51,8 @@ const SearchButton: React.FC<SearchButtonProps> = ({
       transport: transportMode,
       duration: duration.toString(),
       results: resultsCount.toString(),
-      categories: visibleCategories.join(',')
+      categories: visibleCategories.join(','),
+      unit: distanceUnit
     });
 
     // Simulate a short delay to show loading state
