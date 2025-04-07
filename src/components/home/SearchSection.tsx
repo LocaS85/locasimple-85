@@ -64,11 +64,25 @@ const SearchSection = ({
           ))}
         </div>
 
-        <CategorySelector
-          categories={categories}
-          selectedCategories={selectedCategories}
-          onCategorySelect={onCategorySelect}
-        />
+        {/* We need to pass the props correctly to CategorySelector by creating a customized instance  */}
+        <div className="category-selector-wrapper">
+          {/* This is just a wrapper to avoid passing props to the actual component 
+              as it has a different interface */}
+          <div className="text-lg font-medium mb-2">Catégories</div>
+          <div className="flex flex-wrap gap-2">
+            {categories.map(category => (
+              <Button
+                key={category.id}
+                variant={selectedCategories.includes(category.id) ? "default" : "outline"}
+                size="sm"
+                onClick={() => onCategorySelect(category.id)}
+                className="flex items-center gap-2"
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
+        </div>
 
         <FilterPanel
           radius={radius}

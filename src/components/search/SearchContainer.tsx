@@ -68,7 +68,7 @@ export const SearchContainer: React.FC = () => {
     checkServer();
   }, []);
 
-  // Update the distanceUnit state to match the expected type:
+  // Update the distanceUnit state to match the expected type
   const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>('km');
 
   return (
@@ -78,7 +78,7 @@ export const SearchContainer: React.FC = () => {
         results={searchState.searchResults}
         center={searchState.userLocation}
         radius={searchState.selectedDistance || 5}
-        radiusUnit={distanceUnit} 
+        radiusUnit={distanceUnit}
         radiusType="distance"
         duration={searchState.selectedDuration || 15}
         timeUnit="minutes"

@@ -1,11 +1,12 @@
 
 import { useState } from 'react';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 export const useSearchState = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDistance, setSelectedDistance] = useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'miles'>('km');
+  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>('km');
   const [transportMode, setTransportMode] = useState('driving');
   const [resultsCount, setResultsCount] = useState(5);
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
