@@ -22,7 +22,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Responsive layout classes */
+/* Enhanced responsive layout classes */
 @media (max-width: 640px) {
   .responsive-container {
     padding: 0.5rem;
@@ -34,6 +34,10 @@
   
   .responsive-button {
     padding: 0.5rem;
+  }
+  
+  .touch-friendly {
+    min-height: 44px; /* Apple's recommended minimum touch target size */
   }
 }
 
@@ -63,6 +67,11 @@
   .responsive-button {
     padding: 1rem;
   }
+  
+  .desktop-hover-effect:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+  }
 }
 
 /* Search bar styles */
@@ -82,4 +91,60 @@
 .btn-hover-effect:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced accessibility classes */
+.focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Better containers for different devices */
+.container-mobile {
+  padding: 0.75rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.container-tablet {
+  padding: 1rem;
+  margin: 0 auto;
+  max-width: 90%;
+}
+
+.container-desktop {
+  padding: 1.5rem;
+  margin: 0 auto;
+  max-width: 1280px;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  .print-break-avoid {
+    break-inside: avoid;
+  }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 768px) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .reduced-motion {
+    transition: none !important;
+    animation: none !important;
+  }
 }

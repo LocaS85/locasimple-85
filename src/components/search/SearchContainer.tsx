@@ -74,7 +74,7 @@ export const SearchContainer: React.FC = () => {
         results={searchState.searchResults}
         center={searchState.userLocation}
         radius={searchState.selectedDistance || 5}
-        radiusUnit={searchState.distanceUnit as 'km' | 'miles'} 
+        radiusUnit={searchState.distanceUnit as 'km' | 'mi'} 
         radiusType="distance"
         duration={searchState.selectedDuration || 15}
         timeUnit="minutes"
@@ -108,7 +108,7 @@ export const SearchContainer: React.FC = () => {
         onClose={() => searchMenu.setMenuOpen(false)}
         selectedDuration={searchState.selectedDuration}
         selectedDistance={searchState.selectedDistance}
-        distanceUnit={searchState.distanceUnit as 'km' | 'miles'}
+        distanceUnit={searchState.distanceUnit as 'km' | 'mi'}
         transportMode={searchState.transportMode}
         resultsCount={searchState.resultsCount}
         selectedCategory={searchState.selectedCategory}
@@ -117,7 +117,7 @@ export const SearchContainer: React.FC = () => {
         onTransportModeChange={searchState.setTransportMode}
         onDurationChange={searchState.setSelectedDuration}
         onDistanceChange={searchState.setSelectedDistance}
-        onDistanceUnitChange={(unit: 'km' | 'miles') => searchState.setDistanceUnit(unit as any)}
+        onDistanceUnitChange={(unit: 'km' | 'mi') => searchState.setDistanceUnit(unit as any)}
         results={searchState.searchResults}
         onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
         selectedResultId={resultSelection.selectedResultId}
