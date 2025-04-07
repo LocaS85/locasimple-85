@@ -67,7 +67,7 @@ const SearchSection = ({
         <CategorySelector
           categories={categories}
           selectedCategories={selectedCategories}
-          onSelect={onCategorySelect}
+          onCategorySelect={onCategorySelect}
         />
 
         <FilterPanel

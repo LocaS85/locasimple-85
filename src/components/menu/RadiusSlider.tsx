@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface RadiusSliderProps {
   radius: number;
-  unit: 'km' | 'miles';
+  unit: DistanceUnit;
   onRadiusChange: (value: number) => void;
 }
 
