@@ -8,6 +8,7 @@ import { CategoriesFilter } from '@/components/search/CategoriesFilter';
 import { TransportModeFilter } from '@/components/search/TransportModeFilter';
 import { DistanceFilter } from '@/components/search/DistanceFilter';
 import { DurationFilter } from '@/components/search/DurationFilter';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface FiltersPanelProps {
   isMenuCollapsed: boolean;
@@ -25,10 +26,10 @@ interface FiltersPanelProps {
   setTransportMode: (value: string) => void;
   distanceFilter: {
     distance: number;
-    unit: 'km' | 'mi';
+    unit: DistanceUnit;
   };
   handleDistanceChange: (value: number) => void;
-  handleUnitChange: (value: 'km' | 'mi') => void;
+  handleUnitChange: (value: DistanceUnit) => void;
   durationFilter: {
     duration: number;
     timeUnit: 'minutes' | 'hours';

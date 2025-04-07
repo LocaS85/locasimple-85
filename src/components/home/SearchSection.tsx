@@ -1,7 +1,7 @@
 
 import React from 'react';
 import SearchBar from '@/components/SearchBar';
-import CategorySelector from '@/components/CategorySelector';
+import CategorySelector from '@/components/category/CategorySelector';
 import FilterPanel from '@/components/FilterPanel';
 import ResultsList from '@/components/ResultsList';
 import Map from '@/components/Map';

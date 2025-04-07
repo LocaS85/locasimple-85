@@ -38,3 +38,5 @@ export interface TransportModeWithColor {
   color: string;
   defaultColor: string;
 }
+
+export type DistanceUnit = 'km' | 'mi';

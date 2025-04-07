@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { Toaster } from '@/components/ui/toaster';
@@ -7,6 +6,7 @@ import FiltersPanel from '@/components/search-page/FiltersPanel';
 import MapResultsSection from '@/components/search-page/MapResultsSection';
 import MapKeyWarningSection from '@/components/search-page/MapKeyWarningSection';
 import type { Result } from '@/components/ResultsList';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 const SearchPage: React.FC = () => {
   const {
@@ -38,7 +38,7 @@ const SearchPage: React.FC = () => {
   
   const [distanceFilter, setDistanceFilter] = useState({
     distance: 5,
-    unit: 'km' as 'km' | 'mi'
+    unit: 'km' as DistanceUnit
   });
   
   const [durationFilter, setDurationFilter] = useState({

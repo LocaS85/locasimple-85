@@ -3,10 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface RadiusUnitSelectorProps {
-  unit: 'km' | 'mi';
-  onUnitChange: (unit: 'km' | 'mi') => void;
+  unit: DistanceUnit;
+  onUnitChange: (unit: DistanceUnit) => void;
 }
 
 export const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({

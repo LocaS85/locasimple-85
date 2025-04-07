@@ -6,15 +6,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { RadiusUnitSelector } from './RadiusUnitSelector';
 import { RadiusSlider } from './RadiusSlider';
 import { DurationSelector } from './DurationSelector';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface RadiusSelectorProps {
   radius: number;
-  unit: 'km' | 'mi';
+  unit: DistanceUnit;
   radiusType: 'distance' | 'duration';
   duration: number;
   timeUnit: 'minutes' | 'hours';
   onRadiusChange: (value: number) => void;
-  onUnitChange: (unit: 'km' | 'mi') => void;
+  onUnitChange: (unit: DistanceUnit) => void;
   onRadiusTypeChange: (type: 'distance' | 'duration') => void;
   onDurationChange: (value: number) => void;
   onTimeUnitChange: (unit: 'minutes' | 'hours') => void;
