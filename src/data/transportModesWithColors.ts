@@ -1,5 +1,5 @@
 
-import { TransportModeWithColor } from '@/types/categoryTypes';
+import { TransportModeWithColor, TransportMode } from '@/types/categoryTypes';
 
 export const transportModesWithColors: TransportModeWithColor[] = [
   { id: 'car', name: 'Voiture', color: '#3b82f6', defaultColor: '#3b82f6' }, // Bleu
@@ -14,6 +14,10 @@ export const transportModesWithColors: TransportModeWithColor[] = [
   { id: 'coach', name: 'Cars', color: '#92400e', defaultColor: '#92400e' }, // Marron
   { id: 'airport', name: 'Aéroport', color: '#9333ea', defaultColor: '#9333ea' }, // Violet foncé
   { id: 'airstrip', name: 'Aérodrome', color: '#ec4899', defaultColor: '#ec4899' }, // Rose
+  { id: 'driving', name: 'Voiture', color: '#3b82f6', defaultColor: '#3b82f6' }, // Bleu (alias for car)
+  { id: 'walking', name: 'À pied', color: '#22c55e', defaultColor: '#22c55e' }, // Vert (alias for walk)
+  { id: 'bicycling', name: 'Vélo', color: '#ef4444', defaultColor: '#ef4444' }, // Rouge (alias for bike)
+  { id: 'transit', name: 'Transport en commun', color: '#6b7280', defaultColor: '#6b7280' }, // Gris (alias for public)
 ];
 
 export const getTransportModeColor = (transportMode: string): string => {

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useCategory } from './CategoryContext';
@@ -12,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { TransportMode } from '@/types/categories';
+import { TransportMode } from '@/types/categoryTypes';
 
 interface AddressFormData {
   name: string;
@@ -29,10 +30,16 @@ export const AddressForm = ({ categoryId }: { categoryId: string }) => {
   const { toast } = useToast();
 
   const onSubmit = (data: AddressFormData) => {
+    // Add default values for required fields
     addAddress(categoryId, {
       id: crypto.randomUUID(),
       ...data,
+      latitude: 0, // Default value
+      longitude: 0, // Default value
+      category: categoryId,
+      favorite: false, // Default value
     });
+    
     toast({
       title: "Adresse ajoutée",
       description: "L'adresse a été ajoutée avec succès.",
@@ -64,7 +71,7 @@ export const AddressForm = ({ categoryId }: { categoryId: string }) => {
 
       <div>
         <Label htmlFor="country">Pays</Label>
-        <Input id="country" {...register('country', { required: true })} placeholder="France" />
+        <Input id="country" {...register('country', { required: true })} defaultValue="France" placeholder="France" />
       </div>
 
       <div>

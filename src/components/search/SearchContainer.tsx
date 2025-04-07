@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
@@ -119,7 +120,7 @@ export const SearchContainer: React.FC = () => {
         onTransportModeChange={searchState.setTransportMode}
         onDurationChange={searchState.setSelectedDuration}
         onDistanceChange={searchState.setSelectedDistance}
-        onDistanceUnitChange={(unit: 'km' | 'mi') => searchState.setDistanceUnit(unit as any)}
+        onDistanceUnitChange={setDistanceUnit}
         results={searchState.searchResults}
         onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
         selectedResultId={resultSelection.selectedResultId}

@@ -25,9 +25,16 @@ export interface Address {
   longitude: number;
   category: string;
   favorite: boolean;
-  transportMode?: 'driving' | 'walking' | 'bicycling' | 'transit';
+  transportMode?: 'driving' | 'walking' | 'bicycling' | 'transit' | 'car' | 'train' | 'bus' | 'public' | 'bike' | 'walk' | 'plane' | 'metro' | 'tram' | 'coach' | 'airport' | 'airstrip';
   radius?: number;
   duration?: number;
 }
 
-export type TransportMode = 'driving' | 'walking' | 'bicycling' | 'transit';
+export type TransportMode = 'driving' | 'walking' | 'bicycling' | 'transit' | 'car' | 'train' | 'bus' | 'public' | 'bike' | 'walk' | 'plane' | 'metro' | 'tram' | 'coach' | 'airport' | 'airstrip';
+
+export interface TransportModeWithColor {
+  id: TransportMode;
+  name: string;
+  color: string;
+  defaultColor: string;
+}

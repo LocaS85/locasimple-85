@@ -10,6 +10,7 @@ import { TransportModeSelector } from './TransportModeSelector';
 import { Address, TransportMode } from '@/types/categoryTypes';
 import { v4 as uuidv4 } from 'uuid';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getTransportModeColor } from '@/data/transportModesWithColors';
 
 interface AddressManagerProps {
   categoryId: string;
@@ -34,7 +35,11 @@ export function AddressManager({
     city: '',
     postalCode: '',
     country: 'France',
-    transportMode: 'car' as TransportMode
+    transportMode: 'driving',
+    latitude: 0,
+    longitude: 0,
+    category: categoryId,
+    favorite: false
   });
   
   const currentAddresses = addresses[categoryId] || [];
@@ -49,7 +54,11 @@ export function AddressManager({
         city: newAddress.city,
         postalCode: newAddress.postalCode || '',
         country: newAddress.country || 'France',
-        transportMode: newAddress.transportMode || 'car'
+        transportMode: newAddress.transportMode || 'driving',
+        latitude: 0,
+        longitude: 0,
+        category: categoryId,
+        favorite: false
       });
       
       setNewAddress({
@@ -58,7 +67,7 @@ export function AddressManager({
         city: '',
         postalCode: '',
         country: 'France',
-        transportMode: 'car' as TransportMode
+        transportMode: 'driving'
       });
       
       setIsAddingNew(false);
@@ -74,7 +83,11 @@ export function AddressManager({
         city: newAddress.city,
         postalCode: newAddress.postalCode || '',
         country: newAddress.country || 'France',
-        transportMode: newAddress.transportMode || 'car'
+        transportMode: newAddress.transportMode || 'driving',
+        latitude: 0,
+        longitude: 0,
+        category: categoryId,
+        favorite: false
       });
       
       setEditingId(null);
@@ -84,7 +97,7 @@ export function AddressManager({
         city: '',
         postalCode: '',
         country: 'France',
-        transportMode: 'car' as TransportMode
+        transportMode: 'driving'
       });
     }
   };
@@ -109,7 +122,7 @@ export function AddressManager({
       city: '',
       postalCode: '',
       country: 'France',
-      transportMode: 'car' as TransportMode
+      transportMode: 'driving'
     });
     setIsAddingNew(false);
   };
@@ -212,10 +225,10 @@ export function AddressManager({
                       <div className="flex items-center space-x-2">
                         <div
                           className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: getTransportModeColor(address.transportMode) }}
+                          style={{ backgroundColor: getTransportModeColor(address.transportMode || 'driving') }}
                         />
                         <p className="text-xs text-muted-foreground">
-                          {getTransportModeName(address.transportMode)}
+                          {getTransportModeName(address.transportMode || 'driving')}
                         </p>
                       </div>
                     </div>
@@ -320,40 +333,24 @@ export function AddressManager({
 }
 
 // Utility functions
-function getTransportModeColor(transportMode: string): string {
-  // Import this from transportModesWithColors
-  const colorMap: Record<string, string> = {
-    'car': '#3b82f6',
-    'train': '#000000',
-    'bus': '#eab308',
-    'public': '#6b7280',
-    'bike': '#ef4444',
-    'walk': '#22c55e',
-    'plane': '#06b6d4',
-    'metro': '#8b5cf6',
-    'tram': '#f97316',
-    'coach': '#92400e',
-    'airport': '#9333ea',
-    'airstrip': '#ec4899'
-  };
-  
-  return colorMap[transportMode] || '#3b82f6';
-}
-
 function getTransportModeName(transportMode: string): string {
   const nameMap: Record<string, string> = {
+    'driving': 'Voiture',
     'car': 'Voiture',
     'train': 'Train',
     'bus': 'Bus',
     'public': 'Transports en commun',
+    'bicycling': 'Vélo',
     'bike': 'Vélo',
+    'walking': 'À pied',
     'walk': 'À pied',
     'plane': 'Avion',
     'metro': 'Métro',
     'tram': 'Tramway',
     'coach': 'Cars',
     'airport': 'Aéroport',
-    'airstrip': 'Aérodrome'
+    'airstrip': 'Aérodrome',
+    'transit': 'Transport public'
   };
   
   return nameMap[transportMode] || transportMode;

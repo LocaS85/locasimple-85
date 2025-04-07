@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Settings, X } from 'lucide-react';
@@ -10,7 +11,7 @@ import { CategoriesSelector } from '@/components/menu/CategoriesSelector';
 interface InteractiveMenuProps {
   onFilterChange: (filters: {
     radius: number;
-    unit: 'km' | 'miles';
+    unit: 'km' | 'mi';
     duration: number;
     timeUnit: 'minutes' | 'hours';
     resultsCount: number;
@@ -23,7 +24,7 @@ interface InteractiveMenuProps {
 const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [radius, setRadius] = useState(5);
-  const [unit, setUnit] = useState<'km' | 'miles'>('km');
+  const [unit, setUnit] = useState<'km' | 'mi'>('km');
   const [duration, setDuration] = useState(15);
   const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes');
   const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
@@ -105,7 +106,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                 duration={duration}
                 timeUnit={timeUnit}
                 onRadiusChange={setRadius}
-                onUnitChange={(unit: 'km' | 'mi') => setDistanceUnit(unit)}
+                onUnitChange={setUnit}
                 onRadiusTypeChange={setRadiusType}
                 onDurationChange={setDuration}
                 onTimeUnitChange={setTimeUnit}
