@@ -25,8 +25,8 @@ interface SearchMenuProps {
   onDistanceChange: (distance: number) => void;
   selectedDuration: number | null;
   onDurationChange: (duration: number) => void;
-  distanceUnit: 'km' | 'miles';
-  onDistanceUnitChange: (unit: 'km' | 'miles') => void;
+  distanceUnit: 'km' | 'mi';
+  onDistanceUnitChange: (unit: 'km' | 'mi') => void;
   resultsCount: number;
   onResultsCountChange: (count: number) => void;
   results: Result[];

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { motion } from 'framer-motion';
@@ -77,7 +78,7 @@ const SearchPage: React.FC = () => {
     category: place.category || '',
     distance: place.distance || 0,
     duration: place.duration || 0,
-    color: place.color || ''
+    color: place.color || ''  // Make sure color property is included and has a default value
   }));
 
   return (

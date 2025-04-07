@@ -30,7 +30,7 @@ export const RouteDisplayContainer: React.FC<RouteDisplayContainerProps> = ({
   return (
     <div className="absolute bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-20">
       <MultiRouteDisplay
-        routes={routes}
+        routeData={routes}
         activeMode={activeMode}
         onModeChange={(mode) => {
           setActiveMode(mode as TransportMode);
