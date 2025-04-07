@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -161,10 +160,10 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
           />
           
           {showRoutes && userLocation && (
-            <MultiRouteDisplay
+            <RouteLayer
               map={mapRef.current}
-              userLocation={userLocation}
-              destinations={places}
+              start={userLocation}
+              end={places.length > 0 ? [places[0].lon, places[0].lat] : userLocation}
               transportMode={transportMode}
             />
           )}

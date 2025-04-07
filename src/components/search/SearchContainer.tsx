@@ -74,7 +74,7 @@ export const SearchContainer: React.FC = () => {
         results={searchState.searchResults}
         center={searchState.userLocation}
         radius={searchState.selectedDistance || 5}
-        radiusUnit={searchState.distanceUnit as 'km' | 'mi'} 
+        radiusUnit={searchState.distanceUnit as 'km' | 'miles'} 
         radiusType="distance"
         duration={searchState.selectedDuration || 15}
         timeUnit="minutes"

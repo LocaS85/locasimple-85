@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
 import { motion } from 'framer-motion';
@@ -72,8 +71,8 @@ const SearchPage: React.FC = () => {
   const places: Result[] = rawPlaces.map(place => ({
     id: place.id,
     name: place.name,
-    latitude: place.lat,
-    longitude: place.lon,
+    latitude: place.latitude,
+    longitude: place.longitude,
     address: place.address || '',
     category: place.category || '',
     distance: place.distance || 0,
