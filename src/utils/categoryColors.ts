@@ -1,101 +1,44 @@
 
-// Utility to get category color based on category ID or type
-export const getCategoryColor = (category: string | null): string => {
-  if (!category) return 'bg-gray-500';
-  
-  const colorMap: Record<string, string> = {
-    'restaurants': 'app-secondary',
-    'shopping': 'app-primary',
-    'entertainment': 'purple-600',
-    'alimentation': 'blue-500',
-    'achats': 'pink-500',
-    'services': 'amber-500',
-    'sante': 'green-500',
-    'divertissement': 'purple-500',
-    'hebergement': 'orange-500',
-    'adresse-principale': 'violet-500',
-    'famille': 'pink-500',
-    'travail': 'orange-500',
-    'ecole': 'blue-500',
-    'divers': 'green-500',
-    // Can add more categories as needed
-  };
+// Function to get a CSS class for the category background color
+export function getCategoryColorClass(categoryId: string): string {
+  switch (categoryId) {
+    case 'quotidien':
+      return 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/30';
+    case 'alimentation':
+      return 'bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/30';
+    case 'shopping':
+      return 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/30';
+    case 'services':
+      return 'bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/30';
+    case 'sante':
+      return 'bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/30';
+    case 'divertissement':
+      return 'bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/30';
+    case 'hebergement':
+      return 'bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900/20 dark:to-cyan-800/30';
+    default:
+      return 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/20 dark:to-gray-700/30';
+  }
+}
 
-  return colorMap[category] || 'gray-500';
-};
-
-// Utility to get gradient color class for a category
-export const getCategoryGradient = (category: string | null): string => {
-  if (!category) return 'from-gray-400 to-gray-600';
-  
-  const gradientMap: Record<string, string> = {
-    'restaurants': 'from-app-secondary/70 to-app-secondary',
-    'shopping': 'from-app-primary/70 to-app-primary',
-    'entertainment': 'from-purple-400 to-purple-600',
-    'alimentation': 'from-blue-400 to-blue-600',
-    'achats': 'from-pink-400 to-pink-600',
-    'services': 'from-amber-400 to-amber-600',
-    'sante': 'from-green-400 to-green-600',
-    'divertissement': 'from-purple-400 to-purple-600',
-    'hebergement': 'from-orange-400 to-orange-600',
-    'adresse-principale': 'from-violet-400 to-violet-600',
-    'famille': 'from-pink-400 to-pink-600',
-    'travail': 'from-orange-400 to-orange-600',
-    'ecole': 'from-blue-400 to-blue-600',
-    'divers': 'from-green-400 to-green-600',
-    // Can add more categories as needed
-  };
-
-  return gradientMap[category] || 'from-gray-400 to-gray-600';
-};
-
-// Utility to get tailwind color class
-export const getCategoryColorClass = (categoryId: string): string => {
-  // Extract the main category type from the ID (e.g., 'restaurants-1' → 'restaurants')
-  const categoryType = categoryId.split('-')[0];
-  
-  const colorClasses: Record<string, string> = {
-    'restaurants': 'bg-gradient-to-br from-app-secondary/70 to-app-secondary',
-    'shopping': 'bg-gradient-to-br from-app-primary/70 to-app-primary',
-    'entertainment': 'bg-gradient-to-br from-purple-400 to-purple-600',
-    'alimentation': 'bg-gradient-to-br from-blue-400 to-blue-600',
-    'achats': 'bg-gradient-to-br from-pink-400 to-pink-600',
-    'services': 'bg-gradient-to-br from-amber-400 to-amber-600',
-    'sante': 'bg-gradient-to-br from-green-400 to-green-600',
-    'divertissement': 'bg-gradient-to-br from-purple-400 to-purple-600',
-    'hebergement': 'bg-gradient-to-br from-orange-400 to-orange-600',
-    'adresse-principale': 'bg-gradient-to-br from-violet-400 to-violet-600',
-    'famille': 'bg-gradient-to-br from-pink-400 to-pink-600',
-    'travail': 'bg-gradient-to-br from-orange-400 to-orange-600',
-    'ecole': 'bg-gradient-to-br from-blue-400 to-blue-600',
-    'divers': 'bg-gradient-to-br from-green-400 to-green-600',
-    // Can add more as needed
-  };
-  
-  return colorClasses[categoryType] || 'bg-gradient-to-br from-gray-400 to-gray-600';
-};
-
-// Utility to get hover color based on category
-export const getHoverColor = (category: string | null): string => {
-  if (!category) return 'hover:bg-gray-600';
-  
-  const hoverMap: Record<string, string> = {
-    'restaurants': 'hover:bg-app-secondary-dark',
-    'shopping': 'hover:bg-app-primary-dark',
-    'entertainment': 'hover:bg-purple-700',
-    'alimentation': 'hover:bg-blue-700',
-    'achats': 'hover:bg-pink-700',
-    'services': 'hover:bg-amber-700',
-    'sante': 'hover:bg-green-700',
-    'divertissement': 'hover:bg-purple-700',
-    'hebergement': 'hover:bg-orange-700',
-    'adresse-principale': 'hover:bg-violet-700',
-    'famille': 'hover:bg-pink-700',
-    'travail': 'hover:bg-orange-700',
-    'ecole': 'hover:bg-blue-700',
-    'divers': 'hover:bg-green-700',
-    // Can add more categories as needed
-  };
-
-  return hoverMap[category] || 'hover:bg-gray-600';
-};
+// Function to get a text color for category
+export function getCategoryTextColor(categoryId: string): string {
+  switch (categoryId) {
+    case 'quotidien':
+      return 'text-blue-600 dark:text-blue-400';
+    case 'alimentation':
+      return 'text-orange-600 dark:text-orange-400';
+    case 'shopping':
+      return 'text-green-600 dark:text-green-400';
+    case 'services':
+      return 'text-purple-600 dark:text-purple-400';
+    case 'sante':
+      return 'text-red-600 dark:text-red-400';
+    case 'divertissement':
+      return 'text-yellow-600 dark:text-yellow-400';
+    case 'hebergement':
+      return 'text-cyan-600 dark:text-cyan-400';
+    default:
+      return 'text-gray-600 dark:text-gray-400';
+  }
+}

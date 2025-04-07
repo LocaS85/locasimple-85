@@ -1,5 +1,4 @@
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
 import { useRouteDisplay } from '@/hooks/useRouteDisplay';
@@ -67,6 +66,9 @@ export const SearchContainer: React.FC = () => {
     checkServer();
   }, []);
 
+  // Update the distanceUnit state to match the expected type:
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
+
   return (
     <div className="relative w-full h-full">
       {/* Map and Search Components */}
@@ -74,7 +76,7 @@ export const SearchContainer: React.FC = () => {
         results={searchState.searchResults}
         center={searchState.userLocation}
         radius={searchState.selectedDistance || 5}
-        radiusUnit={searchState.distanceUnit as 'km' | 'mi'} 
+        radiusUnit={distanceUnit} 
         radiusType="distance"
         duration={searchState.selectedDuration || 15}
         timeUnit="minutes"
@@ -108,7 +110,7 @@ export const SearchContainer: React.FC = () => {
         onClose={() => searchMenu.setMenuOpen(false)}
         selectedDuration={searchState.selectedDuration}
         selectedDistance={searchState.selectedDistance}
-        distanceUnit={searchState.distanceUnit as 'km' | 'mi'}
+        distanceUnit={distanceUnit}
         transportMode={searchState.transportMode}
         resultsCount={searchState.resultsCount}
         selectedCategory={searchState.selectedCategory}

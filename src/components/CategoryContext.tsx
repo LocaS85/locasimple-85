@@ -27,12 +27,14 @@ export const CategoryProvider = ({ children }: { children: React.ReactNode }) =>
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [addresses, setAddresses] = useState<Record<string, Address[]>>({});
   const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
+    'quotidien': '#8B5CF6',
     'adresse-principale': '#8B5CF6',
     'famille': '#D946EF',
+    'amis': '#F59E0B', 
     'travail': '#F97316',
     'ecole': '#0EA5E9',
     'alimentation': '#1EAEDB',
-    'achats': '#9b87f5',
+    'shopping': '#9b87f5',
     'services': '#7E69AB',
     'sante': '#6E59A5',
     'divertissement': '#F2FCE2',
@@ -40,12 +42,14 @@ export const CategoryProvider = ({ children }: { children: React.ReactNode }) =>
     'divers': '#4ADE80',
   });
   const [categoryVisibility, setCategoryVisibility] = useState<Record<string, boolean>>({
+    'quotidien': true,
     'adresse-principale': true,
     'famille': true,
+    'amis': true,
     'travail': true,
     'ecole': true,
     'alimentation': true,
-    'achats': true,
+    'shopping': true,
     'services': true,
     'sante': true,
     'divertissement': true,
@@ -53,12 +57,14 @@ export const CategoryProvider = ({ children }: { children: React.ReactNode }) =>
     'divers': true,
   });
   const [categoryNames, setCategoryNames] = useState<Record<string, string>>({
+    'quotidien': 'Quotidien',
     'adresse-principale': 'Adresse Principale',
     'famille': 'Famille',
+    'amis': 'Amis',
     'travail': 'Travail',
     'ecole': 'École',
     'alimentation': 'Alimentation',
-    'achats': 'Achats',
+    'shopping': 'Achats',
     'services': 'Services',
     'sante': 'Santé',
     'divertissement': 'Divertissement',

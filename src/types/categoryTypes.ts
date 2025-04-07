@@ -1,16 +1,17 @@
 
-export interface Category {
-  id: string;
-  name: string;
-  icon: string;
-  subCategories?: SubCategory[];
-}
-
 export interface SubCategory {
   id: string;
   name: string;
   parentId: string;
   children?: SubCategory[];
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  subCategories?: SubCategory[];
+  color?: string;
 }
 
 export interface Address {
@@ -20,15 +21,13 @@ export interface Address {
   city: string;
   postalCode: string;
   country: string;
-  transportMode: TransportMode;
+  latitude: number;
+  longitude: number;
+  category: string;
+  favorite: boolean;
+  transportMode?: 'driving' | 'walking' | 'bicycling' | 'transit';
+  radius?: number;
+  duration?: number;
 }
 
-export type TransportMode = 'car' | 'train' | 'bus' | 'public' | 'bike' | 'walk' | 'plane' | 'metro' | 'tram' | 'coach' | 'airport' | 'airstrip';
-
-// Transport Mode avec couleurs
-export interface TransportModeWithColor {
-  id: TransportMode;
-  name: string;
-  color: string;
-  defaultColor: string;
-}
+export type TransportMode = 'driving' | 'walking' | 'bicycling' | 'transit';

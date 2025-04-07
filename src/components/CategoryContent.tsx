@@ -27,12 +27,12 @@ export const CategoryContent = () => {
   const category = CATEGORIES.find(cat => cat.id === selectedCategory);
   if (!category) return null;
 
-  const showAddressForm = ['adresse-principale', 'famille', 'travail', 'ecole', 'divers'].includes(selectedCategory);
+  const showAddressForm = ['adresse-principale', 'famille', 'amis', 'travail', 'ecole', 'divers'].includes(selectedCategory);
   const isDiversCategory = selectedCategory === 'divers';
 
   const categoriesWithoutFilters = [
     'alimentation',
-    'achats',
+    'shopping',
     'services',
     'sante',
     'divertissement',

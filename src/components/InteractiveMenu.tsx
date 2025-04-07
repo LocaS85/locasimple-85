@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Settings, X } from 'lucide-react';
@@ -32,6 +31,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
   const [transportMode, setTransportMode] = useState('driving');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -105,7 +105,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
                 duration={duration}
                 timeUnit={timeUnit}
                 onRadiusChange={setRadius}
-                onUnitChange={setUnit}
+                onUnitChange={(unit: 'km' | 'mi') => setDistanceUnit(unit)}
                 onRadiusTypeChange={setRadiusType}
                 onDurationChange={setDuration}
                 onTimeUnitChange={setTimeUnit}

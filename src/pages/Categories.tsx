@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import CategoryGrid from '@/components/category/CategoryGrid';
 import SubcategoryGrid from '@/components/category/SubcategoryGrid';
@@ -8,7 +8,6 @@ import CategorySearch from '@/components/category/CategorySearch';
 
 const Categories = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   
   return (
     <motion.div

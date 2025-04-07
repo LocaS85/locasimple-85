@@ -1,99 +1,88 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { DAILY_SEARCH_CATEGORIES, SearchFilters } from '@/types/dailySearchCategories';
-import SubCategoryTile from './SubCategoryTile';
-import EnhancedMapComponent from '../map/EnhancedMapComponent';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { CATEGORIES } from '@/types/categories';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getCategoryColorClass } from '@/utils/categoryColors';
+import { getCategoryIcon } from '@/utils/categoryIcons';
+import SubcategoryCard from '@/components/category/SubcategoryCard';
 
 const SubcategoryGrid = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [filters, setFilters] = useState<SearchFilters>({
-    radius: 5,
-    unit: 'km',
-    transport: 'driving',
-    openNow: false
-  });
+  // Find current category
+  const category = CATEGORIES.find(cat => cat.id === categoryId);
   
-  // Find the current category based on the route parameter
-  const currentCategory = DAILY_SEARCH_CATEGORIES.find(cat => cat.id === categoryId);
-  
-  const handleSubcategorySelect = (subcategoryId: string) => {
-    setSelectedSubcategory(subcategoryId);
-  };
-  
-  const handleSearch = () => {
-    if (!selectedSubcategory) {
-      toast.error('Veuillez sélectionner une sous-catégorie');
-      return;
-    }
-    
-    // Navigate to search page with parameters
-    const searchParams = new URLSearchParams({
-      category: categoryId || '',
-      subcategory: selectedSubcategory,
-      radius: String(filters.radius),
-      transport: filters.transport,
-      unit: filters.unit,
-      openNow: String(filters.openNow)
-    });
-    
-    navigate(`/categories/search?${searchParams.toString()}`);
-  };
-  
-  // If category not found, show error and return to categories
-  if (!currentCategory) {
-    useEffect(() => {
-      toast.error('Catégorie non trouvée');
-      navigate('/categories');
-    }, []);
-    
-    return null;
-  }
-  
-  return (
-    <div className="container mx-auto p-4">
-      <header className="mb-6">
-        <button 
-          onClick={() => navigate('/categories')}
-          className="text-blue-500 flex items-center gap-2 mb-4"
-        >
-          &larr; Retour aux catégories
-        </button>
-        
-        <h1 className="text-2xl font-bold mb-2" style={{ color: currentCategory.color }}>
-          {currentCategory.name}
-        </h1>
-        <p className="text-gray-600">
-          Sélectionnez une sous-catégorie pour votre recherche
-        </p>
-      </header>
-      
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-        {currentCategory.subcategories.map(subcategory => (
-          <SubCategoryTile
-            key={subcategory.id}
-            subcategory={subcategory}
-            isSelected={selectedSubcategory === subcategory.id}
-            onSelect={handleSubcategorySelect}
-          />
-        ))}
-      </div>
-      
-      <div className="flex justify-center mt-8">
-        <Button 
-          onClick={handleSearch}
-          disabled={!selectedSubcategory}
-          className="px-8 py-2"
-        >
-          Rechercher
+  if (!category) {
+    return (
+      <div className="container mx-auto p-6 text-center">
+        <h2 className="text-xl font-semibold">{t('categoryNotFound')}</h2>
+        <Button onClick={() => navigate('/categories')} className="mt-4">
+          {t('backToCategories')}
         </Button>
       </div>
+    );
+  }
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center space-x-2 mb-8">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => navigate('/categories')}
+          className="flex items-center text-primary"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t('backToCategories')}
+        </Button>
+      </div>
+      
+      <div className="flex items-center justify-center mb-8">
+        <div className={`p-4 rounded-full ${getCategoryColorClass(category.id)}`}>
+          {getCategoryIcon(category.id, "w-12 h-12")}
+        </div>
+        <h1 className="text-3xl font-bold ml-4">{t(category.name) || category.name}</h1>
+      </div>
+      
+      {category.subCategories && category.subCategories.length > 0 ? (
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {category.subCategories.map(subCategory => (
+            <SubcategoryCard 
+              key={subCategory.id}
+              subCategory={subCategory}
+              categoryId={category.id}
+              onNavigate={navigate}
+              t={t}
+            />
+          ))}
+        </motion.div>
+      ) : (
+        <div className="text-center p-10">
+          <p>{t('noSubcategories')}</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -4,11 +4,7 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { getCategoryIconColorClass, getCategoryTextColor } from '@/utils/categoryColorUtils';
-import { getCategoryIcon } from '@/utils/categoryIcons';
-import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
-import { getHealthIcon } from '@/utils/icons/healthIcons';
-import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
+import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 import { SubCategory } from '@/types/categories';
 import { NavigateFunction } from 'react-router-dom';
 
@@ -40,30 +36,6 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     }
   };
   
-  // Function to get the appropriate icon for a subcategory
-  const getSubcategoryIcon = (subCategoryId: string) => {
-    // For entertainment subcategories, use specific entertainment icons
-    if (categoryId === 'divertissement') {
-      return getEntertainmentIcon(subCategoryId, "w-16 h-16");
-    }
-    
-    // For health subcategories, use specific health icons
-    if (categoryId === 'sante') {
-      return getHealthIcon(subCategoryId, "w-16 h-16");
-    }
-    
-    // For food subcategories, use specific food icons
-    if (categoryId === 'alimentation') {
-      return getFoodCategoryIcon(subCategoryId, "w-16 h-16");
-    }
-    
-    // For other categories, use the regular category icon
-    return getCategoryIcon(subCategoryId, {
-      className: "w-16 h-16",
-      color: getCategoryTextColor(subCategoryId)
-    });
-  };
-  
   return (
     <motion.div
       variants={itemVariants}
@@ -83,7 +55,8 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
         >
           <div className="flex items-center mb-4">
             <div className={`mr-3 text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
-              {getSubcategoryIcon(subCategory.id)}
+              {/* Icon will be determined by category utility functions */}
+              {subCategory.id.charAt(0).toUpperCase()}
             </div>
             <h3 className="text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
           </div>
