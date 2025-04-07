@@ -1,19 +1,12 @@
 
 import React, { useState } from 'react';
 import { useSearchPageStateManager } from '@/hooks/useSearchPageStateManager';
-import { motion } from 'framer-motion';
-import ResultsList, { Result } from '@/components/ResultsList';
-import MapContainer from '@/components/map/MapContainer';
-import SearchBox from '@/components/search/SearchBox';
-import { CategoriesFilter } from '@/components/search/CategoriesFilter';
-import { TransportModeFilter } from '@/components/search/TransportModeFilter';
-import { DistanceFilter } from '@/components/search/DistanceFilter';
-import { DurationFilter } from '@/components/search/DurationFilter';
-import { Button } from '@/components/ui/button';
-import FlaskServerStatus from '@/components/search/FlaskServerStatus';
 import { Toaster } from '@/components/ui/toaster';
-import MapKeyWarning from '@/components/search/MapKeyWarning';
-import { ArrowDown, ArrowUp, Menu, X } from 'lucide-react';
+import SearchPageHeader from '@/components/search-page/SearchPageHeader';
+import FiltersPanel from '@/components/search-page/FiltersPanel';
+import MapResultsSection from '@/components/search-page/MapResultsSection';
+import MapKeyWarningSection from '@/components/search-page/MapKeyWarningSection';
+import type { Result } from '@/components/ResultsList';
 
 const SearchPage: React.FC = () => {
   const {
@@ -78,7 +71,7 @@ const SearchPage: React.FC = () => {
     category: place.category || '',
     distance: place.distance || 0,
     duration: place.duration || 0,
-    color: place.color || ''  // Ensure color property is included
+    color: place.color || ''
   }));
 
   return (
@@ -86,140 +79,56 @@ const SearchPage: React.FC = () => {
       <Toaster />
       
       <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Recherche avancée</h1>
-          <div className="flex items-center">
-            <FlaskServerStatus className="mr-2" />
-            <Button 
-              variant="outline" 
-              size="icon" 
-              className="md:hidden"
-              onClick={handleToggleMenu}
-            >
-              {isMenuCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
+        <SearchPageHeader 
+          title="Recherche avancée" 
+          isMenuCollapsed={isMenuCollapsed}
+          handleToggleMenu={handleToggleMenu}
+        />
       
-        {showNoMapboxTokenWarning && (
-          <MapKeyWarning setTemporaryApiKey={setTemporaryApiKey} />
-        )}
+        <MapKeyWarningSection 
+          showNoMapboxTokenWarning={showNoMapboxTokenWarning}
+          setTemporaryApiKey={setTemporaryApiKey}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <motion.div 
-            className={`bg-white rounded-lg shadow-md p-4 transition-all duration-300 ${
-              isMenuCollapsed ? 'md:col-span-3 lg:col-span-2' : 'md:col-span-4 lg:col-span-3'
-            } ${isMenuCollapsed && 'md:hidden'}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Filtres</h2>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleToggleMenu} 
-                className="md:hidden"
-              >
-                {isMenuCollapsed ? <ArrowDown className="h-4 w-4" /> : <ArrowUp className="h-4 w-4" />}
-              </Button>
-            </div>
-            
-            {!isMenuCollapsed && (
-              <div className="space-y-4">
-                <SearchBox
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  onSearch={performSearch}
-                  onReset={resetSearch}
-                  onLocationClick={handleLocationClick}
-                  isLocationActive={isLocationActive}
-                  loading={loading}
-                />
-                
-                <CategoriesFilter 
-                  selectedCategory={selectedCategory} 
-                  onCategorySelect={handleCategoryToggle}
-                />
-                
-                <TransportModeFilter
-                  selectedMode={transportMode}
-                  onModeChange={setTransportMode}
-                />
-                
-                <DistanceFilter
-                  selectedDistance={distanceFilter.distance}
-                  distanceUnit={distanceFilter.unit}
-                  onDistanceChange={handleDistanceChange}
-                  onDistanceUnitChange={handleUnitChange}
-                />
-                
-                <DurationFilter
-                  selectedDuration={durationFilter.duration}
-                  onDurationChange={handleDurationChange}
-                />
-                
-                <div className="pt-2 grid grid-cols-2 gap-2">
-                  <Button 
-                    variant="outline"
-                    onClick={toggleRoutes}
-                    disabled={!userLocation || places.length === 0}
-                  >
-                    Itinéraires
-                  </Button>
-                  
-                  <Button 
-                    variant="outline"
-                    onClick={generatePDF}
-                    disabled={places.length === 0}
-                  >
-                    Export PDF
-                  </Button>
-                </div>
-              </div>
-            )}
-          </motion.div>
+          <FiltersPanel
+            isMenuCollapsed={isMenuCollapsed}
+            handleToggleMenu={handleToggleMenu}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            performSearch={performSearch}
+            resetSearch={resetSearch}
+            handleLocationClick={handleLocationClick}
+            isLocationActive={isLocationActive}
+            loading={loading}
+            selectedCategory={selectedCategory}
+            handleCategoryToggle={handleCategoryToggle}
+            transportMode={transportMode}
+            setTransportMode={setTransportMode}
+            distanceFilter={distanceFilter}
+            handleDistanceChange={handleDistanceChange}
+            handleUnitChange={handleUnitChange}
+            durationFilter={durationFilter}
+            handleDurationChange={handleDurationChange}
+            toggleRoutes={toggleRoutes}
+            generatePDF={generatePDF}
+            userLocation={userLocation}
+            places={places}
+          />
           
-          <motion.div 
-            className="md:col-span-8 lg:col-span-9"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
-              <div className="h-[60vh] md:h-[500px]">
-                <MapContainer 
-                  results={places}
-                  center={userLocation || [2.3488, 48.8534]}
-                  onLocationClick={handleLocationClick}
-                  isLocationActive={isLocationActive}
-                  loading={loading}
-                  showRoutes={showRoutes}
-                  onSearch={performSearch}
-                  onResultClick={handleResultClick}
-                  selectedCategory={selectedCategory}
-                  onCategorySelect={handleCategoryToggle}
-                  userLocation={userLocation}
-                  transportMode={transportMode}
-                />
-              </div>
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-              className="mb-16 md:mb-6"
-            >
-              <ResultsList 
-                results={places}
-                loading={loading}
-                onResultClick={handleResultClick}
-                userLocation={userLocation}
-              />
-            </motion.div>
-          </motion.div>
+          <MapResultsSection 
+            places={places}
+            userLocation={userLocation}
+            handleLocationClick={handleLocationClick}
+            isLocationActive={isLocationActive}
+            loading={loading}
+            showRoutes={showRoutes}
+            performSearch={performSearch}
+            handleResultClick={handleResultClick}
+            selectedCategory={selectedCategory}
+            handleCategoryToggle={handleCategoryToggle}
+            transportMode={transportMode}
+          />
         </div>
       </div>
     </div>

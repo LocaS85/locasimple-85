@@ -9,12 +9,12 @@ import { DurationSelector } from './DurationSelector';
 
 interface RadiusSelectorProps {
   radius: number;
-  unit: 'km' | 'miles';
+  unit: 'km' | 'mi';
   radiusType: 'distance' | 'duration';
   duration: number;
   timeUnit: 'minutes' | 'hours';
   onRadiusChange: (value: number) => void;
-  onUnitChange: (unit: 'km' | 'miles') => void;
+  onUnitChange: (unit: 'km' | 'mi') => void;
   onRadiusTypeChange: (type: 'distance' | 'duration') => void;
   onDurationChange: (value: number) => void;
   onTimeUnitChange: (unit: 'minutes' | 'hours') => void;
