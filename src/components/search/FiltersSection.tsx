@@ -14,9 +14,9 @@ interface FiltersSectionProps {
   selectedDuration: number | null;
   onDurationChange: (duration: number) => void;
   selectedDistance: number | null;
-  distanceUnit: 'km' | 'mi';  // Changed from 'km' | 'miles'
+  distanceUnit: 'km' | 'mi';
   onDistanceChange: (distance: number) => void;
-  onDistanceUnitChange: (unit: 'km' | 'mi') => void;  // Changed from 'km' | 'miles'
+  onDistanceUnitChange: (unit: 'km' | 'mi') => void;
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
 }

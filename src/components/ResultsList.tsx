@@ -15,7 +15,7 @@ export interface Result {
   durationInSeconds?: number;
   rating?: number;
   openingHours?: string;
-  color?: string;  // Add color property to the interface
+  color?: string;  // Ensure color property is included
   phoneNumber?: string;
   website?: string;
   isFavorite?: boolean;
