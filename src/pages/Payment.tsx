@@ -19,7 +19,7 @@ const Payment = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(t('paymentSuccessful'));
+    toast.success("Paiement effectué avec succès");
     setTimeout(() => navigate('/profile'), 1500);
   };
   
@@ -31,25 +31,25 @@ const Payment = () => {
         onClick={() => navigate(-1)}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t('back')}
+        Retour
       </Button>
       
       <div className="text-center mb-8">
         <CreditCard className="w-12 h-12 mx-auto text-primary mb-4" />
-        <h1 className="text-3xl font-bold mb-2">{t('payment')}</h1>
+        <h1 className="text-3xl font-bold mb-2">Paiement</h1>
         <p className="text-gray-600">
-          {plan === 'premium' ? t('premiumPlanPayment') : t('proPlanPayment')}
+          {plan === 'premium' ? "Paiement pour le plan Premium" : "Paiement pour le plan Pro"}
         </p>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-xl shadow-md">
         <div className="space-y-2">
-          <Label htmlFor="cardName">{t('nameOnCard')}</Label>
+          <Label htmlFor="cardName">Nom sur la carte</Label>
           <Input id="cardName" placeholder="John Doe" required />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="cardNumber">{t('cardNumber')}</Label>
+          <Label htmlFor="cardNumber">Numéro de carte</Label>
           <Input 
             id="cardNumber" 
             placeholder="4242 4242 4242 4242" 
@@ -60,7 +60,7 @@ const Payment = () => {
         
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="expiry">{t('expiryDate')}</Label>
+            <Label htmlFor="expiry">Date d'expiration</Label>
             <Input id="expiry" placeholder="MM/YY" required />
           </div>
           
@@ -71,12 +71,12 @@ const Payment = () => {
         </div>
         
         <div className="pt-2">
-          <Button type="submit" className="w-full">{t('completePayment')}</Button>
+          <Button type="submit" className="w-full">Finaliser le paiement</Button>
         </div>
         
         <div className="flex items-center justify-center text-sm text-gray-500 pt-4">
           <ShieldCheck className="h-4 w-4 mr-2 text-green-500" />
-          <span>{t('securePayment')}</span>
+          <span>Paiement sécurisé</span>
         </div>
       </form>
     </div>
