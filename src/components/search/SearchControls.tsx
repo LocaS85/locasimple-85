@@ -8,7 +8,7 @@ interface SearchControlsProps {
   userLocation: [number, number];
   selectedDistance: number | null;
   selectedDuration: number | null;
-  distanceUnit: "km" | "mi";
+  distanceUnit: "km" | "miles";
   transportMode: string;
   searchQuery: string;
   isRecording: boolean;

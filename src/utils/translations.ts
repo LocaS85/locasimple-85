@@ -1,9 +1,9 @@
-
 export const translations = {
   'fr': {
     // Navigation
     'back': 'Retour',
     'backToHome': 'Retour à l\'accueil',
+    'backToCategories': 'Retour aux catégories',
     'search': 'Rechercher',
     'home': 'Accueil',
     'about': 'À propos',
@@ -297,6 +297,7 @@ export const translations = {
     // General
     'back': 'Back',
     'backToHome': 'Back to home',
+    'backToCategories': 'Back to categories',
     'search': 'Search',
     'home': 'Home',
     'about': 'About',
@@ -559,4 +560,3 @@ export const translations = {
     // ... keep existing code (German translations)
   }
 };
-

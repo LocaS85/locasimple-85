@@ -67,8 +67,8 @@ export const SearchContainer: React.FC = () => {
     checkServer();
   }, []);
 
-  // Update the distanceUnit state to match the expected type (km/mi)
-  const [distanceUnit, setDistanceUnit] = useState<"km" | "mi">("km");
+  // Update the distanceUnit state to match the expected type (km/miles)
+  const [distanceUnit, setDistanceUnit] = useState<"km" | "miles">("km");
 
   return (
     <div className="relative w-full h-full">

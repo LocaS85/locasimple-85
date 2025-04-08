@@ -77,7 +77,7 @@ const SubcategoryGrid = () => {
           className="flex items-center text-primary"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          {t('backToCategories')}
+          Retour aux catégories
         </Button>
       </div>
       

@@ -6,9 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 export interface DistanceFilterProps {
   selectedDistance: number;
-  distanceUnit: "km" | "mi";
+  distanceUnit: "km" | "miles";
   onDistanceChange: (value: number) => void;
-  onDistanceUnitChange: (value: "km" | "mi") => void;
+  onDistanceUnitChange: (value: "km" | "miles") => void;
 }
 
 export const DistanceFilter: React.FC<DistanceFilterProps> = ({
@@ -25,14 +25,14 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
           <span className="text-sm font-medium text-gray-600">{selectedDistance}</span>
           <Select 
             value={distanceUnit} 
-            onValueChange={(value: 'km' | 'mi') => onDistanceUnitChange(value)}
+            onValueChange={(value: 'km' | 'miles') => onDistanceUnitChange(value)}
           >
             <SelectTrigger className="h-6 w-14 text-xs border-none">
               <SelectValue placeholder={distanceUnit} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="km">km</SelectItem>
-              <SelectItem value="mi">mi</SelectItem>
+              <SelectItem value="miles">mi</SelectItem>
             </SelectContent>
           </Select>
         </div>
