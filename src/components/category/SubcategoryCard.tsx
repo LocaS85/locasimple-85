@@ -54,11 +54,11 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
           onClick={!hasChildren ? () => onNavigate(`/search?category=${subCategory.id}`) : undefined}
         >
           <div className="flex items-center mb-3 sm:mb-4">
-            <div className={`mr-3 text-3xl sm:text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
+            <div className={`mr-3 text-2xl sm:text-3xl md:text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
               {/* Icon will be determined by category utility functions */}
               {subCategory.id.charAt(0).toUpperCase()}
             </div>
-            <h3 className="text-base sm:text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
           </div>
           
           {hasChildren && (
@@ -70,7 +70,7 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
                     key={child.id}
                     variant="outline"
                     size="sm"
-                    className="text-xs rounded-full hover:bg-primary hover:text-white transition-colors mb-1"
+                    className="text-xs rounded-full hover:bg-primary hover:text-white transition-colors mb-1 px-2 py-1 h-auto"
                     onClick={() => onNavigate(`/search?category=${child.id}`)}
                   >
                     {t(child.name) || child.name}

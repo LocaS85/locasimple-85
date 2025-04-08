@@ -46,14 +46,14 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
 
   const renderSubCategories = (categories: SubCategory[]) => {
     return categories.map((category) => (
-      <AccordionItem key={category.id} value={category.id}>
-        <AccordionTrigger>
+      <AccordionItem key={category.id} value={category.id} className="border rounded-md mb-2">
+        <AccordionTrigger className="px-4 py-2 hover:bg-accent/50">
           {category.name}
         </AccordionTrigger>
         <AccordionContent>
           {category.children ? (
             <div className="ml-4">
-              <Accordion type="single" collapsible>
+              <Accordion type="single" collapsible className="w-full">
                 {renderSubCategories(category.children)}
               </Accordion>
             </div>
@@ -85,7 +85,7 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 p-2">
       <h2 className="text-xl font-semibold mb-4">Sous-catégories</h2>
       <Accordion type="single" collapsible className="w-full">
         {renderSubCategories(subCategories)}

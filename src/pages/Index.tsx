@@ -4,15 +4,18 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import { motion } from "framer-motion";
-import { Hotel, Store, Heart, Briefcase, Utensils, Film, BookOpen, Home, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { CATEGORIES } from "@/types/categories";
+import { getCategoryIcon } from "@/utils/categoryIcons";
+import { getCategoryColorClass } from "@/utils/categoryColors";
 
 const Index = () => {
   const { t } = useLanguage();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   
-  const handleCategorySelect = (categoryId: string) => {
+  const handleCategoryClick = (categoryId: string) => {
     setSelectedCategories((prevSelected) =>
       prevSelected.includes(categoryId)
         ? prevSelected.filter((id) => id !== categoryId)
@@ -26,7 +29,7 @@ const Index = () => {
       
       <CategoriesSection 
         selectedCategories={selectedCategories} 
-        onCategorySelect={handleCategorySelect} 
+        onCategoryClick={handleCategoryClick} 
       />
       
       <FeaturesSection />
@@ -38,23 +41,27 @@ const Index = () => {
 
 const CategoriesSection = ({ 
   selectedCategories, 
-  onCategorySelect 
+  onCategoryClick 
 }: { 
   selectedCategories: string[], 
-  onCategorySelect: (id: string) => void 
+  onCategoryClick: (id: string) => void 
 }) => {
   const { t } = useLanguage();
   
-  const categoryIcons = {
-    alimentation: <Utensils size={36} className="text-orange-500" />,
-    divertissement: <Film size={36} className="text-blue-500" />,
-    sante: <Heart size={36} className="text-red-500" />,
-    travail: <Briefcase size={36} className="text-purple-500" />,
-    shopping: <Store size={36} className="text-green-500" />,
-    education: <BookOpen size={36} className="text-yellow-500" />,
-    maison: <Home size={36} className="text-pink-500" />,
-    hotel: <Hotel size={36} className="text-cyan-500" />,
-  };
+  // Filter main categories for the grid - matching the same as CategoryGrid.tsx
+  const mainCategories = [
+    'quotidien',
+    'alimentation',
+    'shopping',
+    'services',
+    'sante',
+    'divertissement',
+    'hebergement'
+  ];
+  
+  const displayCategories = CATEGORIES.filter(cat => 
+    mainCategories.includes(cat.id)
+  );
 
   return (
     <div className="bg-background py-16 px-4 categories-section">
@@ -73,9 +80,9 @@ const CategoriesSection = ({
           </p>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {Object.entries(categoryIcons).map(([category, icon], index) => (
+            {displayCategories.map((category, index) => (
               <motion.div
-                key={category}
+                key={category.id}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -83,15 +90,17 @@ const CategoriesSection = ({
                 transition={{ duration: 0.3, delay: 0.1 * index }}
               >
                 <button
-                  onClick={() => onCategorySelect(category)}
+                  onClick={() => onCategoryClick(category.id)}
                   className={`w-full h-32 flex flex-col items-center justify-center p-4 rounded-xl transition-all shadow-sm hover:shadow-md
-                    ${selectedCategories.includes(category) 
+                    ${selectedCategories.includes(category.id) 
                       ? 'bg-primary/10 border-2 border-primary' 
                       : 'bg-card hover:bg-accent border border-border'}`}
                 >
-                  <div className="mb-3">{icon}</div>
+                  <div className="mb-3">
+                    {getCategoryIcon(category.id, "w-10 h-10")}
+                  </div>
                   <p className="text-sm font-medium text-foreground">
-                    {t(category) || category}
+                    {t(category.name) || category.name}
                   </p>
                 </button>
               </motion.div>
@@ -140,7 +149,7 @@ const DiscoverSection = () => {
           </p>
           
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/search">
+            <Link to="/categories">
               <Button 
                 size="lg" 
                 className="bg-primary hover:bg-primary/90 rounded-full px-8 shadow-md hover:shadow-lg transition-all"
