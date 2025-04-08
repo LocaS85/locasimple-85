@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
@@ -68,7 +69,7 @@ export const SearchContainer: React.FC = () => {
   }, []);
 
   // Update the distanceUnit state to match the expected type
-  const [distanceUnit, setDistanceUnit] = useState<"km" | "miles">("km");
+  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
 
   return (
     <div className="relative w-full h-full">
@@ -120,7 +121,7 @@ export const SearchContainer: React.FC = () => {
         onTransportModeChange={searchState.setTransportMode}
         onDurationChange={searchState.setSelectedDuration}
         onDistanceChange={searchState.setSelectedDistance}
-        onDistanceUnitChange={setDistanceUnit}
+        onDistanceUnitChange={(unit: DistanceUnit) => setDistanceUnit(unit)}
         results={searchState.searchResults}
         onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
         selectedResultId={resultSelection.selectedResultId}

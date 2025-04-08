@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -7,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { DailyCategoryType, DAILY_CATEGORIES, DailyContactInfo, getRelationTypeLabel } from "@/types/dailyCategories";
-import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase } from "lucide-react";
+import { DailyCategoryType, DAILY_CATEGORIES, DailyCategory, DailyContactInfo, getRelationTypeLabel } from "@/types/dailyCategories";
+import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase, Edit2, X } from "lucide-react";
 import EnhancedMapComponent from "@/components/map/EnhancedMapComponent";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Mock data for demonstration
 const initialContacts: DailyContactInfo[] = [
@@ -53,6 +54,9 @@ const initialContacts: DailyContactInfo[] = [
 ];
 
 const DailyCategories = () => {
+  // References for the tab scroll
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  
   const [activeCategory, setActiveCategory] = useState<DailyCategoryType | null>(null);
   const [contacts, setContacts] = useState<DailyContactInfo[]>(initialContacts);
   const [filteredContacts, setFilteredContacts] = useState<DailyContactInfo[]>([]);
@@ -62,6 +66,15 @@ const DailyCategories = () => {
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   
+  // Custom categories state
+  const [categories, setCategories] = useState<DailyCategory[]>(DAILY_CATEGORIES);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState<Partial<DailyCategory>>({
+    name: '',
+    color: '#10B981'
+  });
+  const [isEditingCategory, setIsEditingCategory] = useState<string | null>(null);
+
   // Create local state for geolocation functionality
   const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Default to Paris
   const [isLocationActive, setIsLocationActive] = useState(false);
@@ -82,10 +95,6 @@ const DailyCategories = () => {
     relationType: '',
     category: 'adresse-principale',
   });
-
-  // We don't need the custom relation label state anymore since we're directly entering the relation type
-  // Removed: const [customRelationLabel, setCustomRelationLabel] = useState('');
-  // Removed: const [useCustomRelationLabel, setUseCustomRelationLabel] = useState(false);
 
   useEffect(() => {
     // Handle geolocation initialization if needed
@@ -170,7 +179,6 @@ const DailyCategories = () => {
       return;
     }
 
-    // No need to handle custom relation label separately anymore
     if (isEditing) {
       // Update existing contact
       setContacts(contacts.map(contact => 
@@ -270,8 +278,13 @@ const DailyCategories = () => {
   };
 
   const getCategoryColor = (categoryId: DailyCategoryType): string => {
-    const category = DAILY_CATEGORIES.find(cat => cat.id === categoryId);
+    const category = categories.find(cat => cat.id === categoryId);
     return category?.color || '#888888';
+  };
+
+  const getCategoryName = (categoryId: DailyCategoryType): string => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category?.name || categoryId;
   };
 
   const toggleMapView = () => {
@@ -286,22 +299,103 @@ const DailyCategories = () => {
     return userLocation;
   };
 
+  // Handle adding a new category
+  const handleAddCategory = () => {
+    if (!newCategory.name) {
+      toast({
+        title: "Information manquante",
+        description: "Veuillez entrer un nom pour le groupe",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const categoryId = `custom-${Date.now()}`;
+    const category: DailyCategory = {
+      id: categoryId,
+      name: newCategory.name,
+      icon: '📁',
+      color: newCategory.color || '#10B981',
+      isCustom: true
+    };
+
+    setCategories([...categories, category]);
+    setIsAddingCategory(false);
+    setNewCategory({ name: '', color: '#10B981' });
+    toast({
+      title: "Groupe ajouté",
+      description: "Le nouveau groupe a été ajouté avec succès",
+    });
+  };
+
+  // Handle editing a category
+  const handleEditCategory = () => {
+    if (isEditingCategory && newCategory.name) {
+      setCategories(categories.map(cat => 
+        cat.id === isEditingCategory
+          ? { ...cat, name: newCategory.name, color: newCategory.color || cat.color }
+          : cat
+      ));
+      setIsEditingCategory(null);
+      setNewCategory({ name: '', color: '#10B981' });
+      toast({
+        title: "Groupe mis à jour",
+        description: "Le groupe a été renommé avec succès",
+      });
+    }
+  };
+
+  // Start editing a category
+  const startEditingCategory = (categoryId: string) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    if (category && category.isCustom) {
+      setIsEditingCategory(categoryId);
+      setNewCategory({
+        name: category.name,
+        color: category.color
+      });
+    }
+  };
+
+  // Delete a custom category
+  const deleteCategory = (categoryId: string) => {
+    // Move contacts from this category to 'adresse-principale'
+    setContacts(contacts.map(contact => 
+      contact.category === categoryId 
+        ? { ...contact, category: 'adresse-principale' } 
+        : contact
+    ));
+    
+    // Remove the category
+    setCategories(categories.filter(cat => cat.id !== categoryId));
+    
+    // If active category is deleted, set to null
+    if (activeCategory === categoryId) {
+      setActiveCategory(null);
+    }
+
+    toast({
+      title: "Groupe supprimé",
+      description: "Le groupe a été supprimé avec succès",
+    });
+  };
+
   return (
     <motion.div 
-      className="container mx-auto py-8 px-4"
+      className="container mx-auto py-4 md:py-8 px-2 md:px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Quotidien</h1>
-        <div className="space-x-2">
+      <div className="flex flex-wrap justify-between items-center mb-4 md:mb-6 gap-2">
+        <h1 className="text-2xl md:text-3xl font-bold">Quotidien</h1>
+        <div className="flex flex-wrap gap-2">
           <Button 
             variant="outline" 
             size="sm"
             onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
           >
-            {showOnlyFavorites ? <StarOff className="h-4 w-4 mr-2" /> : <Star className="h-4 w-4 mr-2" />}
+            {showOnlyFavorites ? <StarOff className="h-4 w-4 mr-1" /> : <Star className="h-4 w-4 mr-1" />}
             {showOnlyFavorites ? "Tous" : "Favoris"}
           </Button>
           
@@ -310,32 +404,77 @@ const DailyCategories = () => {
             size="sm"
             onClick={toggleMapView}
           >
-            <MapPin className="h-4 w-4 mr-2" />
+            <MapPin className="h-4 w-4 mr-1" />
             Carte
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="all" className="mb-6">
-        <TabsList className="mb-4">
-          <TabsTrigger value="all" onClick={() => setActiveCategory(null)}>
-            Tous
-          </TabsTrigger>
-          
-          {DAILY_CATEGORIES.map((category) => (
-            <TabsTrigger 
-              key={category.id}
-              value={category.id}
-              onClick={() => setActiveCategory(category.id)}
+      {/* Horizontally scrollable tabs */}
+      <div className="relative mb-4">
+        <ScrollArea className="w-full pb-2">
+          <div ref={tabsListRef} className="flex space-x-1 whitespace-nowrap px-1 py-1 overflow-x-auto">
+            <Button 
+              variant={activeCategory === null ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveCategory(null)}
+              className="flex-shrink-0"
             >
-              {category.name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+              Tous
+            </Button>
+            
+            {categories.map((category) => (
+              <div key={category.id} className="flex items-center flex-shrink-0">
+                <Button 
+                  variant={activeCategory === category.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setActiveCategory(category.id)}
+                  className="flex items-center"
+                  style={{ borderLeft: `3px solid ${category.color}` }}
+                >
+                  {getCategoryIcon(category.id)}
+                  <span className="ml-1">{category.name}</span>
+                </Button>
+                
+                {category.isCustom && (
+                  <div className="flex ml-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0" 
+                      onClick={() => startEditingCategory(category.id)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 text-red-500" 
+                      onClick={() => deleteCategory(category.id)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {/* Add new group button */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsAddingCategory(true)}
+              className="flex-shrink-0"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Nouveau groupe
+            </Button>
+          </div>
+        </ScrollArea>
+      </div>
 
       {showMap ? (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 h-[500px]">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4 md:mb-6 h-[300px] md:h-[500px]">
           <EnhancedMapComponent 
             selectedLocations={formatContactsForMap()}
             userLocation={userLocation}
@@ -346,34 +485,34 @@ const DailyCategories = () => {
         </div>
       ) : null}
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">
+      <div className="flex flex-wrap justify-between items-center mb-3 md:mb-4 gap-2">
+        <h2 className="text-lg md:text-xl font-semibold">
           {activeCategory ? 
-            DAILY_CATEGORIES.find(c => c.id === activeCategory)?.name || "Contacts" : 
+            getCategoryName(activeCategory) : 
             "Tous les contacts"} 
           ({filteredContacts.length})
         </h2>
         
-        <Button onClick={handleAddNew}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Button onClick={handleAddNew} size="sm">
+          <Plus className="h-4 w-4 mr-1" />
           Nouveau contact
         </Button>
       </div>
 
       {filteredContacts.length === 0 ? (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 md:p-8 text-center">
           <p className="text-gray-500 dark:text-gray-400">Aucun contact trouvé dans cette catégorie.</p>
           <Button variant="outline" className="mt-4" onClick={handleAddNew}>Ajouter un contact</Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {filteredContacts.map((contact) => (
             <div 
               key={contact.id} 
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 relative"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 md:p-4 relative"
               style={{ borderLeft: `4px solid ${getCategoryColor(contact.category)}` }}
             >
-              <div className="absolute top-3 right-3 flex space-x-1">
+              <div className="absolute top-2 right-2 flex space-x-1">
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -412,11 +551,11 @@ const DailyCategories = () => {
                 />
                 
                 <div>
-                  <div className="flex items-center">
+                  <div className="flex items-center flex-wrap gap-1">
                     <h3 className="font-bold text-lg">{contact.firstName} {contact.lastName}</h3>
-                    <Badge variant="outline" className="ml-2">
+                    <Badge variant="outline" className="ml-0 sm:ml-2 text-xs">
                       {getCategoryIcon(contact.category)}
-                      <span className="ml-1">{DAILY_CATEGORIES.find(cat => cat.id === contact.category)?.name}</span>
+                      <span className="ml-1">{getCategoryName(contact.category)}</span>
                     </Badge>
                   </div>
                   
@@ -448,7 +587,7 @@ const DailyCategories = () => {
       <Dialog open={isAddingNew || isEditing !== null} onOpenChange={(open) => {
         if (!open) handleFormCancel();
       }}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{isEditing ? "Modifier le contact" : "Ajouter un contact"}</DialogTitle>
             <DialogDescription>
@@ -531,13 +670,13 @@ const DailyCategories = () => {
               <Label htmlFor="category">Catégorie *</Label>
               <Select 
                 value={formData.category} 
-                onValueChange={(value: DailyCategoryType) => handleSelectChange('category', value)}
+                onValueChange={(value) => handleSelectChange('category', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez une catégorie" />
                 </SelectTrigger>
                 <SelectContent>
-                  {DAILY_CATEGORIES.map((category) => (
+                  {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
                     </SelectItem>
@@ -561,6 +700,77 @@ const DailyCategories = () => {
           <DialogFooter>
             <Button variant="outline" onClick={handleFormCancel}>Annuler</Button>
             <Button onClick={handleFormSubmit}>{isEditing ? "Mettre à jour" : "Ajouter"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add/Edit Category Dialog */}
+      <Dialog 
+        open={isAddingCategory || isEditingCategory !== null} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsAddingCategory(false);
+            setIsEditingCategory(null);
+            setNewCategory({ name: '', color: '#10B981' });
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[400px] w-[95vw]">
+          <DialogHeader>
+            <DialogTitle>
+              {isEditingCategory ? "Modifier le groupe" : "Ajouter un groupe"}
+            </DialogTitle>
+            <DialogDescription>
+              {isEditingCategory 
+                ? "Modifiez les détails du groupe ci-dessous." 
+                : "Entrez les détails du nouveau groupe ci-dessous."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="groupName">Nom du groupe *</Label>
+              <Input 
+                id="groupName"
+                value={newCategory.name} 
+                onChange={(e) => setNewCategory({...newCategory, name: e.target.value})}
+                placeholder="Nom du groupe" 
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="groupColor">Couleur</Label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="color"
+                  id="groupColor"
+                  value={newCategory.color}
+                  onChange={(e) => setNewCategory({...newCategory, color: e.target.value})}
+                  className="w-10 h-10 rounded cursor-pointer"
+                />
+                <span className="text-sm text-gray-500">
+                  Choisissez une couleur pour identifier ce groupe
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsAddingCategory(false);
+                setIsEditingCategory(null);
+                setNewCategory({ name: '', color: '#10B981' });
+              }}
+            >
+              Annuler
+            </Button>
+            <Button 
+              onClick={isEditingCategory ? handleEditCategory : handleAddCategory}
+            >
+              {isEditingCategory ? "Mettre à jour" : "Ajouter"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

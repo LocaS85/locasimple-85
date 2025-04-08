@@ -1,3 +1,4 @@
+
 export interface DailyContactInfo {
   id: string;
   firstName: string;
@@ -6,7 +7,7 @@ export interface DailyContactInfo {
   address: string;
   latitude: number;
   longitude: number;
-  relationType?: string; // Changed from RelationType to string for free-form input
+  relationType?: string;
   relationLabel?: string; 
   category: DailyCategoryType;
   isFavorite?: boolean;
@@ -28,13 +29,15 @@ export type DailyCategoryType =
   | 'amis'
   | 'travail'
   | 'ecole'
-  | 'activites';
+  | 'activites'
+  | string; // Allow custom category types
 
 export interface DailyCategory {
   id: DailyCategoryType;
   name: string;
   icon: string;
   color: string;
+  isCustom?: boolean;
 }
 
 export interface RelationTypeInfo {
