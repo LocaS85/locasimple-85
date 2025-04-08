@@ -48,29 +48,29 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     >
       <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300">
         <div 
-          className={`p-6 flex flex-col h-full ${
+          className={`p-4 sm:p-6 flex flex-col h-full ${
             hasChildren ? 'cursor-default' : 'cursor-pointer'
           }`}
           onClick={!hasChildren ? () => onNavigate(`/search?category=${subCategory.id}`) : undefined}
         >
-          <div className="flex items-center mb-4">
-            <div className={`mr-3 text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
+          <div className="flex items-center mb-3 sm:mb-4">
+            <div className={`mr-3 text-3xl sm:text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
               {/* Icon will be determined by category utility functions */}
               {subCategory.id.charAt(0).toUpperCase()}
             </div>
-            <h3 className="text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
+            <h3 className="text-base sm:text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
           </div>
           
           {hasChildren && (
             <>
-              <Separator className="my-3" />
-              <div className="flex flex-wrap gap-2 mt-2">
+              <Separator className="my-2 sm:my-3" />
+              <div className="flex flex-wrap gap-1 sm:gap-2 mt-2">
                 {subCategory.children.map(child => (
                   <Button
                     key={child.id}
                     variant="outline"
                     size="sm"
-                    className="text-xs rounded-full hover:bg-primary hover:text-white transition-colors"
+                    className="text-xs rounded-full hover:bg-primary hover:text-white transition-colors mb-1"
                     onClick={() => onNavigate(`/search?category=${child.id}`)}
                   >
                     {t(child.name) || child.name}

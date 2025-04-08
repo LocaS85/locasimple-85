@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface SubCategoryListProps {
   subCategories: SubCategory[];
@@ -24,7 +25,8 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
     radius: 5,
     transportMode: 'driving',
     resultsCount: 3,
-    duration: 15
+    duration: 15,
+    distanceUnit: 'km' as DistanceUnit
   });
 
   const handleSearch = (subCategoryId: string) => {
@@ -34,10 +36,11 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
       radius: filters.radius.toString(),
       transport: filters.transportMode,
       duration: filters.duration.toString(),
-      results: filters.resultsCount.toString()
+      results: filters.resultsCount.toString(),
+      unit: filters.distanceUnit
     });
 
-    navigate(`/search?${searchParams.toString()}`);
+    navigate(`/categories/search?${searchParams.toString()}`);
     toast.success('Recherche lancée');
   };
 
@@ -65,6 +68,7 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
                 onResultsCountChange={(value) => setFilters({ ...filters, resultsCount: value })}
                 duration={filters.duration}
                 onDurationChange={(value) => setFilters({ ...filters, duration: value })}
+                distanceUnit={filters.distanceUnit}
               />
               <Button 
                 onClick={() => handleSearch(category.id)}
@@ -83,9 +87,11 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
   return (
     <div className="mt-4">
       <h2 className="text-xl font-semibold mb-4">Sous-catégories</h2>
-      <Accordion type="single" collapsible>
+      <Accordion type="single" collapsible className="w-full">
         {renderSubCategories(subCategories)}
       </Accordion>
     </div>
   );
 };
+
+export default SubCategoryList;
