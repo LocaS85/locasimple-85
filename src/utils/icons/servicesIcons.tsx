@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { 
-  Star,
   Mail,
   Building,
   Building2,
   Landmark,
-  UserCheck,
+  GanttChartSquare,
+  Shield,
   Siren,
   Flag,
   Briefcase,
@@ -24,21 +24,21 @@ export const getServicesIcon = (categoryId: string, className: string, color?: s
   switch (categoryId) {
     // Main services category
     case 'services':
-      return getIcon(Star, "orange-500");
+      return getIcon(Building, "blue-600");
     
     // Services subcategories
     case 'poste':
       return getIcon(Mail, "blue-600");
     case 'assurances':
-      return getIcon(Building, "gray-700");
+      return getIcon(Building, "purple-700");
     case 'immobilier':
       return getIcon(Building2, "amber-600");
     case 'services-publics':
       return getIcon(Landmark, "blue-800");
     case 'mairie':
-      return getIcon(Landmark, "blue-500");
+      return getIcon(GanttChartSquare, "blue-500");
     case 'police':
-      return getIcon(UserCheck, "blue-700");
+      return getIcon(Shield, "indigo-700");
     case 'pompiers':
       return getIcon(Siren, "red-600");
     case 'ambassade':

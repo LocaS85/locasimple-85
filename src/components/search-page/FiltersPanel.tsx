@@ -58,7 +58,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
         <div className="space-y-4">
           <TransportModeFilter
             selectedMode={transportMode}
-            onChange={onTransportModeChange}
+            onModeChange={onTransportModeChange}
           />
 
           <div>
@@ -91,7 +91,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
           </div>
 
           <ResultsCountPopover
-            value={resultsCount}
+            resultsCount={resultsCount}
             onChange={onResultsCountChange}
           />
         </div>

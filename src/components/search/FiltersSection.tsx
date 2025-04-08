@@ -42,7 +42,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
       
       <TransportModeFilter 
         selectedMode={transportMode} 
-        onChange={onTransportModeChange} 
+        onModeChange={onTransportModeChange} 
       />
       
       {filterMode === 'distance' ? (
@@ -54,7 +54,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
         />
       ) : (
         <DurationFilter 
-          duration={selectedDuration || 15}
+          selectedDuration={selectedDuration || 15}
           onDurationChange={onDurationChange}
         />
       )}

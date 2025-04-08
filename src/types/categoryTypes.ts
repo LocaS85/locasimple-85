@@ -13,5 +13,22 @@ export interface SubCategory {
   children?: SubCategory[];
 }
 
+export interface Address {
+  id: string;
+  title: string;
+  address: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+}
+
 export type DistanceUnit = "km" | "miles";
 export type TransportMode = "driving" | "walking" | "bicycling" | "transit";
+
+export interface TransportModeWithColor {
+  id: TransportMode;
+  name: string;
+  icon: string;
+  color: string;
+}
