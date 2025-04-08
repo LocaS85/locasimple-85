@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { SubCategory } from '@/types/categories';
 import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, Utensils, ShoppingBag, Briefcase, Heart, Film, Hotel } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -44,11 +44,42 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
     toast.success('Recherche lancée');
   };
 
+  // Get the appropriate icon based on category ID
+  const getIconForCategory = (id: string) => {
+    switch(id.toLowerCase()) {
+      case 'alimentation':
+      case 'restaurants':
+      case 'cafes':
+      case 'bars':
+      case 'gastronomie':
+      case 'rapide':
+        return <Utensils className="h-4 w-4 mr-2" />;
+      case 'shopping':
+      case 'vetements':
+      case 'electronique':
+        return <ShoppingBag className="h-4 w-4 mr-2" />;
+      case 'services':
+        return <Briefcase className="h-4 w-4 mr-2" />;
+      case 'sante':
+        return <Heart className="h-4 w-4 mr-2" />;
+      case 'divertissement':
+        return <Film className="h-4 w-4 mr-2" />;
+      case 'hebergement':
+      case 'hotels':
+        return <Hotel className="h-4 w-4 mr-2" />;
+      default:
+        return null;
+    }
+  };
+
   const renderSubCategories = (categories: SubCategory[]) => {
     return categories.map((category) => (
       <AccordionItem key={category.id} value={category.id} className="border rounded-md mb-2">
         <AccordionTrigger className="px-4 py-2 hover:bg-accent/50">
-          {category.name}
+          <div className="flex items-center">
+            {getIconForCategory(category.id)}
+            {category.name}
+          </div>
         </AccordionTrigger>
         <AccordionContent>
           {category.children ? (

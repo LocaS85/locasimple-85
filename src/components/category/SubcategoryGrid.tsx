@@ -7,8 +7,15 @@ import { Button } from '@/components/ui/button';
 import { CATEGORIES } from '@/types/categories';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getCategoryColorClass } from '@/utils/categoryColors';
-import { getCategoryIcon } from '@/utils/categoryIcons';
 import SubcategoryCard from '@/components/category/SubcategoryCard';
+import { 
+  Utensils, 
+  ShoppingBag, 
+  Briefcase, 
+  Heart, 
+  Film, 
+  Hotel 
+} from 'lucide-react';
 
 const SubcategoryGrid = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -28,6 +35,26 @@ const SubcategoryGrid = () => {
       </div>
     );
   }
+
+  // Get the appropriate icon based on category ID
+  const getCategoryIcon = (id: string) => {
+    switch(id.toLowerCase()) {
+      case 'alimentation':
+        return <Utensils className="w-12 h-12" />;
+      case 'shopping':
+        return <ShoppingBag className="w-12 h-12" />;
+      case 'services':
+        return <Briefcase className="w-12 h-12" />;
+      case 'sante':
+        return <Heart className="w-12 h-12" />;
+      case 'divertissement':
+        return <Film className="w-12 h-12" />;
+      case 'hebergement':
+        return <Hotel className="w-12 h-12" />;
+      default:
+        return <Briefcase className="w-12 h-12" />;
+    }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -56,7 +83,7 @@ const SubcategoryGrid = () => {
       
       <div className="flex flex-col sm:flex-row items-center justify-center mb-8 gap-4">
         <div className={`p-4 rounded-full ${getCategoryColorClass(category.id)}`}>
-          {getCategoryIcon(category.id, "w-12 h-12")}
+          {getCategoryIcon(category.id)}
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-center sm:text-left">{t(category.name) || category.name}</h1>
       </div>

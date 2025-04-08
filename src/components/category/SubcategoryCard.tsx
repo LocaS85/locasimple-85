@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/button';
 import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 import { SubCategory } from '@/types/categories';
 import { NavigateFunction } from 'react-router-dom';
+import { 
+  Utensils, 
+  ShoppingBag, 
+  Briefcase, 
+  Heart, 
+  Film, 
+  Hotel,
+  Home
+} from 'lucide-react';
 
 interface SubcategoryCardProps {
   subCategory: SubCategory;
@@ -35,6 +44,32 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
       }
     }
   };
+
+  // Get the appropriate icon based on category ID
+  const getIconForCategory = (id: string) => {
+    switch(id.toLowerCase()) {
+      case 'alimentation':
+      case 'restaurants':
+      case 'cafes':
+      case 'bars':
+        return <Utensils className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+      case 'shopping':
+      case 'vetements':
+      case 'electronique':
+        return <ShoppingBag className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+      case 'services':
+        return <Briefcase className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+      case 'sante':
+        return <Heart className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+      case 'divertissement':
+        return <Film className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+      case 'hebergement':
+      case 'hotels':
+        return <Hotel className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+      default:
+        return <Home className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+    }
+  };
   
   return (
     <motion.div
@@ -54,9 +89,8 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
           onClick={!hasChildren ? () => onNavigate(`/search?category=${subCategory.id}`) : undefined}
         >
           <div className="flex items-center mb-3 sm:mb-4">
-            <div className={`mr-3 text-2xl sm:text-3xl md:text-4xl ${getCategoryIconColorClass(subCategory.id)}`}>
-              {/* Icon will be determined by category utility functions */}
-              {subCategory.id.charAt(0).toUpperCase()}
+            <div className="mr-3 flex-shrink-0">
+              {getIconForCategory(subCategory.id)}
             </div>
             <h3 className="text-sm sm:text-base md:text-lg font-semibold">{t(subCategory.name) || subCategory.name}</h3>
           </div>

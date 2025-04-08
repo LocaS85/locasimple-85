@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { DailyCategoryType, DAILY_CATEGORIES, DailyCategory, DailyContactInfo, getRelationTypeLabel } from "@/types/dailyCategories";
-import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase, Edit2, X } from "lucide-react";
+import { Pencil, MapPin, Plus, Star, StarOff, Trash2, User, Building, Users, Home, BookOpen, Briefcase, Edit2, X, ArrowLeft } from "lucide-react";
 import EnhancedMapComponent from "@/components/map/EnhancedMapComponent";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 // Mock data for demonstration
 const initialContacts: DailyContactInfo[] = [
@@ -54,6 +54,7 @@ const initialContacts: DailyContactInfo[] = [
 ];
 
 const DailyCategories = () => {
+  const navigate = useNavigate();
   // References for the tab scroll
   const tabsListRef = useRef<HTMLDivElement>(null);
   
@@ -380,6 +381,10 @@ const DailyCategories = () => {
     });
   };
 
+  const handleBack = () => {
+    navigate('/categories');
+  };
+
   return (
     <motion.div 
       className="container mx-auto py-4 md:py-8 px-2 md:px-4"
@@ -387,6 +392,17 @@ const DailyCategories = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Back button */}
+      <Button 
+        variant="outline" 
+        size="sm" 
+        onClick={handleBack} 
+        className="mb-4 flex items-center gap-1"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Retour
+      </Button>
+
       <div className="flex flex-wrap justify-between items-center mb-4 md:mb-6 gap-2">
         <h1 className="text-2xl md:text-3xl font-bold">Quotidien</h1>
         <div className="flex flex-wrap gap-2">
@@ -402,7 +418,7 @@ const DailyCategories = () => {
           <Button 
             variant={showMap ? "secondary" : "outline"} 
             size="sm"
-            onClick={toggleMapView}
+            onClick={() => setShowMap(!showMap)}
           >
             <MapPin className="h-4 w-4 mr-1" />
             Carte
