@@ -2,14 +2,13 @@
 import React from 'react';
 import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
-import { DistanceUnit } from '@/types/categoryTypes';
 
 interface SearchControlsProps {
   searchResults: Result[];
   userLocation: [number, number];
   selectedDistance: number | null;
   selectedDuration: number | null;
-  distanceUnit: DistanceUnit;
+  distanceUnit: "km" | "miles";
   transportMode: string;
   searchQuery: string;
   isRecording: boolean;

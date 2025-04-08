@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { getCategoryIconColorClass } from '@/utils/categoryColorUtils';
 import { SubCategory } from '@/types/categories';
 import { NavigateFunction } from 'react-router-dom';
 import { 
@@ -14,7 +13,23 @@ import {
   Heart, 
   Film, 
   Hotel,
-  Home
+  Home,
+  Coffee,
+  ShoppingCart,
+  Shirt,
+  Smartphone,
+  Package,
+  Gift,
+  Palette,
+  BookOpen,
+  Gem,
+  Glasses,
+  Dumbbell,
+  Flower,
+  Scissors,
+  Sparkles,
+  Car,
+  Building
 } from 'lucide-react';
 
 interface SubcategoryCardProps {
@@ -45,29 +60,82 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     }
   };
 
-  // Get the appropriate icon based on category ID
+  // Get the appropriate icon based on category ID with unique colors
   const getIconForCategory = (id: string) => {
     switch(id.toLowerCase()) {
+      // Food related categories
       case 'alimentation':
+        return <Utensils className="h-5 w-5 text-orange-500" />;
       case 'restaurants':
+        return <Utensils className="h-5 w-5 text-red-600" />;
       case 'cafes':
+        return <Coffee className="h-5 w-5 text-amber-700" />;
       case 'bars':
-        return <Utensils className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Utensils className="h-5 w-5 text-amber-500" />;
+      
+      // Shopping related categories
       case 'shopping':
+        return <ShoppingBag className="h-5 w-5 text-pink-500" />;
+      case 'centres-commerciaux':
+        return <ShoppingCart className="h-5 w-5 text-blue-500" />;
       case 'vetements':
+        return <Shirt className="h-5 w-5 text-purple-600" />;
       case 'electronique':
-        return <ShoppingBag className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Smartphone className="h-5 w-5 text-gray-700" />;
+      case 'chaussures':
+        return <Package className="h-5 w-5 text-amber-600" />;
+      case 'cadeaux':
+        return <Gift className="h-5 w-5 text-red-500" />;
+      case 'art':
+        return <Palette className="h-5 w-5 text-teal-500" />;
+      case 'librairies':
+        return <BookOpen className="h-5 w-5 text-amber-800" />;
+      case 'bijouteries':
+        return <Gem className="h-5 w-5 text-yellow-500" />;
+      case 'opticiens-achats':
+        return <Glasses className="h-5 w-5 text-blue-700" />;
+      case 'sport':
+        return <Dumbbell className="h-5 w-5 text-emerald-600" />;
+      case 'fleuristes':
+        return <Flower className="h-5 w-5 text-pink-400" />;
+      case 'jouets':
+        return <Gift className="h-5 w-5 text-indigo-500" />;
+      case 'parfumeries':
+        return <Sparkles className="h-5 w-5 text-violet-400" />;
+      
+      // Beauty related categories
+      case 'coiffeurs':
+        return <Scissors className="h-5 w-5 text-cyan-600" />;
+      case 'beaute':
+        return <Sparkles className="h-5 w-5 text-fuchsia-500" />;
+      case 'pressing':
+        return <Shirt className="h-5 w-5 text-sky-500" />;
+      
+      // Transport & services
+      case 'automobile':
+        return <Car className="h-5 w-5 text-slate-600" />;
+      case 'banques':
+        return <Building className="h-5 w-5 text-emerald-700" />;
+            
+      // Service categories
       case 'services':
-        return <Briefcase className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Briefcase className="h-5 w-5 text-blue-600" />;
+      
+      // Health categories
       case 'sante':
-        return <Heart className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Heart className="h-5 w-5 text-red-500" />;
+      
+      // Entertainment categories
       case 'divertissement':
-        return <Film className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Film className="h-5 w-5 text-violet-500" />;
+      
+      // Accommodation categories
       case 'hebergement':
       case 'hotels':
-        return <Hotel className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Hotel className="h-5 w-5 text-sky-600" />;
+      
       default:
-        return <Home className={`h-5 w-5 ${getCategoryIconColorClass(id)}`} />;
+        return <Home className="h-5 w-5 text-slate-500" />;
     }
   };
   

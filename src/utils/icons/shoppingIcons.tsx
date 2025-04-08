@@ -10,7 +10,13 @@ import {
   Smartphone,
   BookOpen,
   Gem,
-  Flower
+  Flower,
+  Dumbbell,
+  Glasses,
+  Building,
+  Car,
+  Scissors,
+  Sparkles
 } from 'lucide-react';
 
 export const getShoppingCategoryIcon = (categoryId: string, className: string, color?: string) => {
@@ -30,7 +36,7 @@ export const getShoppingCategoryIcon = (categoryId: string, className: string, c
     case 'centres-commerciaux':
       return getIcon(ShoppingCart, "blue-500");
     case 'vetements':
-      return getIcon(Shirt, "purple-500");
+      return getIcon(Shirt, "purple-600");
     case 'chaussures':
       return getIcon(Package, "amber-600");
     case 'cadeaux':
@@ -45,6 +51,24 @@ export const getShoppingCategoryIcon = (categoryId: string, className: string, c
       return getIcon(Gem, "yellow-500");
     case 'fleuristes':
       return getIcon(Flower, "pink-400");
+    case 'sport':
+      return getIcon(Dumbbell, "emerald-600");
+    case 'opticiens-achats':
+      return getIcon(Glasses, "blue-700");
+    case 'jouets':
+      return getIcon(Gift, "indigo-500");
+    case 'parfumeries':
+      return getIcon(Sparkles, "violet-400");
+    case 'coiffeurs':
+      return getIcon(Scissors, "cyan-600");
+    case 'beaute':
+      return getIcon(Sparkles, "fuchsia-500");
+    case 'pressing':
+      return getIcon(Shirt, "sky-500");
+    case 'automobile':
+      return getIcon(Car, "slate-600");
+    case 'banques':
+      return getIcon(Building, "emerald-700");
     default:
       return null;
   }

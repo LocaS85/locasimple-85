@@ -68,7 +68,6 @@ export const SHOPPING_CATEGORIES: Category[] = [
         children: bookStoresSubCategories
       },
       { id: 'jouets', name: 'Magasins de jouets', parentId: 'shopping' },
-      { id: 'pharmacies-achats', name: 'Pharmacies', parentId: 'shopping' },
       { id: 'parfumeries', name: 'Parfumeries', parentId: 'shopping' },
       { id: 'bijouteries', name: 'Bijouteries', parentId: 'shopping' },
       { id: 'opticiens-achats', name: 'Opticiens', parentId: 'shopping' },

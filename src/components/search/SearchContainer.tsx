@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
@@ -67,8 +68,8 @@ export const SearchContainer: React.FC = () => {
     checkServer();
   }, []);
 
-  // Update the distanceUnit state to match the expected type
-  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
+  // Update the distanceUnit state to match the expected type (km/miles)
+  const [distanceUnit, setDistanceUnit] = useState<"km" | "miles">("km");
 
   return (
     <div className="relative w-full h-full">
