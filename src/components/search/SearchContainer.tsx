@@ -7,6 +7,7 @@ import MapSection from './MapSection';
 import SearchMenu from './SearchMenu';
 import { toast } from 'sonner';
 import useSearchApiCore from '@/hooks/search/useSearchApiCore';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 export const SearchContainer: React.FC = () => {
   const {
@@ -68,7 +69,7 @@ export const SearchContainer: React.FC = () => {
   }, []);
 
   // Update the distanceUnit state to match the expected type (km/miles)
-  const [distanceUnit, setDistanceUnit] = useState<"km" | "miles">("km");
+  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
 
   return (
     <div className="relative w-full h-full">

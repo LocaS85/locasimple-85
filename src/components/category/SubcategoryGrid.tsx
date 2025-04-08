@@ -8,6 +8,12 @@ import { CATEGORIES } from '@/types/categories';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getCategoryColorClass } from '@/utils/categoryColors';
 import SubcategoryCard from '@/components/category/SubcategoryCard';
+
+// Import des icônes spécifiques par catégorie
+import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
+import { getServicesIcon } from '@/utils/icons/servicesIcons';
+import { getHealthIcon } from '@/utils/icons/healthIcons';
+import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
 import { 
   Utensils, 
   ShoppingBag, 
@@ -40,19 +46,23 @@ const SubcategoryGrid = () => {
   const getCategoryIcon = (id: string) => {
     switch(id.toLowerCase()) {
       case 'alimentation':
-        return <Utensils className="w-12 h-12" />;
+        // Utilise l'icône d'alimentation avec une couleur spécifique
+        return getFoodCategoryIcon('alimentation', "w-12 h-12", "text-orange-500");
       case 'shopping':
-        return <ShoppingBag className="w-12 h-12" />;
+        return <ShoppingBag className="w-12 h-12 text-green-500" />;
       case 'services':
-        return <Briefcase className="w-12 h-12" />;
+        // Utilise l'icône de services avec une couleur spécifique
+        return getServicesIcon('services', "w-12 h-12", "text-blue-600");
       case 'sante':
-        return <Heart className="w-12 h-12" />;
+        // Utilise l'icône de santé avec une couleur spécifique
+        return getHealthIcon('sante', "w-12 h-12", "text-red-500");
       case 'divertissement':
-        return <Film className="w-12 h-12" />;
+        // Utilise l'icône de divertissement avec une couleur spécifique
+        return getEntertainmentIcon('divertissement', "w-12 h-12", "text-purple-500");
       case 'hebergement':
-        return <Hotel className="w-12 h-12" />;
+        return <Hotel className="w-12 h-12 text-cyan-500" />;
       default:
-        return <Briefcase className="w-12 h-12" />;
+        return <Briefcase className="w-12 h-12 text-gray-500" />;
     }
   };
 
@@ -77,7 +87,7 @@ const SubcategoryGrid = () => {
           className="flex items-center text-primary"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour aux catégories
+          {t('backToCategories')}
         </Button>
       </div>
       

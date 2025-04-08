@@ -3,12 +3,13 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 export interface DistanceFilterProps {
   selectedDistance: number;
-  distanceUnit: "km" | "miles";
+  distanceUnit: DistanceUnit;
   onDistanceChange: (value: number) => void;
-  onDistanceUnitChange: (value: "km" | "miles") => void;
+  onDistanceUnitChange: (value: DistanceUnit) => void;
 }
 
 export const DistanceFilter: React.FC<DistanceFilterProps> = ({
@@ -25,7 +26,7 @@ export const DistanceFilter: React.FC<DistanceFilterProps> = ({
           <span className="text-sm font-medium text-gray-600">{selectedDistance}</span>
           <Select 
             value={distanceUnit} 
-            onValueChange={(value: 'km' | 'miles') => onDistanceUnitChange(value)}
+            onValueChange={(value: DistanceUnit) => onDistanceUnitChange(value)}
           >
             <SelectTrigger className="h-6 w-14 text-xs border-none">
               <SelectValue placeholder={distanceUnit} />

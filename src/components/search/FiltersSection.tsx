@@ -1,75 +1,63 @@
 
 import React from 'react';
-import { ResultsCountPopover } from './ResultsCountPopover';
-import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
-import { DurationFilter } from './DurationFilter';
-import { DistanceFilter } from './DistanceFilter';
-import { CategoriesFilter } from './CategoriesFilter';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TransportModeFilter } from '@/components/search/TransportModeFilter';
+import { DistanceFilter } from '@/components/search/DistanceFilter';
+import { DistanceUnit } from '@/types/categoryTypes';
+import { DurationFilter } from '@/components/search/DurationFilter';
 
 interface FiltersSectionProps {
-  resultsCount: number;
-  onResultsCountChange: (count: number) => void;
   transportMode: string;
   onTransportModeChange: (mode: string) => void;
-  selectedDuration: number | null;
-  onDurationChange: (duration: number) => void;
-  selectedDistance: number | null;
-  distanceUnit: 'km' | 'mi';
+  selectedDistance: number;
   onDistanceChange: (distance: number) => void;
-  onDistanceUnitChange: (unit: 'km' | 'mi') => void;
-  selectedCategory: string | null;
-  onCategorySelect: (categoryId: string | null) => void;
+  selectedDuration: number | null;
+  onDurationChange: (duration: number | null) => void;
+  distanceUnit: DistanceUnit;
+  onDistanceUnitChange: (unit: DistanceUnit) => void;
+  filterMode: string;
+  onFilterModeChange: (mode: string) => void;
 }
 
 export const FiltersSection: React.FC<FiltersSectionProps> = ({
-  resultsCount,
-  onResultsCountChange,
   transportMode,
   onTransportModeChange,
+  selectedDistance,
+  onDistanceChange,
   selectedDuration,
   onDurationChange,
-  selectedDistance,
   distanceUnit,
-  onDistanceChange,
   onDistanceUnitChange,
-  selectedCategory,
-  onCategorySelect
+  filterMode,
+  onFilterModeChange
 }) => {
   return (
-    <div className="px-2 py-1 flex flex-col gap-1.5">
-      <CategoriesFilter
-        selectedCategory={selectedCategory}
-        onCategorySelect={onCategorySelect}
+    <div className="space-y-4 p-2">
+      <Tabs value={filterMode} onValueChange={onFilterModeChange} className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="distance" className="flex-1">Distance</TabsTrigger>
+          <TabsTrigger value="duration" className="flex-1">Durée</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      
+      <TransportModeFilter 
+        selectedMode={transportMode} 
+        onChange={onTransportModeChange} 
       />
       
-      <ResultsCountPopover 
-        resultsCount={resultsCount}
-        onResultsCountChange={onResultsCountChange}
-      />
-      
-      <div className="w-full border border-black rounded-full bg-white text-black">
-        <TransportModeSelector 
-          transportMode={transportMode} 
-          onTransportModeChange={onTransportModeChange} 
+      {filterMode === 'distance' ? (
+        <DistanceFilter
+          selectedDistance={selectedDistance}
+          distanceUnit={distanceUnit}
+          onDistanceChange={onDistanceChange}
+          onDistanceUnitChange={onDistanceUnitChange}
         />
-      </div>
-      
-      <div className="flex justify-between gap-1.5">
-        <div className="w-1/2">
-          <DurationFilter 
-            selectedDuration={selectedDuration}
-            onDurationChange={onDurationChange}
-          />
-        </div>
-        <div className="w-1/2">
-          <DistanceFilter 
-            selectedDistance={selectedDistance}
-            distanceUnit={distanceUnit}
-            onDistanceChange={onDistanceChange}
-            onDistanceUnitChange={onDistanceUnitChange}
-          />
-        </div>
-      </div>
+      ) : (
+        <DurationFilter 
+          duration={selectedDuration || 15}
+          onDurationChange={onDurationChange}
+        />
+      )}
     </div>
   );
 };
