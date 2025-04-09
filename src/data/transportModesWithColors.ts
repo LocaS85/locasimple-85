@@ -9,11 +9,7 @@ import {
   Bike, 
   PersonStanding, 
   Plane, 
-  TrainTrack, 
-  Tram, 
-  Bus as Coach, 
-  Plane as Airport, 
-  Plane as Airstrip 
+  TrainTrack
 } from 'lucide-react';
 
 export const transportModesWithColors: TransportModeWithColor[] = [
@@ -25,7 +21,7 @@ export const transportModesWithColors: TransportModeWithColor[] = [
   { id: 'walk', name: 'À pied', color: '#22c55e', defaultColor: '#22c55e', icon: 'PersonStanding' }, 
   { id: 'plane', name: 'Avion', color: '#06b6d4', defaultColor: '#06b6d4', icon: 'Plane' }, 
   { id: 'metro', name: 'Métro', color: '#8b5cf6', defaultColor: '#8b5cf6', icon: 'TrainTrack' }, 
-  { id: 'tram', name: 'Tramway', color: '#f97316', defaultColor: '#f97316', icon: 'Tram' }, 
+  { id: 'tram', name: 'Tramway', color: '#f97316', defaultColor: '#f97316', icon: 'Train' }, 
   { id: 'coach', name: 'Cars', color: '#92400e', defaultColor: '#92400e', icon: 'Bus' }, 
   { id: 'airport', name: 'Aéroport', color: '#9333ea', defaultColor: '#9333ea', icon: 'Plane' }, 
   { id: 'airstrip', name: 'Aérodrome', color: '#ec4899', defaultColor: '#ec4899', icon: 'Plane' }, 
