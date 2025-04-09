@@ -1,66 +1,79 @@
 
-import React from 'react';
-import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
-import 'react-horizontal-scrolling-menu/dist/styles.css';
-import { DailyCategoryType, DailyCategory } from '@/types/dailyCategories';
+import React, { useState, ReactNode, useContext, useMemo } from 'react';
+import { 
+  ScrollMenu, 
+  VisibilityContext, 
+  type VisibilityContextType
+} from 'react-horizontal-scrolling-menu';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Import our new components
-import LeftArrow from './menu/LeftArrow';
-import RightArrow from './menu/RightArrow';
-import CategoryItem from './menu/CategoryItem';
-import AddCategoryItem from './menu/AddCategoryItem';
+type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
-interface HorizontalScrollMenuProps {
-  categories: DailyCategory[];
-  activeCategory: DailyCategoryType | null;
-  onCategorySelect: (categoryId: DailyCategoryType | null) => void;
-  onAddCategory: () => void;
-  onEditCategory?: (categoryId: string) => void;
-  onDeleteCategory?: (categoryId: string) => void;
-}
+type Props = {
+  children: ReactNode;
+  className?: string;
+};
 
-const HorizontalScrollMenu: React.FC<HorizontalScrollMenuProps> = ({
-  categories,
-  activeCategory,
-  onCategorySelect,
-  onAddCategory
-}) => {
-  // Préparation des éléments du menu avec "Tous" en premier
-  const allCategory = { id: null, name: 'Tous', color: '#6b7280' };
-  
+const LeftArrow = () => {
+  const { isFirstItemVisible, scrollPrev } = 
+    useContext<VisibilityContextType>(VisibilityContext);
+
   return (
-    <div className="w-full relative mb-5 py-1">
-      <ScrollMenu 
-        LeftArrow={LeftArrow} 
+    <button
+      disabled={isFirstItemVisible}
+      onClick={() => scrollPrev()}
+      className={`flex items-center justify-center p-2 rounded-full bg-white shadow-md mr-2 ${
+        isFirstItemVisible ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
+      }`}
+      aria-label="Scroll left"
+    >
+      <ChevronLeft size={20} />
+    </button>
+  );
+};
+
+const RightArrow = () => {
+  const { isLastItemVisible, scrollNext } = 
+    useContext<VisibilityContextType>(VisibilityContext);
+
+  return (
+    <button
+      disabled={isLastItemVisible}
+      onClick={() => scrollNext()}
+      className={`flex items-center justify-center p-2 rounded-full bg-white shadow-md ml-2 ${
+        isLastItemVisible ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'
+      }`}
+      aria-label="Scroll right"
+    >
+      <ChevronRight size={20} />
+    </button>
+  );
+};
+
+const HorizontalScrollMenu = ({ children, className = '' }: Props) => {
+  // Make sure children have itemId by wrapping them
+  const wrappedChildren = useMemo(() => {
+    const childrenArray = React.Children.toArray(children);
+    return childrenArray.map((child, index) => {
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, { 
+          ...child.props,
+          itemId: `item-${index}` // Add the required itemId prop
+        });
+      }
+      return child;
+    });
+  }, [children]);
+
+  return (
+    <div className={`w-full ${className}`}>
+      <ScrollMenu
+        LeftArrow={LeftArrow}
         RightArrow={RightArrow}
-        options={{ 
-          ratio: 0.9, 
-          rootMargin: '0px',
-          threshold: [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] 
-        }}
+        wrapperClassName="flex items-center"
+        scrollContainerClassName="py-1"
       >
-        {/* Use correct JSX pattern for ScrollMenu items */}
-        <CategoryItem
-          itemId="all"
-          category={allCategory}
-          isActive={activeCategory === null}
-          onClick={() => onCategorySelect(null)}
-        />
-        
-        {categories.map((category) => (
-          <CategoryItem
-            key={category.id}
-            itemId={category.id}
-            category={category}
-            isActive={category.id === activeCategory}
-            onClick={() => onCategorySelect(category.id)}
-          />
-        ))}
-        
-        <AddCategoryItem 
-          itemId="add-new"
-          onClick={onAddCategory}
-        />
+        {wrappedChildren}
       </ScrollMenu>
     </div>
   );
