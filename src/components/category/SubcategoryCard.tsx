@@ -6,6 +6,10 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { SubCategory } from '@/types/categories';
 import { NavigateFunction } from 'react-router-dom';
+import { getHealthIcon } from '@/utils/icons/healthIcons';
+import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
+import { getServicesIcon } from '@/utils/icons/servicesIcons';
+import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
 import { 
   Utensils, 
   ShoppingBag, 
@@ -62,6 +66,11 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
 
   // Get the appropriate icon based on category ID with unique colors
   const getIconForCategory = (id: string) => {
+    // Check if parent category is health-related
+    if (categoryId === 'sante') {
+      return getHealthIcon(id, "h-5 w-5");
+    }
+
     switch(id.toLowerCase()) {
       // Food related categories
       case 'alimentation':
