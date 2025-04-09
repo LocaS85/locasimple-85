@@ -16,9 +16,33 @@ export const useSearchState = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showRoutes, setShowRoutes] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [origin, setOrigin] = useState<any>(null);
+  const [destinations, setDestinations] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<'map' | 'list' | 'split'>('map');
+  const [filters, setFilters] = useState({
+    radius: 5,
+    categories: [] as string[],
+    transport: 'driving'
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
+  };
+
+  const resetMapState = () => {
+    setIsLoading(false);
+    setSearchResults([]);
+    setSelectedCategory(null);
+    setShowRoutes(false);
+    setSearchPerformed(false);
+  };
+
+  const updateFilters = (newFilters: Partial<typeof filters>) => {
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters
+    }));
   };
 
   return {
@@ -48,7 +72,18 @@ export const useSearchState = () => {
     setShowRoutes,
     searchPerformed,
     setSearchPerformed,
-    handleSearchChange
+    handleSearchChange,
+    origin,
+    setOrigin,
+    destinations,
+    setDestinations,
+    viewMode,
+    setViewMode,
+    filters,
+    updateFilters,
+    isLoading,
+    setIsLoading,
+    resetMapState
   };
 };
 

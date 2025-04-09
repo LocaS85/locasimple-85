@@ -6,15 +6,22 @@ import FilterStack from './filters/FilterStack';
 import SmartMap from './map/SmartMap';
 import RouteComparator from './route/RouteComparator';
 import GeoErrorBoundary from './GeoErrorBoundary';
-import { useSearchState } from '@/hooks/search/useSearchState';
+import { useSearchState } from '@/hooks/useSearchState';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import MapKeyWarning from './MapKeyWarning';
 import CategoryAccordion from './filters/CategoryAccordion';
 import TransportSelector from './filters/TransportSelector';
-import { DAILY_CATEGORIES } from '@/data/mockCategories';
 import RadiusControl from './filters/RadiusControl';
 import TimeFilter from './filters/TimeFilter';
-import { Car, User } from 'lucide-react'; // Added missing imports
+import { Car, User } from 'lucide-react';
+
+// Define mock DAILY_CATEGORIES until we import from the correct source
+const DAILY_CATEGORIES = [
+  { id: 'food', name: 'Restaurants', color: '#F59E0B' },
+  { id: 'shopping', name: 'Shopping', color: '#3B82F6' },
+  { id: 'entertainment', name: 'Loisirs', color: '#EC4899' },
+  { id: 'services', name: 'Services', color: '#10B981' }
+];
 
 const SearchPage = () => {
   const {

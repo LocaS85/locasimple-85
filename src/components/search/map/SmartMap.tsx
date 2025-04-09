@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Compass, Layers, Map, Locate, Loader2 } from 'lucide-react'; // Changed Map3D to Map
-import Map from '@/components/Map';
+import { Compass, Layers, Map as MapIcon, Locate, Loader2 } from 'lucide-react'; // Renamed Map to MapIcon
+import MapComponent from '@/components/Map'; // Use a different name to avoid conflicts
 import { toast } from 'sonner';
 
 interface SmartMapProps {
@@ -51,7 +51,7 @@ const SmartMap: React.FC<SmartMapProps> = ({
   return (
     <div className="relative w-full h-full">
       {/* Map component */}
-      <Map
+      <MapComponent
         results={[]}
         center={mapCenter}
         radius={filters?.radius || 5}
@@ -70,7 +70,7 @@ const SmartMap: React.FC<SmartMapProps> = ({
             onClick={toggle3DMode}
             title={`Mode ${mapMode === '2d' ? '3D' : '2D'}`}
           >
-            <Map size={20} />
+            <MapIcon size={20} />
           </button>
         )}
         
