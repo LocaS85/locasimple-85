@@ -50,7 +50,6 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
 }) => {
   const hasChildren = subCategory.children && subCategory.children.length > 0;
   
-  // Animation variants
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -63,14 +62,11 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     }
   };
 
-  // Get the appropriate icon based on category ID with unique colors
   const getIconForCategory = (id: string) => {
-    // Check if parent category is health-related
     if (categoryId === 'sante') {
       return getHealthIcon(id, "h-5 w-5");
     }
     
-    // Check for other main categories
     if (categoryId === 'alimentation') {
       return getFoodCategoryIcon(id, "h-5 w-5");
     }
@@ -88,7 +84,6 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     }
 
     switch(id.toLowerCase()) {
-      // Food related categories
       case 'alimentation':
         return <Utensils className="h-5 w-5 text-orange-500" />;
       case 'restaurants':
@@ -98,7 +93,6 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
       case 'bars':
         return <Utensils className="h-5 w-5 text-amber-500" />;
       
-      // Shopping related categories
       case 'shopping':
         return <ShoppingBag className="h-5 w-5 text-pink-500" />;
       case 'centres-commerciaux':
@@ -128,7 +122,6 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
       case 'parfumeries':
         return <Sparkles className="h-5 w-5 text-violet-400" />;
       
-      // Beauty related categories
       case 'coiffeurs':
         return <Scissors className="h-5 w-5 text-cyan-600" />;
       case 'beaute':
@@ -136,28 +129,23 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
       case 'pressing':
         return <Shirt className="h-5 w-5 text-sky-500" />;
       
-      // Transport & services
       case 'automobile':
         return <Car className="h-5 w-5 text-slate-600" />;
       case 'banques':
         return <Building className="h-5 w-5 text-emerald-700" />;
             
-      // Service categories
       case 'services':
         return <Briefcase className="h-5 w-5 text-blue-600" />;
       
-      // Health categories
       case 'sante':
         return <Heart className="h-5 w-5 text-red-500" />;
       
-      // Entertainment categories
       case 'divertissement':
         return <Film className="h-5 w-5 text-violet-500" />;
       
-      // Accommodation categories
       case 'hebergement':
       case 'hotels':
-        return <Hotel className="h-5 w-5 text-sky-600" />;
+        return <Building className="h-5 w-5 text-sky-600" />;
       
       default:
         return <Home className="h-5 w-5 text-slate-500" />;

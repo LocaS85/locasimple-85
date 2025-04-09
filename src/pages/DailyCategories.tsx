@@ -14,8 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
+import HorizontalScrollMenu from "@/components/daily/HorizontalScrollMenu";
 
-// Mock data for demonstration
 const initialContacts: DailyContactInfo[] = [
   {
     id: '1',
@@ -55,9 +55,8 @@ const initialContacts: DailyContactInfo[] = [
 
 const DailyCategories = () => {
   const navigate = useNavigate();
-  // References for the tab scroll
   const tabsListRef = useRef<HTMLDivElement>(null);
-  
+
   const [activeCategory, setActiveCategory] = useState<DailyCategoryType | null>(null);
   const [contacts, setContacts] = useState<DailyContactInfo[]>(initialContacts);
   const [filteredContacts, setFilteredContacts] = useState<DailyContactInfo[]>([]);
@@ -66,8 +65,7 @@ const DailyCategories = () => {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
-  
-  // Custom categories state
+
   const [categories, setCategories] = useState<DailyCategory[]>(DAILY_CATEGORIES);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategory, setNewCategory] = useState<Partial<DailyCategory>>({
@@ -76,16 +74,14 @@ const DailyCategories = () => {
   });
   const [isEditingCategory, setIsEditingCategory] = useState<string | null>(null);
 
-  // Create local state for geolocation functionality
-  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]); // Default to Paris
+  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
   const [isLocationActive, setIsLocationActive] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const [transportMode, setTransportMode] = useState('driving');
   const [searchRadius, setSearchRadius] = useState<number>(5);
   const [showMap, setShowMap] = useState(false);
 
-  // New state for the form
   const [formData, setFormData] = useState<Partial<DailyContactInfo>>({
     firstName: '',
     lastName: '',
@@ -98,7 +94,6 @@ const DailyCategories = () => {
   });
 
   useEffect(() => {
-    // Handle geolocation initialization if needed
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -108,7 +103,6 @@ const DailyCategories = () => {
         },
         (error) => {
           console.error("Geolocation error:", error);
-          // Keep default Paris coordinates
         }
       );
     }
@@ -117,12 +111,10 @@ const DailyCategories = () => {
   useEffect(() => {
     let result = contacts;
 
-    // Filter by active category if selected
     if (activeCategory) {
       result = result.filter(contact => contact.category === activeCategory);
     }
 
-    // Filter favorites if enabled
     if (showOnlyFavorites) {
       result = result.filter(contact => contact.isFavorite);
     }
@@ -181,7 +173,6 @@ const DailyCategories = () => {
     }
 
     if (isEditing) {
-      // Update existing contact
       setContacts(contacts.map(contact => 
         contact.id === isEditing ? { ...contact, ...formData } : contact
       ));
@@ -191,7 +182,6 @@ const DailyCategories = () => {
       });
       setIsEditing(null);
     } else {
-      // Add new contact
       const newContact: DailyContactInfo = {
         id: Date.now().toString(),
         firstName: formData.firstName!,
@@ -292,7 +282,6 @@ const DailyCategories = () => {
     setShowMap(!showMap);
   };
 
-  // Calculate map center based on first contact or user location
   const getMapCenter = (): [number, number] => {
     if (filteredContacts.length > 0) {
       return [filteredContacts[0].longitude, filteredContacts[0].latitude];
@@ -300,7 +289,6 @@ const DailyCategories = () => {
     return userLocation;
   };
 
-  // Handle adding a new category
   const handleAddCategory = () => {
     if (!newCategory.name) {
       toast({
@@ -329,7 +317,6 @@ const DailyCategories = () => {
     });
   };
 
-  // Handle editing a category
   const handleEditCategory = () => {
     if (isEditingCategory && newCategory.name) {
       setCategories(categories.map(cat => 
@@ -346,7 +333,6 @@ const DailyCategories = () => {
     }
   };
 
-  // Start editing a category
   const startEditingCategory = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
     if (category && category.isCustom) {
@@ -358,19 +344,15 @@ const DailyCategories = () => {
     }
   };
 
-  // Delete a custom category
   const deleteCategory = (categoryId: string) => {
-    // Move contacts from this category to 'adresse-principale'
     setContacts(contacts.map(contact => 
       contact.category === categoryId 
         ? { ...contact, category: 'adresse-principale' } 
         : contact
     ));
     
-    // Remove the category
     setCategories(categories.filter(cat => cat.id !== categoryId));
     
-    // If active category is deleted, set to null
     if (activeCategory === categoryId) {
       setActiveCategory(null);
     }
@@ -392,7 +374,6 @@ const DailyCategories = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Back button */}
       <Button 
         variant="outline" 
         size="sm" 
@@ -426,68 +407,12 @@ const DailyCategories = () => {
         </div>
       </div>
 
-      {/* Horizontally scrollable tabs */}
-      <div className="relative mb-4">
-        <ScrollArea className="w-full pb-2">
-          <div ref={tabsListRef} className="flex space-x-1 whitespace-nowrap px-1 py-1 overflow-x-auto">
-            <Button 
-              variant={activeCategory === null ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveCategory(null)}
-              className="flex-shrink-0"
-            >
-              Tous
-            </Button>
-            
-            {categories.map((category) => (
-              <div key={category.id} className="flex items-center flex-shrink-0">
-                <Button 
-                  variant={activeCategory === category.id ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setActiveCategory(category.id)}
-                  className="flex items-center"
-                  style={{ borderLeft: `3px solid ${category.color}` }}
-                >
-                  {getCategoryIcon(category.id)}
-                  <span className="ml-1">{category.name}</span>
-                </Button>
-                
-                {category.isCustom && (
-                  <div className="flex ml-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0" 
-                      onClick={() => startEditingCategory(category.id)}
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0 text-red-500" 
-                      onClick={() => deleteCategory(category.id)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
-            
-            {/* Add new group button */}
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setIsAddingCategory(true)}
-              className="flex-shrink-0"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Nouveau groupe
-            </Button>
-          </div>
-        </ScrollArea>
-      </div>
+      <HorizontalScrollMenu 
+        categories={categories}
+        activeCategory={activeCategory}
+        onCategorySelect={setActiveCategory}
+        onAddCategory={() => setIsAddingCategory(true)}
+      />
 
       {showMap ? (
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4 md:mb-6 h-[300px] md:h-[500px]">
@@ -599,7 +524,6 @@ const DailyCategories = () => {
         </div>
       )}
 
-      {/* Add/Edit Contact Dialog */}
       <Dialog open={isAddingNew || isEditing !== null} onOpenChange={(open) => {
         if (!open) handleFormCancel();
       }}>
@@ -720,7 +644,6 @@ const DailyCategories = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Add/Edit Category Dialog */}
       <Dialog 
         open={isAddingCategory || isEditingCategory !== null} 
         onOpenChange={(open) => {
