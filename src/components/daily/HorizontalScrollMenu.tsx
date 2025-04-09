@@ -2,21 +2,25 @@
 import React, { useState, ReactNode, useContext, useMemo } from 'react';
 import { 
   ScrollMenu, 
-  VisibilityContext, 
-  type VisibilityContextType
+  VisibilityContext
 } from 'react-horizontal-scrolling-menu';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { DailyCategory } from '@/types/dailyCategories';
+import CategoryItem from './menu/CategoryItem';
+import AddCategoryItem from './menu/AddCategoryItem';
 
 type scrollVisibilityApiType = React.ContextType<typeof VisibilityContext>;
 
 type Props = {
-  children: ReactNode;
-  className?: string;
+  categories: DailyCategory[];
+  activeCategory: string | null;
+  onCategorySelect: (categoryId: string | null) => void;
+  onAddCategory: () => void;
 };
 
 const LeftArrow = () => {
   const { isFirstItemVisible, scrollPrev } = 
-    useContext<VisibilityContextType>(VisibilityContext);
+    useContext(VisibilityContext);
 
   return (
     <button
@@ -34,7 +38,7 @@ const LeftArrow = () => {
 
 const RightArrow = () => {
   const { isLastItemVisible, scrollNext } = 
-    useContext<VisibilityContextType>(VisibilityContext);
+    useContext(VisibilityContext);
 
   return (
     <button
@@ -50,30 +54,48 @@ const RightArrow = () => {
   );
 };
 
-const HorizontalScrollMenu = ({ children, className = '' }: Props) => {
-  // Make sure children have itemId by wrapping them
-  const wrappedChildren = useMemo(() => {
-    const childrenArray = React.Children.toArray(children);
-    return childrenArray.map((child, index) => {
-      if (React.isValidElement(child)) {
-        return React.cloneElement(child, { 
-          ...child.props,
-          itemId: `item-${index}` // Add the required itemId prop
-        });
-      }
-      return child;
-    });
-  }, [children]);
+const HorizontalScrollMenu = ({
+  categories,
+  activeCategory,
+  onCategorySelect,
+  onAddCategory
+}: Props) => {
+  const items = [
+    // All categories button
+    <CategoryItem 
+      key="all"
+      itemId="all"
+      category={{ id: null, name: "Tous", color: "#6B7280" }}
+      isActive={activeCategory === null}
+      onClick={() => onCategorySelect(null)}
+    />,
+    // Category buttons
+    ...categories.map(category => (
+      <CategoryItem
+        key={category.id}
+        itemId={category.id}
+        category={category}
+        isActive={activeCategory === category.id}
+        onClick={() => onCategorySelect(category.id)}
+      />
+    )),
+    // Add category button
+    <AddCategoryItem 
+      key="add"
+      itemId="add"
+      onClick={onAddCategory}
+    />
+  ];
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className="w-full mb-4">
       <ScrollMenu
         LeftArrow={LeftArrow}
         RightArrow={RightArrow}
         wrapperClassName="flex items-center"
         scrollContainerClassName="py-1"
       >
-        {wrappedChildren}
+        {items}
       </ScrollMenu>
     </div>
   );

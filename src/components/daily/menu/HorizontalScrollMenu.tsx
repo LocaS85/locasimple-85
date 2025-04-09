@@ -2,8 +2,7 @@
 import React, { useState, ReactNode, useContext, useMemo } from 'react';
 import { 
   ScrollMenu, 
-  VisibilityContext, 
-  type VisibilityContextType
+  VisibilityContext
 } from 'react-horizontal-scrolling-menu';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LeftArrow from './LeftArrow';
