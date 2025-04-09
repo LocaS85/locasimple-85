@@ -51,33 +51,25 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
 
   // Get the appropriate icon based on category ID
   const getIconForCategory = (id: string, parentId: string) => {
-    // Check category specific icons
-    switch(parentId) {
-      case 'sante':
-        return getHealthIcon(id, "h-4 w-4 mr-2");
-      case 'alimentation':
-        return getFoodCategoryIcon(id, "h-4 w-4 mr-2");
-      case 'services':
-        return getServicesIcon(id, "h-4 w-4 mr-2");
-      case 'divertissement':
-        return getEntertainmentIcon(id, "h-4 w-4 mr-2");
-      case 'hebergement':
-        return getAccommodationIcon(id, "h-4 w-4 mr-2");
-      default:
-        // Fallback to basic category checks
-        switch(id.toLowerCase()) {
-          case 'restaurants':
-          case 'cafes':
-          case 'bars':
-            return getFoodCategoryIcon(id, "h-4 w-4 mr-2");
-          case 'shopping':
-          case 'vetements':
-          case 'electronique':
-            return <Search className="h-4 w-4 mr-2" />;
-          default:
-            return <Search className="h-4 w-4 mr-2" />;
-        }
+    // Check category specific icons from utility functions
+    if (parentId === 'sante') {
+      return getHealthIcon(id, "h-4 w-4 mr-2");
     }
+    if (parentId === 'alimentation') {
+      return getFoodCategoryIcon(id, "h-4 w-4 mr-2");
+    }
+    if (parentId === 'services') {
+      return getServicesIcon(id, "h-4 w-4 mr-2");
+    }
+    if (parentId === 'divertissement') {
+      return getEntertainmentIcon(id, "h-4 w-4 mr-2");
+    }
+    if (parentId === 'hebergement') {
+      return getAccommodationIcon(id, "h-4 w-4 mr-2");
+    }
+    
+    // Fallback to search icon
+    return <Search className="h-4 w-4 mr-2" />;
   };
 
   const renderSubCategories = (categories: SubCategory[]) => {

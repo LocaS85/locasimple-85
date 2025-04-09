@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
@@ -11,12 +12,6 @@ import { getServicesIcon } from '@/utils/icons/servicesIcons';
 import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
 import { getAccommodationIcon } from '@/utils/icons/accommodationIcons';
 import { 
-  Utensils, 
-  ShoppingBag, 
-  Briefcase, 
-  Heart, 
-  Film, 
-  Building,
   Home,
   Coffee,
   ShoppingCart,
@@ -33,6 +28,7 @@ import {
   Scissors,
   Sparkles,
   Car,
+  Search
 } from 'lucide-react';
 
 interface SubcategoryCardProps {
@@ -63,6 +59,7 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
   };
 
   const getIconForCategory = (id: string) => {
+    // Vérifier d'abord les icônes spécifiques par catégorie parente
     if (categoryId === 'sante') {
       return getHealthIcon(id, "h-5 w-5");
     }
@@ -83,19 +80,11 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
       return getAccommodationIcon(id, "h-5 w-5");
     }
 
+    // Fallback pour les autres catégories
     switch(id.toLowerCase()) {
-      case 'alimentation':
-        return <Utensils className="h-5 w-5 text-orange-500" />;
-      case 'restaurants':
-        return <Utensils className="h-5 w-5 text-red-600" />;
       case 'cafes':
         return <Coffee className="h-5 w-5 text-amber-700" />;
-      case 'bars':
-        return <Utensils className="h-5 w-5 text-amber-500" />;
-      
       case 'shopping':
-        return <ShoppingBag className="h-5 w-5 text-pink-500" />;
-      case 'centres-commerciaux':
         return <ShoppingCart className="h-5 w-5 text-blue-500" />;
       case 'vetements':
         return <Shirt className="h-5 w-5 text-purple-600" />;
@@ -117,38 +106,14 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
         return <Dumbbell className="h-5 w-5 text-emerald-600" />;
       case 'fleuristes':
         return <Flower className="h-5 w-5 text-pink-400" />;
-      case 'jouets':
-        return <Gift className="h-5 w-5 text-indigo-500" />;
       case 'parfumeries':
         return <Sparkles className="h-5 w-5 text-violet-400" />;
-      
       case 'coiffeurs':
         return <Scissors className="h-5 w-5 text-cyan-600" />;
-      case 'beaute':
-        return <Sparkles className="h-5 w-5 text-fuchsia-500" />;
-      case 'pressing':
-        return <Shirt className="h-5 w-5 text-sky-500" />;
-      
       case 'automobile':
         return <Car className="h-5 w-5 text-slate-600" />;
-      case 'banques':
-        return <Building className="h-5 w-5 text-emerald-700" />;
-            
-      case 'services':
-        return <Briefcase className="h-5 w-5 text-blue-600" />;
-      
-      case 'sante':
-        return <Heart className="h-5 w-5 text-red-500" />;
-      
-      case 'divertissement':
-        return <Film className="h-5 w-5 text-violet-500" />;
-      
-      case 'hebergement':
-      case 'hotels':
-        return <Building className="h-5 w-5 text-sky-600" />;
-      
       default:
-        return <Home className="h-5 w-5 text-slate-500" />;
+        return <Search className="h-5 w-5 text-slate-500" />;
     }
   };
   

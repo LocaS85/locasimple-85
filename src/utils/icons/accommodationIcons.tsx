@@ -9,7 +9,9 @@ import {
   Trees,
   Warehouse,
   LandPlot,
-  Palmtree
+  Palmtree,
+  Hotel,
+  Bed
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -17,7 +19,7 @@ import clsx from 'clsx';
 const accommodationIcons: Record<string, { icon: React.FC<any>; color: string; description: string }> = {
   // Main accommodation category
   hebergement: { 
-    icon: Building, 
+    icon: Hotel, 
     color: "text-sky-500",
     description: "Icône représentant le secteur de l'hébergement avec un symbole d'immeuble élégant"
   },
