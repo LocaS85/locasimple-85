@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ScrollMenu } from 'react-horizontal-scrolling-menu';
+import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { DailyCategoryType, DailyCategory } from '@/types/dailyCategories';
 
