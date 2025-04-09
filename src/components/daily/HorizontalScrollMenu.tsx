@@ -56,22 +56,42 @@ function RightArrow() {
 
 // Composant pour chaque élément du menu
 interface CategoryItemProps {
+  itemId: string;
   category: DailyCategory | { id: null; name: string; color: string; };
   isActive: boolean;
   onClick: () => void;
 }
 
-function CategoryItem({ category, isActive, onClick }: CategoryItemProps) {
+function CategoryItem({ itemId, category, isActive, onClick }: CategoryItemProps) {
   return (
-    <Button 
-      variant={isActive ? "default" : "outline"}
-      size="sm"
-      onClick={onClick}
-      className="flex-shrink-0 mx-1 whitespace-nowrap"
-      style={category.id ? { borderLeft: `3px solid ${category.color}` } : {}}
-    >
-      {category.name}
-    </Button>
+    <div className="mx-1" itemID={itemId}>
+      <Button 
+        variant={isActive ? "default" : "outline"}
+        size="sm"
+        onClick={onClick}
+        className="flex-shrink-0 whitespace-nowrap"
+        style={category.id ? { borderLeft: `3px solid ${category.color}` } : {}}
+      >
+        {category.name}
+      </Button>
+    </div>
+  );
+}
+
+// Composant pour le bouton "Nouveau groupe"
+function AddCategoryItem({ onClick }: { itemId: string; onClick: () => void }) {
+  return (
+    <div className="mx-1">
+      <Button 
+        variant="ghost"
+        size="sm"
+        onClick={onClick}
+        className="flex-shrink-0 whitespace-nowrap"
+      >
+        <Plus className="h-4 w-4 mr-1" />
+        Nouveau groupe
+      </Button>
+    </div>
   );
 }
 
@@ -84,10 +104,7 @@ const HorizontalScrollMenu: React.FC<HorizontalScrollMenuProps> = ({
 }) => {
   
   // Préparation des éléments du menu avec "Tous" en premier
-  const allMenuItems = [
-    { id: null, name: 'Tous', color: '#6b7280' },
-    ...categories
-  ];
+  const allCategory = { id: null, name: 'Tous', color: '#6b7280' };
   
   return (
     <div className="w-full relative mb-4">
@@ -100,27 +117,27 @@ const HorizontalScrollMenu: React.FC<HorizontalScrollMenuProps> = ({
           threshold: [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] 
         }}
       >
-        {allMenuItems.map((category) => {
-          const itemId = category.id?.toString() || 'all';
-          return (
-            <CategoryItem
-              key={itemId}
-              category={category}
-              isActive={category.id === activeCategory || (category.id === null && activeCategory === null)}
-              onClick={() => onCategorySelect(category.id)}
-            />
-          );
-        })}
+        <CategoryItem
+          itemId="all"
+          category={allCategory}
+          isActive={activeCategory === null}
+          onClick={() => onCategorySelect(null)}
+        />
         
-        <Button 
-          variant="ghost"
-          size="sm"
+        {categories.map((category) => (
+          <CategoryItem
+            key={category.id}
+            itemId={category.id}
+            category={category}
+            isActive={category.id === activeCategory}
+            onClick={() => onCategorySelect(category.id)}
+          />
+        ))}
+        
+        <AddCategoryItem 
+          itemId="add-new"
           onClick={onAddCategory}
-          className="flex-shrink-0 mx-1 whitespace-nowrap"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Nouveau groupe
-        </Button>
+        />
       </ScrollMenu>
     </div>
   );
