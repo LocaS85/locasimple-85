@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
@@ -17,7 +16,7 @@ import {
   Briefcase, 
   Heart, 
   Film, 
-  Hotel,
+  Building,
   Home,
   Coffee,
   ShoppingCart,
@@ -34,7 +33,6 @@ import {
   Scissors,
   Sparkles,
   Car,
-  Building
 } from 'lucide-react';
 
 interface SubcategoryCardProps {

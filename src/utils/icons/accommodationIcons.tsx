@@ -1,13 +1,15 @@
 
 import React from 'react';
 import { 
-  Hotel,
-  Umbrella,
+  Building,
   Home,
-  BuildingIcon,
-  Bed,
-  House,
-  Tent
+  Heart,
+  Tent,
+  Sun,
+  Trees,
+  Warehouse,
+  LandPlot,
+  Palmtree
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -15,36 +17,36 @@ import clsx from 'clsx';
 const accommodationIcons: Record<string, { icon: React.FC<any>; color: string; description: string }> = {
   // Main accommodation category
   hebergement: { 
-    icon: Hotel, 
-    color: "text-pink-500",
-    description: "Icône représentant le secteur de l'hébergement avec un symbole d'hôtel élégant"
+    icon: Building, 
+    color: "text-sky-500",
+    description: "Icône représentant le secteur de l'hébergement avec un symbole d'immeuble élégant"
   },
   
   // Accommodation subcategories
   hotels: { 
-    icon: Hotel, 
-    color: "text-pink-600",
-    description: "Icône d'hôtel avec un lit et une enseigne, dans des tons rose vif"
+    icon: Building, 
+    color: "text-amber-600",
+    description: "Icône représentant un bâtiment hôtelier de plusieurs étages avec une enseigne 'Hôtel' en façade, dans des tons dorés et bleu marine"
   },
   auberges: { 
-    icon: BuildingIcon, 
-    color: "text-pink-400",
-    description: "Icône d'une auberge avec une façade simple, dans des tons roses doux"
+    icon: Warehouse, 
+    color: "text-olive-600",
+    description: "Icône illustrant une auberge traditionnelle avec un toit en pente et une cheminée fumante, en nuances de brun et vert olive"
   },
   'chambres-hotes': { 
-    icon: House, 
-    color: "text-pink-300",
-    description: "Icône d'une maison accueillante avec une fenêtre, dans des tons roses clairs"
+    icon: Home, 
+    color: "text-rose-300",
+    description: "Icône d'une maison accueillante avec un cœur sur la porte, symbolisant une chambre d'hôtes, en teintes pastel de rose et beige"
   },
   camping: { 
     icon: Tent, 
-    color: "text-green-500",
-    description: "Icône d'une tente de camping dans un environnement naturel, en vert forêt"
+    color: "text-emerald-600",
+    description: "Icône représentant une tente de camping sous des arbres avec un feu de camp à proximité, en vert forêt et orange feu"
   },
   'locations-vacances': { 
-    icon: Home, 
-    color: "text-amber-500",
-    description: "Icône d'une maison de vacances avec une terrasse, en ambre chaleureux"
+    icon: Palmtree, 
+    color: "text-cyan-500",
+    description: "Icône d'une maison de plage avec une vague et un soleil, évoquant une location de vacances, en bleu turquoise et jaune sable"
   },
 };
 
