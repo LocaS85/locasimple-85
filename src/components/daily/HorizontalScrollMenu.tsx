@@ -39,7 +39,6 @@ const HorizontalScrollMenu: React.FC<HorizontalScrollMenuProps> = ({
           threshold: [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] 
         }}
       >
-        {/* Use correct JSX pattern for ScrollMenu items */}
         <CategoryItem
           itemId="all"
           category={allCategory}

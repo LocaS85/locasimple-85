@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Compass, Layers, Map3D, Locate, Loader2 } from 'lucide-react';
+import { Compass, Layers, Map, Locate, Loader2 } from 'lucide-react'; // Changed Map3D to Map
 import Map from '@/components/Map';
 import { toast } from 'sonner';
 
@@ -70,7 +70,7 @@ const SmartMap: React.FC<SmartMapProps> = ({
             onClick={toggle3DMode}
             title={`Mode ${mapMode === '2d' ? '3D' : '2D'}`}
           >
-            <Map3D size={20} />
+            <Map size={20} />
           </button>
         )}
         

@@ -9,6 +9,12 @@ import GeoErrorBoundary from './GeoErrorBoundary';
 import { useSearchState } from '@/hooks/search/useSearchState';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import MapKeyWarning from './MapKeyWarning';
+import CategoryAccordion from './filters/CategoryAccordion';
+import TransportSelector from './filters/TransportSelector';
+import { DAILY_CATEGORIES } from '@/data/mockCategories';
+import RadiusControl from './filters/RadiusControl';
+import TimeFilter from './filters/TimeFilter';
+import { Car, User } from 'lucide-react'; // Added missing imports
 
 const SearchPage = () => {
   const {
@@ -45,7 +51,26 @@ const SearchPage = () => {
         <div className={`${viewMode === 'list' ? 'w-full' : viewMode === 'split' ? 'w-1/2' : 'hidden md:block md:w-1/4'} 
           h-full overflow-y-auto border-r border-gray-200 transition-all duration-300`}>
           <FilterStack>
-            {/* Filter components will be added here */}
+            <CategoryAccordion 
+              categories={DAILY_CATEGORIES}
+              selectionMode="multi-level"
+              onCategorySelect={() => {}}
+            />
+            <RadiusControl
+              unitOptions={['km', 'mi']}
+              maxRadius={100}
+              step={5}
+            />
+            <TransportSelector
+              modes={[
+                { id: 'driving', icon: <Car size={20} />, label: 'Voiture' },
+                { id: 'walking', icon: <User size={20} />, label: 'Marche' }
+              ]}
+            />
+            <TimeFilter
+              type="time-slider"
+              ranges={['now', 'today', 'custom']}
+            />
           </FilterStack>
         </div>
 

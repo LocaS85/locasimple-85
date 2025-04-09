@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Car, PersonWalking, Bike, Bus } from 'lucide-react';
+import { ChevronDown, ChevronUp, Car, Bike, Bus } from 'lucide-react';
+import { User } from 'lucide-react'; // Using User instead of PersonWalking which doesn't exist
 
 interface TransportMode {
   id: string;
@@ -16,7 +17,7 @@ interface TransportSelectorProps {
 
 const DEFAULT_TRANSPORT_MODES: TransportMode[] = [
   { id: 'driving', icon: <Car size={20} />, label: 'Voiture' },
-  { id: 'walking', icon: <PersonWalking size={20} />, label: 'Marche' },
+  { id: 'walking', icon: <User size={20} />, label: 'Marche' }, // Changed to User icon
   { id: 'cycling', icon: <Bike size={20} />, label: 'Vélo' },
   { id: 'transit', icon: <Bus size={20} />, label: 'Transport' }
 ];
