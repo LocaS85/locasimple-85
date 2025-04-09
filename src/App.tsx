@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   createBrowserRouter,
@@ -9,9 +10,7 @@ import Index from './pages/Index';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import DailyCategories from './pages/DailyCategories';
-import ErrorPage from "./pages/ErrorPage";
-
-// Add the import for SearchPage
+import ErrorPage from './pages/ErrorPage'; // Fixed import path
 import SearchPage from './pages/SearchPage';
 
 const router = createBrowserRouter([

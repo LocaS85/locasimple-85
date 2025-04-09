@@ -13,15 +13,18 @@ type Props = {
   className?: string;
 };
 
+// Define the type for items that can be rendered in the ScrollMenu
+type ValidChild = React.ReactElement<{ itemId?: string }>;
+
 const HorizontalScrollMenu = ({ children, className = '' }: Props) => {
   // Make sure children have itemId by wrapping them
   const wrappedChildren = useMemo(() => {
     const childrenArray = React.Children.toArray(children);
     return childrenArray.map((child, index) => {
       if (React.isValidElement(child)) {
-        return React.cloneElement(child, { 
+        return React.cloneElement(child as ValidChild, { 
           ...child.props,
-          itemId: child.props.itemId || `item-${index}` // Add the required itemId prop if not present
+          itemId: (child as ValidChild).props.itemId || `item-${index}` // Add the required itemId prop if not present
         });
       }
       return child;
