@@ -12,9 +12,9 @@ import {
   Flower2,
   Building2,
   Cross,
-  Tooth,
+  CircleDot, // Replaced Tooth with CircleDot
   Building,
-  Flask,
+  Beaker, // Replaced Flask with Beaker
   Scan
 } from 'lucide-react';
 import clsx from 'clsx';
@@ -40,7 +40,7 @@ const healthIcons: Record<string, { icon: React.FC<any>; color: string; descript
     description: "Icône d'une petite clinique avec une croix verte, dans des tons verts clairs"
   },
   dentistes: { 
-    icon: Tooth, 
+    icon: CircleDot, 
     color: "text-cyan-500",
     description: "Icône d'une dent stylisée avec une brosse à dents, en blanc et bleu"
   },
@@ -55,7 +55,7 @@ const healthIcons: Record<string, { icon: React.FC<any>; color: string; descript
     description: "Icône d'une croix de pharmacie verte avec une feuille, en vert émeraude"
   },
   laboratoires: { 
-    icon: Flask, 
+    icon: Beaker, 
     color: "text-red-800",
     description: "Icône d'un tube à essai avec un liquide rouge, en rouge bordeaux"
   },
