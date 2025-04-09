@@ -21,13 +21,13 @@ function LeftArrow() {
   const { isFirstItemVisible, scrollPrev } = useContext(VisibilityContext);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center mr-1">
       <Button
         variant="ghost"
         size="icon"
         disabled={isFirstItemVisible}
         onClick={() => scrollPrev()}
-        className="cursor-pointer h-8 w-8"
+        className="cursor-pointer h-8 w-8 rounded-full bg-white/80 hover:bg-white shadow-sm"
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -40,13 +40,13 @@ function RightArrow() {
   const { isLastItemVisible, scrollNext } = useContext(VisibilityContext);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center ml-1">
       <Button
         variant="ghost"
         size="icon"
         disabled={isLastItemVisible}
         onClick={() => scrollNext()}
-        className="cursor-pointer h-8 w-8"
+        className="cursor-pointer h-8 w-8 rounded-full bg-white/80 hover:bg-white shadow-sm"
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
@@ -64,12 +64,14 @@ interface CategoryItemProps {
 
 function CategoryItem({ itemId, category, isActive, onClick }: CategoryItemProps) {
   return (
-    <div className="mx-1" itemID={itemId}>
+    <div className="mx-2" key={itemId}>
       <Button 
         variant={isActive ? "default" : "outline"}
         size="sm"
         onClick={onClick}
-        className="flex-shrink-0 whitespace-nowrap"
+        className={`flex-shrink-0 whitespace-nowrap px-4 min-w-20 transition-all ${
+          isActive ? 'shadow-md' : 'hover:shadow-sm'
+        }`}
         style={category.id ? { borderLeft: `3px solid ${category.color}` } : {}}
       >
         {category.name}
@@ -79,14 +81,14 @@ function CategoryItem({ itemId, category, isActive, onClick }: CategoryItemProps
 }
 
 // Composant pour le bouton "Nouveau groupe"
-function AddCategoryItem({ onClick }: { itemId: string; onClick: () => void }) {
+function AddCategoryItem({ onClick, itemId }: { itemId: string; onClick: () => void }) {
   return (
-    <div className="mx-1">
+    <div className="mx-2" key={itemId}>
       <Button 
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={onClick}
-        className="flex-shrink-0 whitespace-nowrap"
+        className="flex-shrink-0 whitespace-nowrap min-w-28 bg-white/70 hover:bg-white/90 transition-all"
       >
         <Plus className="h-4 w-4 mr-1" />
         Nouveau groupe
@@ -107,7 +109,7 @@ const HorizontalScrollMenu: React.FC<HorizontalScrollMenuProps> = ({
   const allCategory = { id: null, name: 'Tous', color: '#6b7280' };
   
   return (
-    <div className="w-full relative mb-4">
+    <div className="w-full relative mb-5 py-1">
       <ScrollMenu 
         LeftArrow={LeftArrow} 
         RightArrow={RightArrow}
