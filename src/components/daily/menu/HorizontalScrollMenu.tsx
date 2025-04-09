@@ -21,7 +21,7 @@ const HorizontalScrollMenu = ({ children, className = '' }: Props) => {
       if (React.isValidElement(child)) {
         return React.cloneElement(child, { 
           ...child.props,
-          itemId: `item-${index}` // Add the required itemId prop
+          itemId: child.props.itemId || `item-${index}` // Add the required itemId prop if not present
         });
       }
       return child;
