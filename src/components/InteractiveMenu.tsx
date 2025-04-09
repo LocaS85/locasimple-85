@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Settings, X } from 'lucide-react';
@@ -7,11 +6,12 @@ import { RadiusSelector } from '@/components/menu/RadiusSelector';
 import { TransportModeSelector } from '@/components/menu/TransportModeSelector';
 import { ResultsCountSelector } from '@/components/menu/ResultsCountSelector';
 import { CategoriesSelector } from '@/components/menu/CategoriesSelector';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface InteractiveMenuProps {
   onFilterChange: (filters: {
     radius: number;
-    unit: 'km' | 'mi';
+    unit: DistanceUnit;
     duration: number;
     timeUnit: 'minutes' | 'hours';
     resultsCount: number;
@@ -24,7 +24,7 @@ interface InteractiveMenuProps {
 const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [radius, setRadius] = useState(5);
-  const [unit, setUnit] = useState<'km' | 'mi'>('km');
+  const [unit, setUnit] = useState<DistanceUnit>('km');
   const [duration, setDuration] = useState(15);
   const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes');
   const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
@@ -32,7 +32,7 @@ const InteractiveMenu: React.FC<InteractiveMenuProps> = ({ onFilterChange }) => 
   const [transportMode, setTransportMode] = useState('driving');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'mi'>('km');
+  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>('km');
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

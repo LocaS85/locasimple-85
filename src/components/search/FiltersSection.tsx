@@ -17,6 +17,10 @@ interface FiltersSectionProps {
   onDistanceUnitChange: (unit: DistanceUnit) => void;
   filterMode: string;
   onFilterModeChange: (mode: string) => void;
+  resultsCount?: number;
+  onResultsCountChange?: (count: number) => void;
+  selectedCategory?: string | null;
+  onCategorySelect?: (categoryId: string | null) => void;
 }
 
 export const FiltersSection: React.FC<FiltersSectionProps> = ({
@@ -29,7 +33,11 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   distanceUnit,
   onDistanceUnitChange,
   filterMode,
-  onFilterModeChange
+  onFilterModeChange,
+  resultsCount,
+  onResultsCountChange,
+  selectedCategory,
+  onCategorySelect
 }) => {
   return (
     <div className="space-y-4 p-2">

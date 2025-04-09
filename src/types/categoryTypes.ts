@@ -15,20 +15,33 @@ export interface SubCategory {
 
 export interface Address {
   id: string;
-  title: string;
-  address: string;
-  coordinates: {
+  name: string;
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  transportMode: string;
+  latitude: number;
+  longitude: number;
+  category: string;
+  favorite: boolean;
+  title?: string;
+  address?: string;
+  coordinates?: {
     lat: number;
     lng: number;
   };
 }
 
 export type DistanceUnit = "km" | "miles";
-export type TransportMode = "driving" | "walking" | "bicycling" | "transit";
+export type TransportMode = "driving" | "walking" | "bicycling" | "transit" | 
+  "car" | "train" | "bus" | "public" | "bike" | "walk" | "plane" | 
+  "metro" | "tram" | "coach" | "airport" | "airstrip";
 
 export interface TransportModeWithColor {
   id: TransportMode;
   name: string;
   icon: string;
   color: string;
+  defaultColor?: string;
 }

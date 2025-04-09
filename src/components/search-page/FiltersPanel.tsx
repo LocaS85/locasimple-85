@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
@@ -92,7 +91,7 @@ export const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
           <ResultsCountPopover
             resultsCount={resultsCount}
-            onChange={onResultsCountChange}
+            onResultsCountChange={onResultsCountChange}
           />
         </div>
       </div>

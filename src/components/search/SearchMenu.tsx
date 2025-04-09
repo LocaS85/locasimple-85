@@ -12,6 +12,7 @@ import ResultsList, { Result } from '@/components/ResultsList';
 import SavedSearches from '@/components/search/SavedSearches';
 import SearchHistory from '@/components/search/SearchHistory';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface SearchMenuProps {
   show: boolean;
@@ -25,8 +26,8 @@ interface SearchMenuProps {
   onDistanceChange: (distance: number) => void;
   selectedDuration: number | null;
   onDurationChange: (duration: number) => void;
-  distanceUnit: 'km' | 'mi';
-  onDistanceUnitChange: (unit: 'km' | 'mi') => void;
+  distanceUnit: DistanceUnit;
+  onDistanceUnitChange: (unit: DistanceUnit) => void;
   resultsCount: number;
   onResultsCountChange: (count: number) => void;
   results: Result[];
