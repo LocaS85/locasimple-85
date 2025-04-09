@@ -72,14 +72,14 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   onToggleFavorite = () => {}
 }) => {
   const { t } = useLanguage();
-  const [radiusType, setRadiusType] = useState<'distance' | 'duration'>('distance');
+  const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
   const [duration, setDuration] = useState(30);
   const [timeUnit, setTimeUnit] = useState<'minutes' | 'hours'>('minutes');
 
   if (!show) return null;
 
   const handleRadiusTypeChange = (type: 'distance' | 'duration') => {
-    setRadiusType(type);
+    setFilterMode(type);
     // Si on change pour durée, utiliser la valeur sélectionnée précédemment
     if (type === 'duration' && selectedDuration) {
       setDuration(selectedDuration);
@@ -121,16 +121,18 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
             
             <TabsContent value="filters" className="space-y-6">
               <FiltersSection
-                resultsCount={resultsCount}
-                onResultsCountChange={onResultsCountChange}
                 transportMode={transportMode}
                 onTransportModeChange={onTransportModeChange}
+                selectedDistance={selectedDistance || 5}
+                onDistanceChange={onDistanceChange}
                 selectedDuration={selectedDuration}
                 onDurationChange={onDurationChange}
-                selectedDistance={selectedDistance}
                 distanceUnit={distanceUnit}
-                onDistanceChange={onDistanceChange}
                 onDistanceUnitChange={onDistanceUnitChange}
+                filterMode={filterMode}
+                onFilterModeChange={handleRadiusTypeChange}
+                resultsCount={resultsCount}
+                onResultsCountChange={onResultsCountChange}
                 selectedCategory={selectedCategory}
                 onCategorySelect={onCategorySelect}
               />

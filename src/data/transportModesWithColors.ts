@@ -1,23 +1,38 @@
 
+import React from 'react';
 import { TransportModeWithColor, TransportMode } from '@/types/categoryTypes';
+import { 
+  Car, 
+  Train, 
+  Bus, 
+  CircuitBoard, 
+  Bike, 
+  PersonStanding, 
+  Plane, 
+  TrainTrack, 
+  Tram, 
+  Bus as Coach, 
+  Plane as Airport, 
+  Plane as Airstrip 
+} from 'lucide-react';
 
 export const transportModesWithColors: TransportModeWithColor[] = [
-  { id: 'car', name: 'Voiture', color: '#3b82f6', defaultColor: '#3b82f6' }, // Bleu
-  { id: 'train', name: 'Train', color: '#000000', defaultColor: '#000000' }, // Noir
-  { id: 'bus', name: 'Bus', color: '#eab308', defaultColor: '#eab308' }, // Jaune
-  { id: 'public', name: 'Transports en commun', color: '#6b7280', defaultColor: '#6b7280' }, // Gris
-  { id: 'bike', name: 'Vélo', color: '#ef4444', defaultColor: '#ef4444' }, // Rouge
-  { id: 'walk', name: 'À pied', color: '#22c55e', defaultColor: '#22c55e' }, // Vert
-  { id: 'plane', name: 'Avion', color: '#06b6d4', defaultColor: '#06b6d4' }, // Cyan
-  { id: 'metro', name: 'Métro', color: '#8b5cf6', defaultColor: '#8b5cf6' }, // Violet
-  { id: 'tram', name: 'Tramway', color: '#f97316', defaultColor: '#f97316' }, // Orange
-  { id: 'coach', name: 'Cars', color: '#92400e', defaultColor: '#92400e' }, // Marron
-  { id: 'airport', name: 'Aéroport', color: '#9333ea', defaultColor: '#9333ea' }, // Violet foncé
-  { id: 'airstrip', name: 'Aérodrome', color: '#ec4899', defaultColor: '#ec4899' }, // Rose
-  { id: 'driving', name: 'Voiture', color: '#3b82f6', defaultColor: '#3b82f6' }, // Bleu (alias for car)
-  { id: 'walking', name: 'À pied', color: '#22c55e', defaultColor: '#22c55e' }, // Vert (alias for walk)
-  { id: 'bicycling', name: 'Vélo', color: '#ef4444', defaultColor: '#ef4444' }, // Rouge (alias for bike)
-  { id: 'transit', name: 'Transport en commun', color: '#6b7280', defaultColor: '#6b7280' }, // Gris (alias for public)
+  { id: 'car', name: 'Voiture', color: '#3b82f6', defaultColor: '#3b82f6', icon: 'Car' }, 
+  { id: 'train', name: 'Train', color: '#000000', defaultColor: '#000000', icon: 'Train' }, 
+  { id: 'bus', name: 'Bus', color: '#eab308', defaultColor: '#eab308', icon: 'Bus' }, 
+  { id: 'public', name: 'Transports en commun', color: '#6b7280', defaultColor: '#6b7280', icon: 'CircuitBoard' }, 
+  { id: 'bike', name: 'Vélo', color: '#ef4444', defaultColor: '#ef4444', icon: 'Bike' }, 
+  { id: 'walk', name: 'À pied', color: '#22c55e', defaultColor: '#22c55e', icon: 'PersonStanding' }, 
+  { id: 'plane', name: 'Avion', color: '#06b6d4', defaultColor: '#06b6d4', icon: 'Plane' }, 
+  { id: 'metro', name: 'Métro', color: '#8b5cf6', defaultColor: '#8b5cf6', icon: 'TrainTrack' }, 
+  { id: 'tram', name: 'Tramway', color: '#f97316', defaultColor: '#f97316', icon: 'Tram' }, 
+  { id: 'coach', name: 'Cars', color: '#92400e', defaultColor: '#92400e', icon: 'Bus' }, 
+  { id: 'airport', name: 'Aéroport', color: '#9333ea', defaultColor: '#9333ea', icon: 'Plane' }, 
+  { id: 'airstrip', name: 'Aérodrome', color: '#ec4899', defaultColor: '#ec4899', icon: 'Plane' }, 
+  { id: 'driving', name: 'Voiture', color: '#3b82f6', defaultColor: '#3b82f6', icon: 'Car' }, 
+  { id: 'walking', name: 'À pied', color: '#22c55e', defaultColor: '#22c55e', icon: 'PersonStanding' }, 
+  { id: 'bicycling', name: 'Vélo', color: '#ef4444', defaultColor: '#ef4444', icon: 'Bike' }, 
+  { id: 'transit', name: 'Transport en commun', color: '#6b7280', defaultColor: '#6b7280', icon: 'Bus' }, 
 ];
 
 export const getTransportModeColor = (transportMode: string): string => {
