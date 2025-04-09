@@ -21,6 +21,7 @@ import Help from "./pages/Help";
 import Plan from "./pages/Plan";
 import Payment from "./pages/Payment";
 import Navigation from "./pages/Navigation";
+import Search from "./pages/Search";
 import Categories from "./pages/Categories";
 import DailyCategories from "./pages/DailyCategories";
 import DesignSystemShowcase from "./components/DesignSystemShowcase";
@@ -63,8 +64,7 @@ const App = () => (
                     {/* Feature pages */}
                     <Route path="/plan" element={<Plan />} />
                     <Route path="/payment" element={<Payment />} />
-                    {/* Redirect search route to categories */}
-                    <Route path="/search" element={<Navigate to="/categories" replace />} />
+                    <Route path="/search" element={<Search />} />
                     <Route path="/categories/*" element={<Categories />} />
                     <Route path="/quotidien" element={<DailyCategories />} />
                     

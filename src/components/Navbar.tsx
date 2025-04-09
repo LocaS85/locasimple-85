@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,6 @@ const Navbar = () => {
   const { t } = useLanguage();
   const { getColor } = useIconTheme();
 
-  // Add scroll detection for navbar styling
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -52,7 +50,6 @@ const Navbar = () => {
     )}>
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between h-14">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-gradient-to-r from-electricblue to-electricblue/80 text-white p-1.5 rounded-lg shadow-sm transition-transform group-hover:scale-110">
               <Map className="h-5 w-5" />
@@ -60,7 +57,6 @@ const Navbar = () => {
             <span className="text-xl font-bold bg-gradient-to-r from-slateblue to-slateblue/80 bg-clip-text text-transparent">LocaSimple</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <NavigationMenu>
               <NavigationMenuList>
@@ -170,7 +166,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center space-x-2">
             <ThemeToggle />
             <LanguageSelector variant="ghost" size="icon" className="p-0" />
@@ -186,7 +181,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-background/95 backdrop-blur-sm border-t border-border py-4 animate-fade-in">
           <div className="container mx-auto px-4 space-y-4">

@@ -1,64 +1,126 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
 
-export interface Place {
-  id: string;
+// Define interface for geopoints
+export interface GeoPoint {
+  type: string;
   name: string;
-  lat: number;
-  lon: number;
-  address?: string;
-  category?: string;
-  duration?: number;
-  distance?: number;
+  coordinates: [number, number];
+  properties?: any;
+}
+
+// Define interface for the SearchState
+export interface SearchState {
+  origin: GeoPoint | null;
+  destinations: GeoPoint[];
+  filters: {
+    radius: number;
+    categories: string[];
+    transport: string;
+  };
+  results: any[];
+  viewMode: 'map' | 'list' | 'split';
 }
 
 export const useSearchState = () => {
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [resultsCount, setResultsCount] = useState<number>(5);
-  const [selectedDuration, setSelectedDuration] = useState<number | null>(15);
-  const [selectedDistance, setSelectedDistance] = useState<number | null>(5);
-  const [distanceUnit, setDistanceUnit] = useState<'km' | 'miles'>('km');
-  const [viewport, setViewport] = useState({
-    latitude: 48.8566, // Paris par défaut
-    longitude: 2.3522,
-    zoom: 12
+  const [origin, setOrigin] = useState<GeoPoint | null>(null);
+  const [destinations, setDestinations] = useState<GeoPoint[]>([]);
+  const [filters, setFilters] = useState({
+    radius: 5,
+    categories: [],
+    transport: 'driving'
   });
-  
-  // Map and results state
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [popupInfo, setPopupInfo] = useState<Place | null>(null);
-  const [showRoutes, setShowRoutes] = useState(false);
-  const [searchPerformed, setSearchPerformed] = useState(false);
-  
-  // Filter state
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [results, setResults] = useState<any[]>([]);
+  const [viewMode, setViewMode] = useState<'map' | 'list' | 'split'>('map');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Update filters
+  const updateFilters = useCallback((newFilters: Partial<typeof filters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
+
+  // Add a destination
+  const addDestination = useCallback((destination: GeoPoint) => {
+    setDestinations(prev => [...prev, destination]);
+  }, []);
+
+  // Remove a destination
+  const removeDestination = useCallback((index: number) => {
+    setDestinations(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  // Clear all destinations
+  const clearDestinations = useCallback(() => {
+    setDestinations([]);
+  }, []);
+
+  // Reset map state (for error recovery)
+  const resetMapState = useCallback(() => {
+    setIsLoading(true);
+    
+    // Simulating map reset/reload
+    setTimeout(() => {
+      toast.success('Carte réinitialisée');
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  // Perform search with current parameters
+  const performSearch = useCallback(() => {
+    if (!origin) {
+      toast.error('Veuillez définir un point de départ');
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Simulate an API call
+    setTimeout(() => {
+      // Mock results
+      const mockResults = Array(5).fill(0).map((_, i) => ({
+        id: `result-${i}`,
+        name: `Lieu ${i + 1}`,
+        category: ['restaurant', 'shop', 'attraction', 'service', 'transport'][i % 5],
+        distance: Math.round((Math.random() * filters.radius * 1000)) / 1000,
+        duration: Math.round(Math.random() * 60),
+        coordinates: [
+          origin.coordinates[0] + (Math.random() - 0.5) * 0.02,
+          origin.coordinates[1] + (Math.random() - 0.5) * 0.02
+        ],
+        rating: Math.round(Math.random() * 50) / 10
+      }));
+
+      setResults(mockResults);
+      setIsLoading(false);
+      
+      if (mockResults.length === 0) {
+        toast.info('Aucun résultat trouvé');
+      } else {
+        toast.success(`${mockResults.length} résultats trouvés`);
+      }
+    }, 1500);
+  }, [origin, filters]);
 
   return {
-    places,
-    setPlaces,
-    resultsCount,
-    setResultsCount,
-    selectedDuration,
-    setSelectedDuration,
-    selectedDistance,
-    setSelectedDistance,
-    distanceUnit,
-    setDistanceUnit,
-    viewport,
-    setViewport,
-    searchResults,
-    setSearchResults,
-    selectedPlaceId,
-    setSelectedPlaceId,
-    popupInfo,
-    setPopupInfo,
-    showRoutes,
-    setShowRoutes,
-    searchPerformed,
-    setSearchPerformed,
-    selectedCategory,
-    setSelectedCategory
+    // State
+    origin,
+    setOrigin,
+    destinations,
+    filters,
+    results,
+    viewMode,
+    isLoading,
+    
+    // Methods
+    setViewMode,
+    updateFilters,
+    addDestination,
+    removeDestination,
+    clearDestinations,
+    resetMapState,
+    performSearch,
+    setResults
   };
 };
 

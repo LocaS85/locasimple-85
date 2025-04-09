@@ -1,63 +1,91 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { AlertCircle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 
-interface MapKeyWarningProps {
-  setTemporaryApiKey: (key: string) => boolean;
-}
+const MapKeyWarning = () => {
+  const [mapboxToken, setMapboxToken] = useState('');
+  const [isInputVisible, setIsInputVisible] = useState(false);
 
-const MapKeyWarning: React.FC<MapKeyWarningProps> = ({ setTemporaryApiKey }) => {
-  const [apiKey, setApiKey] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  
-  const handleSubmit = () => {
-    if (apiKey.trim().length > 0) {
-      const success = setTemporaryApiKey(apiKey.trim());
-      setSubmitted(true);
-      
-      if (!success) {
+  const handleTokenSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mapboxToken.trim()) {
+      try {
+        // Set the temporary token
+        (window as any).TEMPORARY_MAPBOX_TOKEN = mapboxToken.trim();
+        toast.success('Token Mapbox temporairement défini. Veuillez actualiser la page.');
         setTimeout(() => {
-          setSubmitted(false);
-        }, 3000);
+          window.location.reload();
+        }, 1500);
+      } catch (error) {
+        toast.error('Erreur lors de la définition du token');
       }
     }
   };
-  
+
   return (
-    <Card className="mb-4 border-red-300 bg-red-50">
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-red-500" />
-          <CardTitle className="text-lg text-red-700">Clé Mapbox manquante</CardTitle>
+    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-90 z-50 p-4">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
+        <div className="flex items-center mb-4 text-amber-500">
+          <AlertTriangle className="mr-2" />
+          <h2 className="text-xl font-semibold">Token Mapbox manquant</h2>
         </div>
-        <CardDescription className="text-red-600">
-          Une clé API Mapbox valide est requise pour afficher la carte
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-gray-700 mb-4">
-          Ajoutez votre clé API Mapbox dans le fichier .env ou saisissez une clé temporaire ci-dessous.
+        
+        <p className="mb-4 text-gray-700">
+          Pour utiliser les fonctionnalités cartographiques, vous devez configurer un token Mapbox.
         </p>
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            placeholder="Votre clé API Mapbox"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={handleSubmit} disabled={apiKey.trim().length === 0 || submitted}>
-            {submitted ? 'Chargement...' : 'Appliquer'}
-          </Button>
-        </div>
-      </CardContent>
-      <CardFooter className="pt-0 text-xs text-gray-500">
-        Obtenez une clé API sur <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">mapbox.com</a>
-      </CardFooter>
-    </Card>
+        
+        {!isInputVisible ? (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Vous pouvez obtenir un token gratuit sur <a href="https://www.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a> en créant un compte.
+            </p>
+            
+            <button
+              onClick={() => setIsInputVisible(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full"
+            >
+              Entrer un token temporaire
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleTokenSubmit}>
+            <div className="mb-4">
+              <label htmlFor="mapbox-token" className="block text-sm font-medium text-gray-700 mb-1">
+                Token Mapbox
+              </label>
+              <input
+                id="mapbox-token"
+                type="text"
+                value={mapboxToken}
+                onChange={(e) => setMapboxToken(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="pk.eyJ1Ijoi..."
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Note: Ce token sera stocké uniquement dans votre navigateur.
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex-1"
+              >
+                Appliquer
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsInputVisible(false)}
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+              >
+                Annuler
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
   );
 };
 
