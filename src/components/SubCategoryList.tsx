@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { SubCategory } from '@/types/categories';
 import FilterPanel from '@/components/FilterPanel';
 import { Button } from '@/components/ui/button';
-import { Search, Utensils, ShoppingBag, Briefcase, Heart, Film, Hotel } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -13,6 +13,10 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { DistanceUnit } from '@/types/categoryTypes';
+import { getHealthIcon } from '@/utils/icons/healthIcons';
+import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
+import { getServicesIcon } from '@/utils/icons/servicesIcons';
+import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
 
 interface SubCategoryListProps {
   subCategories: SubCategory[];
@@ -45,30 +49,34 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
   };
 
   // Get the appropriate icon based on category ID
-  const getIconForCategory = (id: string) => {
-    switch(id.toLowerCase()) {
+  const getIconForCategory = (id: string, parentId: string) => {
+    // Check if parent category is health
+    if (parentId === 'sante') {
+      return getHealthIcon(id, "h-4 w-4 mr-2");
+    }
+    
+    // Handle other category types
+    switch(parentId.toLowerCase()) {
       case 'alimentation':
-      case 'restaurants':
-      case 'cafes':
-      case 'bars':
-      case 'gastronomie':
-      case 'rapide':
-        return <Utensils className="h-4 w-4 mr-2" />;
-      case 'shopping':
-      case 'vetements':
-      case 'electronique':
-        return <ShoppingBag className="h-4 w-4 mr-2" />;
+        return getFoodCategoryIcon(id, "h-4 w-4 mr-2");
       case 'services':
-        return <Briefcase className="h-4 w-4 mr-2" />;
-      case 'sante':
-        return <Heart className="h-4 w-4 mr-2" />;
+        return getServicesIcon(id, "h-4 w-4 mr-2");
       case 'divertissement':
-        return <Film className="h-4 w-4 mr-2" />;
-      case 'hebergement':
-      case 'hotels':
-        return <Hotel className="h-4 w-4 mr-2" />;
+        return getEntertainmentIcon(id, "h-4 w-4 mr-2");
       default:
-        return null;
+        // Fallback to basic category checks
+        switch(id.toLowerCase()) {
+          case 'restaurants':
+          case 'cafes':
+          case 'bars':
+            return getFoodCategoryIcon(id, "h-4 w-4 mr-2");
+          case 'shopping':
+          case 'vetements':
+          case 'electronique':
+            return <Search className="h-4 w-4 mr-2" />;
+          default:
+            return <Search className="h-4 w-4 mr-2" />;
+        }
     }
   };
 
@@ -77,7 +85,7 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
       <AccordionItem key={category.id} value={category.id} className="border rounded-md mb-2">
         <AccordionTrigger className="px-4 py-2 hover:bg-accent/50">
           <div className="flex items-center">
-            {getIconForCategory(category.id)}
+            {getIconForCategory(category.id, categoryId)}
             {category.name}
           </div>
         </AccordionTrigger>
