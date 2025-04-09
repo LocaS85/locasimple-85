@@ -10,6 +10,7 @@ import { getHealthIcon } from '@/utils/icons/healthIcons';
 import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
 import { getServicesIcon } from '@/utils/icons/servicesIcons';
 import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
+import { getAccommodationIcon } from '@/utils/icons/accommodationIcons';
 import { 
   Utensils, 
   ShoppingBag, 
@@ -69,6 +70,23 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     // Check if parent category is health-related
     if (categoryId === 'sante') {
       return getHealthIcon(id, "h-5 w-5");
+    }
+    
+    // Check for other main categories
+    if (categoryId === 'alimentation') {
+      return getFoodCategoryIcon(id, "h-5 w-5");
+    }
+    
+    if (categoryId === 'services') {
+      return getServicesIcon(id, "h-5 w-5");
+    }
+    
+    if (categoryId === 'divertissement') {
+      return getEntertainmentIcon(id, "h-5 w-5");
+    }
+    
+    if (categoryId === 'hebergement') {
+      return getAccommodationIcon(id, "h-5 w-5");
     }
 
     switch(id.toLowerCase()) {

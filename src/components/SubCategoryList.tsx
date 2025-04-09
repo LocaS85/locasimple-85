@@ -17,6 +17,7 @@ import { getHealthIcon } from '@/utils/icons/healthIcons';
 import { getFoodCategoryIcon } from '@/utils/icons/foodIcons';
 import { getServicesIcon } from '@/utils/icons/servicesIcons';
 import { getEntertainmentIcon } from '@/utils/icons/entertainmentIcons';
+import { getAccommodationIcon } from '@/utils/icons/accommodationIcons';
 
 interface SubCategoryListProps {
   subCategories: SubCategory[];
@@ -50,19 +51,18 @@ export const SubCategoryList = ({ subCategories, categoryId }: SubCategoryListPr
 
   // Get the appropriate icon based on category ID
   const getIconForCategory = (id: string, parentId: string) => {
-    // Check if parent category is health
-    if (parentId === 'sante') {
-      return getHealthIcon(id, "h-4 w-4 mr-2");
-    }
-    
-    // Handle other category types
-    switch(parentId.toLowerCase()) {
+    // Check category specific icons
+    switch(parentId) {
+      case 'sante':
+        return getHealthIcon(id, "h-4 w-4 mr-2");
       case 'alimentation':
         return getFoodCategoryIcon(id, "h-4 w-4 mr-2");
       case 'services':
         return getServicesIcon(id, "h-4 w-4 mr-2");
       case 'divertissement':
         return getEntertainmentIcon(id, "h-4 w-4 mr-2");
+      case 'hebergement':
+        return getAccommodationIcon(id, "h-4 w-4 mr-2");
       default:
         // Fallback to basic category checks
         switch(id.toLowerCase()) {
