@@ -39,27 +39,29 @@ const HorizontalScrollMenu: React.FC<HorizontalScrollMenuProps> = ({
           threshold: [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] 
         }}
       >
-        <CategoryItem
-          itemId="all"
-          category={allCategory}
-          isActive={activeCategory === null}
-          onClick={() => onCategorySelect(null)}
-        />
-        
-        {categories.map((category) => (
+        <div className="flex">
           <CategoryItem
-            key={category.id}
-            itemId={category.id}
-            category={category}
-            isActive={category.id === activeCategory}
-            onClick={() => onCategorySelect(category.id)}
+            itemId="all"
+            category={allCategory}
+            isActive={activeCategory === null}
+            onClick={() => onCategorySelect(null)}
           />
-        ))}
-        
-        <AddCategoryItem 
-          itemId="add-new"
-          onClick={onAddCategory}
-        />
+          
+          {categories.map((category) => (
+            <CategoryItem
+              key={category.id}
+              itemId={category.id}
+              category={category}
+              isActive={category.id === activeCategory}
+              onClick={() => onCategorySelect(category.id)}
+            />
+          ))}
+          
+          <AddCategoryItem 
+            itemId="add-new"
+            onClick={onAddCategory}
+          />
+        </div>
       </ScrollMenu>
     </div>
   );
