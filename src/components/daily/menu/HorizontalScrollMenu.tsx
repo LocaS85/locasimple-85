@@ -4,7 +4,7 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { DailyCategoryType, DailyCategory } from '@/types/dailyCategories';
 
-// Import our new components
+// Import our components
 import LeftArrow from './LeftArrow';
 import RightArrow from './RightArrow';
 import CategoryItem from './CategoryItem';
