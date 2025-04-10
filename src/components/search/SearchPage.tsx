@@ -14,13 +14,14 @@ import TransportSelector from './filters/TransportSelector';
 import RadiusControl from './filters/RadiusControl';
 import TimeFilter from './filters/TimeFilter';
 import { Car, User } from 'lucide-react';
+import { DailyCategory } from '@/types/dailyCategories';
 
 // Define mock DAILY_CATEGORIES until we import from the correct source
-const DAILY_CATEGORIES = [
-  { id: 'food', name: 'Restaurants', color: '#F59E0B' },
-  { id: 'shopping', name: 'Shopping', color: '#3B82F6' },
-  { id: 'entertainment', name: 'Loisirs', color: '#EC4899' },
-  { id: 'services', name: 'Services', color: '#10B981' }
+const DAILY_CATEGORIES: DailyCategory[] = [
+  { id: 'food', name: 'Restaurants', color: '#F59E0B', icon: '🍽️' },
+  { id: 'shopping', name: 'Shopping', color: '#3B82F6', icon: '🛍️' },
+  { id: 'entertainment', name: 'Loisirs', color: '#EC4899', icon: '🎭' },
+  { id: 'services', name: 'Services', color: '#10B981', icon: '🔧' }
 ];
 
 const SearchPage = () => {
@@ -30,7 +31,7 @@ const SearchPage = () => {
     destinations,
     filters,
     updateFilters,
-    results,
+    searchResults,
     viewMode,
     setViewMode,
     resetMapState,

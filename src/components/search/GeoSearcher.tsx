@@ -1,122 +1,106 @@
 
 import React, { useState } from 'react';
-import { Search, Mic, MapPin } from 'lucide-react';
-import { toast } from 'sonner';
+import { Search, Mic, MapPin, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface GeoSearcherProps {
-  modes?: string[];
-  placeholder?: string;
+  modes: string[];
+  onResult: (result: any) => void;
+  placeholder: string;
   enableVoice?: boolean;
-  onResult?: (result: any) => void;
 }
 
 const GeoSearcher: React.FC<GeoSearcherProps> = ({
-  modes = ['address'],
-  placeholder = 'Rechercher...',
-  enableVoice = false,
-  onResult
+  modes,
+  onResult,
+  placeholder,
+  enableVoice = false
 }) => {
-  const [query, setQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-
+  const [searchValue, setSearchValue] = useState('');
+  
   const handleSearch = () => {
-    if (!query.trim()) return;
+    if (!searchValue.trim()) return;
     
-    setIsLoading(true);
-    
-    // Simulate a search result
-    setTimeout(() => {
-      setIsLoading(false);
-      if (onResult) {
-        onResult({
-          name: query,
-          coordinates: [2.3522, 48.8566]
-        });
+    // Simulate a geosearch result
+    const mockResult = {
+      name: searchValue,
+      coordinates: [2.3522, 48.8566], // Paris coordinates as fallback
+      type: 'address',
+      properties: {
+        address: searchValue
       }
-    }, 1000);
+    };
+    
+    onResult(mockResult);
   };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
-  const handleMicClick = () => {
-    if (!enableVoice) return;
-    
-    // Toggle recording state
-    setIsRecording(!isRecording);
-    
-    if (!isRecording) {
-      toast.info('Enregistrement vocal démarré');
-    } else {
-      toast.success('Enregistrement vocal terminé');
-      // In a real implementation, we would process the voice recording here
-    }
-  };
-
-  const handleLocationClick = () => {
-    setIsLoading(true);
-    
-    toast.info('Recherche de votre position...');
-    
-    // Simulate geolocation
-    setTimeout(() => {
-      setIsLoading(false);
-      if (onResult) {
-        onResult({
-          name: 'Ma position',
-          coordinates: [2.3522, 48.8566]
-        });
-      }
-    }, 1000);
-  };
-
   return (
-    <div className="relative w-full">
-      <div className="relative flex items-center">
-        <input
+    <div className="relative flex items-center w-full">
+      <div className="relative flex-1">
+        <Input
           type="text"
-          className="w-full px-4 py-2 pl-10 pr-16 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
           placeholder={placeholder}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="pr-10 pl-4 py-2 rounded-md border border-gray-300 w-full"
         />
-        
-        <Search className="absolute left-3 text-gray-400" size={18} />
-        
-        <div className="absolute right-3 flex space-x-2">
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
           {enableVoice && (
-            <button
-              className={`p-1 rounded-full ${isRecording ? 'bg-red-100 text-red-600' : 'hover:bg-gray-100'}`}
-              onClick={handleMicClick}
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-8 w-8 text-gray-400 hover:text-gray-600"
+              onClick={() => console.log('Voice search activated')}
             >
               <Mic size={18} />
-            </button>
-          )}
-          
-          {modes.includes('current_location') && (
-            <button
-              className="p-1 rounded-full hover:bg-gray-100"
-              onClick={handleLocationClick}
-            >
-              <MapPin size={18} />
-            </button>
+            </Button>
           )}
         </div>
       </div>
       
-      {isLoading && (
-        <div className="absolute top-12 left-0 right-0 bg-white z-10 p-3 rounded-lg shadow-lg text-center">
-          <div className="flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin mr-2"></div>
-            <span>Recherche en cours...</span>
-          </div>
-        </div>
+      <Button 
+        variant="default"
+        className="ml-2"
+        onClick={handleSearch}
+      >
+        <Search size={18} className="mr-2" />
+        Rechercher
+      </Button>
+      
+      {modes.includes('current_location') && (
+        <Button 
+          variant="outline"
+          size="icon"
+          className="ml-2"
+          onClick={() => {
+            onResult({
+              name: "Position actuelle",
+              coordinates: [2.3522, 48.8566], // Fake coordinates
+              type: 'current_location'
+            });
+          }}
+        >
+          <MapPin size={18} />
+        </Button>
+      )}
+      
+      {modes.includes('saved_places') && (
+        <Button 
+          variant="outline"
+          size="icon"
+          className="ml-2"
+          onClick={() => console.log('Saved places')}
+        >
+          <Home size={18} />
+        </Button>
       )}
     </div>
   );

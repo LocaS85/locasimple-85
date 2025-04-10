@@ -1,17 +1,14 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 interface FilterStackProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const FilterStack: React.FC<FilterStackProps> = ({ children }) => {
   return (
-    <div className="filter-stack p-4 space-y-4">
-      <h2 className="text-lg font-semibold">Filtres</h2>
-      <div className="space-y-4">
-        {children}
-      </div>
+    <div className="p-4 space-y-6">
+      {children}
     </div>
   );
 };
