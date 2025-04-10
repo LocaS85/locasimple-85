@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import GeoSearcher from './GeoSearcher';
 import FilterStack from './filters/FilterStack';
@@ -13,7 +13,7 @@ import CategoryAccordion from './filters/CategoryAccordion';
 import TransportSelector from './filters/TransportSelector';
 import RadiusControl from './filters/RadiusControl';
 import TimeFilter from './filters/TimeFilter';
-import { Car, User } from 'lucide-react';
+import { Car, User, Menu, X } from 'lucide-react';
 import { DailyCategory } from '@/types/dailyCategories';
 
 // Define mock DAILY_CATEGORIES until we import from the correct source
@@ -38,13 +38,19 @@ const SearchPage = () => {
     isLoading
   } = useSearchState();
 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   const handleSearchResult = (result: any) => {
     setOrigin(result);
     toast.success(`Position mise à jour: ${result.name || 'Nouvelle localisation'}`);
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-gray-50">
       <div className="p-4 bg-white shadow-md z-10">
         <GeoSearcher
           modes={['address', 'current_location', 'saved_places']}
@@ -55,9 +61,18 @@ const SearchPage = () => {
       </div>
       
       <div className="flex flex-1 relative overflow-hidden">
+        {/* Mobile sidebar toggle button */}
+        <button 
+          className="md:hidden absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
+          onClick={toggleSidebar}
+        >
+          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
         {/* Main content area with map and filters */}
-        <div className={`${viewMode === 'list' ? 'w-full' : viewMode === 'split' ? 'w-1/2' : 'hidden md:block md:w-1/4'} 
-          h-full overflow-y-auto border-r border-gray-200 transition-all duration-300`}>
+        <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block
+          ${viewMode === 'list' ? 'w-full' : viewMode === 'split' ? 'w-full md:w-1/2' : 'w-full md:w-1/4'} 
+          h-full overflow-y-auto border-r border-gray-200 transition-all duration-300 bg-white z-10`}>
           <FilterStack>
             <CategoryAccordion 
               categories={DAILY_CATEGORIES}
@@ -83,7 +98,9 @@ const SearchPage = () => {
         </div>
 
         {/* Map container */}
-        <div className={`${viewMode === 'map' ? 'w-full' : viewMode === 'split' ? 'w-1/2' : 'w-3/4'} 
+        <div className={`${viewMode === 'map' && !sidebarOpen ? 'w-full' : 
+          viewMode === 'map' && sidebarOpen ? 'hidden md:block md:w-3/4' : 
+          viewMode === 'split' ? 'hidden md:block md:w-1/2' : 'hidden'} 
           h-full relative transition-all duration-300`}>
           
           {!MAPBOX_TOKEN && <MapKeyWarning />}
