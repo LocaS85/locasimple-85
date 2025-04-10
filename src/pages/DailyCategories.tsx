@@ -1,21 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from "@/components/ui/button";
 import { DailyCategoryType, DailyContactInfo } from '@/types/dailyCategories';
-import { MapPin, Plus, Star, StarOff, ArrowLeft } from 'lucide-react';
-import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import HorizontalScrollMenu from "@/components/daily/HorizontalScrollMenu";
-import ContactCard from '@/components/daily/ContactCard';
 import ContactFormDialog from '@/components/daily/ContactFormDialog';
 import CategoryFormDialog from '@/components/daily/CategoryFormDialog';
 import ContactsMap from '@/components/daily/ContactsMap';
 import { useDailyContacts } from '@/hooks/useDailyContacts';
 import { useDailyCategories } from '@/hooks/useDailyCategories';
+import DailyCategoriesHeader from '@/components/daily/DailyCategoriesHeader';
+import ContactsSection from '@/components/daily/ContactsSection';
+import GeolocationProvider from '@/components/daily/GeolocationProvider';
 
 const DailyCategories = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   // State
@@ -35,9 +33,7 @@ const DailyCategories = () => {
     category: 'adresse-principale',
   });
 
-  // Geolocation state
-  const [userLocation, setUserLocation] = useState<[number, number]>([2.3522, 48.8566]);
-  const [isLocationActive, setIsLocationActive] = useState(false);
+  // Map state
   const [transportMode, setTransportMode] = useState('driving');
   const [searchRadius, setSearchRadius] = useState<number>(5);
 
@@ -70,22 +66,6 @@ const DailyCategories = () => {
     deleteCategory
   } = useDailyCategories();
 
-  // Effects
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { longitude, latitude } = position.coords;
-          setUserLocation([longitude, latitude]);
-          setIsLocationActive(true);
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-        }
-      );
-    }
-  }, []);
-
   // Handlers
   const handleAddNew = () => {
     setIsAddingNew(true);
@@ -94,8 +74,8 @@ const DailyCategories = () => {
       lastName: '',
       companyName: '',
       address: '',
-      latitude: userLocation[1] || 48.85,
-      longitude: userLocation[0] || 2.35,
+      latitude: 0,
+      longitude: 0,
       relationType: '',
       category: activeCategory || 'adresse-principale',
     });
@@ -182,16 +162,9 @@ const DailyCategories = () => {
 
   const handleCategoryFormSubmit = () => {
     if (isEditingCategory) {
-      const result = handleEditCategory();
-      if (result) {
-        // Update contacts with this category if needed
-      }
+      handleEditCategory();
     } else {
-      const newCat = handleAddCategory();
-      if (newCat) {
-        // Optionally switch to the new category
-        // setActiveCategory(newCat.id);
-      }
+      handleAddCategory();
     }
   };
 
@@ -210,125 +183,75 @@ const DailyCategories = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate('/categories');
-  };
-
   return (
-    <motion.div 
-      className="container mx-auto py-4 md:py-8 px-2 md:px-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={handleBack} 
-        className="mb-4 flex items-center gap-1"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Retour
-      </Button>
+    <GeolocationProvider>
+      {({ userLocation }) => (
+        <motion.div 
+          className="container mx-auto py-4 md:py-8 px-2 md:px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <DailyCategoriesHeader 
+            showOnlyFavorites={showOnlyFavorites}
+            showMap={showMap}
+            setShowOnlyFavorites={setShowOnlyFavorites}
+            setShowMap={setShowMap}
+          />
 
-      <div className="flex flex-wrap justify-between items-center mb-4 md:mb-6 gap-2">
-        <h1 className="text-2xl md:text-3xl font-bold">Quotidien</h1>
-        <div className="flex flex-wrap gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
-          >
-            {showOnlyFavorites ? <StarOff className="h-4 w-4 mr-1" /> : <Star className="h-4 w-4 mr-1" />}
-            {showOnlyFavorites ? "Tous" : "Favoris"}
-          </Button>
-          
-          <Button 
-            variant={showMap ? "secondary" : "outline"} 
-            size="sm"
-            onClick={() => setShowMap(!showMap)}
-          >
-            <MapPin className="h-4 w-4 mr-1" />
-            Carte
-          </Button>
-        </div>
-      </div>
+          <HorizontalScrollMenu 
+            categories={categories}
+            activeCategory={activeCategory}
+            onCategorySelect={setActiveCategory}
+            onAddCategory={() => setIsAddingCategory(true)}
+          />
 
-      <HorizontalScrollMenu 
-        categories={categories}
-        activeCategory={activeCategory}
-        onCategorySelect={setActiveCategory}
-        onAddCategory={() => setIsAddingCategory(true)}
-      />
-
-      {showMap && (
-        <ContactsMap
-          contacts={filteredContacts}
-          selectedContactIds={selectedContactIds}
-          userLocation={userLocation}
-          transportMode={transportMode}
-          searchRadius={searchRadius}
-        />
-      )}
-
-      <div className="flex flex-wrap justify-between items-center mb-3 md:mb-4 gap-2">
-        <h2 className="text-lg md:text-xl font-semibold">
-          {activeCategory ? 
-            getCategoryName(activeCategory) : 
-            "Tous les contacts"} 
-          ({filteredContacts.length})
-        </h2>
-        
-        <Button onClick={handleAddNew} size="sm">
-          <Plus className="h-4 w-4 mr-1" />
-          Nouveau contact
-        </Button>
-      </div>
-
-      {filteredContacts.length === 0 ? (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 md:p-8 text-center">
-          <p className="text-gray-500 dark:text-gray-400">Aucun contact trouvé dans cette catégorie.</p>
-          <Button variant="outline" className="mt-4" onClick={handleAddNew}>Ajouter un contact</Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-          {filteredContacts.map((contact) => (
-            <ContactCard
-              key={contact.id}
-              contact={contact}
-              isSelected={selectedContactIds.has(contact.id)}
-              onToggleSelect={handleToggleContactSelection}
-              onToggleFavorite={handleToggleFavorite}
-              onEdit={handleEditContact}
-              onDelete={handleDeleteContact}
-              getCategoryName={getCategoryName}
-              getCategoryColor={getCategoryColor}
-              getCategoryIcon={getCategoryIcon}
+          {showMap && (
+            <ContactsMap
+              contacts={filteredContacts}
+              selectedContactIds={selectedContactIds}
+              userLocation={userLocation}
+              transportMode={transportMode}
+              searchRadius={searchRadius}
             />
-          ))}
-        </div>
+          )}
+
+          <ContactsSection 
+            activeCategory={activeCategory}
+            filteredContacts={filteredContacts}
+            selectedContactIds={selectedContactIds}
+            getCategoryName={getCategoryName}
+            getCategoryColor={getCategoryColor}
+            getCategoryIcon={getCategoryIcon}
+            handleAddNew={handleAddNew}
+            handleToggleContactSelection={handleToggleContactSelection}
+            handleToggleFavorite={handleToggleFavorite}
+            handleEditContact={handleEditContact}
+            handleDeleteContact={handleDeleteContact}
+          />
+
+          <ContactFormDialog
+            isOpen={isAddingNew || isEditing !== null}
+            isEditing={isEditing}
+            formData={formData}
+            categories={categories}
+            onClose={handleFormCancel}
+            onSubmit={handleFormSubmit}
+            onChange={handleInputChange}
+            onSelectChange={handleSelectChange}
+          />
+
+          <CategoryFormDialog
+            isOpen={isAddingCategory || isEditingCategory !== null}
+            isEditing={isEditingCategory}
+            categoryData={newCategory as {name: string; color: string}}
+            onClose={handleCategoryFormCancel}
+            onSubmit={handleCategoryFormSubmit}
+            onChange={setNewCategory}
+          />
+        </motion.div>
       )}
-
-      <ContactFormDialog
-        isOpen={isAddingNew || isEditing !== null}
-        isEditing={isEditing}
-        formData={formData}
-        categories={categories}
-        onClose={handleFormCancel}
-        onSubmit={handleFormSubmit}
-        onChange={handleInputChange}
-        onSelectChange={handleSelectChange}
-      />
-
-      <CategoryFormDialog
-        isOpen={isAddingCategory || isEditingCategory !== null}
-        isEditing={isEditingCategory}
-        categoryData={newCategory as {name: string; color: string}}
-        onClose={handleCategoryFormCancel}
-        onSubmit={handleCategoryFormSubmit}
-        onChange={setNewCategory}
-      />
-    </motion.div>
+    </GeolocationProvider>
   );
 };
 
