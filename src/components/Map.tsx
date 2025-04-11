@@ -5,12 +5,13 @@ import MapContainer from './map/MapContainer';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 interface MapProps {
   results: Result[];
   center: [number, number];
   radius?: number;
-  radiusUnit?: 'km' | 'miles';
+  radiusUnit?: DistanceUnit;
   radiusType?: 'distance' | 'duration';
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
@@ -61,13 +62,16 @@ const Map = ({
     }
   }, []);
 
+  // Convert radiusUnit to a format compatible with MapContainer
+  const mapRadiusUnit = radiusUnit === 'mi' ? 'miles' : radiusUnit;
+
   return (
     <div className="w-full h-full">
       <MapContainer
         results={results}
         center={center}
         radius={radius}
-        radiusUnit={radiusUnit}
+        radiusUnit={mapRadiusUnit}
         radiusType={radiusType}
         duration={duration}
         timeUnit={timeUnit}

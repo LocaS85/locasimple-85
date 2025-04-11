@@ -4,6 +4,7 @@ import type { Result } from '../ResultsList';
 import MapDisplay from '../map/MapDisplay';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import mapboxgl from 'mapbox-gl';
+import { DistanceUnit } from '@/types/categoryTypes';
 
 // Set the mapboxgl access token globally at the module level
 if (MAPBOX_TOKEN) {
@@ -14,7 +15,7 @@ interface MapContainerProps {
   results: Result[];
   center: [number, number];
   radius?: number;
-  radiusUnit?: 'km' | 'miles';
+  radiusUnit?: string; // Updated to accept string to handle both 'km', 'mi' and 'miles'
   radiusType?: 'distance' | 'duration';
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
