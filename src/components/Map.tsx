@@ -11,7 +11,7 @@ interface MapProps {
   results: Result[];
   center: [number, number];
   radius?: number;
-  radiusUnit?: DistanceUnit;
+  radiusUnit?: string;  // Changed to string to match MapContainer
   radiusType?: 'distance' | 'duration';
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
@@ -62,16 +62,13 @@ const Map = ({
     }
   }, []);
 
-  // Convert radiusUnit to a format compatible with MapContainer
-  const mapRadiusUnit = radiusUnit === 'mi' ? 'miles' : radiusUnit;
-
   return (
     <div className="w-full h-full">
       <MapContainer
         results={results}
         center={center}
         radius={radius}
-        radiusUnit={mapRadiusUnit}
+        radiusUnit={radiusUnit}
         radiusType={radiusType}
         duration={duration}
         timeUnit={timeUnit}

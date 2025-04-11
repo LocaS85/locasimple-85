@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import FilterStack from './filters/FilterStack';
@@ -197,10 +198,7 @@ const SearchPage = () => {
               filters={{
                 radius: selectedDistance || 5,
                 transport: transportMode,
-                categories: selectedCategory ? [selectedCategory] : [],
-                subcategories: selectedSubcategory ? [selectedSubcategory] : [],
-                distanceUnit: distanceUnit,
-                duration: selectedDuration,
+                categories: selectedCategory ? [selectedCategory] : []
               }}
               isLoading={isLoading}
             />

@@ -66,6 +66,11 @@ export const SearchContainer: React.FC = () => {
   }, []);
 
   const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
+  
+  // Convert distance unit for Map component
+  const getMapRadiusUnit = (unit: DistanceUnit): "km" | "miles" => {
+    return unit === "mi" ? "miles" : "km";
+  };
 
   return (
     <div className="relative w-full h-full">
@@ -73,7 +78,7 @@ export const SearchContainer: React.FC = () => {
         results={searchState.searchResults}
         center={searchState.userLocation}
         radius={searchState.selectedDistance || 5}
-        radiusUnit={distanceUnit}
+        radiusUnit={getMapRadiusUnit(distanceUnit)}
         radiusType="distance"
         duration={searchState.selectedDuration || 15}
         timeUnit="minutes"

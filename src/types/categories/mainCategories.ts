@@ -40,7 +40,7 @@ export const MAIN_CATEGORIES: Category[] = [
   }
 ];
 
-// Export all category types
+// Export all category types for proper importing in categories.ts
 export {
   FOOD_CATEGORIES,
   SHOPPING_CATEGORIES,
