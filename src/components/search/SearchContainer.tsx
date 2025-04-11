@@ -34,23 +34,20 @@ export const SearchContainer: React.FC = () => {
     onTransportModeChange
   } = useSearchPanel();
 
-  // Use route display hook
   const { from, to, routes, activeMode, setActiveMode } = useRouteDisplay({
     userLocation: searchState.userLocation,
     searchResults: searchState.searchResults,
     selectedResultId: resultSelection.selectedResultId,
     transportMode: searchState.transportMode
   });
-  
-  // Use search API core for Flask server check
+
   const searchApiCore = useSearchApiCore({
     userLocation: searchState.userLocation,
     setLoading: (loading: boolean) => {
       // We don't need to set loading state here
     }
   });
-  
-  // Check Flask server connection on component mount
+
   useEffect(() => {
     const checkServer = async () => {
       const isConnected = await searchApiCore.checkFlaskServer();
@@ -67,12 +64,10 @@ export const SearchContainer: React.FC = () => {
     checkServer();
   }, []);
 
-  // Update the distanceUnit state to match the expected type (km/miles)
   const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
 
   return (
     <div className="relative w-full h-full">
-      {/* Map and Search Components */}
       <MapSection
         results={searchState.searchResults}
         center={searchState.userLocation}
@@ -105,7 +100,6 @@ export const SearchContainer: React.FC = () => {
         userLocation={searchState.userLocation}
       />
 
-      {/* Bottom slide-up menu - improved for better responsiveness */}
       <SearchMenu
         show={searchMenu.menuOpen}
         onClose={() => searchMenu.setMenuOpen(false)}
@@ -133,7 +127,6 @@ export const SearchContainer: React.FC = () => {
         onReset={resetSearch}
       />
 
-      {/* Route display when a result is selected - improved layout */}
       <RouteDisplayContainer
         selectedResultId={resultSelection.selectedResultId}
         from={from}

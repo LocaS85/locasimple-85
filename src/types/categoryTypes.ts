@@ -1,6 +1,8 @@
 
 export type DistanceUnit = 'km' | 'mi';
-export type TransportMode = 'driving' | 'walking' | 'cycling' | 'transit' | 'train' | 'boat';
+export type TransportMode = 'driving' | 'walking' | 'cycling' | 'transit' | 'train' | 'boat' | 
+                           'car' | 'bus' | 'public' | 'bike' | 'walk' | 'plane' | 'metro' | 
+                           'tram' | 'coach' | 'airport' | 'airstrip' | 'bicycling';
 
 export interface CategoryFilter {
   categoryId: string;
@@ -42,19 +44,25 @@ export interface SubCategory {
 export interface Address {
   id: string;
   name: string;
-  address: string;
+  address?: string;
+  street?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
   latitude: number;
   longitude: number;
   category?: string;
   isFavorite?: boolean;
   notes?: string;
   lastVisited?: string;
+  transportMode?: TransportMode;
 }
 
 export interface TransportModeWithColor {
   id: TransportMode;
   name: string;
-  icon: React.ReactNode;
+  icon: React.ReactNode | string;
   color: string;
+  defaultColor?: string;
   disabled?: boolean;
 }

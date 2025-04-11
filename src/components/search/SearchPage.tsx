@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import FilterStack from './filters/FilterStack';
@@ -111,7 +110,6 @@ const SearchPage = () => {
       </div>
       
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Sidebar toggle button */}
         <button 
           className="absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
           onClick={toggleSidebar}
@@ -119,7 +117,6 @@ const SearchPage = () => {
           {sidebarOpen ? <ChevronLeftCircle size={20} /> : <ChevronRightCircle size={20} />}
         </button>
 
-        {/* Filters sidebar */}
         {sidebarOpen && (
           <div className="w-full md:w-80 lg:w-96 h-full overflow-y-auto border-r border-gray-200 transition-all duration-300 bg-white z-10">
             <FilterStack>
@@ -159,7 +156,6 @@ const SearchPage = () => {
           </div>
         )}
 
-        {/* Map container */}
         <div className={`flex-1 h-full relative transition-all duration-300`}>
           {!MAPBOX_TOKEN && <MapKeyWarning />}
           
@@ -199,13 +195,12 @@ const SearchPage = () => {
               origin={origin}
               destinations={destinations}
               filters={{
-                ...filters,
                 radius: selectedDistance || 5,
-                distanceUnit: distanceUnit,
-                duration: selectedDuration,
                 transport: transportMode,
                 categories: selectedCategory ? [selectedCategory] : [],
-                subcategories: selectedSubcategory ? [selectedSubcategory] : []
+                subcategories: selectedSubcategory ? [selectedSubcategory] : [],
+                distanceUnit: distanceUnit,
+                duration: selectedDuration,
               }}
               isLoading={isLoading}
             />
@@ -213,7 +208,6 @@ const SearchPage = () => {
         </div>
       </div>
 
-      {/* Bottom route comparator (conditionally shown) */}
       {destinations.length > 0 && (
         <div className="h-48 border-t border-gray-200 bg-white">
           <RouteComparator
@@ -227,7 +221,6 @@ const SearchPage = () => {
         </div>
       )}
 
-      {/* View mode toggle buttons */}
       <div className="absolute bottom-4 right-4 z-10 bg-white rounded-full shadow-lg flex">
         <button 
           className={`p-3 ${viewMode === 'map' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'} rounded-l-full`}

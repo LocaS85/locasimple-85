@@ -37,7 +37,7 @@ export const AddressForm = ({ categoryId }: { categoryId: string }) => {
       latitude: 0, // Default value
       longitude: 0, // Default value
       category: categoryId,
-      favorite: false, // Default value
+      isFavorite: false, // Default value
     });
     
     toast({
