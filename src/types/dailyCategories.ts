@@ -1,79 +1,63 @@
 
-export interface DailyContactInfo {
+export interface DailySubcategory {
   id: string;
-  firstName: string;
-  lastName: string;
-  companyName?: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  relationType?: string;
-  relationLabel?: string; 
-  category: DailyCategoryType;
-  isFavorite?: boolean;
+  name: string;
+  icon?: string;
+  apiKey: string;
 }
-
-export type RelationType = 
-  | 'pere' 
-  | 'mere' 
-  | 'frere' 
-  | 'soeur' 
-  | 'cousin' 
-  | 'ami' 
-  | 'collegue' 
-  | 'autre';
-
-export type DailyCategoryType = 
-  | 'adresse-principale'
-  | 'famille'
-  | 'amis'
-  | 'travail'
-  | 'ecole'
-  | 'activites'
-  | string; // Allow custom category types
 
 export interface DailyCategory {
-  id: DailyCategoryType;
+  id: string;
   name: string;
-  icon: string;
   color: string;
-  isCustom?: boolean;
+  icon?: string;
+  subcategories?: DailySubcategory[];
 }
 
-export interface RelationTypeInfo {
-  id: RelationType;
-  name: string;
-  customLabel?: string;
-}
-
+// Example categories with subcategories
 export const DAILY_CATEGORIES: DailyCategory[] = [
-  { id: 'adresse-principale', name: 'Adresse principale', icon: '🏠', color: '#8B5CF6' },
-  { id: 'famille', name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D946EF' },
-  { id: 'amis', name: 'Amis', icon: '👫', color: '#3B82F6' },
-  { id: 'travail', name: 'Travail', icon: '🏢', color: '#F97316' },
-  { id: 'ecole', name: 'École', icon: '🏫', color: '#0EA5E9' },
-  { id: 'activites', name: 'Activités', icon: '🎭', color: '#10B981' }
+  {
+    id: 'food',
+    name: 'Restaurants',
+    color: '#F59E0B',
+    icon: '🍽️',
+    subcategories: [
+      { id: 'restaurant', name: 'Restaurant', apiKey: 'restaurant' },
+      { id: 'fast_food', name: 'Fast Food', apiKey: 'fast_food' },
+      { id: 'cafe', name: 'Café', apiKey: 'cafe' }
+    ]
+  },
+  {
+    id: 'shopping',
+    name: 'Shopping',
+    color: '#3B82F6',
+    icon: '🛍️',
+    subcategories: [
+      { id: 'clothing', name: 'Vêtements', apiKey: 'clothing_store' },
+      { id: 'supermarket', name: 'Supermarché', apiKey: 'supermarket' },
+      { id: 'mall', name: 'Centre Commercial', apiKey: 'shopping_mall' }
+    ]
+  },
+  {
+    id: 'entertainment',
+    name: 'Loisirs',
+    color: '#EC4899',
+    icon: '🎭',
+    subcategories: [
+      { id: 'cinema', name: 'Cinéma', apiKey: 'movie_theater' },
+      { id: 'museum', name: 'Musée', apiKey: 'museum' },
+      { id: 'park', name: 'Parc', apiKey: 'park' }
+    ]
+  },
+  {
+    id: 'services',
+    name: 'Services',
+    color: '#10B981',
+    icon: '🔧',
+    subcategories: [
+      { id: 'bank', name: 'Banque', apiKey: 'bank' },
+      { id: 'hospital', name: 'Hôpital', apiKey: 'hospital' },
+      { id: 'pharmacy', name: 'Pharmacie', apiKey: 'pharmacy' }
+    ]
+  }
 ];
-
-export const RELATION_TYPES: RelationTypeInfo[] = [
-  { id: 'pere', name: 'Père' },
-  { id: 'mere', name: 'Mère' },
-  { id: 'frere', name: 'Frère' },
-  { id: 'soeur', name: 'Sœur' },
-  { id: 'cousin', name: 'Cousin' },
-  { id: 'ami', name: 'Ami' },
-  { id: 'collegue', name: 'Collègue' },
-  { id: 'autre', name: 'Autre' }
-];
-
-export const getRelationTypeLabel = (
-  relationType: string | undefined, 
-  customLabel?: string
-): string => {
-  if (!relationType) return '';
-  
-  if (customLabel) return customLabel;
-  
-  const type = RELATION_TYPES.find(type => type.id === relationType);
-  return type ? type.name : relationType;
-};

@@ -1,28 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import GeoSearcher from './GeoSearcher';
 import FilterStack from './filters/FilterStack';
-import SmartMap from './map/SmartMap';
-import RouteComparator from './route/RouteComparator';
-import GeoErrorBoundary from './GeoErrorBoundary';
-import { useSearchState } from '@/hooks/useSearchState';
-import { MAPBOX_TOKEN } from '@/config/environment';
-import MapKeyWarning from './MapKeyWarning';
 import CategoryAccordion from './filters/CategoryAccordion';
 import TransportSelector from './filters/TransportSelector';
 import RadiusControl from './filters/RadiusControl';
 import TimeFilter from './filters/TimeFilter';
-import { Car, User, Menu, X } from 'lucide-react';
-import { DailyCategory } from '@/types/dailyCategories';
-
-// Define mock DAILY_CATEGORIES until we import from the correct source
-const DAILY_CATEGORIES: DailyCategory[] = [
-  { id: 'food', name: 'Restaurants', color: '#F59E0B', icon: '🍽️' },
-  { id: 'shopping', name: 'Shopping', color: '#3B82F6', icon: '🛍️' },
-  { id: 'entertainment', name: 'Loisirs', color: '#EC4899', icon: '🎭' },
-  { id: 'services', name: 'Services', color: '#10B981', icon: '🔧' }
-];
+import PrintExportControl from './filters/PrintExportControl';
+import GeoSearcher from './GeoSearcher';
+import SmartMap from './map/SmartMap';
+import RouteComparator from './route/RouteComparator';
+import GeoErrorBoundary from './GeoErrorBoundary';
+import MapKeyWarning from './MapKeyWarning';
+import { MAPBOX_TOKEN } from '@/config/environment';
+import { useSearchState } from '@/hooks/useSearchState';
+import { DAILY_CATEGORIES } from '@/types/dailyCategories';
+import { ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
 
 const SearchPage = () => {
   const {
@@ -35,10 +28,29 @@ const SearchPage = () => {
     viewMode,
     setViewMode,
     resetMapState,
-    isLoading
+    isLoading,
+    searchQuery,
+    setSearchQuery,
+    selectedDistance,
+    setSelectedDistance,
+    selectedDuration,
+    setSelectedDuration,
+    distanceUnit,
+    setDistanceUnit,
+    transportMode,
+    setTransportMode,
+    resultsCount,
+    setResultsCount,
+    userLocation,
+    setUserLocation,
+    isLocationActive,
+    selectedCategory,
+    setSelectedCategory
   } = useSearchState();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
+  const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
 
   const handleSearchResult = (result: any) => {
     setOrigin(result);
@@ -47,6 +59,44 @@ const SearchPage = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleCategorySelect = (categoryId: string, subcategoryId?: string) => {
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory(subcategoryId);
+    
+    toast.success(`Catégorie sélectionnée: ${
+      subcategoryId 
+        ? `${categoryId} > ${subcategoryId}` 
+        : categoryId
+    }`);
+  };
+
+  const handleExport = (format: string, options: any) => {
+    toast.success(`Exporting ${format} with options: ${JSON.stringify(options)}`);
+    // Implementation would connect to map instance and capture the view
+  };
+
+  const handleRadiusChange = (radius: number, unit: string) => {
+    setSelectedDistance(radius);
+    setDistanceUnit(unit as any);
+    setFilterMode('distance');
+    updateFilters({ radius });
+  };
+
+  const handleDurationChange = (duration: number, timeUnit: string) => {
+    setSelectedDuration(duration);
+    setFilterMode('duration');
+  };
+
+  const handleTimeRangeChange = (timeRange: { start: string; end: string }) => {
+    console.log('Time range changed:', timeRange);
+    // Implement time range filter logic here
+  };
+
+  const handleTransportModeChange = (mode: string) => {
+    setTransportMode(mode);
+    updateFilters({ transport: mode });
   };
 
   return (
@@ -61,48 +111,56 @@ const SearchPage = () => {
       </div>
       
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Mobile sidebar toggle button */}
+        {/* Sidebar toggle button */}
         <button 
-          className="md:hidden absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
+          className="absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
           onClick={toggleSidebar}
         >
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          {sidebarOpen ? <ChevronLeftCircle size={20} /> : <ChevronRightCircle size={20} />}
         </button>
 
-        {/* Main content area with map and filters */}
-        <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block
-          ${viewMode === 'list' ? 'w-full' : viewMode === 'split' ? 'w-full md:w-1/2' : 'w-full md:w-1/4'} 
-          h-full overflow-y-auto border-r border-gray-200 transition-all duration-300 bg-white z-10`}>
-          <FilterStack>
-            <CategoryAccordion 
-              categories={DAILY_CATEGORIES}
-              selectionMode="multi-level"
-              onCategorySelect={() => {}}
-            />
-            <RadiusControl
-              unitOptions={['km', 'mi']}
-              maxRadius={100}
-              step={5}
-            />
-            <TransportSelector
-              modes={[
-                { id: 'driving', icon: <Car size={20} />, label: 'Voiture' },
-                { id: 'walking', icon: <User size={20} />, label: 'Marche' }
-              ]}
-            />
-            <TimeFilter
-              type="time-slider"
-              ranges={['now', 'today', 'custom']}
-            />
-          </FilterStack>
-        </div>
+        {/* Filters sidebar */}
+        {sidebarOpen && (
+          <div className="w-full md:w-80 lg:w-96 h-full overflow-y-auto border-r border-gray-200 transition-all duration-300 bg-white z-10">
+            <FilterStack>
+              <CategoryAccordion 
+                categories={DAILY_CATEGORIES}
+                selectionMode="hierarchical"
+                onCategorySelect={handleCategorySelect}
+                selectedCategory={selectedCategory}
+                selectedSubcategory={selectedSubcategory}
+              />
+              
+              <RadiusControl
+                unitOptions={['km', 'mi']}
+                maxRadius={100}
+                step={5}
+                defaultRadius={selectedDistance || 5}
+                defaultUnit={distanceUnit}
+                onChange={handleRadiusChange}
+                onDurationChange={handleDurationChange}
+              />
+              
+              <TransportSelector
+                defaultMode={transportMode}
+                onChange={handleTransportModeChange}
+              />
+              
+              <TimeFilter
+                type="time-range"
+                ranges={['now', 'today', 'custom']}
+                onChange={handleTimeRangeChange}
+              />
+              
+              <PrintExportControl
+                onExport={handleExport}
+              />
+            </FilterStack>
+          </div>
+        )}
 
         {/* Map container */}
-        <div className={`${viewMode === 'map' && !sidebarOpen ? 'w-full' : 
-          viewMode === 'map' && sidebarOpen ? 'hidden md:block md:w-3/4' : 
-          viewMode === 'split' ? 'hidden md:block md:w-1/2' : 'hidden'} 
-          h-full relative transition-all duration-300`}>
-          
+        <div className={`flex-1 h-full relative transition-all duration-300`}>
           {!MAPBOX_TOKEN && <MapKeyWarning />}
           
           <GeoErrorBoundary
@@ -140,7 +198,15 @@ const SearchPage = () => {
               ]}
               origin={origin}
               destinations={destinations}
-              filters={filters}
+              filters={{
+                ...filters,
+                radius: selectedDistance || 5,
+                distance_unit: distanceUnit,
+                duration: selectedDuration,
+                transport: transportMode,
+                categories: selectedCategory ? [selectedCategory] : [],
+                subcategories: selectedSubcategory ? [selectedSubcategory] : []
+              }}
               isLoading={isLoading}
             />
           </GeoErrorBoundary>
