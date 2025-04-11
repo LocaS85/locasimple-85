@@ -28,9 +28,9 @@ export const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
       </Button>
       <Button 
         size="sm" 
-        variant={unit === 'miles' ? 'default' : 'outline'} 
-        onClick={() => onUnitChange('miles')}
-        className={cn("px-2 py-1 h-7 text-white", unit === 'miles' ? "bg-accent hover:bg-accent/90" : "")}
+        variant={unit === 'mi' ? 'default' : 'outline'} 
+        onClick={() => onUnitChange('mi')}
+        className={cn("px-2 py-1 h-7 text-white", unit === 'mi' ? "bg-accent hover:bg-accent/90" : "")}
       >
         {t('miles')}
       </Button>

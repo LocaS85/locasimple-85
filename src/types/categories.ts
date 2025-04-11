@@ -1,5 +1,15 @@
 
-import { Category } from './categoryTypes';
+import { 
+  Category, 
+  SubCategory, 
+  DistanceUnit, 
+  TransportMode, 
+  CategoryFilter, 
+  SearchFilters, 
+  Address,
+  TransportModeWithColor
+} from './categoryTypes';
+
 import { MAIN_CATEGORIES } from './categories/mainCategories';
 import { FOOD_CATEGORIES } from './categories/foodCategories';
 import { SHOPPING_CATEGORIES } from './categories/shoppingCategories';
@@ -8,7 +18,16 @@ import { HEALTH_CATEGORIES } from './categories/healthCategories';
 import { ENTERTAINMENT_CATEGORIES } from './categories/entertainmentCategories';
 import { ACCOMMODATION_CATEGORIES } from './categories/accommodationCategories';
 
-export * from './categoryTypes';
+export { 
+  Category, 
+  SubCategory, 
+  DistanceUnit, 
+  TransportMode, 
+  CategoryFilter, 
+  SearchFilters, 
+  Address,
+  TransportModeWithColor
+};
 
 export const CATEGORIES: Category[] = [
   ...MAIN_CATEGORIES,

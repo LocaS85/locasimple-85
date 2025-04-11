@@ -1,56 +1,30 @@
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Printer, FileImage, FilePdf, Download } from 'lucide-react';
-import { toast } from 'sonner';
-
-interface ExportFormat {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  handler?: () => void;
-}
+import { Button } from '@/components/ui/button';
+import { FileText, Image, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 interface PrintExportControlProps {
-  formats?: ExportFormat[];
-  includeMap?: boolean;
-  includeFilters?: boolean;
-  includeLegend?: boolean;
-  onExport?: (format: string, options: { map: boolean; filters: boolean; legend: boolean }) => void;
+  onExport?: (format: string, options: any) => void;
 }
 
-const DEFAULT_EXPORT_FORMATS: ExportFormat[] = [
-  { id: 'pdf', label: 'PDF', icon: <FilePdf size={18} /> },
-  { id: 'image', label: 'Image', icon: <FileImage size={18} /> }
-];
-
 const PrintExportControl: React.FC<PrintExportControlProps> = ({
-  formats = DEFAULT_EXPORT_FORMATS,
-  includeMap = true,
-  includeFilters = true,
-  includeLegend = false,
-  onExport
+  onExport = () => {}
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [options, setOptions] = useState({
-    map: includeMap,
-    filters: includeFilters,
-    legend: includeLegend
+  const [isOpen, setIsOpen] = useState(true);
+  const [includeOptions, setIncludeOptions] = useState({
+    map: true,
+    filters: true,
+    legend: true
   });
 
-  const handleExport = (formatId: string) => {
-    if (onExport) {
-      onExport(formatId, options);
-    } else {
-      // Fallback if no handler is provided
-      toast.info(`Exporting in ${formatId} format with options: ${JSON.stringify(options)}`);
-    }
-  };
-
-  const toggleOption = (option: keyof typeof options) => {
-    setOptions(prev => ({
-      ...prev,
-      [option]: !prev[option]
-    }));
+  const handleExport = (format: string) => {
+    onExport(format, includeOptions);
   };
 
   return (
@@ -59,68 +33,66 @@ const PrintExportControl: React.FC<PrintExportControlProps> = ({
         className="w-full flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-2">
-          <Printer size={16} />
-          <span className="font-medium">Exporter</span>
-        </div>
+        <span className="font-medium">Exporter</span>
         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
       
       {isOpen && (
         <div className="p-4 space-y-4">
-          <div className="space-y-2">
-            <div className="text-sm font-medium">Options</div>
-            <div className="space-y-1">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={options.map} 
-                  onChange={() => toggleOption('map')}
-                  className="rounded text-blue-500 focus:ring-blue-500"
-                />
-                Inclure la carte
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={options.filters} 
-                  onChange={() => toggleOption('filters')}
-                  className="rounded text-blue-500 focus:ring-blue-500"
-                />
-                Inclure les filtres
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={options.legend} 
-                  onChange={() => toggleOption('legend')}
-                  className="rounded text-blue-500 focus:ring-blue-500"
-                />
-                Inclure la légende
-              </label>
-            </div>
+          <div className="flex flex-col space-y-2">
+            <label className="flex items-center space-x-2">
+              <input 
+                type="checkbox" 
+                checked={includeOptions.map} 
+                onChange={() => setIncludeOptions(prev => ({...prev, map: !prev.map}))}
+                className="rounded border-gray-300"
+              />
+              <span>Inclure la carte</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input 
+                type="checkbox" 
+                checked={includeOptions.filters} 
+                onChange={() => setIncludeOptions(prev => ({...prev, filters: !prev.filters}))}
+                className="rounded border-gray-300"
+              />
+              <span>Inclure les filtres</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input 
+                type="checkbox" 
+                checked={includeOptions.legend} 
+                onChange={() => setIncludeOptions(prev => ({...prev, legend: !prev.legend}))}
+                className="rounded border-gray-300"
+              />
+              <span>Inclure la légende</span>
+            </label>
           </div>
           
-          <div className="grid grid-cols-2 gap-2">
-            {formats.map(format => (
-              <button
-                key={format.id}
-                className="flex items-center justify-center gap-2 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md transition-colors"
-                onClick={() => format.handler ? format.handler() : handleExport(format.id)}
-              >
-                {format.icon}
-                <span>{format.label}</span>
-              </button>
-            ))}
+          <div className="flex justify-between">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="px-4">
+                  <Download className="mr-2 h-4 w-4" />
+                  Exporter
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport('image')}>
+                  <Image className="mr-2 h-4 w-4" />
+                  Image
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            <Button variant="default" onClick={() => window.print()}>
+              Imprimer
+            </Button>
           </div>
-          
-          <button
-            className="w-full flex items-center justify-center gap-2 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
-            onClick={() => handleExport('pdf')}
-          >
-            <Download size={18} />
-            <span>Télécharger</span>
-          </button>
         </div>
       )}
     </div>

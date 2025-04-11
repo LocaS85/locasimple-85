@@ -201,7 +201,7 @@ const SearchPage = () => {
               filters={{
                 ...filters,
                 radius: selectedDistance || 5,
-                distance_unit: distanceUnit,
+                distanceUnit: distanceUnit,
                 duration: selectedDuration,
                 transport: transportMode,
                 categories: selectedCategory ? [selectedCategory] : [],

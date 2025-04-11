@@ -1,4 +1,6 @@
 
+export type DailyCategoryType = string;
+
 export interface DailySubcategory {
   id: string;
   name: string;
@@ -11,7 +13,32 @@ export interface DailyCategory {
   name: string;
   color: string;
   icon?: string;
+  isCustom?: boolean;
   subcategories?: DailySubcategory[];
+}
+
+export interface DailyContactInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+  companyName?: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  relationType?: string;
+  category: DailyCategoryType;
+  isFavorite: boolean;
+}
+
+export function getRelationTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    'family': 'Famille',
+    'friend': 'Ami(e)',
+    'colleague': 'Collègue',
+    'business': 'Professionnel',
+    'other': 'Autre'
+  };
+  return labels[type] || type;
 }
 
 // Example categories with subcategories
