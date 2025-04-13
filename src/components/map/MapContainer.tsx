@@ -5,6 +5,7 @@ import MapDisplay from '../map/MapDisplay';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import mapboxgl from 'mapbox-gl';
 import { DistanceUnit } from '@/types/categoryTypes';
+import { convertDistance } from '@/lib/utils';
 
 // Set the mapboxgl access token globally at the module level
 if (MAPBOX_TOKEN) {
@@ -102,6 +103,74 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }
   }, [map, onMapInitialized]);
 
+  // Handle radius visualization
+  useEffect(() => {
+    if (!map || !map.loaded()) return;
+    
+    // Only add the radius circle if we have a center point
+    if (center) {
+      // Convert radius to kilometers for consistent calculations
+      // radiusUnit could be 'km', 'mi', or 'miles'
+      let radiusInKm = radius;
+      if (radiusUnit === 'mi' || radiusUnit === 'miles') {
+        radiusInKm = convertDistance(radius, radiusUnit, 'km');
+      }
+      
+      // Function to update or create the radius circle
+      const updateRadiusCircle = () => {
+        const geojson = {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [center[0], center[1]]
+          },
+          properties: {
+            radius: radiusInKm
+          }
+        };
+        
+        // Check if the source exists
+        if (map.getSource('radius-source')) {
+          // Update existing source
+          (map.getSource('radius-source') as mapboxgl.GeoJSONSource).setData(geojson as any);
+        } else {
+          // Create new source and layers
+          map.addSource('radius-source', {
+            type: 'geojson',
+            data: geojson as any
+          });
+          
+          // Add a transparent circle layer
+          map.addLayer({
+            id: 'radius-circle',
+            type: 'circle',
+            source: 'radius-source',
+            paint: {
+              'circle-radius': {
+                stops: [
+                  [0, 0],
+                  [20, radiusInKm * 1000 / 0.075] // Scale radius based on zoom level
+                ],
+                base: 2
+              },
+              'circle-color': '#3b82f6',
+              'circle-opacity': 0.15,
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#3b82f6',
+              'circle-stroke-opacity': 0.3
+            }
+          });
+        }
+      };
+      
+      if (map.loaded()) {
+        updateRadiusCircle();
+      } else {
+        map.on('load', updateRadiusCircle);
+      }
+    }
+  }, [map, center, radius, radiusUnit]);
+
   // Map Result type to the format expected by MapDisplay
   const placesForMapDisplay = results.map(result => ({
     id: result.id,
@@ -132,6 +201,8 @@ const MapContainer: React.FC<MapContainerProps> = ({
         handleLocationClick={onLocationClick || (() => {})}
         transportMode={transportMode || 'driving'}
         setMap={setMap}
+        showRoutes={showRoutes}
+        radiusKm={radius}
       />
       
       {/* Map Results */}
