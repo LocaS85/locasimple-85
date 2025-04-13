@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { SubCategory } from '@/types/categoryTypes';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ScrollableSubcategoriesProps {
   subcategories: SubCategory[];
@@ -56,16 +57,22 @@ export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableS
           <button
             key={subcategory.id}
             onClick={() => handleSubcategoryClick(subcategory.id)}
-            className={`whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0
-              ${selectedSubcategories.includes(subcategory.id)
-                ? 'bg-primary/20 text-primary border border-primary/30'
-                : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'}`}
+            className={cn(
+              "whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0",
+              selectedSubcategories.includes(subcategory.id)
+                ? "bg-primary/20 text-primary border border-primary/30"
+                : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+            )}
           >
-            {typeof subcategory.icon === 'string' ? (
-              <span>{subcategory.icon}</span>
-            ) : subcategory.icon ? (
-              React.createElement(subcategory.icon as React.ComponentType, { size: 16 })
-            ) : null}
+            <span className="flex items-center justify-center w-4 h-4">
+              {typeof subcategory.icon === 'string' ? (
+                <span>{subcategory.icon}</span>
+              ) : React.isValidElement(subcategory.icon) ? (
+                subcategory.icon
+              ) : typeof subcategory.icon === 'function' ? (
+                React.createElement(subcategory.icon as React.ComponentType, {})
+              ) : null}
+            </span>
             {subcategory.name}
           </button>
         ))}
@@ -79,7 +86,7 @@ export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableS
         <ChevronRight size={20} />
       </button>
       
-      <style jsx="true">{`
+      <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

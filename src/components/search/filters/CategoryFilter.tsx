@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { Category } from '@/types/categoryTypes';
 import { ScrollableSubcategories } from './ScrollableSubcategories';
+import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
+import { cn } from '@/lib/utils';
 
 interface CategoryFilterProps {
   categories: Category[]; // Structure : { id, name, icon, subcategories[] }
@@ -29,32 +31,50 @@ const CategoryFilter = ({
     }
   };
 
+  // Function to provide tactile feedback
+  const provideTactileFeedback = () => {
+    if ('vibrate' in navigator) {
+      try {
+        navigator.vibrate(20); // Subtle vibration
+      } catch (e) {
+        console.log('Vibration not supported');
+      }
+    }
+  };
+
   return (
     <div className="category-filter space-y-4">
       {/* Catégories principales */}
       <div className="main-categories flex flex-wrap gap-2">
         {categories.map((category) => {
-          // Handle both string and React component icons
-          const IconComponent = typeof category.icon === 'string' 
-            ? null 
-            : category.icon;
+          // Support both string and component icons
+          const iconComponent = category.icon;
           
           return (
             <button 
               key={category.id}
-              onClick={() => handleCategoryClick(category.id)}
-              className={`category-btn flex items-center gap-2 px-3 py-2 rounded-full 
-                ${selectedCategory === category.id 
-                  ? 'bg-primary text-white' 
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+              onClick={() => {
+                provideTactileFeedback();
+                handleCategoryClick(category.id);
+              }}
+              className={cn(
+                "category-btn flex items-center gap-2 px-3 py-2 rounded-full transition-all", 
+                selectedCategory === category.id 
+                  ? getCategoryColor(category.id)
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+              )}
             >
-              {typeof category.icon === 'string' ? (
-                <span className="category-icon text-lg">{category.icon}</span>
-              ) : IconComponent ? (
-                <span className="category-icon w-5 h-5">
-                  {React.createElement(IconComponent as React.ComponentType, { className: "w-5 h-5" })}
-                </span>
-              ) : null}
+              <span className="category-icon w-5 h-5 flex items-center justify-center">
+                {typeof iconComponent === 'string' ? (
+                  <span className="text-lg">{iconComponent}</span>
+                ) : React.isValidElement(iconComponent) ? (
+                  iconComponent
+                ) : typeof iconComponent === 'function' ? (
+                  React.createElement(iconComponent as React.ComponentType, {})
+                ) : (
+                  null
+                )}
+              </span>
               <span>{category.name}</span>
             </button>
           );
@@ -71,5 +91,28 @@ const CategoryFilter = ({
     </div>
   );
 };
+
+// Helper function to get category color class
+function getCategoryColor(categoryId: string): string {
+  switch(categoryId) {
+    case 'restaurants': return 'bg-red-500 hover:bg-red-600 text-white';
+    case 'bars': return 'bg-orange-500 hover:bg-orange-600 text-white';
+    case 'cafes': return 'bg-amber-500 hover:bg-amber-600 text-white';
+    case 'shopping': return 'bg-yellow-500 hover:bg-yellow-600 text-white';
+    case 'hotels': return 'bg-lime-500 hover:bg-lime-600 text-white';
+    case 'entertainment': return 'bg-green-500 hover:bg-green-600 text-white';
+    case 'health': return 'bg-teal-500 hover:bg-teal-600 text-white';
+    case 'services': return 'bg-cyan-500 hover:bg-cyan-600 text-white';
+    case 'education': return 'bg-blue-500 hover:bg-blue-600 text-white';
+    case 'transport': return 'bg-indigo-500 hover:bg-indigo-600 text-white';
+    case 'alimentation': return 'bg-red-500 hover:bg-red-600 text-white';
+    case 'achat': return 'bg-purple-500 hover:bg-purple-600 text-white';
+    case 'sante': return 'bg-teal-500 hover:bg-teal-600 text-white';
+    case 'divertissement': return 'bg-green-500 hover:bg-green-600 text-white';
+    case 'hebergement': return 'bg-lime-500 hover:bg-lime-600 text-white';
+    case 'quotidien': return 'bg-blue-500 hover:bg-blue-600 text-white';
+    default: return 'bg-slate-500 hover:bg-slate-600 text-white';
+  }
+}
 
 export default CategoryFilter;

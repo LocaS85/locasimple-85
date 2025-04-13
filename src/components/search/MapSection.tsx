@@ -1,131 +1,137 @@
 
-import React, { useState } from 'react';
-import MapContainer from '@/components/map/MapContainer';
-import type { Result } from '@/components/ResultsList';
-import { useSearchMenu } from '@/hooks/useSearchMenu';
-import HistoryPanel from '@/components/search/HistoryPanel';
-import useRoutes from '@/hooks/useRoutes';
-import mapboxgl from 'mapbox-gl';
+import React, { useState, useEffect } from 'react';
+import { MapDisplay } from './MapDisplay';
+import { ResultsPopup } from './ResultsPopup';
+import { ResultDetail } from './ResultDetail';
+import { RouteDisplayContainer } from './RouteDisplayContainer';
+import { NoResultsMessage } from './NoResultsMessage';
+import { MapKeyWarning } from './MapKeyWarning';
+import CategorySubcategoriesScroller from './map/CategorySubcategoriesScroller';
+import { CATEGORIES } from '@/types/categories';
 
 interface MapSectionProps {
-  results: Result[];
-  center: [number, number];
-  radius: number;
-  radiusUnit: 'km' | 'miles';
-  radiusType: 'distance' | 'duration';
-  duration: number;
-  timeUnit: 'minutes' | 'hours';
-  transportMode: string;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  isRecording: boolean;
-  onMicClick: () => void;
-  onLocationClick: () => void;
-  isLocationActive: boolean;
+  userLocation?: [number, number];
+  selectedPlaceId?: string;
+  places: any[];
   loading: boolean;
   showRoutes: boolean;
-  onSearch: () => void;
-  selectedResultId?: string;
-  onResultClick: (result: Result) => void;
+  transportMode: string;
   selectedCategory: string | null;
-  onCategorySelect: (categoryId: string | null) => void;
-  searchHistory: string[];
-  savedSearches: string[];
-  onHistoryItemClick: (query: string) => void;
-  onSaveSearch: (query: string) => void;
-  onRemoveSavedSearch: (query: string) => void;
-  resetSearch: () => void;
-  onTransportModeChange: (mode: string) => void;
-  userLocation?: [number, number];
+  radiusType: 'time' | 'distance';
+  radius: number;
+  distanceUnit: 'km' | 'mi';
+  onPlaceSelect: (placeId: string) => void;
+  onClosePopup: () => void;
+  showNoMapboxTokenWarning: boolean;
+  onSetMapboxToken: (token: string) => boolean;
 }
 
-export const MapSection: React.FC<MapSectionProps> = ({
-  results,
-  center,
-  radius,
-  radiusUnit,
-  radiusType,
-  duration,
-  timeUnit,
-  transportMode,
-  searchQuery,
-  onSearchChange,
-  isRecording,
-  onMicClick,
-  onLocationClick,
-  isLocationActive,
+export const MapSection = ({
+  userLocation,
+  selectedPlaceId,
+  places = [],
   loading,
   showRoutes,
-  onSearch,
-  selectedResultId,
-  onResultClick,
+  transportMode,
   selectedCategory,
-  onCategorySelect,
-  searchHistory,
-  savedSearches,
-  onHistoryItemClick,
-  onSaveSearch,
-  onRemoveSavedSearch,
-  resetSearch,
-  onTransportModeChange,
-  userLocation
-}) => {
-  const [showHistory, setShowHistory] = useState(false);
-  const { menuOpen, setMenuOpen, toggleMenu } = useSearchMenu();
-  const [map, setMap] = useState<mapboxgl.Map | null>(null);
+  radiusType,
+  radius,
+  distanceUnit,
+  onPlaceSelect,
+  onClosePopup,
+  showNoMapboxTokenWarning,
+  onSetMapboxToken,
+}: MapSectionProps) => {
+  const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  
+  // Find the selected place based on placeId
+  useEffect(() => {
+    if (selectedPlaceId && places.length > 0) {
+      const place = places.find(p => p.id === selectedPlaceId);
+      setSelectedPlace(place || null);
+    } else {
+      setSelectedPlace(null);
+    }
+  }, [selectedPlaceId, places]);
 
-  // Initialize map reference when MapContainer sets it
-  const handleMapInitialized = (mapInstance: mapboxgl.Map) => {
-    setMap(mapInstance);
+  const handleSubcategorySelect = (subcategoryId: string) => {
+    setSelectedSubcategories(prev => {
+      if (prev.includes(subcategoryId)) {
+        return prev.filter(id => id !== subcategoryId);
+      } else {
+        return [...prev, subcategoryId];
+      }
+    });
   };
 
-  // Use the routes hook to manage route display
-  useRoutes({
-    map,
-    showRoutes,
-    results,
-    center,
-    transportMode,
-    selectedResultId
-  });
+  // Get subcategories for the selected category
+  const subcategories = selectedCategory 
+    ? CATEGORIES.find(c => c.id === selectedCategory)?.subCategories || []
+    : [];
 
   return (
-    <div className="w-full h-full relative">
-      <MapContainer
-        results={results}
-        center={center}
-        radius={radius}
-        radiusUnit={radiusUnit}
-        radiusType={radiusType}
-        duration={duration}
-        timeUnit={timeUnit}
-        transportMode={transportMode}
-        isRecording={isRecording}
-        onMicClick={onMicClick}
-        onLocationClick={onLocationClick}
-        isLocationActive={isLocationActive}
-        loading={loading}
-        showRoutes={showRoutes}
-        onSearch={onSearch}
-        selectedResultId={selectedResultId}
-        onResultClick={onResultClick}
-        selectedCategory={selectedCategory}
-        onCategorySelect={onCategorySelect}
-        userLocation={userLocation}
-        onMapInitialized={handleMapInitialized}
-      />
-      
-      {/* History Panel */}
-      <HistoryPanel
-        showHistory={showHistory}
-        setShowHistory={setShowHistory}
-        searchHistory={searchHistory}
-        savedSearches={savedSearches}
-        onHistoryItemClick={onHistoryItemClick}
-        onSaveSearch={onSaveSearch}
-        onRemoveSavedSearch={onRemoveSavedSearch}
-        searchQuery={searchQuery}
-      />
+    <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
+      {showNoMapboxTokenWarning ? (
+        <MapKeyWarning onSetMapboxToken={onSetMapboxToken} />
+      ) : (
+        <>
+          <MapDisplay
+            places={places}
+            userLocation={userLocation}
+            selectedPlaceId={selectedPlaceId}
+            onPlaceSelect={onPlaceSelect}
+            loading={loading}
+            radiusType={radiusType}
+            radius={radius}
+            distanceUnit={distanceUnit}
+            transportMode={transportMode}
+            selectedCategory={selectedCategory}
+            selectedSubcategories={selectedSubcategories}
+          />
+          
+          {/* Afficher le sélecteur de sous-catégories lorsqu'une catégorie est sélectionnée */}
+          {selectedCategory && subcategories.length > 0 && (
+            <CategorySubcategoriesScroller
+              subcategories={subcategories}
+              selectedSubcategories={selectedSubcategories}
+              onSubcategorySelect={handleSubcategorySelect}
+              parentCategoryId={selectedCategory}
+            />
+          )}
+
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <div className="p-4 bg-white rounded-md shadow-lg">
+                <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+                <p className="mt-2 text-sm text-gray-600">Chargement des résultats...</p>
+              </div>
+            </div>
+          )}
+
+          {!loading && places.length === 0 && (
+            <NoResultsMessage />
+          )}
+
+          {selectedPlace && (
+            <ResultDetail
+              place={selectedPlace}
+              onClose={onClosePopup}
+              transportMode={transportMode}
+              userLocation={userLocation}
+              showRoutes={showRoutes}
+            />
+          )}
+
+          {showRoutes && selectedPlace && userLocation && (
+            <RouteDisplayContainer
+              destination={[selectedPlace.longitude, selectedPlace.latitude]}
+              origin={userLocation}
+              transportMode={transportMode}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 };
