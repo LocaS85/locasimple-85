@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { SubCategory } from '@/types/categoryTypes';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,7 @@ interface ScrollableSubcategoriesProps {
 
 export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableSubcategoriesProps) => {
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const handleSubcategoryClick = (subcategoryId: string) => {
     const updatedSelection = selectedSubcategories.includes(subcategoryId)
@@ -86,7 +86,7 @@ export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableS
         <ChevronRight size={20} />
       </button>
       
-      <style jsx global>{`
+      <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

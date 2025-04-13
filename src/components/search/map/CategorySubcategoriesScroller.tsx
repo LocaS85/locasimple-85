@@ -3,6 +3,8 @@ import React, { useRef } from 'react';
 import { SubCategory } from '@/types/categoryTypes';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 interface CategorySubcategoriesScrollerProps {
   subcategories: SubCategory[];
@@ -31,6 +33,13 @@ const CategorySubcategoriesScroller = ({
     }
   };
 
+  const getColorForSubcategory = (subcategoryId: string, isSelected: boolean) => {
+    if (isSelected) {
+      return getCategoryColorClass(parentCategoryId);
+    }
+    return "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100";
+  };
+
   if (!subcategories || subcategories.length === 0) {
     return null;
   }
@@ -51,29 +60,34 @@ const CategorySubcategoriesScroller = ({
           className="flex overflow-x-auto py-2 px-8 gap-2 scroll-smooth scrollbar-hide"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {subcategories.map((subcategory) => (
-            <button
-              key={subcategory.id}
-              onClick={() => onSubcategorySelect(subcategory.id)}
-              className={cn(
-                "whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0 transition-all",
-                selectedSubcategories.includes(subcategory.id)
-                  ? "bg-primary/20 text-primary border border-primary/30"
-                  : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
-              )}
-            >
-              <span className="flex items-center justify-center w-4 h-4">
-                {typeof subcategory.icon === 'string' ? (
-                  <span>{subcategory.icon}</span>
-                ) : React.isValidElement(subcategory.icon) ? (
-                  subcategory.icon
-                ) : typeof subcategory.icon === 'function' ? (
-                  React.createElement(subcategory.icon as React.ComponentType, {})
-                ) : null}
-              </span>
-              {subcategory.name}
-            </button>
-          ))}
+          {subcategories.map((subcategory) => {
+            const isSelected = selectedSubcategories.includes(subcategory.id);
+            return (
+              <button
+                key={subcategory.id}
+                onClick={() => onSubcategorySelect(subcategory.id)}
+                className={cn(
+                  "whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0 transition-all",
+                  isSelected
+                    ? `bg-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-500/20 ${getCategoryTextColor(parentCategoryId)} border border-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-500/30`
+                    : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+                )}
+              >
+                <span className="flex items-center justify-center w-4 h-4">
+                  {typeof subcategory.icon === 'string' ? (
+                    <span>{subcategory.icon}</span>
+                  ) : React.isValidElement(subcategory.icon) ? (
+                    subcategory.icon
+                  ) : typeof subcategory.icon === 'function' ? (
+                    React.createElement(subcategory.icon as React.ComponentType, {})
+                  ) : (
+                    getCategoryIcon(subcategory.id, "w-3.5 h-3.5")
+                  )}
+                </span>
+                {subcategory.name}
+              </button>
+            );
+          })}
         </div>
 
         <button

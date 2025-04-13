@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Category } from '@/types/categoryTypes';
 import { ScrollableSubcategories } from './ScrollableSubcategories';
-import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
+import { getCategoryColorClass } from '@/utils/categoryColors';
 import { cn } from '@/lib/utils';
 
 interface CategoryFilterProps {
@@ -60,7 +60,7 @@ const CategoryFilter = ({
               className={cn(
                 "category-btn flex items-center gap-2 px-3 py-2 rounded-full transition-all", 
                 selectedCategory === category.id 
-                  ? getCategoryColor(category.id)
+                  ? getCategoryColorClass(category.id)
                   : "bg-gray-100 hover:bg-gray-200 text-gray-700"
               )}
             >
@@ -91,28 +91,5 @@ const CategoryFilter = ({
     </div>
   );
 };
-
-// Helper function to get category color class
-function getCategoryColor(categoryId: string): string {
-  switch(categoryId) {
-    case 'restaurants': return 'bg-red-500 hover:bg-red-600 text-white';
-    case 'bars': return 'bg-orange-500 hover:bg-orange-600 text-white';
-    case 'cafes': return 'bg-amber-500 hover:bg-amber-600 text-white';
-    case 'shopping': return 'bg-yellow-500 hover:bg-yellow-600 text-white';
-    case 'hotels': return 'bg-lime-500 hover:bg-lime-600 text-white';
-    case 'entertainment': return 'bg-green-500 hover:bg-green-600 text-white';
-    case 'health': return 'bg-teal-500 hover:bg-teal-600 text-white';
-    case 'services': return 'bg-cyan-500 hover:bg-cyan-600 text-white';
-    case 'education': return 'bg-blue-500 hover:bg-blue-600 text-white';
-    case 'transport': return 'bg-indigo-500 hover:bg-indigo-600 text-white';
-    case 'alimentation': return 'bg-red-500 hover:bg-red-600 text-white';
-    case 'achat': return 'bg-purple-500 hover:bg-purple-600 text-white';
-    case 'sante': return 'bg-teal-500 hover:bg-teal-600 text-white';
-    case 'divertissement': return 'bg-green-500 hover:bg-green-600 text-white';
-    case 'hebergement': return 'bg-lime-500 hover:bg-lime-600 text-white';
-    case 'quotidien': return 'bg-blue-500 hover:bg-blue-600 text-white';
-    default: return 'bg-slate-500 hover:bg-slate-600 text-white';
-  }
-}
 
 export default CategoryFilter;

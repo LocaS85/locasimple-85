@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { MapDisplay } from './MapDisplay';
-import { ResultsPopup } from './ResultsPopup';
-import { ResultDetail } from './ResultDetail';
-import { RouteDisplayContainer } from './RouteDisplayContainer';
-import { NoResultsMessage } from './NoResultsMessage';
-import { MapKeyWarning } from './MapKeyWarning';
+import ResultsPopup from './ResultsPopup';
+import ResultDetail from './ResultDetail';
+import RouteDisplayContainer from './RouteDisplayContainer';
+import NoResultsMessage from './NoResultsMessage';
+import MapKeyWarning from './MapKeyWarning';
 import CategorySubcategoriesScroller from './map/CategorySubcategoriesScroller';
 import { CATEGORIES } from '@/types/categories';
 
@@ -125,7 +125,7 @@ export const MapSection = ({
 
           {showRoutes && selectedPlace && userLocation && (
             <RouteDisplayContainer
-              destination={[selectedPlace.longitude, selectedPlace.latitude]}
+              destinations={[selectedPlace.longitude, selectedPlace.latitude]}
               origin={userLocation}
               transportMode={transportMode}
             />

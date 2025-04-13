@@ -2,41 +2,98 @@
 import React from 'react';
 import { 
   Home, 
+  Users, 
+  Briefcase, 
+  School, 
   Utensils, 
   ShoppingBag, 
-  Briefcase, 
   Heart, 
   Film, 
-  Hotel,
-  Users
+  Hotel, 
+  Wrench,
+  Bus,
+  Bike,
+  Car,
+  Ship,
+  Train,
+  CircleEllipsis
 } from 'lucide-react';
 
-interface IconOptions {
-  className?: string;
-  color?: string;
-}
-
-export const getCategoryIcon = (categoryId: string, options: IconOptions | string = {}) => {
-  // Handle legacy format where options is just a className string
-  let className = typeof options === 'string' ? options : options.className || "h-6 w-6";
-  let color = typeof options === 'object' ? options.color : undefined;
-  
+export const getCategoryIcon = (categoryId: string, className: string = "w-5 h-5") => {
   switch (categoryId) {
-    case 'quotidien':
-      return <Users className={className} style={color ? { color } : undefined} />;
+    case 'adresse-principale':
+      return <Home className={className} />;
+    case 'famille':
+      return <Users className={className} />;
+    case 'amis':
+      return <Users className={className} />;
+    case 'travail':
+      return <Briefcase className={className} />;
+    case 'ecole':
+    case 'education':
+      return <School className={className} />;
     case 'alimentation':
-      return <Utensils className={className} style={color ? { color } : undefined} />;
+    case 'restaurants':
+      return <Utensils className={className} />;
     case 'shopping':
-      return <ShoppingBag className={className} style={color ? { color } : undefined} />;
-    case 'services':
-      return <Briefcase className={className} style={color ? { color } : undefined} />;
+    case 'achat':
+      return <ShoppingBag className={className} />;
     case 'sante':
-      return <Heart className={className} style={color ? { color } : undefined} />;
+      return <Heart className={className} />;
     case 'divertissement':
-      return <Film className={className} style={color ? { color } : undefined} />;
+    case 'loisirs':
+      return <Film className={className} />;
     case 'hebergement':
-      return <Hotel className={className} style={color ? { color } : undefined} />;
+    case 'hotel':
+      return <Hotel className={className} />;
+    case 'services':
+      return <Wrench className={className} />;
+    case 'transport-public':
+    case 'bus':
+      return <Bus className={className} />;
+    case 'velo':
+    case 'cycling':
+      return <Bike className={className} />;
+    case 'voiture':
+    case 'driving':
+      return <Car className={className} />;
+    case 'bateau':
+    case 'boat':
+      return <Ship className={className} />;
+    case 'train':
+    case 'metro':
+    case 'tram':
+      return <Train className={className} />;
+    case 'quotidien':
+      return <CircleEllipsis className={className} />;
     default:
-      return <Home className={className} style={color ? { color } : undefined} />;
+      return <CircleEllipsis className={className} />;
+  }
+};
+
+export const getTransportModeIcon = (mode: string, className: string = "w-5 h-5") => {
+  switch (mode) {
+    case 'driving':
+    case 'voiture':
+      return <Car className={className} />;
+    case 'walking':
+    case 'marche':
+      return <Users className={className} />;
+    case 'cycling':
+    case 'velo':
+      return <Bike className={className} />;
+    case 'transit':
+    case 'public':
+    case 'transport-public':
+      return <Bus className={className} />;
+    case 'boat':
+    case 'bateau':
+      return <Ship className={className} />;
+    case 'train':
+    case 'metro':
+    case 'tram':
+      return <Train className={className} />;
+    default:
+      return <Car className={className} />;
   }
 };

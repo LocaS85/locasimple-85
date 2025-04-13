@@ -1,48 +1,34 @@
 
 import React from 'react';
-import { toast } from 'sonner';
-import MultiRouteDisplay from '../map/MultiRouteDisplay';
-import { TransportMode } from '@/hooks/useMapboxRoutes';
 
 interface RouteDisplayContainerProps {
-  selectedResultId?: string;
-  from?: [number, number];
-  to?: [number, number];
-  routes: Record<TransportMode, any>;
-  activeMode: TransportMode;
-  setActiveMode: (mode: TransportMode) => void;
-  setTransportMode: (mode: string) => void;
+  destinations: [number, number];
+  origin: [number, number];
+  transportMode: string;
 }
 
-export const RouteDisplayContainer: React.FC<RouteDisplayContainerProps> = ({
-  selectedResultId,
-  from,
-  to,
-  routes,
-  activeMode,
-  setActiveMode,
-  setTransportMode
-}) => {
-  if (!selectedResultId || !from || !to) {
-    return null;
-  }
-
+export const RouteDisplayContainer = ({
+  destinations,
+  origin,
+  transportMode
+}: RouteDisplayContainerProps) => {
   return (
-    <div className="absolute bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-20">
-      <MultiRouteDisplay
-        routeData={routes}
-        activeMode={activeMode}
-        onModeChange={(mode) => {
-          setActiveMode(mode as TransportMode);
-          setTransportMode(mode === 'driving-traffic' ? 'driving' : mode);
-        }}
-        onRouteSelect={(route, mode) => {
-          console.log(`Route sélectionnée en mode ${mode}:`, route);
-        }}
-        onSaveRoute={(route, mode) => {
-          toast.success(`Itinéraire en ${mode} sauvegardé`);
-        }}
-      />
+    <div className="route-display-container absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4 z-10">
+      <h3 className="text-lg font-semibold mb-2">Itinéraire</h3>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white">A</span>
+          <span>Votre position</span>
+        </div>
+        <div className="w-0.5 h-4 bg-gray-300 ml-3"></div>
+        <div className="flex items-center gap-2">
+          <span className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white">B</span>
+          <span>Destination</span>
+        </div>
+      </div>
+      <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+        Mode de transport: {transportMode}
+      </div>
     </div>
   );
 };
