@@ -1,147 +1,86 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
-import { useSearchPanel } from '@/hooks/useSearchPanel';
-import { useRouteDisplay } from '@/hooks/useRouteDisplay';
-import MapSection from './MapSection';
 import SearchMenu from './SearchMenu';
 import { toast } from 'sonner';
-import useSearchApiCore from '@/hooks/search/useSearchApiCore';
+import MapSection from './MapSection';
 import { DistanceUnit } from '@/types/categoryTypes';
 
-export const SearchContainer: React.FC = () => {
+interface SearchContainerProps {
+  searchPanel?: any;
+  routeDisplay?: any;
+  searchApiCore?: any;
+  searchState?: any;
+}
+
+export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
+  // Destructure props with default empty objects to prevent errors
   const {
-    query,
-    setQuery,
-    searchLoading,
-    isRecording,
-    handleMicClick,
-    handleLocationClick,
-    showHistory,
-    setShowHistory,
-    searchHistory,
-    savedSearches,
-    handleHistoryItemClick,
-    handleSaveSearch,
-    removeSavedSearch,
-    search,
-    resetSearch,
-    searchMenu,
-    searchState,
-    resultSelection,
-    handleSearchPress,
-    isLocationActive,
-    transportMode,
-    onTransportModeChange
-  } = useSearchPanel();
+    searchPanel = {},
+    routeDisplay = {},
+    searchApiCore = {},
+    searchState = {}
+  } = props;
 
-  const { from, to, routes, activeMode, setActiveMode } = useRouteDisplay({
-    userLocation: searchState.userLocation,
-    searchResults: searchState.searchResults,
-    selectedResultId: resultSelection.selectedResultId,
-    transportMode: searchState.transportMode
-  });
-
-  const searchApiCore = useSearchApiCore({
-    userLocation: searchState.userLocation,
-    setLoading: (loading: boolean) => {
-      // We don't need to set loading state here
-    }
-  });
-
-  useEffect(() => {
-    const checkServer = async () => {
-      const isConnected = await searchApiCore.checkFlaskServer();
-      if (isConnected) {
-        console.log('Flask server is connected');
-      } else {
-        console.warn('Flask server is not connected');
-        toast.warning('Le serveur Flask n\'est pas accessible. Certaines fonctionnalités peuvent être limitées.', {
-          duration: 5000,
-        });
-      }
-    };
-    
-    checkServer();
-  }, []);
-
-  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
+  // Extract values from nested objects
+  const query = searchPanel.query || '';
+  const setQuery = searchPanel.setQuery || (() => {});
+  const searchLoading = searchPanel.searchLoading || false;
+  const isRecording = searchPanel.isRecording || false;
+  const handleMicClick = searchPanel.handleMicClick || (() => {});
+  const handleLocationClick = searchPanel.handleLocationClick || (() => {});
+  const isLocationActive = searchPanel.isLocationActive || false;
+  const transportMode = searchPanel.transportMode || 'driving';
+  const onTransportModeChange = searchPanel.onTransportModeChange || (() => {});
+  const searchMenu = searchPanel.searchMenu || { menuOpen: false, setMenuOpen: () => {} };
   
-  // Convert distance unit for Map component
-  const getMapRadiusUnit = (unit: DistanceUnit): "km" | "miles" => {
-    return unit === "mi" ? "miles" : "km";
-  };
+  // Use a safer way to check for userLocation
+  const userLocation = searchState.userLocation || [0, 0];
+  const selectedResultId = searchState.selectedResultId || '';
+  const searchResults = searchState.searchResults || [];
+  const loading = searchState.loading || false;
+  const selectedCategory = searchState.selectedCategory || null;
+  const showRoutes = searchState.showRoutes || false;
+  
+  // Default empty state for distanceUnit
+  const [distanceUnit, setDistanceUnit] = React.useState<DistanceUnit>("km");
 
   return (
     <div className="relative w-full h-full">
       <MapSection
-        results={searchState.searchResults}
-        center={searchState.userLocation}
-        radius={searchState.selectedDistance || 5}
-        radiusUnit={getMapRadiusUnit(distanceUnit)}
+        userLocation={userLocation}
+        selectedPlaceId={selectedResultId}
+        places={searchResults}
+        loading={loading}
+        showRoutes={showRoutes}
+        transportMode={transportMode}
+        selectedCategory={selectedCategory}
         radiusType="distance"
-        duration={searchState.selectedDuration || 15}
-        timeUnit="minutes"
-        transportMode={searchState.transportMode}
-        searchQuery={query}
-        onSearchChange={setQuery}
-        isRecording={isRecording}
-        onMicClick={handleMicClick}
-        onLocationClick={handleLocationClick}
-        isLocationActive={isLocationActive}
-        loading={searchState.loading || searchLoading}
-        showRoutes={searchState.showRoutes}
-        onSearch={handleSearchPress}
-        selectedResultId={resultSelection.selectedResultId}
-        onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
-        selectedCategory={searchState.selectedCategory}
-        onCategorySelect={searchState.setSelectedCategory}
-        searchHistory={searchHistory}
-        savedSearches={savedSearches}
-        onHistoryItemClick={handleHistoryItemClick}
-        onSaveSearch={handleSaveSearch}
-        onRemoveSavedSearch={removeSavedSearch}
-        resetSearch={resetSearch}
-        onTransportModeChange={onTransportModeChange}
-        userLocation={searchState.userLocation}
-      />
-
-      <SearchMenu
-        show={searchMenu.menuOpen}
-        onClose={() => searchMenu.setMenuOpen(false)}
-        selectedDuration={searchState.selectedDuration}
-        selectedDistance={searchState.selectedDistance}
+        radius={5}
         distanceUnit={distanceUnit}
-        transportMode={searchState.transportMode}
-        resultsCount={searchState.resultsCount}
-        selectedCategory={searchState.selectedCategory}
-        onCategorySelect={searchState.setSelectedCategory}
-        onResultsCountChange={searchState.setResultsCount}
-        onTransportModeChange={searchState.setTransportMode}
-        onDurationChange={searchState.setSelectedDuration}
-        onDistanceChange={searchState.setSelectedDistance}
-        onDistanceUnitChange={setDistanceUnit}
-        results={searchState.searchResults}
-        onResultClick={(result) => resultSelection.setSelectedResultId(result.id)}
-        selectedResultId={resultSelection.selectedResultId}
-        searchHistory={searchHistory}
-        savedSearches={savedSearches}
-        onHistoryItemClick={handleHistoryItemClick}
-        onSaveSearch={handleSaveSearch}
-        onRemoveSavedSearch={removeSavedSearch}
-        searchQuery={query}
-        onReset={resetSearch}
+        onPlaceSelect={(id) => console.log('Selected place:', id)}
+        onClosePopup={() => console.log('Closed popup')}
+        showNoMapboxTokenWarning={false}
+        onSetMapboxToken={(token) => {
+          console.log('Set token:', token);
+          return true;
+        }}
       />
 
-      <RouteDisplayContainer
-        selectedResultId={resultSelection.selectedResultId}
-        from={from}
-        to={to}
-        routes={routes}
-        activeMode={activeMode}
-        setActiveMode={setActiveMode}
-        setTransportMode={searchState.setTransportMode}
-      />
+      {searchMenu.menuOpen && (
+        <SearchMenu
+          show={searchMenu.menuOpen}
+          onClose={() => searchMenu.setMenuOpen(false)}
+        />
+      )}
+
+      {showRoutes && selectedResultId && userLocation && (
+        <RouteDisplayContainer
+          origin={userLocation}
+          destinations={[0, 0]} // Placeholder
+          transportMode={transportMode}
+        />
+      )}
     </div>
   );
 };

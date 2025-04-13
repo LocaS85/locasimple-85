@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Layers, Map as MapIcon, Plus, Minus, CompassIcon, Filter, Navigation } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { mockCategories } from '@/data/mockCategories';
 import { cn } from '@/lib/utils';
-import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
+import { getCategoryColorClass, getHoverColor } from '@/utils/categoryColors';
 import mapboxgl from 'mapbox-gl';
 
 export interface MapControlsProps {
@@ -197,7 +198,7 @@ const MapControls: React.FC<MapControlsProps> = ({
                       className={cn(
                         "rounded-full border whitespace-nowrap px-2 py-0.5 h-7 flex-shrink-0 text-xs transition-colors",
                         isSelected 
-                          ? getCategoryColor(category.id)
+                          ? getCategoryColorClass(category.id)
                           : `bg-white text-black border-black ${getHoverColor(category.id)}`
                       )}
                       onClick={() => onCategorySelect(category.id === selectedCategory ? null : category.id)}

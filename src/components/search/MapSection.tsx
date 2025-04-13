@@ -12,35 +12,35 @@ import { CATEGORIES } from '@/types/categories';
 interface MapSectionProps {
   userLocation?: [number, number];
   selectedPlaceId?: string;
-  places: any[];
-  loading: boolean;
-  showRoutes: boolean;
-  transportMode: string;
-  selectedCategory: string | null;
-  radiusType: 'time' | 'distance';
-  radius: number;
-  distanceUnit: 'km' | 'mi';
-  onPlaceSelect: (placeId: string) => void;
-  onClosePopup: () => void;
-  showNoMapboxTokenWarning: boolean;
-  onSetMapboxToken: (token: string) => boolean;
+  places?: any[];
+  loading?: boolean;
+  showRoutes?: boolean;
+  transportMode?: string;
+  selectedCategory?: string | null;
+  radiusType?: 'time' | 'distance';
+  radius?: number;
+  distanceUnit?: 'km' | 'mi';
+  onPlaceSelect?: (placeId: string) => void;
+  onClosePopup?: () => void;
+  showNoMapboxTokenWarning?: boolean;
+  onSetMapboxToken?: (token: string) => boolean;
 }
 
 export const MapSection = ({
   userLocation,
   selectedPlaceId,
   places = [],
-  loading,
-  showRoutes,
-  transportMode,
-  selectedCategory,
-  radiusType,
-  radius,
-  distanceUnit,
-  onPlaceSelect,
-  onClosePopup,
-  showNoMapboxTokenWarning,
-  onSetMapboxToken,
+  loading = false,
+  showRoutes = false,
+  transportMode = 'driving',
+  selectedCategory = null,
+  radiusType = 'distance',
+  radius = 5,
+  distanceUnit = 'km',
+  onPlaceSelect = () => {},
+  onClosePopup = () => {},
+  showNoMapboxTokenWarning = false,
+  onSetMapboxToken = () => false,
 }: MapSectionProps) => {
   const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
@@ -65,10 +65,19 @@ export const MapSection = ({
     });
   };
 
+  // Clear selected subcategories when category changes
+  useEffect(() => {
+    setSelectedSubcategories([]);
+  }, [selectedCategory]);
+
   // Get subcategories for the selected category
   const subcategories = selectedCategory 
     ? CATEGORIES.find(c => c.id === selectedCategory)?.subCategories || []
     : [];
+
+  const handleClearFilters = () => {
+    // Implementation
+  };
 
   return (
     <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
@@ -110,7 +119,11 @@ export const MapSection = ({
           )}
 
           {!loading && places.length === 0 && (
-            <NoResultsMessage />
+            <NoResultsMessage 
+              searchQuery=""
+              loading={loading}
+              clearFilters={handleClearFilters}
+            />
           )}
 
           {selectedPlace && (

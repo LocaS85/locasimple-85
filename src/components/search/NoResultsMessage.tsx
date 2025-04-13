@@ -1,39 +1,34 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
-interface NoResultsMessageProps {
-  searchQuery: string;
-  loading: boolean;
-  clearFilters: () => void;
+export interface NoResultsMessageProps {
+  searchQuery?: string;
+  loading?: boolean;
+  clearFilters?: () => void;
 }
 
 const NoResultsMessage: React.FC<NoResultsMessageProps> = ({ 
-  searchQuery,
-  loading,
-  clearFilters
+  searchQuery = '',
+  loading = false,
+  clearFilters = () => {}
 }) => {
-  if (loading || searchQuery.trim() === '') return null;
-
+  if (loading) return null;
+  
   return (
-    <motion.div 
-      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center py-10 text-gray-500 bg-white/80 rounded-lg p-6 shadow-sm z-20"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.2 }}
-    >
-      <p className="text-sm">Aucun résultat trouvé</p>
-      <p className="text-xs mt-1">Essayez de modifier votre recherche ou vos filtres</p>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        className="mt-3" 
-        onClick={clearFilters}
-      >
-        Réinitialiser
-      </Button>
-    </motion.div>
+    <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+      <div className="max-w-md p-6 bg-white rounded-lg shadow-md text-center">
+        <h3 className="text-xl font-semibold mb-2">Aucun résultat trouvé</h3>
+        <p className="text-gray-600 mb-4">
+          {searchQuery 
+            ? `Aucun résultat ne correspond à "${searchQuery}".`
+            : "Aucun résultat ne correspond à vos critères de recherche."}
+        </p>
+        <Button onClick={clearFilters} variant="outline">
+          Réinitialiser les filtres
+        </Button>
+      </div>
+    </div>
   );
 };
 

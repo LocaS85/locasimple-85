@@ -3,7 +3,7 @@ import React from 'react';
 import { mockCategories } from '@/data/mockCategories';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
+import { getCategoryColorClass, getHoverColor } from '@/utils/categoryColors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Category } from '@/types/categories';
 
@@ -33,7 +33,7 @@ const CategoryScroller: React.FC<CategoryScrollerProps> = ({
                 className={cn(
                   "rounded-full whitespace-nowrap px-3 py-1 h-8 flex-shrink-0 text-xs transition-colors",
                   isSelected 
-                    ? getCategoryColor(category.id)
+                    ? getCategoryColorClass(category.id)
                     : `bg-white text-black border-gray-300 border ${getHoverColor(category.id)}`
                 )}
                 onClick={() => onCategorySelect(category.id === selectedCategory ? null : category.id)}

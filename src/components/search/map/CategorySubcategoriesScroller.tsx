@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { SubCategory } from '@/types/categoryTypes';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -33,11 +33,15 @@ const CategorySubcategoriesScroller = ({
     }
   };
 
-  const getColorForSubcategory = (subcategoryId: string, isSelected: boolean) => {
-    if (isSelected) {
-      return getCategoryColorClass(parentCategoryId);
+  // Function to provide tactile feedback
+  const provideTactileFeedback = () => {
+    if ('vibrate' in navigator) {
+      try {
+        navigator.vibrate(20); // Subtle vibration
+      } catch (e) {
+        console.log('Vibration not supported');
+      }
     }
-    return "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100";
   };
 
   if (!subcategories || subcategories.length === 0) {
@@ -65,11 +69,14 @@ const CategorySubcategoriesScroller = ({
             return (
               <button
                 key={subcategory.id}
-                onClick={() => onSubcategorySelect(subcategory.id)}
+                onClick={() => {
+                  provideTactileFeedback();
+                  onSubcategorySelect(subcategory.id);
+                }}
                 className={cn(
                   "whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0 transition-all",
                   isSelected
-                    ? `bg-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-500/20 ${getCategoryTextColor(parentCategoryId)} border border-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-500/30`
+                    ? `${getCategoryTextColor(parentCategoryId)} bg-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-100 border border-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-200`
                     : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
                 )}
               >
@@ -98,6 +105,15 @@ const CategorySubcategoriesScroller = ({
           <ChevronRight size={18} />
         </button>
       </div>
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };

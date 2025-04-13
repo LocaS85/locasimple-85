@@ -1,19 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Category } from '@/types/categoryTypes';
 import { ScrollableSubcategories } from './ScrollableSubcategories';
-import { getCategoryColorClass } from '@/utils/categoryColors';
+import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
 import { cn } from '@/lib/utils';
+import { getCategoryIcon } from '@/utils/categoryIcons';
+import { CATEGORIES } from '@/types/categories';
 
 interface CategoryFilterProps {
-  categories: Category[]; // Structure : { id, name, icon, subcategories[] }
+  categories?: Category[]; // Structure : { id, name, icon, subcategories[] }
   onSubcategorySelect: (subcategories: string[]) => void;
   selectedCategory?: string | null;
   onCategorySelect?: (categoryId: string) => void;
 }
 
 const CategoryFilter = ({ 
-  categories, 
+  categories = CATEGORIES, 
   onSubcategorySelect, 
   selectedCategory: externalSelectedCategory, 
   onCategorySelect 
@@ -47,8 +49,10 @@ const CategoryFilter = ({
       {/* Catégories principales */}
       <div className="main-categories flex flex-wrap gap-2">
         {categories.map((category) => {
-          // Support both string and component icons
-          const iconComponent = category.icon;
+          // Get the category icon
+          const iconComponent = typeof category.icon === 'string' 
+            ? category.icon 
+            : getCategoryIcon(category.id);
           
           return (
             <button 
@@ -72,7 +76,7 @@ const CategoryFilter = ({
                 ) : typeof iconComponent === 'function' ? (
                   React.createElement(iconComponent as React.ComponentType, {})
                 ) : (
-                  null
+                  getCategoryIcon(category.id, "w-5 h-5")
                 )}
               </span>
               <span>{category.name}</span>
