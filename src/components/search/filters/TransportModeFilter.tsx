@@ -1,8 +1,12 @@
 
 import React from 'react';
-import { Car, Bike, PersonStanding, Bus } from 'lucide-react';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Car, Bike, PersonStanding, Bus, Ship, Train } from 'lucide-react';
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from '@/components/ui/tooltip';
 
 interface TransportMode {
   id: string;
@@ -14,8 +18,10 @@ interface TransportMode {
 const TRANSPORT_MODES: TransportMode[] = [
   { id: 'driving', icon: <Car className="h-5 w-5" />, label: 'Voiture', profile: 'mapbox/driving' },
   { id: 'cycling', icon: <Bike className="h-5 w-5" />, label: 'Vélo', profile: 'mapbox/cycling' },
-  { id: 'walking', icon: <PersonStanding className="h-5 w-5" />, label: 'Marche', profile: 'mapbox/walking' },
-  { id: 'transit', icon: <Bus className="h-5 w-5" />, label: 'Transport', profile: 'mapbox/transit' }
+  { id: 'walking', icon: <PersonStanding className="h-5 w-5" />, label: 'À pied', profile: 'mapbox/walking' },
+  { id: 'transit', icon: <Bus className="h-5 w-5" />, label: 'Bus', profile: 'mapbox/transit' },
+  { id: 'boat', icon: <Ship className="h-5 w-5" />, label: 'Bateau', profile: 'mapbox/driving' },
+  { id: 'train', icon: <Train className="h-5 w-5" />, label: 'Transport', profile: 'mapbox/transit' }
 ];
 
 interface TransportModesProps {
@@ -60,32 +66,27 @@ const TransportModeFilter = ({
       <h3 className="text-sm font-medium mb-3">Mode de transport</h3>
       
       <TooltipProvider>
-        <ToggleGroup 
-          type={multiSelect ? "multiple" : "single"}
-          value={multiSelect ? selectedModes : [selectedMode]}
-          className="flex justify-between"
-        >
+        <div className="flex flex-wrap justify-between gap-2">
           {TRANSPORT_MODES.map((mode) => (
             <Tooltip key={mode.id}>
               <TooltipTrigger asChild>
-                <ToggleGroupItem 
-                  value={mode.id}
+                <button 
                   onClick={() => handleModeChange(mode.id)}
                   className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg w-16 h-16 
                     ${(multiSelect ? selectedModes.includes(mode.id) : selectedMode === mode.id) 
-                      ? 'bg-primary/10 border-primary/30 text-primary' 
-                      : 'bg-gray-50 hover:bg-gray-100'}`}
+                      ? 'bg-primary/10 border-primary/30 text-primary border' 
+                      : 'bg-gray-50 hover:bg-gray-100 border border-transparent'}`}
                 >
                   {mode.icon}
                   <span className="text-xs">{mode.label}</span>
-                </ToggleGroupItem>
+                </button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>{mode.label}</p>
               </TooltipContent>
             </Tooltip>
           ))}
-        </ToggleGroup>
+        </div>
       </TooltipProvider>
     </div>
   );

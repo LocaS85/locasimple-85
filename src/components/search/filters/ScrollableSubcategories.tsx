@@ -49,7 +49,7 @@ export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableS
       
       <div 
         ref={scrollContainerRef}
-        className="flex overflow-x-auto scrollbar-hide py-2 px-8 gap-2 scroll-smooth"
+        className="flex overflow-x-auto py-2 px-8 gap-2 scroll-smooth scrollbar-hide"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {subcategories.map((subcategory) => (
@@ -64,7 +64,7 @@ export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableS
             {typeof subcategory.icon === 'string' ? (
               <span>{subcategory.icon}</span>
             ) : subcategory.icon ? (
-              React.createElement(subcategory.icon as any, { size: 16 })
+              React.createElement(subcategory.icon as React.ComponentType, { size: 16 })
             ) : null}
             {subcategory.name}
           </button>
@@ -79,7 +79,7 @@ export const ScrollableSubcategories = ({ subcategories, onSelect }: ScrollableS
         <ChevronRight size={20} />
       </button>
       
-      <style jsx>{`
+      <style jsx="true">{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }

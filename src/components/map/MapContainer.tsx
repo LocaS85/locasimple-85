@@ -202,7 +202,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
         transportMode={transportMode || 'driving'}
         setMap={setMap}
         showRoutes={showRoutes}
-        radiusKm={radius}
       />
       
       {/* Map Results */}

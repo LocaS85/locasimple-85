@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, MapPin } from 'lucide-react';
 import { DistanceUnit } from '@/types/categoryTypes';
+import { Button } from '@/components/ui/button';
 
 interface RadiusFilterProps {
   onRadiusChange: (value: number) => void;
@@ -34,6 +35,8 @@ const RadiusFilter = ({
     cycling: 15,
     walking: 5,
     transit: 30,
+    boat: 20,
+    train: 60,
   };
 
   // Convert between time and distance
@@ -90,59 +93,82 @@ const RadiusFilter = ({
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-medium">Rayon de recherche</h3>
         
-        <ToggleGroup 
-          type="single" 
-          value={radiusType}
-          onValueChange={(value) => value && handleRadiusTypeChange(value as 'time' | 'distance')}
-          className="border rounded-md"
+        <Tabs
+          defaultValue={radiusType}
+          onValueChange={(v) => handleRadiusTypeChange(v as 'time' | 'distance')}
         >
-          <ToggleGroupItem value="time" aria-label="Par temps">
-            <Clock className="h-4 w-4 mr-1" />
-            <span className="text-xs">Minutes</span>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="distance" aria-label="Par distance">
-            <MapPin className="h-4 w-4 mr-1" />
-            <span className="text-xs">Distance</span>
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
-      <div className="px-2">
-        <Slider
-          min={radiusType === 'time' ? 5 : 1}
-          max={radiusType === 'time' ? 180 : 50}
-          step={radiusType === 'time' ? 5 : 1}
-          value={[radiusValue]}
-          onValueChange={(values) => {
-            const val = values[0];
-            setRadiusValue(val);
-            onRadiusChange(val);
-          }}
-        />
-      </div>
-
-      <div className="flex justify-between items-center">
-        <span className="radius-display text-sm font-medium">
-          {radiusType === 'time' 
-            ? `${radiusValue} minutes` 
-            : `${radiusValue} ${unit}`}
-        </span>
-        
-        {radiusType === 'distance' && (
-          <ToggleGroup 
-            type="single" 
-            value={unit}
-            onValueChange={(value) => value && handleUnitChange(value as DistanceUnit)}
-            className="border rounded-md"
-          >
-            <ToggleGroupItem value="km" className="text-xs px-2 py-1" aria-label="Kilomètres">
-              km
-            </ToggleGroupItem>
-            <ToggleGroupItem value="mi" className="text-xs px-2 py-1" aria-label="Miles">
-              mi
-            </ToggleGroupItem>
-          </ToggleGroup>
-        )}
+          <TabsList>
+            <TabsTrigger value="time" className="flex gap-1 items-center">
+              <Clock className="h-4 w-4" />
+              <span className="text-xs">Minutes</span>
+            </TabsTrigger>
+            <TabsTrigger value="distance" className="flex gap-1 items-center">
+              <MapPin className="h-4 w-4" />
+              <span className="text-xs">Distance</span>
+            </TabsTrigger>
+          </TabsList>
+      
+          <TabsContent value="time" className="space-y-4">
+            <div className="px-2">
+              <Slider
+                min={5}
+                max={180}
+                step={5}
+                value={[radiusValue]}
+                onValueChange={(values) => {
+                  const val = values[0];
+                  setRadiusValue(val);
+                  onRadiusChange(convertRadius(val, 'time', transportMode));
+                }}
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="radius-display text-sm font-medium">
+                {radiusValue} minutes
+              </span>
+            </div>
+          </TabsContent>
+      
+          <TabsContent value="distance" className="space-y-4">
+            <div className="px-2">
+              <Slider
+                min={1}
+                max={50}
+                step={1}
+                value={[radiusValue]}
+                onValueChange={(values) => {
+                  const val = values[0];
+                  setRadiusValue(val);
+                  onRadiusChange(val);
+                }}
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="radius-display text-sm font-medium">
+                {radiusValue} {unit}
+              </span>
+              
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant={unit === 'km' ? 'default' : 'outline'} 
+                  onClick={() => handleUnitChange('km')}
+                  className="px-2 py-1 h-8"
+                >
+                  km
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant={unit === 'mi' ? 'default' : 'outline'} 
+                  onClick={() => handleUnitChange('mi')}
+                  className="px-2 py-1 h-8"
+                >
+                  mi
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

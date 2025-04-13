@@ -11,7 +11,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): {
-  (...args: Parameters<T>): ReturnType<T> | undefined;
+  (...args: Parameters<T>): void;
   cancel: () => void;
 } {
   let timeout: ReturnType<typeof setTimeout> | null = null;

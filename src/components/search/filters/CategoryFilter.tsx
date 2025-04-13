@@ -51,7 +51,9 @@ const CategoryFilter = ({
               {typeof category.icon === 'string' ? (
                 <span className="category-icon text-lg">{category.icon}</span>
               ) : IconComponent ? (
-                <IconComponent className="category-icon w-5 h-5" />
+                <span className="category-icon w-5 h-5">
+                  {React.createElement(IconComponent as React.ComponentType, { className: "w-5 h-5" })}
+                </span>
               ) : null}
               <span>{category.name}</span>
             </button>
