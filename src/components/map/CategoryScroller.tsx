@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { mockCategories } from '@/data/mockCategories';
+import { CATEGORIES } from '@/types/categories';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getCategoryColorClass, getHoverColor } from '@/utils/categoryColors';
@@ -10,13 +10,13 @@ import { Category } from '@/types/categories';
 export interface CategoryScrollerProps {
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
-  categories?: any[]; // This allows the prop but doesn't require it
+  categories?: Category[]; // This allows the prop but doesn't require it
 }
 
 const CategoryScroller: React.FC<CategoryScrollerProps> = ({
   selectedCategory,
   onCategorySelect,
-  categories = mockCategories // Default to mockCategories if not provided
+  categories = CATEGORIES // Default to CATEGORIES from types/categories if not provided
 }) => {
   const { t } = useLanguage();
   

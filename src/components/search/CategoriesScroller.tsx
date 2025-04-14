@@ -1,9 +1,11 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, MapPin } from 'lucide-react';
-import { mockCategories } from '@/data/mockCategories';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { CATEGORIES } from '@/types/categories';
 import { cn } from '@/lib/utils';
+import { getCategoryColorClass, getHoverColor } from '@/utils/categoryColors';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CategoriesScrollerProps {
   selectedCategory: string | null;
@@ -15,9 +17,49 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
   onCategorySelect 
 }) => {
   const categoriesRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+
+  // Check if we should show navigation arrows
+  useEffect(() => {
+    const checkScroll = () => {
+      if (!categoriesRef.current) return;
+      
+      setShowLeftArrow(categoriesRef.current.scrollLeft > 0);
+      setShowRightArrow(
+        categoriesRef.current.scrollLeft + categoriesRef.current.offsetWidth < 
+        categoriesRef.current.scrollWidth
+      );
+    };
+
+    checkScroll();
+    
+    if (categoriesRef.current) {
+      categoriesRef.current.addEventListener('scroll', checkScroll);
+    }
+    
+    return () => {
+      if (categoriesRef.current) {
+        categoriesRef.current.removeEventListener('scroll', checkScroll);
+      }
+    };
+  }, []);
+
+  const scrollRight = () => {
+    if (categoriesRef.current) {
+      categoriesRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollLeft = () => {
+    if (categoriesRef.current) {
+      categoriesRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!categoriesRef.current) return;
@@ -53,39 +95,8 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
   };
 
   const handleCategoryClick = (categoryId: string) => {
-    onCategorySelect(categoryId === selectedCategory ? null : categoryId);
-  };
-
-  // Define category colors
-  const getCategoryColor = (categoryId: string) => {
-    switch(categoryId) {
-      case 'restaurants': return 'bg-red-500 hover:bg-red-500 text-white border-red-500';
-      case 'bars': return 'bg-orange-500 hover:bg-orange-500 text-white border-orange-500';
-      case 'cafes': return 'bg-amber-500 hover:bg-amber-500 text-white border-amber-500';
-      case 'shopping': return 'bg-yellow-500 hover:bg-yellow-500 text-white border-yellow-500';
-      case 'hotels': return 'bg-lime-500 hover:bg-lime-500 text-white border-lime-500';
-      case 'entertainment': return 'bg-green-500 hover:bg-green-500 text-white border-green-500';
-      case 'health': return 'bg-teal-500 hover:bg-teal-500 text-white border-teal-500';
-      case 'services': return 'bg-cyan-500 hover:bg-cyan-500 text-white border-cyan-500';
-      case 'education': return 'bg-blue-500 hover:bg-blue-500 text-white border-blue-500';
-      case 'transport': return 'bg-indigo-500 hover:bg-indigo-500 text-white border-indigo-500';
-      default: return 'bg-black hover:bg-black text-white border-black';
-    }
-  };
-  
-  const getHoverColor = (categoryId: string) => {
-    switch(categoryId) {
-      case 'restaurants': return 'hover:bg-red-200 hover:text-red-700 hover:border-red-500';
-      case 'bars': return 'hover:bg-orange-200 hover:text-orange-700 hover:border-orange-500';
-      case 'cafes': return 'hover:bg-amber-200 hover:text-amber-700 hover:border-amber-500';
-      case 'shopping': return 'hover:bg-yellow-200 hover:text-yellow-700 hover:border-yellow-500';
-      case 'hotels': return 'hover:bg-lime-200 hover:text-lime-700 hover:border-lime-500';
-      case 'entertainment': return 'hover:bg-green-200 hover:text-green-700 hover:border-green-500';
-      case 'health': return 'hover:bg-teal-200 hover:text-teal-700 hover:border-teal-500';
-      case 'services': return 'hover:bg-cyan-200 hover:text-cyan-700 hover:border-cyan-500';
-      case 'education': return 'hover:bg-blue-200 hover:text-blue-700 hover:border-blue-500';
-      case 'transport': return 'hover:bg-indigo-200 hover:text-indigo-700 hover:border-indigo-500';
-      default: return 'hover:bg-gray-200 hover:text-gray-700 hover:border-gray-500';
+    if (!isDragging) {
+      onCategorySelect(categoryId === selectedCategory ? null : categoryId);
     }
   };
 
@@ -93,16 +104,25 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
     <div className="px-2 py-1">
       <div className="mb-1.5 flex justify-center">
         <div className="rounded-full border border-black px-4 py-0.5 bg-white text-sm">
-          Catégorie
+          {t('categories') || 'Catégories'}
         </div>
       </div>
       
       <div className="flex justify-center items-center">
-        <ArrowLeft className="h-4 w-4 mr-1.5 text-gray-400" />
+        {showLeftArrow && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6 rounded-full" 
+            onClick={scrollLeft}
+          >
+            <ArrowLeft className="h-4 w-4 text-gray-500" />
+          </Button>
+        )}
         
         <div 
           ref={categoriesRef}
-          className="flex gap-1.5 overflow-x-auto no-scrollbar py-1 px-1 max-w-full"
+          className="flex gap-1.5 overflow-x-auto hide-scrollbar py-1 px-1 max-w-full"
           style={{ 
             cursor: isDragging ? 'grabbing' : 'grab',
             userSelect: 'none'
@@ -115,29 +135,40 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleDragEnd}
         >
-          {mockCategories.map((category) => {
+          {CATEGORIES.map((category) => {
             const isSelected = category.id === selectedCategory;
             
             return (
               <Button 
                 key={category.id} 
                 className={cn(
-                  "rounded-full border whitespace-nowrap px-2 py-0.5 h-7 flex-shrink-0 text-xs transition-colors",
+                  "rounded-full whitespace-nowrap px-3 py-1 h-8 flex-shrink-0 text-xs transition-colors",
                   isSelected 
-                    ? getCategoryColor(category.id)
-                    : `bg-white text-black border-black ${getHoverColor(category.id)}`
+                    ? getCategoryColorClass(category.id)
+                    : `bg-white text-black border-gray-300 border ${getHoverColor(category.id)}`
                 )}
                 onClick={() => handleCategoryClick(category.id)}
               >
-                <MapPin className="h-3 w-3 mr-1" />
-                <span>{category.name}</span>
+                {category.icon}
+                <span className="ml-1">{t(category.id) || category.name}</span>
               </Button>
             );
           })}
         </div>
         
-        <ArrowRight className="h-4 w-4 ml-1.5 text-gray-400" />
+        {showRightArrow && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-6 w-6 rounded-full" 
+            onClick={scrollRight}
+          >
+            <ArrowRight className="h-4 w-4 text-gray-500" />
+          </Button>
+        )}
       </div>
     </div>
   );
 };
+
+export default CategoriesScroller;

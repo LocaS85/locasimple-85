@@ -6,7 +6,8 @@ import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryCol
 import { getCategoryIcon } from '@/utils/categoryIcons';
 
 export interface ResultDetailProps {
-  place: any;
+  place?: any;
+  result?: any;
   onClose: () => void;
   transportMode: string;
   userLocation?: [number, number];
@@ -15,18 +16,22 @@ export interface ResultDetailProps {
 
 const ResultDetail: React.FC<ResultDetailProps> = ({
   place,
+  result,
   onClose,
   transportMode,
   userLocation,
   showRoutes = false
 }) => {
-  if (!place) return null;
+  // Use either place or result, depending on which one is provided
+  const item = place || result;
+  
+  if (!item) return null;
 
   const getDistance = () => {
-    if (place.distance) {
-      return place.distance < 1 
-        ? `${Math.round(place.distance * 1000)} m` 
-        : `${place.distance.toFixed(1)} km`;
+    if (item.distance) {
+      return item.distance < 1 
+        ? `${Math.round(item.distance * 1000)} m` 
+        : `${item.distance.toFixed(1)} km`;
     }
     return '';
   };
@@ -34,25 +39,25 @@ const ResultDetail: React.FC<ResultDetailProps> = ({
   return (
     <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg z-20 max-h-[70vh] overflow-y-auto">
       <div className="sticky top-0 bg-white z-10 flex justify-between items-center p-4 border-b">
-        <h3 className="text-lg font-bold">{place.name || 'Détails du lieu'}</h3>
+        <h3 className="text-lg font-bold">{item.name || 'Détails du lieu'}</h3>
         <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-8 w-8">
           <X size={18} />
         </Button>
       </div>
       
       <div className="p-4 space-y-4">
-        {place.category && (
+        {item.category && (
           <div className="flex items-center gap-2">
-            <span className={`flex items-center justify-center w-8 h-8 rounded-full ${getCategoryColorClass(place.category)}`}>
-              {getCategoryIcon(place.category, "w-4 h-4")}
+            <span className={`flex items-center justify-center w-8 h-8 rounded-full ${getCategoryColorClass(item.category)}`}>
+              {getCategoryIcon(item.category, "w-4 h-4")}
             </span>
-            <span className={`font-medium ${getCategoryTextColor(place.category)}`}>{place.category}</span>
+            <span className={`font-medium ${getCategoryTextColor(item.category)}`}>{item.category}</span>
           </div>
         )}
         
-        {place.address && (
+        {item.address && (
           <div className="text-gray-700">
-            <p>{place.address}</p>
+            <p>{item.address}</p>
           </div>
         )}
         
@@ -62,9 +67,9 @@ const ResultDetail: React.FC<ResultDetailProps> = ({
           </div>
         )}
         
-        {place.description && (
+        {item.description && (
           <div className="text-gray-600 mt-2">
-            <p>{place.description}</p>
+            <p>{item.description}</p>
           </div>
         )}
         

@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import SearchMenu from './SearchMenu';
-import { toast } from 'sonner';
 import MapSection from './MapSection';
 import { DistanceUnit } from '@/types/categoryTypes';
+import { toast } from 'sonner';
 
 interface SearchContainerProps {
   searchPanel?: any;
@@ -42,8 +42,22 @@ export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
   const selectedCategory = searchState.selectedCategory || null;
   const showRoutes = searchState.showRoutes || false;
   
-  // Default empty state for distanceUnit
-  const [distanceUnit, setDistanceUnit] = React.useState<DistanceUnit>("km");
+  // Default empty state for distanceUnit and settings
+  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
+  const [selectedDistance, setSelectedDistance] = useState(5);
+  const [selectedDuration, setSelectedDuration] = useState(15);
+  
+  // Default handlers for common actions
+  const onCategorySelect = (categoryId: string | null) => {
+    console.log(`Selected category: ${categoryId}`);
+    // Add your category selection logic here
+  };
+  
+  const handleSearch = () => {
+    console.log('Performing search');
+    // Add your search logic here
+    toast.info('Recherche lancée');
+  };
 
   return (
     <div className="relative w-full h-full">
@@ -69,8 +83,21 @@ export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
 
       {searchMenu.menuOpen && (
         <SearchMenu
+          transportMode={transportMode}
+          onTransportModeChange={onTransportModeChange}
+          selectedCategory={selectedCategory}
+          onCategorySelect={onCategorySelect}
+          selectedDistance={selectedDistance}
+          onDistanceChange={setSelectedDistance}
+          selectedDuration={selectedDuration}
+          onDurationChange={setSelectedDuration}
+          distanceUnit={distanceUnit}
+          onDistanceUnitChange={setDistanceUnit}
+          resultsCount={searchResults.length}
           show={searchMenu.menuOpen}
           onClose={() => searchMenu.setMenuOpen(false)}
+          filterMode="distance"
+          onFilterModeChange={() => {}}
         />
       )}
 
