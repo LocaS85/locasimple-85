@@ -14,8 +14,9 @@ import GeoErrorBoundary from './GeoErrorBoundary';
 import MapKeyWarning from './MapKeyWarning';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { useSearchState } from '@/hooks/useSearchState';
-import { DAILY_CATEGORIES } from '@/types/dailyCategories';
+import { CATEGORIES } from '@/types/categories';
 import { ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
+import CategoriesScroller from './CategoriesScroller';
 
 const SearchPage = () => {
   const {
@@ -51,6 +52,14 @@ const SearchPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
   const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
+
+  // Set Mapbox token
+  useEffect(() => {
+    if (MAPBOX_TOKEN) {
+      // Set the token for the application
+      (window as any).mapboxgl.accessToken = MAPBOX_TOKEN;
+    }
+  }, []);
 
   const handleSearchResult = (result: any) => {
     setOrigin(result);
@@ -110,6 +119,14 @@ const SearchPage = () => {
         />
       </div>
       
+      {/* Categories scroller added before the main content */}
+      <div className="w-full bg-white border-b border-gray-200 shadow-sm z-10">
+        <CategoriesScroller 
+          selectedCategory={selectedCategory} 
+          onCategorySelect={setSelectedCategory} 
+        />
+      </div>
+      
       <div className="flex flex-1 relative overflow-hidden">
         <button 
           className="absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
@@ -122,7 +139,7 @@ const SearchPage = () => {
           <div className="w-full md:w-80 lg:w-96 h-full overflow-y-auto border-r border-gray-200 transition-all duration-300 bg-white z-10">
             <FilterStack>
               <CategoryAccordion 
-                categories={DAILY_CATEGORIES}
+                categories={CATEGORIES}
                 selectionMode="hierarchical"
                 onCategorySelect={handleCategorySelect}
                 selectedCategory={selectedCategory}
@@ -158,7 +175,7 @@ const SearchPage = () => {
         )}
 
         <div className={`flex-1 h-full relative transition-all duration-300`}>
-          {!MAPBOX_TOKEN && <MapKeyWarning />}
+          {!MAPBOX_TOKEN && <MapKeyWarning onSetMapboxToken={() => true} />}
           
           <GeoErrorBoundary
             fallback={(error) => (

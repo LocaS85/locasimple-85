@@ -44,47 +44,47 @@ export function getRelationTypeLabel(type: string): string {
 // Example categories with subcategories
 export const DAILY_CATEGORIES: DailyCategory[] = [
   {
-    id: 'food',
-    name: 'Restaurants',
+    id: 'famille',
+    name: 'Famille',
     color: '#F59E0B',
-    icon: '🍽️',
+    icon: '👨‍👩‍👧‍👦',
     subcategories: [
-      { id: 'restaurant', name: 'Restaurant', apiKey: 'restaurant' },
-      { id: 'fast_food', name: 'Fast Food', apiKey: 'fast_food' },
-      { id: 'cafe', name: 'Café', apiKey: 'cafe' }
+      { id: 'parents', name: 'Parents', apiKey: 'parents' },
+      { id: 'enfants', name: 'Enfants', apiKey: 'enfants' },
+      { id: 'fratrie', name: 'Fratrie', apiKey: 'fratrie' }
     ]
   },
   {
-    id: 'shopping',
-    name: 'Shopping',
+    id: 'ami',
+    name: 'Amis',
     color: '#3B82F6',
-    icon: '🛍️',
+    icon: '🫂',
     subcategories: [
-      { id: 'clothing', name: 'Vêtements', apiKey: 'clothing_store' },
-      { id: 'supermarket', name: 'Supermarché', apiKey: 'supermarket' },
-      { id: 'mall', name: 'Centre Commercial', apiKey: 'shopping_mall' }
+      { id: 'proches', name: 'Proches', apiKey: 'proches' },
+      { id: 'ecole', name: 'École', apiKey: 'ecole' },
+      { id: 'travail', name: 'Travail', apiKey: 'travail_amis' }
     ]
   },
   {
-    id: 'entertainment',
-    name: 'Loisirs',
-    color: '#EC4899',
-    icon: '🎭',
-    subcategories: [
-      { id: 'cinema', name: 'Cinéma', apiKey: 'movie_theater' },
-      { id: 'museum', name: 'Musée', apiKey: 'museum' },
-      { id: 'park', name: 'Parc', apiKey: 'park' }
-    ]
-  },
-  {
-    id: 'services',
-    name: 'Services',
+    id: 'travail',
+    name: 'Travail',
     color: '#10B981',
-    icon: '🔧',
+    icon: '💼',
     subcategories: [
-      { id: 'bank', name: 'Banque', apiKey: 'bank' },
-      { id: 'hospital', name: 'Hôpital', apiKey: 'hospital' },
-      { id: 'pharmacy', name: 'Pharmacie', apiKey: 'pharmacy' }
+      { id: 'bureau', name: 'Bureau', apiKey: 'bureau' },
+      { id: 'collegues', name: 'Collègues', apiKey: 'collegues' },
+      { id: 'clients', name: 'Clients', apiKey: 'clients' }
+    ]
+  },
+  {
+    id: 'sport',
+    name: 'Sport',
+    color: '#EC4899',
+    icon: '🏋️‍♂️',
+    subcategories: [
+      { id: 'equipe', name: 'Équipe', apiKey: 'equipe' },
+      { id: 'salles', name: 'Salles', apiKey: 'salles' },
+      { id: 'entraineurs', name: 'Entraîneurs', apiKey: 'entraineurs' }
     ]
   }
 ];

@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CATEGORIES } from '@/types/categories';
 import { getCategoryIcon } from '@/utils/categoryIcons';
 import { getCategoryColorClass } from '@/utils/categoryColors';
+import { Users, Briefcase, Heart, ShoppingBag, Utensils, Film, Hotel, Home } from 'lucide-react';
 
 const CategoryGrid = () => {
   const navigate = useNavigate();
@@ -57,14 +58,46 @@ const CategoryGrid = () => {
     mainCategories.includes(cat.id)
   );
 
+  // Icon mapping function to get Lucide icons
+  const getCategoryLucideIcon = (categoryId: string) => {
+    switch(categoryId) {
+      case 'quotidien':
+        return <Users className="w-12 h-12 text-white" />;
+      case 'alimentation':
+        return <Utensils className="w-12 h-12 text-white" />;
+      case 'shopping':
+        return <ShoppingBag className="w-12 h-12 text-white" />;
+      case 'services':
+        return <Briefcase className="w-12 h-12 text-white" />;
+      case 'sante':
+        return <Heart className="w-12 h-12 text-white" />;
+      case 'divertissement':
+        return <Film className="w-12 h-12 text-white" />;
+      case 'hebergement':
+        return <Hotel className="w-12 h-12 text-white" />;
+      default:
+        return <Home className="w-12 h-12 text-white" />;
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <motion.h1 
+        className="text-3xl font-bold mb-2 text-center"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
         Explorer les catégories
-      </h1>
-      <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
+      </motion.h1>
+      <motion.p 
+        className="text-center text-gray-600 dark:text-gray-300 mb-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
         Choisissez parmi nos catégories pour trouver exactement ce que vous cherchez
-      </p>
+      </motion.p>
       
       <motion.div 
         className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
@@ -86,7 +119,7 @@ const CategoryGrid = () => {
           >
             <div className="p-6 flex flex-col items-center text-center">
               <div className={`mb-4 text-4xl p-4 rounded-full ${getCategoryColorClass(category.id)}`}>
-                {getCategoryIcon(category.id, "w-12 h-12 text-white")}
+                {getCategoryLucideIcon(category.id)}
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 {category.name}

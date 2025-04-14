@@ -2,12 +2,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Grid, List } from 'lucide-react';
+import { Grid, List, Users, Briefcase, Heart, ShoppingBag, Utensils, Film, Hotel, Home } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { CATEGORIES } from '@/types/categories';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { getCategoryIcon } from '@/utils/categoryIcons';
 import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
 
 const CategorySelector: React.FC = () => {
@@ -17,6 +16,28 @@ const CategorySelector: React.FC = () => {
   
   const mainCategories = CATEGORIES.filter(cat => !cat.subCategories || cat.subCategories.length === 0);
   
+  // Category icon mapping function
+  const getCategoryLucideIcon = (categoryId: string, className: string) => {
+    switch(categoryId) {
+      case 'quotidien':
+        return <Users className={className} />;
+      case 'alimentation':
+        return <Utensils className={className} />;
+      case 'shopping':
+        return <ShoppingBag className={className} />;
+      case 'services':
+        return <Briefcase className={className} />;
+      case 'sante':
+        return <Heart className={className} />;
+      case 'divertissement':
+        return <Film className={className} />;
+      case 'hebergement':
+        return <Hotel className={className} />;
+      default:
+        return <Home className={className} />;
+    }
+  };
+
   return (
     <ScrollArea className="flex-1">
       <div className="p-6 space-y-6">
@@ -39,14 +60,14 @@ const CategorySelector: React.FC = () => {
               {listView ? (
                 <div className="p-3 flex items-center gap-3">
                   <div className={`p-2 rounded-full ${getCategoryColorClass(category.id)}`}>
-                    {getCategoryIcon(category.id, "h-5 w-5 text-white")}
+                    {getCategoryLucideIcon(category.id, "h-5 w-5 text-white")}
                   </div>
                   <span className="text-md font-medium">{category.name}</span>
                 </div>
               ) : (
                 <div className="p-6 flex flex-col items-center justify-center h-full">
                   <div className={`p-4 rounded-full ${getCategoryColorClass(category.id)} mb-3`}>
-                    {getCategoryIcon(category.id, "h-8 w-8 text-white")}
+                    {getCategoryLucideIcon(category.id, "h-8 w-8 text-white")}
                   </div>
                   <span className="text-md font-medium">{category.name}</span>
                   <span className="text-xs text-gray-500 mt-1">

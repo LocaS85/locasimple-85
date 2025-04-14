@@ -76,7 +76,7 @@ export const MapSection = ({
     : [];
 
   const handleClearFilters = () => {
-    // Implementation
+    setSelectedSubcategories([]);
   };
 
   return (
@@ -99,7 +99,7 @@ export const MapSection = ({
             selectedSubcategories={selectedSubcategories}
           />
           
-          {/* Afficher le sélecteur de sous-catégories lorsqu'une catégorie est sélectionnée */}
+          {/* Show subcategories scroller when a category is selected */}
           {selectedCategory && subcategories.length > 0 && (
             <CategorySubcategoriesScroller
               subcategories={subcategories}

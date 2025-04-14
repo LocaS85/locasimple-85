@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
 import { getCategoryIcon } from '@/utils/categoryIcons';
+import { motion } from 'framer-motion';
 
 interface CategorySubcategoriesScrollerProps {
   subcategories: SubCategory[];
@@ -48,12 +49,35 @@ const CategorySubcategoriesScroller = ({
     return null;
   }
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.3,
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -5 },
+    visible: { opacity: 1, x: 0 }
+  };
+
   return (
     <div className="absolute top-2 left-0 right-0 z-10 px-4">
-      <div className="relative bg-white rounded-md shadow-md">
+      <motion.div 
+        className="relative bg-white rounded-md shadow-md"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
         <button
           onClick={scrollLeft}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md p-1 ml-1"
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md p-1 ml-1 hover:bg-gray-100 transition-colors"
           aria-label="Défiler à gauche"
         >
           <ChevronLeft size={18} />
@@ -88,8 +112,11 @@ const CategorySubcategoriesScroller = ({
               : "text-gray-700";
               
             return (
-              <button
+              <motion.button
                 key={subcategory.id}
+                variants={itemVariants}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   provideTactileFeedback();
                   onSubcategorySelect(subcategory.id);
@@ -115,19 +142,19 @@ const CategorySubcategoriesScroller = ({
                   )}
                 </span>
                 {subcategory.name}
-              </button>
+              </motion.button>
             );
           })}
         </div>
 
         <button
           onClick={scrollRight}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md p-1 mr-1"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md p-1 mr-1 hover:bg-gray-100 transition-colors"
           aria-label="Défiler à droite"
         >
           <ChevronRight size={18} />
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 };
