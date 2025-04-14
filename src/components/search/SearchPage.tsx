@@ -17,6 +17,8 @@ import { useSearchState } from '@/hooks/useSearchState';
 import { CATEGORIES } from '@/types/categories';
 import { ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
 import CategoriesScroller from './CategoriesScroller';
+import { initializeMapbox, setMapboxToken } from '@/utils/mapUtils';
+import { DAILY_CATEGORIES } from '@/types/dailyCategories';
 
 const SearchPage = () => {
   const {
@@ -55,10 +57,7 @@ const SearchPage = () => {
 
   // Set Mapbox token
   useEffect(() => {
-    if (MAPBOX_TOKEN) {
-      // Set the token for the application
-      (window as any).mapboxgl.accessToken = MAPBOX_TOKEN;
-    }
+    initializeMapbox();
   }, []);
 
   const handleSearchResult = (result: any) => {
@@ -175,7 +174,7 @@ const SearchPage = () => {
         )}
 
         <div className={`flex-1 h-full relative transition-all duration-300`}>
-          {!MAPBOX_TOKEN && <MapKeyWarning onSetMapboxToken={() => true} />}
+          {!MAPBOX_TOKEN && <MapKeyWarning onSetMapboxToken={setMapboxToken} />}
           
           <GeoErrorBoundary
             fallback={(error) => (
