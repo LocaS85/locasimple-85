@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { CATEGORIES } from '@/types/categories';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getCategoryIcon } from '@/utils/categoryIcons';
-import { getCategoryColorClass } from '@/utils/categoryColors';
+import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
 
 const CategorySelector: React.FC = () => {
   const navigate = useNavigate();
@@ -33,14 +33,27 @@ const CategorySelector: React.FC = () => {
               key={category.id}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
-              className={`cursor-pointer rounded-lg shadow-md transition-all duration-300 overflow-hidden
-                ${getCategoryColorClass(category.id)}`}
+              className="cursor-pointer rounded-lg shadow-md transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
               onClick={() => navigate(`/categories/${category.id}`)}
             >
-              <div className="p-4 flex flex-col items-center justify-center h-full">
-                {getCategoryIcon(category.id, listView ? "h-8 w-8" : "h-12 w-12")}
-                <span className="text-md font-medium mt-2">{category.name}</span>
-              </div>
+              {listView ? (
+                <div className="p-3 flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${getCategoryColorClass(category.id)}`}>
+                    {getCategoryIcon(category.id, "h-5 w-5 text-white")}
+                  </div>
+                  <span className="text-md font-medium">{category.name}</span>
+                </div>
+              ) : (
+                <div className="p-6 flex flex-col items-center justify-center h-full">
+                  <div className={`p-4 rounded-full ${getCategoryColorClass(category.id)} mb-3`}>
+                    {getCategoryIcon(category.id, "h-8 w-8 text-white")}
+                  </div>
+                  <span className="text-md font-medium">{category.name}</span>
+                  <span className="text-xs text-gray-500 mt-1">
+                    {category.subCategories?.length || 0} sous-catégories
+                  </span>
+                </div>
+              )}
             </motion.div>
           ))}
         </div>

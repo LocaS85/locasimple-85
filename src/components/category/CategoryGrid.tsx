@@ -81,16 +81,21 @@ const CategoryGrid = () => {
               boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
             }}
             whileTap={{ scale: 0.98 }}
-            className={`bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 ${getCategoryColorClass(category.id)}`}
+            className={`bg-white dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-300`}
             onClick={() => handleCategoryClick(category.id)}
           >
             <div className="p-6 flex flex-col items-center text-center">
-              <div className="mb-4 text-4xl">
-                {getCategoryIcon(category.id, "w-16 h-16")}
+              <div className={`mb-4 text-4xl p-4 rounded-full ${getCategoryColorClass(category.id)}`}>
+                {getCategoryIcon(category.id, "w-12 h-12 text-white")}
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 {category.name}
               </h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {category.subCategories && category.subCategories.length > 0
+                  ? `${category.subCategories.length} options`
+                  : 'Explorez cette catégorie'}
+              </p>
             </div>
           </motion.div>
         ))}

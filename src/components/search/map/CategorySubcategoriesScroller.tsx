@@ -61,11 +61,32 @@ const CategorySubcategoriesScroller = ({
 
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto py-2 px-8 gap-2 scroll-smooth scrollbar-hide"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex overflow-x-auto py-2 px-8 gap-2 scroll-smooth hide-scrollbar"
         >
           {subcategories.map((subcategory) => {
             const isSelected = selectedSubcategories.includes(subcategory.id);
+            
+            // Determine the correct background and text colors based on category
+            let bgClass = isSelected
+              ? `bg-${parentCategoryId === 'shopping' ? 'blue' : 
+                   parentCategoryId === 'restaurants' ? 'orange' : 
+                   parentCategoryId === 'loisirs' ? 'pink' : 
+                   parentCategoryId === 'services' ? 'emerald' : 
+                   'primary'}-100`
+              : "bg-gray-50";
+            
+            let borderClass = isSelected
+              ? `border-${parentCategoryId === 'shopping' ? 'blue' : 
+                   parentCategoryId === 'restaurants' ? 'orange' : 
+                   parentCategoryId === 'loisirs' ? 'pink' : 
+                   parentCategoryId === 'services' ? 'emerald' : 
+                   'primary'}-200`
+              : "border-gray-200";
+            
+            let textColorClass = isSelected
+              ? getCategoryTextColor(parentCategoryId)
+              : "text-gray-700";
+              
             return (
               <button
                 key={subcategory.id}
@@ -75,9 +96,11 @@ const CategorySubcategoriesScroller = ({
                 }}
                 className={cn(
                   "whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0 transition-all",
-                  isSelected
-                    ? `${getCategoryTextColor(parentCategoryId)} bg-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-100 border border-${parentCategoryId === 'shopping' ? 'blue' : parentCategoryId === 'restaurants' ? 'orange' : parentCategoryId === 'loisirs' ? 'pink' : parentCategoryId === 'services' ? 'emerald' : 'primary'}-200`
-                    : "bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100"
+                  bgClass,
+                  textColorClass,
+                  "border",
+                  borderClass,
+                  !isSelected && "hover:bg-gray-100"
                 )}
               >
                 <span className="flex items-center justify-center w-4 h-4">
@@ -105,17 +128,6 @@ const CategorySubcategoriesScroller = ({
           <ChevronRight size={18} />
         </button>
       </div>
-      <style>
-        {`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        `}
-      </style>
     </div>
   );
 };
