@@ -46,6 +46,7 @@ export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
   const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
   const [selectedDistance, setSelectedDistance] = useState(5);
   const [selectedDuration, setSelectedDuration] = useState(15);
+  const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
   
   // Default handlers for common actions
   const onCategorySelect = (categoryId: string | null) => {
@@ -58,6 +59,11 @@ export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
     // Add your search logic here
     toast.info('Recherche lancée');
   };
+
+  // Dummy data for other required props
+  const dummySearchHistory: string[] = [];
+  const dummySavedSearches: string[] = [];
+  const dummyFavoritePlaces: any[] = [];
 
   return (
     <div className="relative w-full h-full">
@@ -83,6 +89,8 @@ export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
 
       {searchMenu.menuOpen && (
         <SearchMenu
+          show={searchMenu.menuOpen}
+          onClose={() => searchMenu.setMenuOpen(false)}
           transportMode={transportMode}
           onTransportModeChange={onTransportModeChange}
           selectedCategory={selectedCategory}
@@ -94,10 +102,18 @@ export const SearchContainer: React.FC<SearchContainerProps> = (props) => {
           distanceUnit={distanceUnit}
           onDistanceUnitChange={setDistanceUnit}
           resultsCount={searchResults.length}
-          show={searchMenu.menuOpen}
-          onClose={() => searchMenu.setMenuOpen(false)}
-          filterMode="distance"
-          onFilterModeChange={() => {}}
+          onResultsCountChange={() => {}}
+          filterMode={filterMode}
+          onFilterModeChange={setFilterMode}
+          results={searchResults}
+          onResultClick={() => {}}
+          searchHistory={dummySearchHistory}
+          savedSearches={dummySavedSearches}
+          onHistoryItemClick={() => {}}
+          onSaveSearch={() => {}}
+          onRemoveSavedSearch={() => {}}
+          searchQuery=""
+          favoritePlaces={dummyFavoritePlaces}
         />
       )}
 

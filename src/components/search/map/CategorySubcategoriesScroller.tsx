@@ -105,7 +105,8 @@ const CategorySubcategoriesScroller = ({
           <ChevronRight size={18} />
         </button>
       </div>
-      <style jsx>{`
+      <style>
+        {`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
@@ -113,7 +114,8 @@ const CategorySubcategoriesScroller = ({
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

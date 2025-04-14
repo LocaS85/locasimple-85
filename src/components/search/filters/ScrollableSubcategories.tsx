@@ -109,7 +109,8 @@ export const ScrollableSubcategories = ({
         <ChevronRight size={20} />
       </button>
       
-      <style jsx>{`
+      <style>
+        {`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
@@ -117,7 +118,8 @@ export const ScrollableSubcategories = ({
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

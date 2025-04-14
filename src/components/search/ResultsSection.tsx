@@ -12,13 +12,19 @@ interface ResultsSectionProps {
   loading: boolean;
   selectedResult: Result | null;
   onResultClick: (result: Result) => void;
+  onCloseResult?: () => void;
+  transportMode?: string;
+  userLocation?: [number, number];
 }
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({
   results,
   loading,
   selectedResult,
-  onResultClick
+  onResultClick,
+  onCloseResult = () => {},
+  transportMode = 'driving',
+  userLocation
 }) => {
   const { t } = useLanguage();
   const [view, setView] = React.useState<'map' | 'list'>('map');
@@ -67,7 +73,14 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({
             )}
           </h2>
           
-          <ResultDetail result={selectedResult} />
+          {selectedResult && (
+            <ResultDetail 
+              result={selectedResult} 
+              onClose={onCloseResult}
+              transportMode={transportMode}
+              userLocation={userLocation}
+            />
+          )}
         </div>
       </div>
     </div>

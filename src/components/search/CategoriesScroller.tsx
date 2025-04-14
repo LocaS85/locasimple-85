@@ -22,7 +22,7 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const [initialScrollLeft, setInitialScrollLeft] = useState(0);
 
   // Check if we should show navigation arrows
   useEffect(() => {
@@ -65,14 +65,14 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
     if (!categoriesRef.current) return;
     setIsDragging(true);
     setStartX(e.pageX - categoriesRef.current.offsetLeft);
-    setScrollLeft(categoriesRef.current.scrollLeft);
+    setInitialScrollLeft(categoriesRef.current.scrollLeft);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!categoriesRef.current) return;
     setIsDragging(true);
     setStartX(e.touches[0].pageX - categoriesRef.current.offsetLeft);
-    setScrollLeft(categoriesRef.current.scrollLeft);
+    setInitialScrollLeft(categoriesRef.current.scrollLeft);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -80,14 +80,14 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
     e.preventDefault();
     const x = e.pageX - categoriesRef.current.offsetLeft;
     const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = scrollLeft - walk;
+    categoriesRef.current.scrollLeft = initialScrollLeft - walk;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !categoriesRef.current) return;
     const x = e.touches[0].pageX - categoriesRef.current.offsetLeft;
     const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = scrollLeft - walk;
+    categoriesRef.current.scrollLeft = initialScrollLeft - walk;
   };
 
   const handleDragEnd = () => {
@@ -114,7 +114,7 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
             variant="ghost" 
             size="icon" 
             className="h-6 w-6 rounded-full" 
-            onClick={scrollLeft}
+            onClick={() => scrollLeft()}
           >
             <ArrowLeft className="h-4 w-4 text-gray-500" />
           </Button>
@@ -161,7 +161,7 @@ export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
             variant="ghost" 
             size="icon" 
             className="h-6 w-6 rounded-full" 
-            onClick={scrollRight}
+            onClick={() => scrollRight()}
           >
             <ArrowRight className="h-4 w-4 text-gray-500" />
           </Button>

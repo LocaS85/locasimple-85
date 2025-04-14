@@ -23,7 +23,7 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const [initialScrollLeft, setInitialScrollLeft] = useState(0);
   
   // Find subcategories for selected category
   const subcategories: SubCategory[] = React.useMemo(() => {
@@ -76,14 +76,14 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
     if (!scrollRef.current) return;
     setIsDragging(true);
     setStartX(e.pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
+    setInitialScrollLeft(scrollRef.current.scrollLeft);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
     setStartX(e.touches[0].pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
+    setInitialScrollLeft(scrollRef.current.scrollLeft);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -91,14 +91,14 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
     e.preventDefault();
     const x = e.pageX - scrollRef.current.offsetLeft;
     const walk = (x - startX) * 2;
-    scrollRef.current.scrollLeft = scrollLeft - walk;
+    scrollRef.current.scrollLeft = initialScrollLeft - walk;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || !scrollRef.current) return;
     const x = e.touches[0].pageX - scrollRef.current.offsetLeft;
     const walk = (x - startX) * 2;
-    scrollRef.current.scrollLeft = scrollLeft - walk;
+    scrollRef.current.scrollLeft = initialScrollLeft - walk;
   };
 
   const handleDragEnd = () => {
@@ -126,7 +126,7 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
               variant="ghost" 
               size="icon" 
               className="h-6 w-6 rounded-full flex-shrink-0" 
-              onClick={scrollLeft}
+              onClick={() => scrollLeft()}
             >
               <ArrowLeft className="h-4 w-4 text-gray-500" />
             </Button>
@@ -172,7 +172,7 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
               variant="ghost" 
               size="icon" 
               className="h-6 w-6 rounded-full flex-shrink-0" 
-              onClick={scrollRight}
+              onClick={() => scrollRight()}
             >
               <ArrowRight className="h-4 w-4 text-gray-500" />
             </Button>
