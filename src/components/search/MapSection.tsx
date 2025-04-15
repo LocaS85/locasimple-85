@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapDisplay } from './MapDisplay';
 import ResultsPopup from './ResultsPopup';
@@ -17,7 +16,7 @@ interface MapSectionProps {
   showRoutes?: boolean;
   transportMode?: string;
   selectedCategory?: string | null;
-  radiusType?: 'time' | 'distance';
+  radiusType?: 'distance' | 'duration';
   radius?: number;
   distanceUnit?: 'km' | 'mi';
   onPlaceSelect?: (placeId: string) => void;
@@ -45,7 +44,6 @@ export const MapSection = ({
   const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   
-  // Find the selected place based on placeId
   useEffect(() => {
     if (selectedPlaceId && places.length > 0) {
       const place = places.find(p => p.id === selectedPlaceId);
@@ -65,12 +63,10 @@ export const MapSection = ({
     });
   };
 
-  // Clear selected subcategories when category changes
   useEffect(() => {
     setSelectedSubcategories([]);
   }, [selectedCategory]);
 
-  // Get subcategories for the selected category
   const subcategories = selectedCategory 
     ? CATEGORIES.find(c => c.id === selectedCategory)?.subCategories || []
     : [];
@@ -99,7 +95,6 @@ export const MapSection = ({
             selectedSubcategories={selectedSubcategories}
           />
           
-          {/* Show subcategories scroller when a category is selected */}
           {selectedCategory && subcategories.length > 0 && (
             <CategorySubcategoriesScroller
               subcategories={subcategories}

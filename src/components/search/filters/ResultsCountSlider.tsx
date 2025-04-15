@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Slider } from '@/components/ui/slider';
 
 interface ResultsCountSliderProps {
@@ -20,12 +21,23 @@ const ResultsCountSlider: React.FC<ResultsCountSliderProps> = ({
   };
 
   return (
-    <div className="w-60">
+    <motion.div 
+      className="w-60"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium">Résultats à afficher</span>
-        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+        <motion.span 
+          className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full"
+          key={value}
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 15 }}
+        >
           {value}
-        </span>
+        </motion.span>
       </div>
       
       <Slider
@@ -41,7 +53,7 @@ const ResultsCountSlider: React.FC<ResultsCountSliderProps> = ({
         <span className="text-xs text-gray-500">{min}</span>
         <span className="text-xs text-gray-500">{max}</span>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

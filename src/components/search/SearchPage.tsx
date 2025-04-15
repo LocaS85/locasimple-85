@@ -1,10 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
 import { useSearchState } from '@/hooks/useSearchState';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { DAILY_CATEGORIES } from '@/types/dailyCategories';
+import AddressSearch from '@/components/search/AddressSearch';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Components
 import FilterSidebar from './filters/FilterSidebar';
@@ -16,11 +20,15 @@ import ResultsCountSlider from './filters/ResultsCountSlider';
 interface SearchPageProps {
   mapboxTokenSet?: boolean;
   onSetMapboxToken?: (token: string) => boolean;
+  isExpanded?: boolean;
+  toggleExpandedView?: () => void;
 }
 
 const SearchPage: React.FC<SearchPageProps> = ({ 
   mapboxTokenSet = false, 
-  onSetMapboxToken = () => false 
+  onSetMapboxToken = () => false,
+  isExpanded = false,
+  toggleExpandedView = () => {}
 }) => {
   const {
     origin, 
@@ -45,6 +53,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
   const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
+  const isMobile = useIsMobile();
 
   // Handle search result
   const handleSearchResult = (result: any) => {
@@ -67,54 +76,92 @@ const SearchPage: React.FC<SearchPageProps> = ({
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Search Bar */}
-      <div className="p-4 bg-white shadow-md z-10">
-        <GeoSearcher
-          modes={['address', 'current_location', 'saved_places']}
-          onResult={handleSearchResult}
-          placeholder="Adresse, lieu ou coordonnées GPS..."
-          enableVoice={true}
-        />
-      </div>
+      <motion.div 
+        className="p-4 bg-white shadow-md z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className={cn(
+          "transition-all duration-300",
+          (isMobile && isExpanded) ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}>
+          <GeoSearcher
+            modes={['address', 'current_location', 'saved_places']}
+            onResult={handleSearchResult}
+            placeholder="Adresse, lieu ou coordonnées GPS..."
+            enableVoice={true}
+          />
+        </div>
+      </motion.div>
       
       {/* Categories Scroller */}
-      <div className="w-full bg-white border-b border-gray-200 shadow-sm z-10">
+      <motion.div 
+        className="w-full bg-white border-b border-gray-200 shadow-sm z-10"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
         <CategoriesScroller 
           selectedCategory={selectedCategory} 
           onCategorySelect={setSelectedCategory} 
         />
-      </div>
+      </motion.div>
       
       {/* Main Content */}
       <div className="flex flex-1 relative overflow-hidden">
         {/* Sidebar Toggle Button */}
-        <button 
+        <motion.button 
           className="absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
           onClick={toggleSidebar}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
         >
           {sidebarOpen ? <ChevronLeftCircle size={20} /> : <ChevronRightCircle size={20} />}
-        </button>
+        </motion.button>
 
         {/* Sidebar */}
-        {sidebarOpen && (
-          <FilterSidebar 
-            selectedCategory={selectedCategory}
-            onCategorySelect={handleCategorySelect}
-            selectedDistance={selectedDistance}
-            distanceUnit={distanceUnit}
-            transportMode={transportMode}
-            onTransportModeChange={setTransportMode}
-            resultsCount={resultsCount}
-            onResultsCountChange={setResultsCount}
-            filterMode={filterMode}
-            onFilterModeChange={setFilterMode}
-          />
-        )}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: "spring", damping: 30, stiffness: 500 }}
+              className="z-10"
+            >
+              <FilterSidebar 
+                selectedCategory={selectedCategory}
+                onCategorySelect={handleCategorySelect}
+                selectedDistance={selectedDistance}
+                distanceUnit={distanceUnit}
+                transportMode={transportMode}
+                onTransportModeChange={setTransportMode}
+                resultsCount={resultsCount}
+                onResultsCountChange={setResultsCount}
+                filterMode={filterMode}
+                onFilterModeChange={setFilterMode}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Map Area */}
-        <div className={`flex-1 h-full relative transition-all duration-300`}>
+        <motion.div 
+          className={`flex-1 h-full relative transition-all duration-300`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           {!mapboxTokenSet && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-20">
-              <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
+              <motion.div 
+                className="bg-white p-6 rounded-lg shadow-lg max-w-md"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
                 <h3 className="text-lg font-semibold mb-2">Token Mapbox manquant</h3>
                 <p className="mb-4 text-gray-600">
                   Pour afficher la carte, veuillez entrer votre token d'accès Mapbox.
@@ -142,7 +189,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
                     Appliquer
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
           )}
           
@@ -160,15 +207,20 @@ const SearchPage: React.FC<SearchPageProps> = ({
           />
           
           {/* Results count controller (floating) */}
-          <div className="absolute bottom-4 left-4 z-10 bg-white p-2 rounded-lg shadow-md">
+          <motion.div 
+            className="absolute bottom-4 left-4 z-10 bg-white p-2 rounded-lg shadow-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+          >
             <ResultsCountSlider
               value={resultsCount}
               onChange={setResultsCount}
               min={1}
               max={10}
             />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
