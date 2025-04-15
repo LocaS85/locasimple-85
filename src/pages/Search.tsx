@@ -1,9 +1,9 @@
 
 import React from 'react';
-import SearchPage from '../components/search/SearchPage';
+import SearchPageContainer from '../components/search/SearchPageContainer';
 
 const Search = () => {
-  return <SearchPage />;
+  return <SearchPageContainer />;
 };
 
 export default Search;

@@ -1,5 +1,5 @@
 
-import { Family, Users, Briefcase, Dumbbell } from 'lucide-react';
+import { Icon } from 'lucide-react';
 
 export interface DailyCategory {
   id: string;
@@ -16,7 +16,7 @@ export const DAILY_CATEGORIES: DailyCategory[] = [
   {
     id: 'famille',
     name: 'Famille',
-    icon: Family,
+    icon: 'Family',
     color: '#4F46E5',
     subCategories: [
       { id: 'ecole', name: 'École' },
@@ -28,7 +28,7 @@ export const DAILY_CATEGORIES: DailyCategory[] = [
   {
     id: 'ami',
     name: 'Ami',
-    icon: Users,
+    icon: 'Users',
     color: '#10B981',
     subCategories: [
       { id: 'restaurant', name: 'Restaurant' },
@@ -40,7 +40,7 @@ export const DAILY_CATEGORIES: DailyCategory[] = [
   {
     id: 'travail',
     name: 'Travail',
-    icon: Briefcase,
+    icon: 'Briefcase',
     color: '#F59E0B',
     subCategories: [
       { id: 'bureau', name: 'Bureau' },
@@ -52,7 +52,7 @@ export const DAILY_CATEGORIES: DailyCategory[] = [
   {
     id: 'sport',
     name: 'Sport',
-    icon: Dumbbell,
+    icon: 'Dumbbell',
     color: '#EF4444',
     subCategories: [
       { id: 'salle_sport', name: 'Salle de sport' },
