@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { DAILY_CATEGORIES } from '@/types/dailyCategories';
 import CategoryAccordion from './CategoryAccordion';
 import RadiusControl from './RadiusControl';
 import TransportSelector from './TransportSelector';
@@ -59,11 +60,9 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
       <FilterStack>
         {/* Category selection */}
         <CategoryAccordion 
-          categories={[]}
-          selectionMode="hierarchical"
-          onCategorySelect={(categoryId) => onCategorySelect(categoryId)}
+          categories={DAILY_CATEGORIES}
           selectedCategory={selectedCategory}
-          selectedSubcategory={undefined}
+          onCategorySelect={onCategorySelect}
         />
         
         {/* Results count control */}

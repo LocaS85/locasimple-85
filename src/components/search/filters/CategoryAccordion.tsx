@@ -7,26 +7,40 @@ import { DailyCategory } from '@/types/dailyCategories';
 interface CategoryAccordionProps {
   categories: DailyCategory[];
   selectedCategory: string | null;
-  onSelectCategory: (categoryId: string) => void;
+  onSelectCategory?: (categoryId: string) => void;
+  onCategorySelect?: (categoryId: string) => void; // Alternative name for the same function
   onSelectSubcategory?: (subcategoryId: string) => void;
   selectedSubcategories?: string[];
+  selectedSubcategory?: string;
+  selectionMode?: 'single' | 'multiple' | 'hierarchical';
 }
 
 const CategoryAccordion: React.FC<CategoryAccordionProps> = ({
   categories,
   selectedCategory,
   onSelectCategory,
+  onCategorySelect,
   onSelectSubcategory,
-  selectedSubcategories = []
+  selectedSubcategories = [],
+  selectedSubcategory,
+  selectionMode = 'single'
 }) => {
   const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
+
+  const handleCategorySelect = (categoryId: string) => {
+    if (onCategorySelect) {
+      onCategorySelect(categoryId);
+    } else if (onSelectCategory) {
+      onSelectCategory(categoryId);
+    }
+  };
 
   const toggleCategory = (categoryId: string) => {
     if (expandedCategoryId === categoryId) {
       setExpandedCategoryId(null);
     } else {
       setExpandedCategoryId(categoryId);
-      onSelectCategory(categoryId);
+      handleCategorySelect(categoryId);
     }
   };
 
@@ -70,7 +84,7 @@ const CategoryAccordion: React.FC<CategoryAccordionProps> = ({
                       <button
                         key={subcategory.id}
                         className={`px-3 py-2 rounded text-sm text-left ${
-                          selectedSubcategories.includes(subcategory.id)
+                          (selectedSubcategories.includes(subcategory.id) || selectedSubcategory === subcategory.id)
                             ? 'bg-primary/20 font-medium'
                             : 'bg-white hover:bg-gray-100'
                         }`}

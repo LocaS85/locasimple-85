@@ -7,7 +7,7 @@ import RouteDisplayContainer from './RouteDisplayContainer';
 import NoResultsMessage from './NoResultsMessage';
 import MapKeyWarning from './MapKeyWarning';
 import CategorySubcategoriesScroller from './map/CategorySubcategoriesScroller';
-import { CATEGORIES } from '@/types/categories';
+import { DAILY_CATEGORIES } from '@/types/dailyCategories';
 
 interface MapSectionProps {
   userLocation?: [number, number];
@@ -17,7 +17,7 @@ interface MapSectionProps {
   showRoutes?: boolean;
   transportMode?: string;
   selectedCategory?: string | null;
-  radiusType?: 'distance' | 'time';
+  radiusType?: 'distance' | 'time' | 'duration';
   radius?: number;
   distanceUnit?: 'km' | 'mi';
   onPlaceSelect?: (placeId: string) => void;
@@ -69,12 +69,15 @@ export const MapSection = ({
   }, [selectedCategory]);
 
   const subcategories = selectedCategory 
-    ? CATEGORIES.find(c => c.id === selectedCategory)?.subCategories || []
+    ? DAILY_CATEGORIES.find(c => c.id === selectedCategory)?.subCategories || []
     : [];
 
   const handleClearFilters = () => {
     setSelectedSubcategories([]);
   };
+
+  // Convert 'duration' to 'time' for the MapDisplay component
+  const displayRadiusType = radiusType === 'duration' ? 'time' : radiusType;
 
   return (
     <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
@@ -88,7 +91,7 @@ export const MapSection = ({
             selectedPlaceId={selectedPlaceId}
             onPlaceSelect={onPlaceSelect}
             loading={loading}
-            radiusType={radiusType}
+            radiusType={displayRadiusType}
             radius={radius}
             distanceUnit={distanceUnit}
             transportMode={transportMode}
