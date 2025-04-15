@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { List, Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import SearchPage from './SearchPage';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { initializeMapbox, setMapboxToken } from '@/utils/mapUtils';

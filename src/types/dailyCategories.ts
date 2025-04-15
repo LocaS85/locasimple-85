@@ -1,16 +1,54 @@
 
 import { Icon } from 'lucide-react';
 
+export type DailyCategoryType = string;
+
 export interface DailyCategory {
   id: string;
   name: string;
   icon: any;
   color: string;
+  isCustom?: boolean;
   subCategories?: {
     id: string;
     name: string;
   }[];
 }
+
+export interface DailyContactInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+  companyName?: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  relationType?: string;
+  category: DailyCategoryType;
+  isFavorite: boolean;
+}
+
+export const getRelationTypeLabel = (relationType: string): string => {
+  const relationTypes: Record<string, string> = {
+    'ami': 'Ami(e)',
+    'famille': 'Famille',
+    'collegue': 'Collègue',
+    'voisin': 'Voisin(e)',
+    'connaissance': 'Connaissance',
+    'partenaire': 'Partenaire',
+    'client': 'Client',
+    'fournisseur': 'Fournisseur',
+    'medecin': 'Médecin',
+    'ecole': 'École',
+    'mere': 'Mère',
+    'pere': 'Père',
+    'frere': 'Frère',
+    'soeur': 'Sœur',
+    'enfant': 'Enfant',
+  };
+  
+  return relationTypes[relationType] || relationType;
+};
 
 export const DAILY_CATEGORIES: DailyCategory[] = [
   {
@@ -26,8 +64,8 @@ export const DAILY_CATEGORIES: DailyCategory[] = [
     ]
   },
   {
-    id: 'ami',
-    name: 'Ami',
+    id: 'amis',
+    name: 'Amis',
     icon: 'Users',
     color: '#10B981',
     subCategories: [

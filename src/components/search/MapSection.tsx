@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapDisplay } from './MapDisplay';
 import ResultsPopup from './ResultsPopup';
@@ -16,7 +17,7 @@ interface MapSectionProps {
   showRoutes?: boolean;
   transportMode?: string;
   selectedCategory?: string | null;
-  radiusType?: 'distance' | 'duration';
+  radiusType?: 'distance' | 'time';
   radius?: number;
   distanceUnit?: 'km' | 'mi';
   onPlaceSelect?: (placeId: string) => void;
