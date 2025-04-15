@@ -1,172 +1,141 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { CATEGORIES } from '@/types/categories';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getCategoryColorClass, getHoverColor } from '@/utils/categoryColors';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { CATEGORIES } from '@/types/categories';
+import { DAILY_CATEGORIES } from '@/types/dailyCategories';
+import { getCategoryIcon } from '@/utils/categoryIcons';
 
 interface CategoriesScrollerProps {
   selectedCategory: string | null;
-  onCategorySelect: (categoryId: string | null) => void;
+  onCategorySelect: (categoryId: string) => void;
 }
 
-export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({ 
-  selectedCategory, 
-  onCategorySelect 
+const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
+  selectedCategory,
+  onCategorySelect
 }) => {
-  const categoriesRef = useRef<HTMLDivElement>(null);
-  const { t } = useLanguage();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [initialScrollLeft, setInitialScrollLeft] = useState(0);
-
-  // Check if we should show navigation arrows
-  useEffect(() => {
-    const checkScroll = () => {
-      if (!categoriesRef.current) return;
-      
-      setShowLeftArrow(categoriesRef.current.scrollLeft > 0);
-      setShowRightArrow(
-        categoriesRef.current.scrollLeft + categoriesRef.current.offsetWidth < 
-        categoriesRef.current.scrollWidth
-      );
-    };
-
-    checkScroll();
+  
+  // Check scroll position and update arrow visibility
+  const checkScrollPosition = () => {
+    if (!scrollContainerRef.current) return;
     
-    if (categoriesRef.current) {
-      categoriesRef.current.addEventListener('scroll', checkScroll);
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10); // 10px buffer
+  };
+  
+  // Set up scroll event listener
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollPosition);
+      // Initial check
+      checkScrollPosition();
+      
+      return () => {
+        container.removeEventListener('scroll', checkScrollPosition);
+      };
     }
+  }, []);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => checkScrollPosition();
+    window.addEventListener('resize', handleResize);
     
     return () => {
-      if (categoriesRef.current) {
-        categoriesRef.current.removeEventListener('scroll', checkScroll);
-      }
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
-
-  const scrollRight = () => {
-    if (categoriesRef.current) {
-      categoriesRef.current.scrollBy({ left: 200, behavior: 'smooth' });
-    }
-  };
-
+  
+  // Scroll left/right functions
   const scrollLeft = () => {
-    if (categoriesRef.current) {
-      categoriesRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
     }
   };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!categoriesRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - categoriesRef.current.offsetLeft);
-    setInitialScrollLeft(categoriesRef.current.scrollLeft);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!categoriesRef.current) return;
-    setIsDragging(true);
-    setStartX(e.touches[0].pageX - categoriesRef.current.offsetLeft);
-    setInitialScrollLeft(categoriesRef.current.scrollLeft);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !categoriesRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - categoriesRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = initialScrollLeft - walk;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !categoriesRef.current) return;
-    const x = e.touches[0].pageX - categoriesRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = initialScrollLeft - walk;
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    if (!isDragging) {
-      onCategorySelect(categoryId === selectedCategory ? null : categoryId);
+  
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="px-2 py-1">
-      <div className="mb-1.5 flex justify-center">
-        <div className="rounded-full border border-black px-4 py-0.5 bg-white text-sm">
-          {t('categories') || 'Catégories'}
-        </div>
+    <div className="relative px-2 py-3 overflow-hidden">
+      {showLeftArrow && (
+        <Button
+          onClick={scrollLeft}
+          size="icon"
+          variant="ghost"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm"
+        >
+          <ChevronLeft size={18} />
+        </Button>
+      )}
+      
+      <div 
+        ref={scrollContainerRef}
+        className="flex overflow-x-auto scrollbar-hide gap-2 px-2 pb-1 snap-x"
+      >
+        {CATEGORIES.map((category) => {
+          const isSelected = selectedCategory === category.id;
+          const IconComponent = typeof category.icon === 'function' 
+            ? category.icon 
+            : getCategoryIcon(category.id);
+            
+          return (
+            <motion.div
+              key={category.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="snap-start"
+            >
+              <Button
+                onClick={() => onCategorySelect(category.id)}
+                variant={isSelected ? "default" : "outline"}
+                className={cn(
+                  "flex flex-col items-center justify-center h-20 min-w-[90px] px-2 py-3 gap-2 rounded-xl transition-all duration-200",
+                  isSelected ? "bg-primary text-primary-foreground shadow-md" : "bg-white text-gray-700 hover:bg-gray-100"
+                )}
+              >
+                <div className={cn(
+                  "w-8 h-8 flex items-center justify-center rounded-full",
+                  isSelected ? "text-primary-foreground" : "text-primary"
+                )}>
+                  {React.isValidElement(IconComponent) ? (
+                    IconComponent
+                  ) : typeof IconComponent === 'function' ? (
+                    <IconComponent size={20} />
+                  ) : (
+                    getCategoryIcon(category.id, "w-5 h-5")
+                  )}
+                </div>
+                <span className="text-xs font-medium truncate max-w-full">
+                  {category.name}
+                </span>
+              </Button>
+            </motion.div>
+          );
+        })}
       </div>
       
-      <div className="flex justify-center items-center">
-        {showLeftArrow && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-6 w-6 rounded-full" 
-            onClick={() => scrollLeft()}
-          >
-            <ArrowLeft className="h-4 w-4 text-gray-500" />
-          </Button>
-        )}
-        
-        <div 
-          ref={categoriesRef}
-          className="flex gap-1.5 overflow-x-auto hide-scrollbar py-1 px-1 max-w-full"
-          style={{ 
-            cursor: isDragging ? 'grabbing' : 'grab',
-            userSelect: 'none'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleDragEnd}
+      {showRightArrow && (
+        <Button
+          onClick={scrollRight}
+          size="icon" 
+          variant="ghost"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm shadow-sm"
         >
-          {CATEGORIES.map((category) => {
-            const isSelected = category.id === selectedCategory;
-            
-            return (
-              <Button 
-                key={category.id} 
-                className={cn(
-                  "rounded-full whitespace-nowrap px-3 py-1 h-8 flex-shrink-0 text-xs transition-colors",
-                  isSelected 
-                    ? getCategoryColorClass(category.id)
-                    : `bg-white text-black border-gray-300 border ${getHoverColor(category.id)}`
-                )}
-                onClick={() => handleCategoryClick(category.id)}
-              >
-                {category.icon}
-                <span className="ml-1">{t(category.id) || category.name}</span>
-              </Button>
-            );
-          })}
-        </div>
-        
-        {showRightArrow && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-6 w-6 rounded-full" 
-            onClick={() => scrollRight()}
-          >
-            <ArrowRight className="h-4 w-4 text-gray-500" />
-          </Button>
-        )}
-      </div>
+          <ChevronRight size={18} />
+        </Button>
+      )}
     </div>
   );
 };

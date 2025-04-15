@@ -1,160 +1,141 @@
 
-import React, { useRef, useEffect } from 'react';
-import { SubCategory } from '@/types/categoryTypes';
+import React, { useRef, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getCategoryColorClass, getCategoryTextColor } from '@/utils/categoryColors';
-import { getCategoryIcon } from '@/utils/categoryIcons';
 import { motion } from 'framer-motion';
 
+interface SubcategoryType {
+  id: string;
+  name: string;
+}
+
 interface CategorySubcategoriesScrollerProps {
-  subcategories: SubCategory[];
+  subcategories: SubcategoryType[];
   selectedSubcategories: string[];
-  onSubcategorySelect: (id: string) => void;
+  onSubcategorySelect: (subcategoryId: string) => void;
   parentCategoryId: string;
 }
 
-const CategorySubcategoriesScroller = ({
+const CategorySubcategoriesScroller: React.FC<CategorySubcategoriesScrollerProps> = ({
   subcategories,
   selectedSubcategories,
   onSubcategorySelect,
-  parentCategoryId,
-}: CategorySubcategoriesScrollerProps) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
+  parentCategoryId
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  
+  // Check scroll position
+  const checkScrollPosition = () => {
+    if (!scrollRef.current) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setShowLeftArrow(scrollLeft > 20);
+    setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
+  };
+  
+  // Add scroll event listener
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', checkScrollPosition);
+      // Initial check
+      checkScrollPosition();
+      
+      return () => {
+        scrollContainer.removeEventListener('scroll', checkScrollPosition);
+      };
+    }
+  }, [subcategories]);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => checkScrollPosition();
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  // Scroll functions
   const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
     }
   };
-
+  
   const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
     }
   };
-
-  // Function to provide tactile feedback
-  const provideTactileFeedback = () => {
-    if ('vibrate' in navigator) {
-      try {
-        navigator.vibrate(20); // Subtle vibration
-      } catch (e) {
-        console.log('Vibration not supported');
-      }
-    }
-  };
-
+  
+  // Don't render if no subcategories
   if (!subcategories || subcategories.length === 0) {
     return null;
   }
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.3,
-        staggerChildren: 0.05
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -5 },
-    visible: { opacity: 1, x: 0 }
-  };
-
+  
   return (
     <div className="absolute top-2 left-0 right-0 z-10 px-4">
-      <motion.div 
-        className="relative bg-white rounded-md shadow-md"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <button
-          onClick={scrollLeft}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md p-1 ml-1 hover:bg-gray-100 transition-colors"
-          aria-label="Défiler à gauche"
-        >
-          <ChevronLeft size={18} />
-        </button>
-
-        <div
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto py-2 px-8 gap-2 scroll-smooth hide-scrollbar"
-        >
-          {subcategories.map((subcategory) => {
-            const isSelected = selectedSubcategories.includes(subcategory.id);
-            
-            // Determine the correct background and text colors based on category
-            let bgClass = isSelected
-              ? `bg-${parentCategoryId === 'shopping' ? 'blue' : 
-                   parentCategoryId === 'restaurants' ? 'orange' : 
-                   parentCategoryId === 'loisirs' ? 'pink' : 
-                   parentCategoryId === 'services' ? 'emerald' : 
-                   'primary'}-100`
-              : "bg-gray-50";
-            
-            let borderClass = isSelected
-              ? `border-${parentCategoryId === 'shopping' ? 'blue' : 
-                   parentCategoryId === 'restaurants' ? 'orange' : 
-                   parentCategoryId === 'loisirs' ? 'pink' : 
-                   parentCategoryId === 'services' ? 'emerald' : 
-                   'primary'}-200`
-              : "border-gray-200";
-            
-            let textColorClass = isSelected
-              ? getCategoryTextColor(parentCategoryId)
-              : "text-gray-700";
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2 shadow-md">
+        <div className="flex items-center">
+          {showLeftArrow && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6 rounded-full flex-shrink-0" 
+              onClick={scrollLeft}
+            >
+              <ChevronLeft className="h-4 w-4 text-gray-500" />
+            </Button>
+          )}
+          
+          <div 
+            ref={scrollRef}
+            className="flex overflow-x-auto hide-scrollbar py-1 gap-2 flex-1 snap-x"
+          >
+            {subcategories.map((subcategory) => {
+              const isSelected = selectedSubcategories.includes(subcategory.id);
               
-            return (
-              <motion.button
-                key={subcategory.id}
-                variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  provideTactileFeedback();
-                  onSubcategorySelect(subcategory.id);
-                }}
-                className={cn(
-                  "whitespace-nowrap px-3 py-1.5 rounded-full text-sm flex items-center gap-1.5 flex-shrink-0 transition-all",
-                  bgClass,
-                  textColorClass,
-                  "border",
-                  borderClass,
-                  !isSelected && "hover:bg-gray-100"
-                )}
-              >
-                <span className="flex items-center justify-center w-4 h-4">
-                  {typeof subcategory.icon === 'string' ? (
-                    <span>{subcategory.icon}</span>
-                  ) : React.isValidElement(subcategory.icon) ? (
-                    subcategory.icon
-                  ) : typeof subcategory.icon === 'function' ? (
-                    React.createElement(subcategory.icon as React.ComponentType, {})
-                  ) : (
-                    getCategoryIcon(subcategory.id, "w-3.5 h-3.5")
-                  )}
-                </span>
-                {subcategory.name}
-              </motion.button>
-            );
-          })}
+              return (
+                <motion.div
+                  key={subcategory.id}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="snap-start"
+                >
+                  <Button 
+                    variant={isSelected ? "default" : "outline"}
+                    className={cn(
+                      "rounded-full whitespace-nowrap px-3 py-1 h-7 flex-shrink-0 text-xs transition-colors",
+                      isSelected 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-white text-foreground border-muted"
+                    )}
+                    onClick={() => onSubcategorySelect(subcategory.id)}
+                  >
+                    <span>{subcategory.name}</span>
+                  </Button>
+                </motion.div>
+              );
+            })}
+          </div>
+          
+          {showRightArrow && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6 rounded-full flex-shrink-0" 
+              onClick={scrollRight}
+            >
+              <ChevronRight className="h-4 w-4 text-gray-500" />
+            </Button>
+          )}
         </div>
-
-        <button
-          onClick={scrollRight}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md p-1 mr-1 hover:bg-gray-100 transition-colors"
-          aria-label="Défiler à droite"
-        >
-          <ChevronRight size={18} />
-        </button>
-      </motion.div>
+      </div>
     </div>
   );
 };
