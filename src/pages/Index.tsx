@@ -1,177 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recherche Géolocalisée</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #2A5C82;
+      --secondary-color: #5BA4E6;
+    }
 
-import React, { useState } from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import HeroSection from "@/components/home/HeroSection";
-import FeaturesSection from "@/components/home/FeaturesSection";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { CATEGORIES } from "@/types/categories";
-import { getCategoryIcon } from "@/utils/categoryIcons";
-import { getCategoryColorClass } from "@/utils/categoryColors";
+    body {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-const Index = () => {
-  const { t } = useLanguage();
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategories((prevSelected) =>
-      prevSelected.includes(categoryId)
-        ? prevSelected.filter((id) => id !== categoryId)
-        : [...prevSelected, categoryId]
-    );
-  };
+    .filters-panel {
+      background: white;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      z-index: 1001;
+    }
 
-  return (
-    <div className="w-full">
-      <HeroSection />
-      
-      <CategoriesSection 
-        selectedCategories={selectedCategories} 
-        onCategoryClick={handleCategoryClick} 
-      />
-      
-      <FeaturesSection />
-      
-      <DiscoverSection />
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    #searchInput {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 25px;
+    }
+
+    .voice-search {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      cursor: pointer;
+    }
+
+    .voice-search:hover {
+      background: var(--secondary-color);
+    }
+
+    .filter-group {
+      margin: 20px 0;
+    }
+
+    .transport-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .transport-btn {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: white;
+      font-size: 14px;
+      transition: transform 0.2s ease;
+    }
+
+    .transport-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .subcategories-scroll {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding: 10px 0;
+    }
+
+    .subcategory-item {
+      flex: 0 0 auto;
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .subcategory-item:hover {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    #map {
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .distance-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button:focus {
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60vh;
+        transform: translateY(100%);
+        transition: transform 0.3s;
+      }
+
+      .filters-active .filters-panel {
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="filters-panel">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Rechercher..." />
+      <button class="voice-search" title="Recherche vocale"><i class="fas fa-microphone"></i></button>
     </div>
-  );
-};
 
-const CategoriesSection = ({ 
-  selectedCategories, 
-  onCategoryClick 
-}: { 
-  selectedCategories: string[], 
-  onCategoryClick: (id: string) => void 
-}) => {
-  const { t } = useLanguage();
-  
-  // Filter main categories for the grid - matching the same as CategoryGrid.tsx
-  const mainCategories = [
-    'quotidien',
-    'alimentation',
-    'shopping',
-    'services',
-    'sante',
-    'divertissement',
-    'hebergement'
-  ];
-  
-  const displayCategories = CATEGORIES.filter(cat => 
-    mainCategories.includes(cat.id)
-  );
+    <div class="filter-group">
+      <h4>Catégorie</h4>
+      <select onchange="showSubcategories(this.value)">
+        <option value="">Choisir</option>
+        <option value="Adresse principale">Adresse principale</option>
+        <option value="Famille">Famille</option>
+        <option value="Travail">Travail</option>
+        <option value="École">École</option>
+        <option value="Alimentation et Boissons">Alimentation et Boissons</option>
+        <option value="Achats">Achats</option>
+        <option value="Services">Services</option>
+        <option value="Santé et Bien-être">Santé et Bien-être</option>
+        <option value="Divertissement et Loisirs">Divertissement et Loisirs</option>
+        <option value="Hébergement">Hébergement</option>
+      </select>
+    </div>
 
-  return (
-    <div className="bg-background py-16 px-4 categories-section">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <h2 className="text-3xl font-bold mb-4 text-center text-foreground font-heading">
-            {t('exploreCategories')}
-          </h2>
-          
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-10">
-            {t('categoriesDescription')}
-          </p>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {displayCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 * index }}
-              >
-                <button
-                  onClick={() => onCategoryClick(category.id)}
-                  className={`w-full h-32 flex flex-col items-center justify-center p-4 rounded-xl transition-all shadow-sm hover:shadow-md
-                    ${selectedCategories.includes(category.id) 
-                      ? 'bg-primary/10 border-2 border-primary' 
-                      : 'bg-card hover:bg-accent border border-border'}`}
-                >
-                  <div className="mb-3">
-                    {getCategoryIcon(category.id, "w-10 h-10")}
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    {t(category.name) || category.name}
-                  </p>
-                </button>
-              </motion.div>
-            ))}
-          </div>
-          
-          <motion.div 
-            className="mt-10 text-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.6 }}
-          >
-            <Link to="/categories">
-              <Button 
-                variant="outline" 
-                className="rounded-full group text-orange-400 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-              >
-                <span>{t('browseCategories')}</span>
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-orange-400" />
-              </Button>
-            </Link>
-          </motion.div>
-        </motion.div>
+    <div class="filter-group">
+      <div class="subcategories-scroll" id="subcategories"></div>
+    </div>
+
+    <div class="filter-group">
+      <h4>Nombre de résultats</h4>
+      <input type="range" min="1" max="10" value="5" id="resultRange" />
+    </div>
+
+    <div class="filter-group">
+      <h4>Rayon de recherche</h4>
+      <div class="distance-filter">
+        <button onclick="setUnit('km')">km</button>
+        <button onclick="setUnit('mi')">mi</button>
+        <input type="number" id="distanceInput" value="5" onchange="updateRadius(this.value)" />
       </div>
     </div>
-  );
-};
 
-const DiscoverSection = () => {
-  const { t } = useLanguage();
-  
-  return (
-    <div className="bg-gradient-to-b from-accent/30 to-background py-16 px-4">
-      <div className="max-w-5xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-card p-8 rounded-2xl shadow-lg"
-        >
-          <h2 className="text-3xl font-bold mb-6 text-primary font-heading">
-            {t('startExploring')}
-          </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
-            {t('exploreDescription')}
-          </p>
-          
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/categories">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 rounded-full px-8 shadow-md hover:shadow-lg transition-all"
-              >
-                {t('search')}
-              </Button>
-            </Link>
-            
-            <Link to="/categories">
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="rounded-full px-8 border-orange-300 text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
-              >
-                {t('browseCategories')}
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
+    <div class="filter-group">
+      <h4>Mode de transport</h4>
+      <div class="transport-filter">
+        <button class="transport-btn" style="background: #FF6B6B"><i class="fas fa-car"></i> Voiture</button>
+        <button class="transport-btn" style="background: #4ECDC4"><i class="fas fa-walking"></i> À pied</button>
+        <button class="transport-btn" style="background: #45B7D1"><i class="fas fa-bicycle"></i> Vélo</button>
+        <button class="transport-btn" style="background: #96CEB4"><i class="fas fa-bus"></i> Transports</button>
+        <button class="transport-btn" style="background: #FFEEAD"><i class="fas fa-train"></i> Train</button>
+        <button class="transport-btn" style="background: #D4A5A5"><i class="fas fa-ship"></i> Bateau</button>
+        <button class="transport-btn" style="background: #774F38"><i class="fas fa-users"></i> Co-voiturage</button>
+        <button class="transport-btn" style="background: #8E44AD"><i class="fas fa-plane"></i> Avion</button>
       </div>
     </div>
-  );
-};
+  </div>
 
-export default Index;
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map', { zoomControl: false }).setView([48.8566, 2.3522], 13);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let currentRadius;
+    function updateRadius(radius) {
+      if (currentRadius) map.removeLayer(currentRadius);
+      currentRadius = L.circle(map.getCenter(), {
+        radius: radius * 1000,
+        color: '#2A5C82',
+        fillOpacity: 0.1
+      }).addTo(map);
+    }
+
+    let unit = 'km';
+    function setUnit(selected) {
+      unit = selected;
+    }
+  </script>
+</body>
+</html>
+
