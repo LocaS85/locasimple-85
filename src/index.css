@@ -225,7 +225,29 @@
 
 /* Subcategory item hover effect */
 .subcategory-item {
-  @apply px-3 py-2 rounded-md hover:bg-muted/50 cursor-pointer transition-colors;
+  flex: 0 0 auto;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.subcategory-item:hover {
+  background: var(--secondary-color);
+  color: white;
+}
+
+.subcategory-item.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Map controls positioning */

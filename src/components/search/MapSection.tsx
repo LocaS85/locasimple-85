@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapDisplay } from './MapDisplay';
 import ResultsPopup from './ResultsPopup';
@@ -10,6 +9,7 @@ import CategorySubcategoriesScroller from './map/CategorySubcategoriesScroller';
 import { DAILY_CATEGORIES } from '@/types/dailyCategories';
 import MapboxInitializer from '../map/MapboxInitializer';
 import { MAPBOX_TOKEN } from '@/config/environment';
+import { Result } from '@/components/ResultsList';
 
 interface MapSectionProps {
   userLocation?: [number, number];
@@ -22,10 +22,11 @@ interface MapSectionProps {
   radiusType?: 'distance' | 'time' | 'duration';
   radius?: number;
   distanceUnit?: 'km' | 'mi';
-  onPlaceSelect?: (placeId: string) => void;
+  onPlaceSelect?: (place: Result) => void;
   onClosePopup?: () => void;
   showNoMapboxTokenWarning?: boolean;
   onSetMapboxToken?: (token: string) => boolean;
+  onSearch?: () => void;
 }
 
 export const MapSection = ({
@@ -43,6 +44,7 @@ export const MapSection = ({
   onClosePopup = () => {},
   showNoMapboxTokenWarning = false,
   onSetMapboxToken = () => false,
+  onSearch
 }: MapSectionProps) => {
   const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
@@ -79,6 +81,10 @@ export const MapSection = ({
     setSelectedSubcategories([]);
   };
 
+  const handlePlaceSelect = (place: Result) => {
+    onPlaceSelect(place);
+  };
+
   const displayRadiusType = radiusType === 'duration' ? 'time' : radiusType;
   
   const isMapboxTokenValid = MAPBOX_TOKEN && MAPBOX_TOKEN.length > 0;
@@ -95,7 +101,7 @@ export const MapSection = ({
             places={places}
             userLocation={userLocation}
             selectedPlaceId={selectedPlaceId}
-            onPlaceSelect={onPlaceSelect}
+            onPlaceSelect={handlePlaceSelect}
             loading={loading}
             radiusType={displayRadiusType}
             radius={radius}

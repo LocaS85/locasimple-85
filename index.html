@@ -19,6 +19,42 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- Leaflet Locate Control JS -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.79.0/dist/L.Control.Locate.min.js"></script>
+    <!-- Subcategories Script -->
+    <script>
+      const subcategories = {
+        'Culture': ['Cinéma', 'Théâtre', 'Musée', 'Galerie', 'Concert'],
+        'Restaurants': ['Français', 'Italien', 'Asiatique', 'Vegan', 'Fast Food'],
+        'Bars': ['Cocktail', 'Rooftop', 'Bière artisanale', 'Karaoké'],
+        'Nature': ['Parc', 'Plage', 'Lac', 'Montagne'],
+        'Hébergement': ['Hôtel', 'Auberge', 'Appartement', 'Camping']
+      };
+
+      function showSubcategories(category) {
+        const container = document.getElementById('subcategories');
+        container.innerHTML = '';
+
+        if (!category || !subcategories[category]) return;
+
+        subcategories[category].forEach(name => {
+          const btn = document.createElement('div');
+          btn.className = 'subcategory-item';
+          btn.textContent = name;
+          btn.onclick = () => {
+            document.querySelectorAll('.subcategory-item').forEach(e => e.classList.remove('active'));
+            btn.classList.add('active');
+            handleSubcategoryClick(name);
+          };
+          container.appendChild(btn);
+        });
+      }
+
+      function handleSubcategoryClick(subcategory) {
+        console.log("Recherche en cours pour :", subcategory);
+        // Tu peux ici appeler une fonction de tracé sur la carte ou une recherche via API
+        // Exemple fictif :
+        // drawLocationsForSubcategory(subcategory);
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

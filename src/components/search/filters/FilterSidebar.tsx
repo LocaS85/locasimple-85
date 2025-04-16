@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchIcon, MapPin, Car, Walking, Bike, Bus, Filter } from 'lucide-react';
+import { SearchIcon, MapPin, Car, User as Walking, Bike, Bus, Filter } from 'lucide-react';
 import { DistanceUnit } from '@/types/categoryTypes';
 import { CATEGORIES } from '@/types/categories';
 

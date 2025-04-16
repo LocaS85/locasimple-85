@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -11,13 +10,6 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import mapboxSearchService from '@/services/mapboxSearchService';
 import { Result } from '@/components/ResultsList';
-
-// Components
-import FilterSidebar from './filters/FilterSidebar';
-import GeoSearcher from './GeoSearcher';
-import MapSection from './MapSection';
-import CategoriesScroller from './CategoriesScroller';
-import ResultsCountSlider from './filters/ResultsCountSlider';
 
 interface SearchPageProps {
   mapboxTokenSet?: boolean;
@@ -59,34 +51,28 @@ const SearchPage: React.FC<SearchPageProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const isMobile = useIsMobile();
 
-  // Handle search result
   const handleSearchResult = (result: any) => {
     setOrigin(result);
     toast.success(`Position mise à jour: ${result.name || 'Nouvelle localisation'}`);
   };
 
-  // Toggle sidebar
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Handle category selection
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(undefined);
     
-    // Trigger search immediately when category changes
     performSearch(categoryId);
   };
-  
-  // Perform search
+
   const performSearch = async (categoryId?: string) => {
     if (isSearching) return;
     
     setIsSearching(true);
     
     try {
-      // If we have no user location, show an error
       if (!userLocation) {
         toast.error('Veuillez activer la localisation pour effectuer une recherche');
         return;
@@ -96,7 +82,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
         query: searchQuery,
         userLocation,
         limit: resultsCount,
-        radius: selectedDistance * (distanceUnit === 'km' ? 1000 : 1609.34), // Convert to meters
+        radius: selectedDistance * (distanceUnit === 'km' ? 1000 : 1609.34),
         category: categoryId || selectedCategory,
         transportMode
       });
@@ -115,15 +101,12 @@ const SearchPage: React.FC<SearchPageProps> = ({
       setIsSearching(false);
     }
   };
-  
-  // Handle search input change
+
   const handleSearchInputChange = (query: string) => {
     setSearchQuery(query);
   };
-  
-  // Automatically search when filters change
+
   useEffect(() => {
-    // Don't search if no query or category is selected
     if ((!searchQuery || searchQuery.trim().length === 0) && !selectedCategory) return;
     
     const timer = setTimeout(() => {
@@ -132,16 +115,13 @@ const SearchPage: React.FC<SearchPageProps> = ({
     
     return () => clearTimeout(timer);
   }, [selectedDistance, transportMode, resultsCount, distanceUnit]);
-  
-  // Handle result click
-  const handleResultClick = (result: Result) => {
-    // You can implement actions when a result is clicked
-    toast.info(`Sélection: ${result.name}`);
+
+  const handlePlaceSelect = (place: Result) => {
+    toast.info(`Sélection: ${place.name}`);
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      {/* Search Bar */}
       <motion.div 
         className="p-4 bg-white shadow-md z-10"
         initial={{ opacity: 0, y: -20 }}
@@ -162,7 +142,6 @@ const SearchPage: React.FC<SearchPageProps> = ({
         </div>
       </motion.div>
       
-      {/* Categories Scroller */}
       <motion.div 
         className="w-full bg-white border-b border-gray-200 shadow-sm z-10"
         initial={{ opacity: 0, y: -10 }}
@@ -175,9 +154,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
         />
       </motion.div>
       
-      {/* Main Content */}
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Sidebar Toggle Button */}
         <motion.button 
           className="absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
           onClick={toggleSidebar}
@@ -188,7 +165,6 @@ const SearchPage: React.FC<SearchPageProps> = ({
           {sidebarOpen ? <ChevronLeftCircle size={20} /> : <ChevronRightCircle size={20} />}
         </motion.button>
 
-        {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.div
@@ -215,7 +191,6 @@ const SearchPage: React.FC<SearchPageProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Map Area */}
         <motion.div 
           className={`flex-1 h-full relative transition-all duration-300`}
           initial={{ opacity: 0 }}
@@ -271,13 +246,12 @@ const SearchPage: React.FC<SearchPageProps> = ({
             radius={selectedDistance || 5}
             distanceUnit={distanceUnit}
             places={searchResults}
-            onPlaceSelect={handleResultClick}
+            onPlaceSelect={handlePlaceSelect}
             showNoMapboxTokenWarning={!mapboxTokenSet}
             onSetMapboxToken={onSetMapboxToken}
             onSearch={performSearch}
           />
           
-          {/* Results count controller (floating) */}
           <motion.div 
             className="absolute bottom-4 left-4 z-10 bg-white p-2 rounded-lg shadow-md"
             initial={{ opacity: 0, y: 20 }}
