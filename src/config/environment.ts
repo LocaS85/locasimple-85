@@ -1,5 +1,4 @@
 
-
 // Détection d'environnement
 export const isDevelopment = import.meta.env.DEV;
 export const isProduction = import.meta.env.PROD;
@@ -23,9 +22,9 @@ export const isApiKeyValid = (key?: string): boolean => {
 
 // Vérification de la présence du token Mapbox
 if (!isApiKeyValid(MAPBOX_TOKEN)) {
-  console.warn('⚠️ VITE_MAPBOX_TOKEN non défini dans les variables d\'environnement. La carte ne fonctionnera pas correctement.');
+  console.warn('⚠️ MAPBOX_TOKEN non défini dans les variables d\'environnement. La carte ne fonctionnera pas correctement.');
   if (isDevelopment) {
-    console.info('Pour utiliser Mapbox en développement, créez un fichier .env à la racine du projet avec la variable VITE_MAPBOX_TOKEN=votre_token_mapbox');
+    console.info('Pour utiliser Mapbox en développement, créez un fichier .env à la racine du projet avec la variable MAPBOX_TOKEN=votre_token_mapbox');
   }
 }
 
@@ -49,4 +48,3 @@ export const API_CONFIG = {
     baseUrl: API_BASE_URL
   }
 };
-

@@ -80,12 +80,14 @@ export const MapSection = ({
   };
 
   const displayRadiusType = radiusType === 'duration' ? 'time' : radiusType;
+  
+  const isMapboxTokenValid = MAPBOX_TOKEN && MAPBOX_TOKEN.length > 0;
 
   return (
     <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
       <MapboxInitializer onInitialized={setMapInitialized} />
       
-      {showNoMapboxTokenWarning && !MAPBOX_TOKEN ? (
+      {showNoMapboxTokenWarning && !isMapboxTokenValid ? (
         <MapKeyWarning onSetMapboxToken={onSetMapboxToken} />
       ) : (
         <>
@@ -153,4 +155,3 @@ export const MapSection = ({
 };
 
 export default MapSection;
-

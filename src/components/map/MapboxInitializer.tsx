@@ -1,5 +1,4 @@
 
-
 import { useEffect } from 'react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
@@ -13,18 +12,27 @@ const MapboxInitializer = ({ onInitialized }: MapboxInitializerProps) => {
     // Try to initialize Mapbox global access token
     try {
       if (typeof window !== 'undefined' && window.mapboxgl) {
-        window.mapboxgl.accessToken = MAPBOX_TOKEN;
-        console.log('Mapbox initialized with token:', MAPBOX_TOKEN.substring(0, 8) + '...');
-        
-        // Call the callback if provided
-        if (onInitialized) {
-          onInitialized(true);
+        if (MAPBOX_TOKEN && MAPBOX_TOKEN.length > 0) {
+          window.mapboxgl.accessToken = MAPBOX_TOKEN;
+          console.log('Mapbox initialized with token:', MAPBOX_TOKEN.substring(0, 8) + '...');
+          
+          // Call the callback if provided
+          if (onInitialized) {
+            onInitialized(true);
+          }
+        } else {
+          console.warn('Mapbox token is empty or not defined');
+          if (onInitialized) {
+            onInitialized(false);
+          }
         }
       } else if (typeof window !== 'undefined' && !window.mapboxgl) {
         console.warn('Mapbox GL JS not loaded yet');
         
         // Set a global variable to use later when Mapbox is loaded
-        window.MAPBOX_TOKEN_READY = MAPBOX_TOKEN;
+        if (MAPBOX_TOKEN && MAPBOX_TOKEN.length > 0) {
+          window.MAPBOX_TOKEN_READY = MAPBOX_TOKEN;
+        }
         
         // Call the callback with false if Mapbox isn't available yet
         if (onInitialized) {
@@ -51,4 +59,3 @@ const MapboxInitializer = ({ onInitialized }: MapboxInitializerProps) => {
 };
 
 export default MapboxInitializer;
-

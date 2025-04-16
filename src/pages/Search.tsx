@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Mic, Car, User, Bike, Bus, Train, Ship, Users, Plane
+  Mic, Car, User, Bike, Bus, Train, Ship, Users, Plane, MapPin, Search as SearchIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Slider } from '@/components/ui/slider';
@@ -10,12 +10,15 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { MAPBOX_TOKEN } from '@/config/environment';
+import AddressSearch from '@/components/search/AddressSearch';
 
 const Search = () => {
   // Map reference
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const [currentRadius, setCurrentRadius] = useState<any>(null);
+  const [currentMarker, setCurrentMarker] = useState<any>(null);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,10 +29,26 @@ const Search = () => {
   const [transportMode, setTransportMode] = useState<string>('driving');
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isPanelOpen, setIsPanelOpen] = useState<boolean>(true);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   
   // Subcategories state
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
+
+  // Categories state (using the same data as Categories.tsx)
+  const [categories, setCategories] = useState<Array<{
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+  }>>([
+    { id: '1', name: 'Restaurants', icon: '🍽️', color: '#FF5733' },
+    { id: '2', name: 'Shopping', icon: '🛍️', color: '#33FF57' },
+    { id: '3', name: 'Divertissement', icon: '🎭', color: '#3357FF' },
+    { id: '4', name: 'Santé', icon: '💊', color: '#FF33A8' },
+    { id: '5', name: 'Services', icon: '🔧', color: '#33FFF3' },
+    { id: '6', name: 'Transport', icon: '🚗', color: '#F3FF33' },
+  ]);
 
   // Check if mobile on mount
   useEffect(() => {
@@ -66,6 +85,48 @@ const Search = () => {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap'
         }).addTo(newMap);
+        
+        // Add location control
+        const locateControl = L.control.locate({
+          position: 'bottomright',
+          flyTo: true,
+          keepCurrentZoomLevel: true,
+          strings: {
+            title: 'Ma position'
+          },
+          locateOptions: {
+            maxZoom: 16
+          }
+        }).addTo(newMap);
+        
+        // Handle location found
+        newMap.on('locationfound', (e: any) => {
+          const { lat, lng } = e.latlng;
+          setUserLocation([lat, lng]);
+          
+          // Add marker for user location
+          if (currentMarker) {
+            newMap.removeLayer(currentMarker);
+          }
+          
+          const userMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+              className: 'user-location-marker',
+              html: `<div class="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full border-2 border-white"><span class="text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg></span></div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            })
+          }).addTo(newMap);
+          
+          setCurrentMarker(userMarker);
+          toast.success('Position trouvée !');
+        });
+        
+        // Handle location error
+        newMap.on('locationerror', (e: any) => {
+          toast.error('Impossible de trouver votre position');
+          console.error('Location error:', e);
+        });
         
         setMap(newMap);
         
@@ -113,46 +174,46 @@ const Search = () => {
     setCurrentRadius(newRadius);
   };
   
+  // Handle location click
+  const handleLocationClick = () => {
+    if (map && 'locate' in map) {
+      map.locate({
+        setView: true,
+        maxZoom: 16
+      });
+    } else {
+      toast.error('Fonctionnalité de localisation non disponible');
+    }
+  };
+  
   // Handle unit change
   const handleUnitChange = (newUnit: 'km' | 'mi') => {
     setUnit(newUnit);
   };
   
   // Handle category change and load subcategories
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
     
     // Set subcategories based on selected category
-    switch(category) {
-      case 'Adresse principale':
-        setSubcategories(['Maison', 'Appartement']);
+    switch(categoryId) {
+      case 'Restaurants':
+        setSubcategories(['Français', 'Italien', 'Japonais', 'Fast-food']);
         break;
-      case 'Famille':
-        setSubcategories(['Parents', 'Frères/Sœurs', 'Grands-parents', 'Autres']);
+      case 'Shopping':
+        setSubcategories(['Vêtements', 'Électronique', 'Livres', 'Sport']);
         break;
-      case 'Travail':
-        setSubcategories(['Bureau', 'Client', 'Réunion', 'Conférence']);
+      case 'Divertissement':
+        setSubcategories(['Cinéma', 'Musée', 'Théâtre', 'Parc']);
         break;
-      case 'École':
-        setSubcategories(['École primaire', 'Collège', 'Lycée', 'Université']);
-        break;
-      case 'Alimentation et Boissons':
-        setSubcategories(['Restaurant', 'Café', 'Bar', 'Fast-food', 'Supermarché']);
-        break;
-      case 'Achats':
-        setSubcategories(['Centre commercial', 'Vêtements', 'Électronique', 'Librairie']);
+      case 'Santé':
+        setSubcategories(['Médecin', 'Pharmacie', 'Hôpital', 'Dentiste']);
         break;
       case 'Services':
         setSubcategories(['Banque', 'Poste', 'Administration', 'Coiffeur']);
         break;
-      case 'Santé et Bien-être':
-        setSubcategories(['Hôpital', 'Médecin', 'Pharmacie', 'Gym']);
-        break;
-      case 'Divertissement et Loisirs':
-        setSubcategories(['Cinéma', 'Parc', 'Musée', 'Théâtre']);
-        break;
-      case 'Hébergement':
-        setSubcategories(['Hôtel', 'Airbnb', 'Camping', 'Auberge']);
+      case 'Transport':
+        setSubcategories(['Gare', 'Métro', 'Bus', 'Aéroport']);
         break;
       default:
         setSubcategories([]);
@@ -163,6 +224,45 @@ const Search = () => {
   const handleTransportModeSelect = (mode: string) => {
     setTransportMode(mode);
     toast.success(`Mode de transport: ${mode}`);
+  };
+  
+  // Handle address selection
+  const handleAddressSelect = (location: {
+    name: string;
+    longitude: number;
+    latitude: number;
+  }) => {
+    setSearchQuery(location.name);
+    
+    if (map) {
+      map.setView([location.latitude, location.longitude], 15);
+      
+      // Add marker for selected location
+      if (currentMarker) {
+        map.removeLayer(currentMarker);
+      }
+      
+      const marker = (window as any).L.marker([location.latitude, location.longitude]).addTo(map);
+      setCurrentMarker(marker);
+      
+      // Update radius to new center
+      if (currentRadius) {
+        map.removeLayer(currentRadius);
+      }
+      
+      const radiusInMeters = unit === 'km' ? radius * 1000 : radius * 1609.34;
+      
+      const newRadius = (window as any).L.circle([location.latitude, location.longitude], {
+        radius: radiusInMeters,
+        color: '#2A5C82',
+        fillColor: '#5BA4E6',
+        fillOpacity: 0.1
+      }).addTo(map);
+      
+      setCurrentRadius(newRadius);
+    }
+    
+    toast.success(`Recherche: ${location.name}`);
   };
   
   // Handle voice search
@@ -235,11 +335,10 @@ const Search = () => {
       >
         <div className="p-5">
           <div className="flex gap-2 mb-5">
-            <Input
-              className="flex-1 rounded-full"
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+            <AddressSearch
+              onAddressSelect={handleAddressSelect}
+              placeholder="Rechercher un lieu..."
+              userLocation={userLocation || undefined}
             />
             <Button
               className="rounded-full w-12 h-12 flex-shrink-0"
@@ -247,6 +346,17 @@ const Search = () => {
               onClick={handleVoiceSearch}
             >
               <Mic size={20} />
+            </Button>
+          </div>
+          
+          <div className="mb-4">
+            <Button
+              className="w-full flex items-center justify-center gap-2"
+              variant="outline"
+              onClick={handleLocationClick}
+            >
+              <MapPin size={16} />
+              Utiliser ma position
             </Button>
           </div>
           
@@ -261,16 +371,16 @@ const Search = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Choisir</SelectItem>
-                <SelectItem value="Adresse principale">Adresse principale</SelectItem>
-                <SelectItem value="Famille">Famille</SelectItem>
-                <SelectItem value="Travail">Travail</SelectItem>
-                <SelectItem value="École">École</SelectItem>
-                <SelectItem value="Alimentation et Boissons">Alimentation et Boissons</SelectItem>
-                <SelectItem value="Achats">Achats</SelectItem>
-                <SelectItem value="Services">Services</SelectItem>
-                <SelectItem value="Santé et Bien-être">Santé et Bien-être</SelectItem>
-                <SelectItem value="Divertissement et Loisirs">Divertissement et Loisirs</SelectItem>
-                <SelectItem value="Hébergement">Hébergement</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem 
+                    key={category.id} 
+                    value={category.name}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="mr-2">{category.icon}</span>
+                    <span style={{ color: category.color }}>{category.name}</span>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
