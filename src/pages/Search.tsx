@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Mic, Car, Walking, Bike, Bus, Train, Ship, Users, Plane
+  Mic, Car, User, Bike, Bus, Train, Ship, Users, Plane
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Slider } from '@/components/ui/slider';
@@ -197,7 +196,7 @@ const Search = () => {
   // Define transport options with colors
   const transportOptions = [
     { mode: 'car', icon: <Car size={18} />, label: 'Voiture', color: '#FF6B6B' },
-    { mode: 'walking', icon: <Walking size={18} />, label: 'À pied', color: '#4ECDC4' },
+    { mode: 'walking', icon: <User size={18} />, label: 'À pied', color: '#4ECDC4' },
     { mode: 'bicycle', icon: <Bike size={18} />, label: 'Vélo', color: '#45B7D1' },
     { mode: 'bus', icon: <Bus size={18} />, label: 'Transports', color: '#96CEB4' },
     { mode: 'train', icon: <Train size={18} />, label: 'Train', color: '#FFEEAD' },

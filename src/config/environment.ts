@@ -4,7 +4,7 @@ export const isDevelopment = import.meta.env.DEV;
 export const isProduction = import.meta.env.PROD;
 
 // Mapbox configuration
-export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTdwMTZmZXAwZ3Q4MmtyM3U1bG8weng3In0.38X4Wh5p8tTmfNQj1rqutw';
+export const MAPBOX_TOKEN = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTlrMjI4dzAwaTNvMmpzZ3o4OHdjcGJxIn0.-BsgOhfBsfiCv1rD0SUKxA';
 
 // Supabase Configuration
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapDisplay } from './MapDisplay';
 import ResultsPopup from './ResultsPopup';
@@ -8,6 +7,8 @@ import NoResultsMessage from './NoResultsMessage';
 import MapKeyWarning from './MapKeyWarning';
 import CategorySubcategoriesScroller from './map/CategorySubcategoriesScroller';
 import { DAILY_CATEGORIES } from '@/types/dailyCategories';
+import MapboxInitializer from '../map/MapboxInitializer';
+import { MAPBOX_TOKEN } from '@/config/environment';
 
 interface MapSectionProps {
   userLocation?: [number, number];
@@ -44,6 +45,7 @@ export const MapSection = ({
 }: MapSectionProps) => {
   const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [mapInitialized, setMapInitialized] = useState(false);
   
   useEffect(() => {
     if (selectedPlaceId && places.length > 0) {
@@ -76,12 +78,13 @@ export const MapSection = ({
     setSelectedSubcategories([]);
   };
 
-  // Convert 'duration' to 'time' for the MapDisplay component
   const displayRadiusType = radiusType === 'duration' ? 'time' : radiusType;
 
   return (
     <div className="relative w-full h-full bg-gray-100 rounded-lg overflow-hidden">
-      {showNoMapboxTokenWarning ? (
+      <MapboxInitializer onInitialized={setMapInitialized} />
+      
+      {showNoMapboxTokenWarning && !MAPBOX_TOKEN ? (
         <MapKeyWarning onSetMapboxToken={onSetMapboxToken} />
       ) : (
         <>
