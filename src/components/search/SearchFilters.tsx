@@ -21,6 +21,7 @@ interface SearchFiltersProps {
   radiusType: 'time' | 'distance';
   transportMode: string;
   distanceUnit: DistanceUnit;
+  onSearch?: () => void;
 }
 
 const SearchFilters = ({
@@ -35,6 +36,7 @@ const SearchFilters = ({
   radiusType,
   transportMode,
   distanceUnit,
+  onSearch
 }: SearchFiltersProps) => {
   // Provide vibration feedback if supported
   const provideTactileFeedback = () => {
@@ -56,16 +58,21 @@ const SearchFilters = ({
   // Create a debounced search function to avoid too many API calls
   useEffect(() => {
     const fetchResults = debounce(() => {
-      // This would trigger the search based on all filters
-      toast.info(`Recherche avec filtres mis à jour`, {
-        description: `Catégorie: ${selectedCategory || 'Toutes'}, Rayon: ${selectedRadius}${radiusType === 'distance' ? distanceUnit : ' min'}, Transport: ${transportMode}`,
-      });
-    }, 500);
+      if (onSearch) {
+        console.log('Recherche automatique avec filtres mis à jour');
+        onSearch();
+      } else {
+        // Pour le débogage uniquement
+        toast.info(`Filtres mis à jour`, {
+          description: `Catégorie: ${selectedCategory || 'Toutes'}, Rayon: ${selectedRadius}${radiusType === 'distance' ? distanceUnit : ' min'}, Transport: ${transportMode}`,
+        });
+      }
+    }, 1000); // Longer delay for automatic search to avoid too many API calls
     
     fetchResults();
     
     return () => fetchResults.cancel?.();
-  }, [selectedCategory, selectedRadius, radiusType, transportMode, distanceUnit]);
+  }, [selectedCategory, selectedRadius, radiusType, transportMode, distanceUnit, onSearch]);
 
   return (
     <div className="search-filters space-y-6 p-4">

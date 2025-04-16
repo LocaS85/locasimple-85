@@ -9,6 +9,8 @@ import { DAILY_CATEGORIES } from '@/types/dailyCategories';
 import AddressSearch from '@/components/search/AddressSearch';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import mapboxSearchService from '@/services/mapboxSearchService';
+import { Result } from '@/components/ResultsList';
 
 // Components
 import FilterSidebar from './filters/FilterSidebar';
@@ -53,6 +55,8 @@ const SearchPage: React.FC<SearchPageProps> = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
   const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
+  const [searchResults, setSearchResults] = useState<Result[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const isMobile = useIsMobile();
 
   // Handle search result
@@ -70,7 +74,69 @@ const SearchPage: React.FC<SearchPageProps> = ({
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(undefined);
-    toast.success(`Catégorie sélectionnée: ${categoryId}`);
+    
+    // Trigger search immediately when category changes
+    performSearch(categoryId);
+  };
+  
+  // Perform search
+  const performSearch = async (categoryId?: string) => {
+    if (isSearching) return;
+    
+    setIsSearching(true);
+    
+    try {
+      // If we have no user location, show an error
+      if (!userLocation) {
+        toast.error('Veuillez activer la localisation pour effectuer une recherche');
+        return;
+      }
+      
+      const results = await mapboxSearchService.search({
+        query: searchQuery,
+        userLocation,
+        limit: resultsCount,
+        radius: selectedDistance * (distanceUnit === 'km' ? 1000 : 1609.34), // Convert to meters
+        category: categoryId || selectedCategory,
+        transportMode
+      });
+      
+      setSearchResults(results);
+      
+      if (results.length === 0) {
+        toast.info('Aucun résultat trouvé');
+      } else {
+        toast.success(`${results.length} résultats trouvés`);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      toast.error('Erreur lors de la recherche');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  // Handle search input change
+  const handleSearchInputChange = (query: string) => {
+    setSearchQuery(query);
+  };
+  
+  // Automatically search when filters change
+  useEffect(() => {
+    // Don't search if no query or category is selected
+    if ((!searchQuery || searchQuery.trim().length === 0) && !selectedCategory) return;
+    
+    const timer = setTimeout(() => {
+      performSearch();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [selectedDistance, transportMode, resultsCount, distanceUnit]);
+  
+  // Handle result click
+  const handleResultClick = (result: Result) => {
+    // You can implement actions when a result is clicked
+    toast.info(`Sélection: ${result.name}`);
   };
 
   return (
@@ -91,6 +157,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
             onResult={handleSearchResult}
             placeholder="Adresse, lieu ou coordonnées GPS..."
             enableVoice={true}
+            onSearch={handleSearchInputChange}
           />
         </div>
       </motion.div>
@@ -104,7 +171,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
       >
         <CategoriesScroller 
           selectedCategory={selectedCategory} 
-          onCategorySelect={setSelectedCategory} 
+          onCategorySelect={handleCategorySelect} 
         />
       </motion.div>
       
@@ -142,6 +209,7 @@ const SearchPage: React.FC<SearchPageProps> = ({
                 onResultsCountChange={setResultsCount}
                 filterMode={filterMode}
                 onFilterModeChange={setFilterMode}
+                onSearch={performSearch}
               />
             </motion.div>
           )}
@@ -195,15 +263,18 @@ const SearchPage: React.FC<SearchPageProps> = ({
           
           <MapSection
             userLocation={userLocation}
-            loading={loading}
+            loading={loading || isSearching}
             showRoutes={showRoutes}
             transportMode={transportMode}
             selectedCategory={selectedCategory}
             radiusType={filterMode}
             radius={selectedDistance || 5}
             distanceUnit={distanceUnit}
+            places={searchResults}
+            onPlaceSelect={handleResultClick}
             showNoMapboxTokenWarning={!mapboxTokenSet}
             onSetMapboxToken={onSetMapboxToken}
+            onSearch={performSearch}
           />
           
           {/* Results count controller (floating) */}
