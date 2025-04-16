@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapDisplay } from './MapDisplay';
 import ResultsPopup from './ResultsPopup';
@@ -152,3 +153,4 @@ export const MapSection = ({
 };
 
 export default MapSection;
+

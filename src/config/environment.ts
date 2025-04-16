@@ -1,4 +1,5 @@
 
+
 // Détection d'environnement
 export const isDevelopment = import.meta.env.DEV;
 export const isProduction = import.meta.env.PROD;
@@ -48,3 +49,4 @@ export const API_CONFIG = {
     baseUrl: API_BASE_URL
   }
 };
+

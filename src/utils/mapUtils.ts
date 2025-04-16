@@ -1,4 +1,5 @@
 
+
 import { MAPBOX_TOKEN } from '@/config/environment';
 
 export const initializeMapbox = () => {
@@ -54,3 +55,4 @@ export const getMapboxToken = (): string => {
 export const isMapboxTokenSet = (): boolean => {
   return !!getMapboxToken();
 };
+

@@ -1,4 +1,5 @@
 
+
 import { useEffect } from 'react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
@@ -50,3 +51,4 @@ const MapboxInitializer = ({ onInitialized }: MapboxInitializerProps) => {
 };
 
 export default MapboxInitializer;
+

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -259,7 +260,7 @@ const Search = () => {
                 <SelectValue placeholder="Choisir une catégorie" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Choisir</SelectItem>
+                <SelectItem value="none">Choisir</SelectItem>
                 <SelectItem value="Adresse principale">Adresse principale</SelectItem>
                 <SelectItem value="Famille">Famille</SelectItem>
                 <SelectItem value="Travail">Travail</SelectItem>
