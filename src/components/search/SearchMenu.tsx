@@ -28,8 +28,6 @@ interface SearchMenuProps {
   onDistanceUnitChange: (unit: DistanceUnit) => void;
   resultsCount: number;
   onResultsCountChange: (count: number) => void;
-  filterMode: 'distance' | 'duration';
-  onFilterModeChange: (type: 'distance' | 'duration') => void;
   results: Result[];
   onResultClick: (result: Result) => void;
   selectedResultId?: string;
@@ -59,8 +57,6 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   onDistanceUnitChange,
   resultsCount,
   onResultsCountChange,
-  filterMode,
-  onFilterModeChange,
   results,
   onResultClick,
   selectedResultId,
@@ -74,11 +70,12 @@ export const SearchMenu: React.FC<SearchMenuProps> = ({
   onToggleFavorite = () => {}
 }) => {
   const { t } = useLanguage();
+  const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
 
   if (!show) return null;
 
   const handleRadiusTypeChange = (type: 'distance' | 'duration') => {
-    onFilterModeChange(type);
+    setFilterMode(type);
     // Si on change pour durée, utiliser la valeur sélectionnée précédemment
     if (type === 'duration' && selectedDuration) {
       // This is handled by the parent now

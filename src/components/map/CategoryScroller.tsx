@@ -1,22 +1,22 @@
 
 import React from 'react';
-import { CATEGORIES } from '@/types/categories';
+import { mockCategories } from '@/data/mockCategories';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getCategoryColorClass, getHoverColor } from '@/utils/categoryColors';
+import { getCategoryColor, getHoverColor } from '@/utils/categoryColors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Category } from '@/types/categories';
 
 export interface CategoryScrollerProps {
   selectedCategory: string | null;
   onCategorySelect: (categoryId: string | null) => void;
-  categories?: Category[]; // This allows the prop but doesn't require it
+  categories?: any[]; // This allows the prop but doesn't require it
 }
 
 const CategoryScroller: React.FC<CategoryScrollerProps> = ({
   selectedCategory,
   onCategorySelect,
-  categories = CATEGORIES // Default to CATEGORIES from types/categories if not provided
+  categories = mockCategories // Default to mockCategories if not provided
 }) => {
   const { t } = useLanguage();
   
@@ -33,7 +33,7 @@ const CategoryScroller: React.FC<CategoryScrollerProps> = ({
                 className={cn(
                   "rounded-full whitespace-nowrap px-3 py-1 h-8 flex-shrink-0 text-xs transition-colors",
                   isSelected 
-                    ? getCategoryColorClass(category.id)
+                    ? getCategoryColor(category.id)
                     : `bg-white text-black border-gray-300 border ${getHoverColor(category.id)}`
                 )}
                 onClick={() => onCategorySelect(category.id === selectedCategory ? null : category.id)}

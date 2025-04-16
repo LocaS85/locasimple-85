@@ -1,267 +1,248 @@
-import React, { useRef, useEffect, useState } from 'react';
-import Map, { Marker, Popup, NavigationControl, Source, Layer } from 'react-map-gl';
-import { MAPBOX_TOKEN } from '@/config/environment';
-import { convertDistance } from '@/lib/utils';
-import { getColorForCategory, getColorForResult } from '@/utils/mapColors';
-import { getCategoryIcon } from '@/utils/categoryIcons';
-import { DistanceUnit } from '@/types/categoryTypes';
+import React, { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { MAPBOX_TOKEN } from '@/config/environment';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
-// Je garde la définition existante de MapDisplay et j'ajoute deux nouvelles props:
-// selectedCategory et selectedSubcategories
-interface MapDisplayProps {
-  places: any[];
-  userLocation?: [number, number];
-  selectedPlaceId?: string;
-  onPlaceSelect: (placeId: string) => void;
-  loading: boolean;
-  radiusType: 'time' | 'distance';
-  radius: number;
-  distanceUnit: 'km' | 'mi';
-  transportMode: string;
-  selectedCategory: string | null;
-  selectedSubcategories: string[];
+interface Place {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  address?: string;
+  category?: string;
 }
 
-export const MapDisplay = ({
-  places, 
-  userLocation, 
-  selectedPlaceId, 
-  onPlaceSelect, 
-  loading, 
-  radiusType, 
-  radius, 
-  distanceUnit, 
+interface MapDisplayProps {
+  viewport: {
+    latitude: number;
+    longitude: number;
+    zoom: number;
+  };
+  setViewport: (viewport: any) => void;
+  places: Place[];
+  resultsCount: number;
+  selectedPlaceId: string | null;
+  popupInfo: any;
+  setPopupInfo: (info: any) => void;
+  handleResultClick: (place: any) => void;
+  isLocationActive: boolean;
+  userLocation?: [number, number];
+  loading: boolean;
+  handleLocationClick: () => void;
+  transportMode: string;
+  setMap?: (map: mapboxgl.Map) => void;
+  mapboxToken?: string;
+}
+
+const MapDisplay: React.FC<MapDisplayProps> = ({
+  viewport,
+  setViewport,
+  places,
+  resultsCount,
+  selectedPlaceId,
+  popupInfo,
+  setPopupInfo,
+  handleResultClick,
+  isLocationActive,
+  userLocation,
+  loading,
+  handleLocationClick,
   transportMode,
-  selectedCategory,
-  selectedSubcategories
-}: MapDisplayProps) => {
-  const mapRef = useRef<any>(null);
-  const [popupInfo, setPopupInfo] = useState<any | null>(null);
-  const [viewport, setViewport] = useState({
-    latitude: userLocation ? userLocation[1] : 48.8566,
-    longitude: userLocation ? userLocation[0] : 2.3522,
-    zoom: 12
-  });
+  setMap,
+  mapboxToken = MAPBOX_TOKEN
+}) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
+  const [userMarker, setUserMarker] = useState<mapboxgl.Marker | null>(null);
+  const [popups, setPopups] = useState<mapboxgl.Popup[]>([]);
+  const [mapReady, setMapReady] = useState(false);
 
-  // Filter places by selected subcategories if any are selected
-  const filteredPlaces = selectedSubcategories.length > 0
-    ? places.filter(place => {
-        // Check if the place has a subcategory that matches one of the selected ones
-        return selectedSubcategories.includes(place.subcategoryId);
-      })
-    : places;
-
-  // Update viewport when user location changes
   useEffect(() => {
-    if (userLocation) {
-      setViewport({
-        latitude: userLocation[1],
-        longitude: userLocation[0],
-        zoom: 13
-      });
+    if (!mapContainer.current) return;
+    
+    const token = mapboxToken || MAPBOX_TOKEN;
+    
+    if (!token) {
+      console.error('Mapbox token is missing');
+      toast.error('Le token Mapbox est manquant, la carte ne peut pas être chargée');
+      return;
     }
-  }, [userLocation]);
-
-  // Update viewport to fit all markers
-  useEffect(() => {
-    if (places.length > 0 && mapRef.current && !loading) {
-      const map = mapRef.current.getMap();
-      
-      const bounds = new window.mapboxgl.LngLatBounds();
-      
-      // Add user location to bounds if available
-      if (userLocation) {
-        bounds.extend([userLocation[0], userLocation[1]]);
-      }
-      
-      // Add all places to bounds
-      places.forEach(place => {
-        bounds.extend([place.longitude, place.latitude]);
+    
+    mapboxgl.accessToken = token;
+    
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [viewport.longitude, viewport.latitude],
+        zoom: viewport.zoom
       });
       
-      map.fitBounds(bounds, {
-        padding: 100,
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      
+      map.current.on('moveend', () => {
+        if (!map.current) return;
+        
+        const center = map.current.getCenter();
+        setViewport({
+          latitude: center.lat,
+          longitude: center.lng,
+          zoom: map.current.getZoom()
+        });
+      });
+      
+      map.current.on('load', () => {
+        setMapReady(true);
+        console.log('Map loaded successfully');
+      });
+      
+      if (setMap && map.current) {
+        setMap(map.current);
+      }
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      toast.error('Erreur lors de l\'initialisation de la carte');
+    }
+    
+    return () => {
+      markers.forEach(marker => marker.remove());
+      popups.forEach(popup => popup.remove());
+      if (userMarker) userMarker.remove();
+      
+      if (map.current) {
+        map.current.remove();
+      }
+    };
+  }, [mapboxToken]);
+
+  useEffect(() => {
+    if (!map.current) return;
+    
+    map.current.flyTo({
+      center: [viewport.longitude, viewport.latitude],
+      zoom: viewport.zoom,
+      essential: true
+    });
+  }, [viewport]);
+
+  useEffect(() => {
+    if (!map.current || !userLocation) return;
+    
+    if (userMarker) {
+      userMarker.remove();
+    }
+    
+    const userEl = document.createElement('div');
+    userEl.className = 'user-marker';
+    userEl.innerHTML = `
+      <div class="relative">
+        <div class="absolute w-8 h-8 bg-blue-500/30 rounded-full animate-ping"></div>
+        <div class="relative bg-blue-500 border-2 border-white w-4 h-4 rounded-full shadow-md"></div>
+      </div>
+    `;
+    
+    const marker = new mapboxgl.Marker(userEl)
+      .setLngLat([userLocation[0], userLocation[1]])
+      .addTo(map.current);
+    
+    setUserMarker(marker);
+  }, [userLocation, map.current]);
+
+  useEffect(() => {
+    if (!map.current) return;
+    
+    markers.forEach(marker => marker.remove());
+    popups.forEach(popup => popup.remove());
+    
+    const newMarkers: mapboxgl.Marker[] = [];
+    const newPopups: mapboxgl.Popup[] = [];
+    
+    places.forEach((place, index) => {
+      const el = document.createElement('div');
+      el.className = `place-marker ${selectedPlaceId === place.id ? 'selected' : ''}`;
+      el.innerHTML = `
+        <div class="bg-white rounded-full shadow-md border-2 border-blue-500 w-6 h-6 flex items-center justify-center text-xs font-bold">
+          ${index + 1}
+        </div>
+      `;
+      
+      const popup = new mapboxgl.Popup({
+        offset: 25,
+        closeButton: false,
+        closeOnClick: true
+      }).setHTML(`
+        <div class="p-2">
+          <h3 class="font-bold text-sm">${place.name}</h3>
+          ${place.address ? `<p class="text-xs text-gray-500">${place.address}</p>` : ''}
+          <button class="start-navigation-btn mt-2 text-xs bg-blue-500 text-white px-2 py-1 rounded" data-id="${place.id}">
+            Itinéraire
+          </button>
+        </div>
+      `);
+      
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([place.lon, place.lat])
+        .setPopup(popup)
+        .addTo(map.current!);
+      
+      el.addEventListener('click', () => {
+        handleResultClick(place);
+      });
+      
+      newMarkers.push(marker);
+      newPopups.push(popup);
+    });
+    
+    setMarkers(newMarkers);
+    setPopups(newPopups);
+    
+    if (newMarkers.length > 0 && userLocation) {
+      const bounds = new mapboxgl.LngLatBounds();
+      
+      bounds.extend(userLocation);
+      
+      places.forEach(place => {
+        bounds.extend([place.lon, place.lat]);
+      });
+      
+      map.current.fitBounds(bounds, {
+        padding: 50,
         maxZoom: 15
       });
     }
-  }, [places, userLocation, loading]);
-
-  // Show popup for selected place
-  useEffect(() => {
-    if (selectedPlaceId) {
-      const selectedPlace = places.find(place => place.id === selectedPlaceId);
-      if (selectedPlace) {
-        setPopupInfo(selectedPlace);
-        
-        setViewport({
-          latitude: selectedPlace.latitude,
-          longitude: selectedPlace.longitude,
-          zoom: 15
-        });
-      }
-    } else {
-      setPopupInfo(null);
-    }
-  }, [selectedPlaceId, places]);
-
-  // Create circle layer for radius visualization
-  const circleLayer = userLocation ? {
-    id: 'radius-circle',
-    type: 'fill',
-    paint: {
-      'fill-color': '#3b82f6',
-      'fill-opacity': 0.1,
-      'fill-outline-color': '#3b82f6'
-    }
-  } : null;
-
-  // Create circle source for radius visualization
-  const circleSource = userLocation ? {
-    type: 'geojson',
-    data: {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          createCirclePoints(
-            userLocation[0], 
-            userLocation[1], 
-            radiusType === 'distance' 
-              ? convertDistance(radius, distanceUnit, 'km') 
-              : 2 // Default radius for time-based search
-          )
-        ]
-      }
-    }
-  } : null;
-
-  // Create circle points for radius visualization
-  function createCirclePoints(centerLng: number, centerLat: number, radiusKm: number, points = 64) {
-    const coords = [];
-    const distanceX = radiusKm / (111.32 * Math.cos(centerLat * (Math.PI / 180)));
-    const distanceY = radiusKm / 110.574;
-
-    for (let i = 0; i < points; i++) {
-      const angle = (i / points) * (2 * Math.PI);
-      const x = centerLng + distanceX * Math.cos(angle);
-      const y = centerLat + distanceY * Math.sin(angle);
-      coords.push([x, y]);
-    }
-    
-    // Close the circle
-    coords.push(coords[0]);
-    
-    return coords;
-  }
+  }, [places, selectedPlaceId, map.current]);
 
   return (
-    <Map
-      ref={mapRef}
-      mapboxAccessToken={MAPBOX_TOKEN || (window as any).TEMPORARY_MAPBOX_TOKEN}
-      initialViewState={viewport}
-      style={{ width: '100%', height: '100%' }}
-      mapStyle="mapbox://styles/mapbox/streets-v12"
-    >
-      {/* Navigation controls */}
-      <NavigationControl position="top-right" />
+    <div className="relative w-full h-full">
+      <div ref={mapContainer} className="w-full h-full" />
       
-      {/* User location marker */}
-      {userLocation && (
-        <Marker 
-          longitude={userLocation[0]} 
-          latitude={userLocation[1]}
-          anchor="center"
-        >
-          <div className="w-6 h-6 bg-blue-500 border-2 border-white rounded-full flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/10 z-20">
+          <div className="bg-white p-3 rounded-full shadow-lg">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
           </div>
-        </Marker>
+        </div>
       )}
       
-      {/* Radius circle */}
-      {userLocation && circleSource && circleLayer && (
-        <Source id="radius-circle-source" {...circleSource}>
-          <Layer {...circleLayer as any} />
-        </Source>
-      )}
+      <div className="absolute bottom-0 right-0 bg-white/80 text-xs p-1 rounded-tl">
+        © <a href="https://www.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500">Mapbox</a>
+      </div>
       
-      {/* Place markers */}
-      {filteredPlaces.map(place => {
-        const isSelected = selectedPlaceId === place.id;
-        const color = getColorForResult(place.color || getColorForCategory(place.category || 'default'));
-        
-        return (
-          <Marker
-            key={place.id}
-            longitude={place.longitude}
-            latitude={place.latitude}
-            anchor="bottom"
-            onClick={e => {
-              e.originalEvent.stopPropagation();
-              onPlaceSelect(place.id);
-            }}
-          >
-            <div className={`
-              marker-container 
-              transition-all 
-              duration-300 
-              transform 
-              ${isSelected ? 'scale-125' : 'scale-100'}
-              cursor-pointer
-            `}>
-              <div 
-                className={`
-                  w-8 h-8 
-                  rounded-full 
-                  flex items-center justify-center
-                  shadow-md
-                  ${isSelected ? 'ring-2 ring-white' : ''}
-                `}
-                style={{ backgroundColor: color }}
-              >
-                {place.category && getCategoryIcon(place.category, 'w-4 h-4 text-white')}
-              </div>
-              <div 
-                className="w-2 h-2 
-                  bg-white 
-                  rotate-45 
-                  absolute 
-                  -bottom-1 
-                  left-1/2 
-                  transform 
-                  -translate-x-1/2"
-              ></div>
-            </div>
-          </Marker>
-        );
-      })}
-      
-      {/* Popup for selected place */}
-      {popupInfo && (
-        <Popup
-          anchor="bottom"
-          longitude={popupInfo.longitude}
-          latitude={popupInfo.latitude}
-          onClose={() => setPopupInfo(null)}
-          closeButton={false}
-          closeOnClick={false}
-          className="map-popup"
-        >
-          <div className="p-2 max-w-xs">
-            <h3 className="font-bold text-sm">{popupInfo.name}</h3>
-            {popupInfo.address && (
-              <p className="text-xs text-gray-600 mt-1">{popupInfo.address}</p>
-            )}
-            {popupInfo.distance && (
-              <p className="text-xs font-medium mt-1">
-                {popupInfo.distance.toFixed(1)} {distanceUnit}
-              </p>
-            )}
+      {!mapboxToken && !MAPBOX_TOKEN && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-20">
+          <div className="bg-white p-4 rounded-lg shadow-lg max-w-md">
+            <h3 className="text-lg font-semibold text-red-600">Token Mapbox manquant</h3>
+            <p className="mt-2 text-sm text-gray-700">
+              Veuillez configurer votre token Mapbox dans le fichier .env pour afficher la carte.
+            </p>
           </div>
-        </Popup>
+        </div>
       )}
-    </Map>
+    </div>
   );
 };
+
+export default MapDisplay;

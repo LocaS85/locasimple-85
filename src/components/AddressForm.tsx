@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { TransportMode } from '@/types/categoryTypes';
-import { transportModesWithColors } from '@/data/transportModesWithColors';
 
 interface AddressFormData {
   name: string;
@@ -38,7 +37,7 @@ export const AddressForm = ({ categoryId }: { categoryId: string }) => {
       latitude: 0, // Default value
       longitude: 0, // Default value
       category: categoryId,
-      isFavorite: false, // Default value
+      favorite: false, // Default value
     });
     
     toast({
@@ -47,10 +46,6 @@ export const AddressForm = ({ categoryId }: { categoryId: string }) => {
     });
     reset();
   };
-
-  // Filter transport modes to only show common ones
-  const commonTransportModes = transportModesWithColors
-    .filter(mode => ['car', 'train', 'bus', 'public', 'bike', 'walk', 'plane'].includes(mode.id));
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mb-6">
@@ -86,9 +81,13 @@ export const AddressForm = ({ categoryId }: { categoryId: string }) => {
             <SelectValue placeholder="Sélectionnez un mode de transport" />
           </SelectTrigger>
           <SelectContent>
-            {commonTransportModes.map(mode => (
-              <SelectItem key={mode.id} value={mode.id}>{mode.name}</SelectItem>
-            ))}
+            <SelectItem value="car">Voiture</SelectItem>
+            <SelectItem value="train">Train</SelectItem>
+            <SelectItem value="bus">Bus</SelectItem>
+            <SelectItem value="public">Transports en commun</SelectItem>
+            <SelectItem value="bike">Vélo</SelectItem>
+            <SelectItem value="walk">À pied</SelectItem>
+            <SelectItem value="plane">Avion</SelectItem>
           </SelectContent>
         </Select>
       </div>

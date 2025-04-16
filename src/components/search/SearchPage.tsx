@@ -1,55 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+
+import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { ChevronLeftCircle, ChevronRightCircle } from 'lucide-react';
+import GeoSearcher from './GeoSearcher';
+import FilterStack from './filters/FilterStack';
+import SmartMap from './map/SmartMap';
+import RouteComparator from './route/RouteComparator';
+import GeoErrorBoundary from './GeoErrorBoundary';
 import { useSearchState } from '@/hooks/useSearchState';
 import { MAPBOX_TOKEN } from '@/config/environment';
-import { DAILY_CATEGORIES } from '@/types/dailyCategories';
-import AddressSearch from '@/components/search/AddressSearch';
-import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-import mapboxSearchService from '@/services/mapboxSearchService';
-import { Result } from '@/components/ResultsList';
+import MapKeyWarning from './MapKeyWarning';
+import CategoryAccordion from './filters/CategoryAccordion';
+import TransportSelector from './filters/TransportSelector';
+import RadiusControl from './filters/RadiusControl';
+import TimeFilter from './filters/TimeFilter';
+import { Car, User, Menu, X } from 'lucide-react';
+import { DailyCategory } from '@/types/dailyCategories';
 
-interface SearchPageProps {
-  mapboxTokenSet?: boolean;
-  onSetMapboxToken?: (token: string) => boolean;
-  isExpanded?: boolean;
-  toggleExpandedView?: () => void;
-}
+// Define mock DAILY_CATEGORIES until we import from the correct source
+const DAILY_CATEGORIES: DailyCategory[] = [
+  { id: 'food', name: 'Restaurants', color: '#F59E0B', icon: '🍽️' },
+  { id: 'shopping', name: 'Shopping', color: '#3B82F6', icon: '🛍️' },
+  { id: 'entertainment', name: 'Loisirs', color: '#EC4899', icon: '🎭' },
+  { id: 'services', name: 'Services', color: '#10B981', icon: '🔧' }
+];
 
-const SearchPage: React.FC<SearchPageProps> = ({ 
-  mapboxTokenSet = false, 
-  onSetMapboxToken = () => false,
-  isExpanded = false,
-  toggleExpandedView = () => {}
-}) => {
+const SearchPage = () => {
   const {
     origin, 
     setOrigin,
-    searchQuery,
-    setSearchQuery,
-    selectedDistance,
-    distanceUnit,
-    transportMode,
-    setTransportMode,
-    resultsCount,
-    setResultsCount,
-    userLocation,
-    isLocationActive,
-    selectedCategory,
-    setSelectedCategory,
-    loading,
-    showRoutes,
+    destinations,
+    filters,
+    updateFilters,
+    searchResults,
+    viewMode,
+    setViewMode,
     resetMapState,
+    isLoading
   } = useSearchState();
-  
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | undefined>(undefined);
-  const [filterMode, setFilterMode] = useState<'distance' | 'duration'>('distance');
-  const [searchResults, setSearchResults] = useState<Result[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const isMobile = useIsMobile();
 
   const handleSearchResult = (result: any) => {
     setOrigin(result);
@@ -60,212 +49,150 @@ const SearchPage: React.FC<SearchPageProps> = ({
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setSelectedSubcategory(undefined);
-    
-    performSearch(categoryId);
-  };
-
-  const performSearch = async (categoryId?: string) => {
-    if (isSearching) return;
-    
-    setIsSearching(true);
-    
-    try {
-      if (!userLocation) {
-        toast.error('Veuillez activer la localisation pour effectuer une recherche');
-        return;
-      }
-      
-      const results = await mapboxSearchService.search({
-        query: searchQuery,
-        userLocation,
-        limit: resultsCount,
-        radius: selectedDistance * (distanceUnit === 'km' ? 1000 : 1609.34),
-        category: categoryId || selectedCategory,
-        transportMode
-      });
-      
-      setSearchResults(results);
-      
-      if (results.length === 0) {
-        toast.info('Aucun résultat trouvé');
-      } else {
-        toast.success(`${results.length} résultats trouvés`);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
-      toast.error('Erreur lors de la recherche');
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleSearchInputChange = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  useEffect(() => {
-    if ((!searchQuery || searchQuery.trim().length === 0) && !selectedCategory) return;
-    
-    const timer = setTimeout(() => {
-      performSearch();
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [selectedDistance, transportMode, resultsCount, distanceUnit]);
-
-  const handlePlaceSelect = (place: Result) => {
-    toast.info(`Sélection: ${place.name}`);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      <motion.div 
-        className="p-4 bg-white shadow-md z-10"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className={cn(
-          "transition-all duration-300",
-          (isMobile && isExpanded) ? "opacity-0 pointer-events-none" : "opacity-100"
-        )}>
-          <GeoSearcher
-            modes={['address', 'current_location', 'saved_places']}
-            onResult={handleSearchResult}
-            placeholder="Adresse, lieu ou coordonnées GPS..."
-            enableVoice={true}
-            onSearch={handleSearchInputChange}
-          />
-        </div>
-      </motion.div>
-      
-      <motion.div 
-        className="w-full bg-white border-b border-gray-200 shadow-sm z-10"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <CategoriesScroller 
-          selectedCategory={selectedCategory} 
-          onCategorySelect={handleCategorySelect} 
+      <div className="p-4 bg-white shadow-md z-10">
+        <GeoSearcher
+          modes={['address', 'current_location', 'saved_places']}
+          onResult={handleSearchResult}
+          placeholder="Adresse, lieu ou coordonnées GPS..."
+          enableVoice={true}
         />
-      </motion.div>
+      </div>
       
       <div className="flex flex-1 relative overflow-hidden">
-        <motion.button 
-          className="absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
+        {/* Mobile sidebar toggle button */}
+        <button 
+          className="md:hidden absolute top-4 left-4 z-20 bg-white p-2 rounded-full shadow-md"
           onClick={toggleSidebar}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
         >
-          {sidebarOpen ? <ChevronLeftCircle size={20} /> : <ChevronRightCircle size={20} />}
-        </motion.button>
+          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
 
-        <AnimatePresence>
-          {sidebarOpen && (
-            <motion.div
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", damping: 30, stiffness: 500 }}
-              className="z-10"
-            >
-              <FilterSidebar 
-                selectedCategory={selectedCategory}
-                onCategorySelect={handleCategorySelect}
-                selectedDistance={selectedDistance}
-                distanceUnit={distanceUnit}
-                transportMode={transportMode}
-                onTransportModeChange={setTransportMode}
-                resultsCount={resultsCount}
-                onResultsCountChange={setResultsCount}
-                filterMode={filterMode}
-                onFilterModeChange={setFilterMode}
-                onSearch={performSearch}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Main content area with map and filters */}
+        <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block
+          ${viewMode === 'list' ? 'w-full' : viewMode === 'split' ? 'w-full md:w-1/2' : 'w-full md:w-1/4'} 
+          h-full overflow-y-auto border-r border-gray-200 transition-all duration-300 bg-white z-10`}>
+          <FilterStack>
+            <CategoryAccordion 
+              categories={DAILY_CATEGORIES}
+              selectionMode="multi-level"
+              onCategorySelect={() => {}}
+            />
+            <RadiusControl
+              unitOptions={['km', 'mi']}
+              maxRadius={100}
+              step={5}
+            />
+            <TransportSelector
+              modes={[
+                { id: 'driving', icon: <Car size={20} />, label: 'Voiture' },
+                { id: 'walking', icon: <User size={20} />, label: 'Marche' }
+              ]}
+            />
+            <TimeFilter
+              type="time-slider"
+              ranges={['now', 'today', 'custom']}
+            />
+          </FilterStack>
+        </div>
 
-        <motion.div 
-          className={`flex-1 h-full relative transition-all duration-300`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-        >
-          {!mapboxTokenSet && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-20">
-              <motion.div 
-                className="bg-white p-6 rounded-lg shadow-lg max-w-md"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-lg font-semibold mb-2">Token Mapbox manquant</h3>
-                <p className="mb-4 text-gray-600">
-                  Pour afficher la carte, veuillez entrer votre token d'accès Mapbox.
-                </p>
-                
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="pk.eyJ1Ijoi..."
-                    className="w-full border rounded p-2"
-                    id="mapbox-token-input"
-                  />
-                  
-                  <button
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-                    onClick={() => {
-                      const input = document.getElementById('mapbox-token-input') as HTMLInputElement;
-                      if (input && input.value) {
-                        onSetMapboxToken(input.value);
-                      } else {
-                        toast.error('Veuillez entrer un token valide');
-                      }
-                    }}
+        {/* Map container */}
+        <div className={`${viewMode === 'map' && !sidebarOpen ? 'w-full' : 
+          viewMode === 'map' && sidebarOpen ? 'hidden md:block md:w-3/4' : 
+          viewMode === 'split' ? 'hidden md:block md:w-1/2' : 'hidden'} 
+          h-full relative transition-all duration-300`}>
+          
+          {!MAPBOX_TOKEN && <MapKeyWarning />}
+          
+          <GeoErrorBoundary
+            fallback={(error) => (
+              <div className="flex items-center justify-center h-full bg-gray-100">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
+                  <h3 className="text-lg font-semibold text-red-500">
+                    Problème de chargement cartographique
+                  </h3>
+                  <p className="my-2 text-gray-600">
+                    Code d'erreur: {error.code || 'Inconnu'}
+                  </p>
+                  <button 
+                    onClick={resetMapState}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
-                    Appliquer
+                    Réessayer
                   </button>
                 </div>
-              </motion.div>
-            </div>
-          )}
-          
-          <MapSection
-            userLocation={userLocation}
-            loading={loading || isSearching}
-            showRoutes={showRoutes}
-            transportMode={transportMode}
-            selectedCategory={selectedCategory}
-            radiusType={filterMode}
-            radius={selectedDistance || 5}
-            distanceUnit={distanceUnit}
-            places={searchResults}
-            onPlaceSelect={handlePlaceSelect}
-            showNoMapboxTokenWarning={!mapboxTokenSet}
-            onSetMapboxToken={onSetMapboxToken}
-            onSearch={performSearch}
-          />
-          
-          <motion.div 
-            className="absolute bottom-4 left-4 z-10 bg-white p-2 rounded-lg shadow-md"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
+              </div>
+            )}
           >
-            <ResultsCountSlider
-              value={resultsCount}
-              onChange={setResultsCount}
-              min={1}
-              max={10}
+            <SmartMap
+              layers={[
+                'base-map',
+                'poi-clusters',
+                'isochrones',
+                'multi-routes'
+              ]}
+              controls={[
+                '3d-toggle',
+                'layer-switcher',
+                'compass',
+                'geolocate'
+              ]}
+              origin={origin}
+              destinations={destinations}
+              filters={filters}
+              isLoading={isLoading}
             />
-          </motion.div>
-        </motion.div>
+          </GeoErrorBoundary>
+        </div>
+      </div>
+
+      {/* Bottom route comparator (conditionally shown) */}
+      {destinations.length > 0 && (
+        <div className="h-48 border-t border-gray-200 bg-white">
+          <RouteComparator
+            mode="split-view"
+            metrics={['distance', 'time', 'elevation', 'cost']}
+            displayModes={['2d-map', '3d-view', 'elevation-profile']}
+            origin={origin}
+            destinations={destinations}
+            transportMode={filters.transport}
+          />
+        </div>
+      )}
+
+      {/* View mode toggle buttons */}
+      <div className="absolute bottom-4 right-4 z-10 bg-white rounded-full shadow-lg flex">
+        <button 
+          className={`p-3 ${viewMode === 'map' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'} rounded-l-full`}
+          onClick={() => setViewMode('map')}
+          title="Vue carte"
+        >
+          <span className="sr-only">Vue carte</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+        </button>
+        <button 
+          className={`p-3 ${viewMode === 'split' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
+          onClick={() => setViewMode('split')}
+          title="Vue partagée"
+        >
+          <span className="sr-only">Vue partagée</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 6v12m6-12v12M3 6h18v12H3z" />
+          </svg>
+        </button>
+        <button 
+          className={`p-3 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'} rounded-r-full`}
+          onClick={() => setViewMode('list')}
+          title="Vue liste"
+        >
+          <span className="sr-only">Vue liste</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+        </button>
       </div>
     </div>
   );

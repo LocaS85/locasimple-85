@@ -1,196 +1,175 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import React, { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import HeroSection from "@/components/home/HeroSection";
+import FeaturesSection from "@/components/home/FeaturesSection";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { CATEGORIES } from "@/types/categories";
+import { getCategoryIcon } from "@/utils/categoryIcons";
+import { getCategoryColorClass } from "@/utils/categoryColors";
 
 const Index = () => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<any>(null);
-  const [currentRadius, setCurrentRadius] = useState<any>(null);
-  const [unit, setUnitState] = useState<'km' | 'mi'>('km');
-  const [radiusValue, setRadiusValue] = useState<number>(5);
-
-  // Initialize map
-  useEffect(() => {
-    if (!mapContainerRef.current || map) return;
-
-    // Check if we're in a browser environment with Leaflet available
-    if (typeof window !== 'undefined' && 'L' in window) {
-      const L = (window as any).L;
-      
-      const newMap = L.map(mapContainerRef.current, { 
-        zoomControl: false 
-      }).setView([48.8566, 2.3522], 13);
-      
-      L.control.zoom({ position: 'bottomright' }).addTo(newMap);
-      
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-      }).addTo(newMap);
-      
-      setMap(newMap);
-      
-      // Initial radius circle
-      updateRadiusCircle(radiusValue, newMap);
-    }
-    
-    return () => {
-      if (map) {
-        map.remove();
-      }
-    };
-  }, []);
-
-  // Update radius when changed
-  useEffect(() => {
-    if (map) {
-      updateRadiusCircle(radiusValue, map);
-    }
-  }, [radiusValue, unit, map]);
-
-  // Function to update radius circle on map
-  const updateRadiusCircle = (radius: number, mapInstance: any) => {
-    if (currentRadius) {
-      mapInstance.removeLayer(currentRadius);
-    }
-    
-    const radiusInMeters = unit === 'km' ? radius * 1000 : radius * 1609.34;
-    
-    const newRadius = (window as any).L.circle(mapInstance.getCenter(), {
-      radius: radiusInMeters,
-      color: '#2A5C82',
-      fillOpacity: 0.1
-    }).addTo(mapInstance);
-    
-    setCurrentRadius(newRadius);
-  };
-
-  const handleUnitChange = (selected: 'km' | 'mi') => {
-    setUnitState(selected);
-  };
-
-  const handleRadiusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRadiusValue(Number(e.target.value));
-  };
-
-  const showSubcategories = (value: string) => {
-    // This would be implemented to show subcategories based on the selected category
-    console.log("Selected category:", value);
+  const { t } = useLanguage();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategories((prevSelected) =>
+      prevSelected.includes(categoryId)
+        ? prevSelected.filter((id) => id !== categoryId)
+        : [...prevSelected, categoryId]
+    );
   };
 
   return (
-    <div className="grid grid-cols-[300px_1fr] h-screen">
-      <div className="filters-panel bg-white p-5 shadow-md overflow-y-auto z-[1001]">
-        <div className="search-bar flex gap-2.5 mb-5">
-          <input 
-            type="text" 
-            id="searchInput" 
-            placeholder="Rechercher..." 
-            className="flex-1 py-3 px-3 border border-gray-300 rounded-3xl"
-          />
-          <button 
-            className="voice-search bg-[#2A5C82] text-white border-none rounded-full w-[45px] h-[45px] cursor-pointer hover:bg-[#5BA4E6]"
-            title="Recherche vocale"
-          >
-            <i className="fas fa-microphone"></i>
-          </button>
-        </div>
+    <div className="w-full">
+      <HeroSection />
+      
+      <CategoriesSection 
+        selectedCategories={selectedCategories} 
+        onCategoryClick={handleCategoryClick} 
+      />
+      
+      <FeaturesSection />
+      
+      <DiscoverSection />
+    </div>
+  );
+};
 
-        <div className="filter-group my-5">
-          <h4>Catégorie</h4>
-          <select 
-            onChange={(e) => showSubcategories(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="">Choisir</option>
-            <option value="Adresse principale">Adresse principale</option>
-            <option value="Famille">Famille</option>
-            <option value="Travail">Travail</option>
-            <option value="École">École</option>
-            <option value="Alimentation et Boissons">Alimentation et Boissons</option>
-            <option value="Achats">Achats</option>
-            <option value="Services">Services</option>
-            <option value="Santé et Bien-être">Santé et Bien-être</option>
-            <option value="Divertissement et Loisirs">Divertissement et Loisirs</option>
-            <option value="Hébergement">Hébergement</option>
-          </select>
-        </div>
+const CategoriesSection = ({ 
+  selectedCategories, 
+  onCategoryClick 
+}: { 
+  selectedCategories: string[], 
+  onCategoryClick: (id: string) => void 
+}) => {
+  const { t } = useLanguage();
+  
+  // Filter main categories for the grid - matching the same as CategoryGrid.tsx
+  const mainCategories = [
+    'quotidien',
+    'alimentation',
+    'shopping',
+    'services',
+    'sante',
+    'divertissement',
+    'hebergement'
+  ];
+  
+  const displayCategories = CATEGORIES.filter(cat => 
+    mainCategories.includes(cat.id)
+  );
 
-        <div className="filter-group my-5">
-          <div id="subcategories" className="subcategories-scroll flex overflow-x-auto gap-[15px] py-2.5"></div>
-        </div>
-
-        <div className="filter-group my-5">
-          <h4>Nombre de résultats</h4>
-          <input 
-            type="range" 
-            min="1" 
-            max="10" 
-            defaultValue="5" 
-            id="resultRange"
-            className="w-full" 
-          />
-        </div>
-
-        <div className="filter-group my-5">
-          <h4>Rayon de recherche</h4>
-          <div className="distance-filter flex items-center gap-2.5">
-            <Button 
-              onClick={() => handleUnitChange('km')}
-              variant={unit === 'km' ? 'default' : 'outline'}
-              size="sm"
-            >
-              km
-            </Button>
-            <Button 
-              onClick={() => handleUnitChange('mi')}
-              variant={unit === 'mi' ? 'default' : 'outline'}
-              size="sm"
-            >
-              mi
-            </Button>
-            <input 
-              type="number" 
-              id="distanceInput" 
-              value={radiusValue} 
-              onChange={handleRadiusChange}
-              className="w-20 p-2 border border-gray-300 rounded" 
-            />
+  return (
+    <div className="bg-background py-16 px-4 categories-section">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <h2 className="text-3xl font-bold mb-4 text-center text-foreground font-heading">
+            {t('exploreCategories')}
+          </h2>
+          
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-10">
+            {t('categoriesDescription')}
+          </p>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            {displayCategories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 * index }}
+              >
+                <button
+                  onClick={() => onCategoryClick(category.id)}
+                  className={`w-full h-32 flex flex-col items-center justify-center p-4 rounded-xl transition-all shadow-sm hover:shadow-md
+                    ${selectedCategories.includes(category.id) 
+                      ? 'bg-primary/10 border-2 border-primary' 
+                      : 'bg-card hover:bg-accent border border-border'}`}
+                >
+                  <div className="mb-3">
+                    {getCategoryIcon(category.id, "w-10 h-10")}
+                  </div>
+                  <p className="text-sm font-medium text-foreground">
+                    {t(category.name) || category.name}
+                  </p>
+                </button>
+              </motion.div>
+            ))}
           </div>
-        </div>
-
-        <div className="filter-group my-5">
-          <h4>Mode de transport</h4>
-          <div className="transport-filter flex flex-wrap gap-2">
-            <button className="transport-btn" style={{ background: '#FF6B6B' }}>
-              <i className="fas fa-car"></i> Voiture
-            </button>
-            <button className="transport-btn" style={{ background: '#4ECDC4' }}>
-              <i className="fas fa-walking"></i> À pied
-            </button>
-            <button className="transport-btn" style={{ background: '#45B7D1' }}>
-              <i className="fas fa-bicycle"></i> Vélo
-            </button>
-            <button className="transport-btn" style={{ background: '#96CEB4' }}>
-              <i className="fas fa-bus"></i> Transports
-            </button>
-            <button className="transport-btn" style={{ background: '#FFEEAD' }}>
-              <i className="fas fa-train"></i> Train
-            </button>
-            <button className="transport-btn" style={{ background: '#D4A5A5' }}>
-              <i className="fas fa-ship"></i> Bateau
-            </button>
-            <button className="transport-btn" style={{ background: '#774F38' }}>
-              <i className="fas fa-users"></i> Co-voiturage
-            </button>
-            <button className="transport-btn" style={{ background: '#8E44AD' }}>
-              <i className="fas fa-plane"></i> Avion
-            </button>
-          </div>
-        </div>
+          
+          <motion.div 
+            className="mt-10 text-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.6 }}
+          >
+            <Link to="/categories">
+              <Button 
+                variant="outline" 
+                className="rounded-full group text-orange-400 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+              >
+                <span>{t('browseCategories')}</span>
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform text-orange-400" />
+              </Button>
+            </Link>
+          </motion.div>
+        </motion.div>
       </div>
+    </div>
+  );
+};
 
-      <div ref={mapContainerRef} id="map" className="h-screen"></div>
+const DiscoverSection = () => {
+  const { t } = useLanguage();
+  
+  return (
+    <div className="bg-gradient-to-b from-accent/30 to-background py-16 px-4">
+      <div className="max-w-5xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-card p-8 rounded-2xl shadow-lg"
+        >
+          <h2 className="text-3xl font-bold mb-6 text-primary font-heading">
+            {t('startExploring')}
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto">
+            {t('exploreDescription')}
+          </p>
+          
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link to="/categories">
+              <Button 
+                size="lg" 
+                className="bg-primary hover:bg-primary/90 rounded-full px-8 shadow-md hover:shadow-lg transition-all"
+              >
+                {t('search')}
+              </Button>
+            </Link>
+            
+            <Link to="/categories">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="rounded-full px-8 border-orange-300 text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+              >
+                {t('browseCategories')}
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };

@@ -39,7 +39,7 @@ export function AddressManager({
     latitude: 0,
     longitude: 0,
     category: categoryId,
-    isFavorite: false
+    favorite: false
   });
   
   const currentAddresses = addresses[categoryId] || [];
@@ -58,7 +58,7 @@ export function AddressManager({
         latitude: 0,
         longitude: 0,
         category: categoryId,
-        isFavorite: false
+        favorite: false
       });
       
       setNewAddress({
@@ -87,7 +87,7 @@ export function AddressManager({
         latitude: 0,
         longitude: 0,
         category: categoryId,
-        isFavorite: false
+        favorite: false
       });
       
       setEditingId(null);

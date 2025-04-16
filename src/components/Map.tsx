@@ -5,13 +5,12 @@ import MapContainer from './map/MapContainer';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { DistanceUnit } from '@/types/categoryTypes';
 
 interface MapProps {
   results: Result[];
   center: [number, number];
   radius?: number;
-  radiusUnit?: string;  // Changed to string to match MapContainer
+  radiusUnit?: 'km' | 'miles';
   radiusType?: 'distance' | 'duration';
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
@@ -54,7 +53,7 @@ const Map = ({
 }: MapProps) => {
   // Verify that we have a Mapbox token
   useEffect(() => {
-    if (!MAPBOX_TOKEN || MAPBOX_TOKEN.trim().length === 0) {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
       toast.error('Mapbox token manquant. Veuillez configurer votre token dans le fichier .env.');
       console.error('Mapbox token is missing or empty');
     } else {

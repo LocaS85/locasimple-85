@@ -1,20 +1,17 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MAPBOX_TOKEN } from '@/config/environment';
+import { isApiKeyValid, MAPBOX_TOKEN } from '@/config/environment';
+import { Category } from '@/types/categories';
+import { CATEGORIES } from '@/types/categories';
+import MapMarkers from './MapMarkers';
+import CategoryScroller from './CategoryScroller';
+import RouteLayer from './RouteLayer';
+import MapControls from './MapControls';
+import MultiRouteDisplay from './MultiRouteDisplay';
 
-interface Place {
-  id: string;
-  name: string;
-  lat: number;
-  lon: number;
-  address?: string;
-  category?: string;
-  distance?: number;
-  duration?: number;
-  color?: string;
-}
+// Don't set token globally here - we'll set it in the component
 
 interface MapDisplayProps {
   viewport: {
@@ -23,222 +20,169 @@ interface MapDisplayProps {
     zoom: number;
   };
   setViewport: (viewport: any) => void;
-  places: Place[];
-  selectedPlaceId: string | null;
-  resultsCount: number;
-  popupInfo: any;
+  places: any[];
+  resultsCount?: number;
+  selectedPlaceId?: string | null;
+  popupInfo?: any;
   setPopupInfo: (info: any) => void;
-  handleResultClick: (place: Place) => void;
+  handleResultClick?: (result: any) => void;
   isLocationActive?: boolean;
   userLocation?: [number, number];
   loading?: boolean;
   handleLocationClick?: () => void;
   transportMode?: string;
-  setMap?: (map: mapboxgl.Map) => void;
   showRoutes?: boolean;
+  setMap?: (map: mapboxgl.Map | null) => void;
+  customStyle?: string;
 }
 
 const MapDisplay: React.FC<MapDisplayProps> = ({
   viewport,
   setViewport,
-  places,
-  selectedPlaceId,
-  resultsCount,
+  places = [],
+  resultsCount = 0,
+  selectedPlaceId = null,
   popupInfo,
   setPopupInfo,
   handleResultClick,
   isLocationActive = false,
   userLocation,
   loading = false,
-  handleLocationClick,
+  handleLocationClick = () => {},
   transportMode = 'driving',
+  showRoutes = false,
   setMap,
-  showRoutes = false
+  customStyle
 }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<{ [key: string]: mapboxgl.Marker }>({});
-  const popupRef = useRef<mapboxgl.Popup | null>(null);
-
-  // Initialize map when component mounts
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    // Check if map is already initialized or container isn't ready
+    if (mapInitialized || !mapContainerRef.current) return;
     
-    if (!MAPBOX_TOKEN) {
-      console.error('Mapbox token is missing');
-      return;
-    }
-    
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    
-    const newMap = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [viewport.longitude, viewport.latitude],
-      zoom: viewport.zoom
-    });
-    
-    // Add navigation controls
-    newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    
-    // Set map ref
-    map.current = newMap;
-    
-    // Wait for map to load
-    newMap.on('load', () => {
-      if (setMap) setMap(newMap);
+    // Set token correctly
+    if (isApiKeyValid(MAPBOX_TOKEN)) {
+      // Set mapbox token - use the correct property
+      mapboxgl.accessToken = MAPBOX_TOKEN;
       
-      // Add user location marker if available
-      if (userLocation) {
-        new mapboxgl.Marker({ color: '#3b82f6' })
-          .setLngLat([userLocation[0], userLocation[1]])
-          .addTo(newMap);
-      }
-    });
-    
-    return () => {
-      newMap.remove();
-      map.current = null;
-    };
-  }, [mapContainer]);
-
-  // Update viewport when map moves
-  useEffect(() => {
-    if (!map.current) return;
-    
-    const moveEndHandler = () => {
-      if (!map.current) return;
-      const center = map.current.getCenter();
-      setViewport({
-        latitude: center.lat,
-        longitude: center.lng,
-        zoom: map.current.getZoom()
-      });
-    };
-    
-    map.current.on('moveend', moveEndHandler);
-    
-    return () => {
-      if (map.current) {
-        map.current.off('moveend', moveEndHandler);
-      }
-    };
-  }, [setViewport]);
-
-  // Update map center when viewport changes
-  useEffect(() => {
-    if (!map.current) return;
-    
-    map.current.flyTo({
-      center: [viewport.longitude, viewport.latitude],
-      zoom: viewport.zoom,
-      essential: true
-    });
-  }, [viewport.latitude, viewport.longitude, viewport.zoom]);
-
-  // Add markers for places
-  useEffect(() => {
-    if (!map.current) return;
-    
-    // Remove previous markers
-    Object.values(markersRef.current).forEach(marker => marker.remove());
-    markersRef.current = {};
-    
-    // Add new markers
-    places.forEach(place => {
-      // Create marker element
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.style.width = '28px';
-      el.style.height = '28px';
-      el.style.borderRadius = '50%';
-      el.style.cursor = 'pointer';
-      
-      // Set color based on selection or category
-      if (selectedPlaceId === place.id) {
-        el.style.backgroundColor = '#3b82f6';
-        el.style.border = '3px solid white';
-        el.style.boxShadow = '0 0 0 2px #3b82f6';
-      } else {
-        el.style.backgroundColor = place.color || '#ef4444';
-        el.style.border = '2px solid white';
-      }
-      
-      // Create popup
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div class="p-2">
-          <h3 class="font-bold">${place.name}</h3>
-          ${place.address ? `<p class="text-sm">${place.address}</p>` : ''}
-          ${place.category ? `<p class="text-xs text-gray-500">${place.category}</p>` : ''}
-          ${place.distance ? `<p class="text-xs">Distance: ${place.distance.toFixed(1)} km</p>` : ''}
-          ${place.duration ? `<p class="text-xs">Durée: ${place.duration.toFixed(0)} min</p>` : ''}
-        </div>
-      `);
-      
-      // Create marker
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([place.lon, place.lat])
-        .setPopup(popup)
-        .addTo(map.current!);
-      
-      // Add click event
-      el.addEventListener('click', () => {
-        handleResultClick(place);
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: customStyle || 'mapbox://styles/mapbox/streets-v11',
+        center: [viewport.longitude, viewport.latitude],
+        zoom: viewport.zoom
       });
       
-      // Store marker reference
-      markersRef.current[place.id] = marker;
-    });
-  }, [places, selectedPlaceId, handleResultClick]);
-
-  // Show popup for selected place
-  useEffect(() => {
-    if (!map.current || !selectedPlaceId) return;
-    
-    const marker = markersRef.current[selectedPlaceId];
-    if (marker) {
-      marker.togglePopup();
+      map.on('load', () => {
+        setMapInitialized(true);
+        if (setMap) setMap(map);
+      });
+      
+      map.on('move', () => {
+        const center = map.getCenter();
+        setViewport({
+          latitude: center.lat,
+          longitude: center.lng,
+          zoom: map.getZoom()
+        });
+      });
+      
+      mapRef.current = map;
+      
+      // Add navigation controls
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      
+      // Cleanup on unmount
+      return () => {
+        map.remove();
+        if (setMap) setMap(null);
+      };
+    } else {
+      console.error('Invalid Mapbox token. Map will not initialize.');
     }
-  }, [selectedPlaceId]);
-
+  }, [viewport.longitude, viewport.latitude, viewport.zoom, mapInitialized, customStyle, setMap]);
+  
+  // Update map when viewport changes
+  useEffect(() => {
+    if (mapRef.current && mapInitialized) {
+      mapRef.current.setCenter([viewport.longitude, viewport.latitude]);
+      mapRef.current.setZoom(viewport.zoom);
+    }
+  }, [viewport.longitude, viewport.latitude, viewport.zoom, mapInitialized]);
+  
+  // Update user location marker when it changes
+  useEffect(() => {
+    if (!mapRef.current || !mapInitialized || !isLocationActive || !userLocation) return;
+    
+    // Add or update user location marker logic here
+  }, [userLocation, isLocationActive, mapInitialized]);
+  
+  // Handle category selection
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+  };
+  
   return (
-    <div className="map-container relative w-full h-full">
-      <div ref={mapContainer} className="absolute inset-0" />
+    <div className="relative w-full h-full">
+      <div 
+        ref={mapContainerRef} 
+        className="absolute inset-0 map-container"
+        data-testid="map-container"
+      />
       
-      {/* Loading indicator */}
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <svg className="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p className="mt-2 text-center">Chargement...</p>
+      {!isApiKeyValid(MAPBOX_TOKEN) && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80 z-50">
+          <div className="bg-white p-4 rounded-md shadow-lg max-w-md text-center">
+            <p className="text-red-500 font-semibold">Mapbox token is missing or invalid</p>
+            <p className="mt-2 text-sm">Please add a valid Mapbox token in your environment variables.</p>
           </div>
         </div>
       )}
       
-      {/* User location button */}
-      <button
-        onClick={handleLocationClick}
-        className={`absolute bottom-4 right-4 p-3 rounded-full shadow-md ${
-          isLocationActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'
-        }`}
-        title="Ma position"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      </button>
-      
-      {/* Results count */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-80 p-2 text-center text-sm">
-        {places.length > 0 ? 
-          `${places.length} résultats trouvés` : 
-          loading ? 'Recherche en cours...' : 'Aucun résultat'
-        }
-      </div>
+      {isApiKeyValid(MAPBOX_TOKEN) && mapInitialized && (
+        <>
+          <CategoryScroller 
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+          />
+          
+          <MapMarkers
+            map={mapRef.current}
+            places={places}
+            center={userLocation || [viewport.longitude, viewport.latitude]}
+            selectedPlaceId={selectedPlaceId || null}
+            popupInfo={popupInfo}
+            setPopupInfo={setPopupInfo}
+            handleMarkerClick={handleResultClick}
+            userLocation={isLocationActive ? userLocation : undefined}
+            transportMode={transportMode}
+          />
+          
+          {showRoutes && userLocation && (
+            <RouteLayer
+              map={mapRef.current}
+              start={userLocation}
+              end={places.length > 0 ? [places[0].lon, places[0].lat] : userLocation}
+              color="#3b82f6" // Adding the missing color property
+              transportMode={transportMode}
+            />
+          )}
+          
+          <MapControls
+            mapStyle="streets"
+            onStyleChange={(style) => console.log(`Map style changed to: ${style}`)}
+            selectedCategory={selectedCategory}
+            onCategorySelect={handleCategorySelect}
+            map={mapRef.current}
+            isLocationActive={isLocationActive}
+            handleLocationClick={handleLocationClick}
+            loading={loading}
+            resultsCount={resultsCount}
+          />
+        </>
+      )}
     </div>
   );
 };

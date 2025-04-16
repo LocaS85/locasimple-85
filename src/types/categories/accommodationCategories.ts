@@ -3,23 +3,20 @@ import { Category } from '../categoryTypes';
 
 export const ACCOMMODATION_CATEGORIES: Category[] = [
   {
-    id: 'hotels',
-    name: 'Hôtels',
+    id: 'hebergement',
+    name: 'Hébergement',
     icon: '🏨',
+    subCategories: [
+      { id: 'hotels', name: 'Hôtels', parentId: 'hebergement' },
+      { id: 'auberges', name: 'Auberges', parentId: 'hebergement' },
+      { id: 'chambres-hotes', name: 'Chambres d\'hôtes', parentId: 'hebergement' },
+      { id: 'camping', name: 'Camping', parentId: 'hebergement' },
+      { id: 'locations-vacances', name: 'Locations de vacances', parentId: 'hebergement' },
+    ]
   },
   {
-    id: 'apartments',
-    name: 'Appartements',
-    icon: '🏢',
-  },
-  {
-    id: 'hostels',
-    name: 'Auberges',
-    icon: '🛏️',
-  },
-  {
-    id: 'camping',
-    name: 'Camping',
-    icon: '⛺',
-  },
+    id: 'divers',
+    name: 'Divers',
+    icon: '🔍',
+  }
 ];

@@ -1,97 +1,42 @@
 
 import React from 'react';
 import { 
-  Coffee, 
+  Home, 
   Utensils, 
   ShoppingBag, 
-  Building2, 
-  Landmark, 
-  Hotel, 
-  GraduationCap, 
-  Bus, 
-  Building, 
+  Briefcase, 
   Heart, 
-  Dumbbell,
-  MapPin,
-  Car,
-  Train,
-  Bike
+  Film, 
+  Hotel,
+  Users
 } from 'lucide-react';
 
-// Flexible icon props that can be a string or an object with className and color
-type IconProps = string | { className?: string; color?: string };
+interface IconOptions {
+  className?: string;
+  color?: string;
+}
 
-export const getCategoryIcon = (categoryId: string, props: IconProps = {}, color?: string) => {
-  // Handle both string and object params
-  let className = typeof props === 'string' ? props : props.className || '';
-  let iconColor = color || (typeof props !== 'string' ? props.color : undefined);
+export const getCategoryIcon = (categoryId: string, options: IconOptions | string = {}) => {
+  // Handle legacy format where options is just a className string
+  let className = typeof options === 'string' ? options : options.className || "h-6 w-6";
+  let color = typeof options === 'object' ? options.color : undefined;
   
-  const iconProps = {
-    className,
-    color: iconColor,
-    size: 16
-  };
-
-  switch(categoryId) {
-    case 'restaurant':
-    case 'restaurants':
-      return <Utensils {...iconProps} />;
-    case 'cafe':
-    case 'cafes':
-      return <Coffee {...iconProps} />;
+  switch (categoryId) {
+    case 'quotidien':
+      return <Users className={className} style={color ? { color } : undefined} />;
+    case 'alimentation':
+      return <Utensils className={className} style={color ? { color } : undefined} />;
     case 'shopping':
-      return <ShoppingBag {...iconProps} />;
-    case 'business':
-      return <Building2 {...iconProps} />;
-    case 'attraction':
-      return <Landmark {...iconProps} />;
-    case 'hotel':
-    case 'hotels':
-      return <Hotel {...iconProps} />;
-    case 'education':
-      return <GraduationCap {...iconProps} />;
-    case 'transport':
-      return <Bus {...iconProps} />;
-    case 'office':
-      return <Building {...iconProps} />;
-    case 'health':
-      return <Heart {...iconProps} />;
-    case 'sport':
-      return <Dumbbell {...iconProps} />;
-    case 'driving':
-    case 'car':
-      return <Car {...iconProps} />;
-    case 'walking':
-    case 'walk':
-      return <MapPin {...iconProps} />;
-    case 'cycling':
-    case 'bike':
-    case 'bicycle':
-      return <Bike {...iconProps} />;
-    case 'transit':
-    case 'train':
-      return <Train {...iconProps} />;
+      return <ShoppingBag className={className} style={color ? { color } : undefined} />;
+    case 'services':
+      return <Briefcase className={className} style={color ? { color } : undefined} />;
+    case 'sante':
+      return <Heart className={className} style={color ? { color } : undefined} />;
+    case 'divertissement':
+      return <Film className={className} style={color ? { color } : undefined} />;
+    case 'hebergement':
+      return <Hotel className={className} style={color ? { color } : undefined} />;
     default:
-      return <MapPin {...iconProps} />;
-  }
-};
-
-export const getTransportModeIcon = (transportMode: string, className: string = '') => {
-  switch(transportMode) {
-    case 'driving':
-    case 'car':
-      return <Car className={className} />;
-    case 'walking':
-    case 'walk':
-      return <MapPin className={className} />;
-    case 'cycling':
-    case 'bike':
-    case 'bicycle':
-      return <Bike className={className} />;
-    case 'transit':
-    case 'train':
-      return <Train className={className} />;
-    default:
-      return <Car className={className} />;
+      return <Home className={className} style={color ? { color } : undefined} />;
   }
 };

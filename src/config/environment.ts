@@ -4,7 +4,7 @@ export const isDevelopment = import.meta.env.DEV;
 export const isProduction = import.meta.env.PROD;
 
 // Mapbox configuration
-export const MAPBOX_TOKEN = 'pk.eyJ1IjoibG9jYXNpbXBsZSIsImEiOiJjbTlrMjI4dzAwaTNvMmpzZ3o4OHdjcGJxIn0.-BsgOhfBsfiCv1rD0SUKxA';
+export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
 // Supabase Configuration
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
@@ -22,9 +22,9 @@ export const isApiKeyValid = (key?: string): boolean => {
 
 // Vérification de la présence du token Mapbox
 if (!isApiKeyValid(MAPBOX_TOKEN)) {
-  console.warn('⚠️ MAPBOX_TOKEN non défini dans les variables d\'environnement. La carte ne fonctionnera pas correctement.');
+  console.warn('⚠️ VITE_MAPBOX_TOKEN non défini dans les variables d\'environnement. La carte ne fonctionnera pas correctement.');
   if (isDevelopment) {
-    console.info('Pour utiliser Mapbox en développement, créez un fichier .env à la racine du projet avec la variable MAPBOX_TOKEN=votre_token_mapbox');
+    console.info('Pour utiliser Mapbox en développement, créez un fichier .env à la racine du projet avec la variable VITE_MAPBOX_TOKEN=votre_token_mapbox');
   }
 }
 

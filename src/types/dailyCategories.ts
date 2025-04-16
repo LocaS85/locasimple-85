@@ -1,20 +1,4 @@
 
-import { Icon } from 'lucide-react';
-
-export type DailyCategoryType = string;
-
-export interface DailyCategory {
-  id: string;
-  name: string;
-  icon: any;
-  color: string;
-  isCustom?: boolean;
-  subCategories?: {
-    id: string;
-    name: string;
-  }[];
-}
-
 export interface DailyContactInfo {
   id: string;
   firstName: string;
@@ -24,79 +8,72 @@ export interface DailyContactInfo {
   latitude: number;
   longitude: number;
   relationType?: string;
+  relationLabel?: string; 
   category: DailyCategoryType;
-  isFavorite: boolean;
+  isFavorite?: boolean;
 }
 
-export const getRelationTypeLabel = (relationType: string): string => {
-  const relationTypes: Record<string, string> = {
-    'ami': 'Ami(e)',
-    'famille': 'Famille',
-    'collegue': 'Collègue',
-    'voisin': 'Voisin(e)',
-    'connaissance': 'Connaissance',
-    'partenaire': 'Partenaire',
-    'client': 'Client',
-    'fournisseur': 'Fournisseur',
-    'medecin': 'Médecin',
-    'ecole': 'École',
-    'mere': 'Mère',
-    'pere': 'Père',
-    'frere': 'Frère',
-    'soeur': 'Sœur',
-    'enfant': 'Enfant',
-  };
-  
-  return relationTypes[relationType] || relationType;
-};
+export type RelationType = 
+  | 'pere' 
+  | 'mere' 
+  | 'frere' 
+  | 'soeur' 
+  | 'cousin' 
+  | 'ami' 
+  | 'collegue' 
+  | 'autre';
+
+export type DailyCategoryType = 
+  | 'adresse-principale'
+  | 'famille'
+  | 'amis'
+  | 'travail'
+  | 'ecole'
+  | 'activites'
+  | string; // Allow custom category types
+
+export interface DailyCategory {
+  id: DailyCategoryType;
+  name: string;
+  icon: string;
+  color: string;
+  isCustom?: boolean;
+}
+
+export interface RelationTypeInfo {
+  id: RelationType;
+  name: string;
+  customLabel?: string;
+}
 
 export const DAILY_CATEGORIES: DailyCategory[] = [
-  {
-    id: 'famille',
-    name: 'Famille',
-    icon: 'Family',
-    color: '#4F46E5',
-    subCategories: [
-      { id: 'ecole', name: 'École' },
-      { id: 'creche', name: 'Crèche' },
-      { id: 'parc', name: 'Parc' },
-      { id: 'bibliotheque', name: 'Bibliothèque' }
-    ]
-  },
-  {
-    id: 'amis',
-    name: 'Amis',
-    icon: 'Users',
-    color: '#10B981',
-    subCategories: [
-      { id: 'restaurant', name: 'Restaurant' },
-      { id: 'bar', name: 'Bar' },
-      { id: 'cafe', name: 'Café' },
-      { id: 'loisir', name: 'Loisir' }
-    ]
-  },
-  {
-    id: 'travail',
-    name: 'Travail',
-    icon: 'Briefcase',
-    color: '#F59E0B',
-    subCategories: [
-      { id: 'bureau', name: 'Bureau' },
-      { id: 'coworking', name: 'Coworking' },
-      { id: 'salle_reunion', name: 'Salle de réunion' },
-      { id: 'restaurant_affaires', name: 'Restaurant d\'affaires' }
-    ]
-  },
-  {
-    id: 'sport',
-    name: 'Sport',
-    icon: 'Dumbbell',
-    color: '#EF4444',
-    subCategories: [
-      { id: 'salle_sport', name: 'Salle de sport' },
-      { id: 'piscine', name: 'Piscine' },
-      { id: 'terrain', name: 'Terrain' },
-      { id: 'parc_sportif', name: 'Parc sportif' }
-    ]
-  }
+  { id: 'adresse-principale', name: 'Adresse principale', icon: '🏠', color: '#8B5CF6' },
+  { id: 'famille', name: 'Famille', icon: '👨‍👩‍👧‍👦', color: '#D946EF' },
+  { id: 'amis', name: 'Amis', icon: '👫', color: '#3B82F6' },
+  { id: 'travail', name: 'Travail', icon: '🏢', color: '#F97316' },
+  { id: 'ecole', name: 'École', icon: '🏫', color: '#0EA5E9' },
+  { id: 'activites', name: 'Activités', icon: '🎭', color: '#10B981' }
 ];
+
+export const RELATION_TYPES: RelationTypeInfo[] = [
+  { id: 'pere', name: 'Père' },
+  { id: 'mere', name: 'Mère' },
+  { id: 'frere', name: 'Frère' },
+  { id: 'soeur', name: 'Sœur' },
+  { id: 'cousin', name: 'Cousin' },
+  { id: 'ami', name: 'Ami' },
+  { id: 'collegue', name: 'Collègue' },
+  { id: 'autre', name: 'Autre' }
+];
+
+export const getRelationTypeLabel = (
+  relationType: string | undefined, 
+  customLabel?: string
+): string => {
+  if (!relationType) return '';
+  
+  if (customLabel) return customLabel;
+  
+  const type = RELATION_TYPES.find(type => type.id === relationType);
+  return type ? type.name : relationType;
+};

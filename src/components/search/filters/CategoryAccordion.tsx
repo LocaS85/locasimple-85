@@ -1,105 +1,75 @@
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { DailyCategory } from '@/types/dailyCategories';
 
 interface CategoryAccordionProps {
   categories: DailyCategory[];
-  selectedCategory: string | null;
-  onSelectCategory?: (categoryId: string) => void;
-  onCategorySelect?: (categoryId: string) => void; // Alternative name for the same function
-  onSelectSubcategory?: (subcategoryId: string) => void;
-  selectedSubcategories?: string[];
-  selectedSubcategory?: string;
-  selectionMode?: 'single' | 'multiple' | 'hierarchical';
+  selectionMode?: 'single' | 'multi-level';
+  onCategorySelect?: (selectedCategories: string[]) => void;
 }
 
 const CategoryAccordion: React.FC<CategoryAccordionProps> = ({
   categories,
-  selectedCategory,
-  onSelectCategory,
-  onCategorySelect,
-  onSelectSubcategory,
-  selectedSubcategories = [],
-  selectedSubcategory,
-  selectionMode = 'single'
+  selectionMode = 'multi-level',
+  onCategorySelect
 }) => {
-  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
-
-  const handleCategorySelect = (categoryId: string) => {
-    if (onCategorySelect) {
-      onCategorySelect(categoryId);
-    } else if (onSelectCategory) {
-      onSelectCategory(categoryId);
-    }
-  };
+  const [isOpen, setIsOpen] = useState(true);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const toggleCategory = (categoryId: string) => {
-    if (expandedCategoryId === categoryId) {
-      setExpandedCategoryId(null);
+    let newSelected;
+    
+    if (selectedCategories.includes(categoryId)) {
+      newSelected = selectedCategories.filter(id => id !== categoryId);
     } else {
-      setExpandedCategoryId(categoryId);
-      handleCategorySelect(categoryId);
+      // If single selection mode, replace the selection
+      if (selectionMode === 'single') {
+        newSelected = [categoryId];
+      } else {
+        // If multi-level, add to the selection
+        newSelected = [...selectedCategories, categoryId];
+      }
+    }
+    
+    setSelectedCategories(newSelected);
+    if (onCategorySelect) {
+      onCategorySelect(newSelected);
     }
   };
 
   return (
-    <div className="space-y-2">
-      {categories.map((category) => (
-        <div key={category.id} className="border rounded-lg overflow-hidden">
-          <button
-            className={`w-full p-3 flex justify-between items-center text-left ${
-              selectedCategory === category.id ? 'bg-primary/10' : 'bg-white'
-            }`}
-            onClick={() => toggleCategory(category.id)}
-          >
-            <div className="flex items-center space-x-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: category.color }}
-              />
-              <span className="font-medium">{category.name}</span>
-            </div>
-            <motion.div
-              animate={{ rotate: expandedCategoryId === category.id ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronDown size={18} />
-            </motion.div>
-          </button>
-
-          <AnimatePresence>
-            {expandedCategoryId === category.id && category.subCategories && category.subCategories.length > 0 && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="p-2 bg-gray-50 border-t">
-                  <div className="grid grid-cols-2 gap-2">
-                    {category.subCategories.map((subcategory) => (
-                      <button
-                        key={subcategory.id}
-                        className={`px-3 py-2 rounded text-sm text-left ${
-                          (selectedSubcategories.includes(subcategory.id) || selectedSubcategory === subcategory.id)
-                            ? 'bg-primary/20 font-medium'
-                            : 'bg-white hover:bg-gray-100'
-                        }`}
-                        onClick={() => onSelectSubcategory?.(subcategory.id)}
-                      >
-                        {subcategory.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+    <div className="border border-gray-200 rounded-md overflow-hidden">
+      <button 
+        className="w-full flex justify-between items-center px-4 py-3 bg-gray-50 hover:bg-gray-100"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="font-medium">Catégories</span>
+        {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button>
+      
+      {isOpen && (
+        <div className="p-2 max-h-60 overflow-y-auto">
+          <div className="space-y-1">
+            {categories.map(category => (
+              <div key={category.id}>
+                <button
+                  className={`w-full flex items-center px-3 py-2 rounded-md hover:bg-gray-100 ${
+                    selectedCategories.includes(category.id) ? 'bg-blue-50 text-blue-700' : ''
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  <span 
+                    className="w-3 h-3 rounded-full mr-2" 
+                    style={{ backgroundColor: category.color }}
+                  ></span>
+                  <span>{category.name}</span>
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };

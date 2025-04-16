@@ -4,10 +4,6 @@ import type { Result } from '../ResultsList';
 import MapDisplay from '../map/MapDisplay';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import mapboxgl from 'mapbox-gl';
-import { DistanceUnit } from '@/types/categoryTypes';
-import { convertDistance } from '@/lib/utils';
-import CategoryScroller from './CategoryScroller';
-import SubcategoryScroller from './SubcategoryScroller';
 
 // Set the mapboxgl access token globally at the module level
 if (MAPBOX_TOKEN) {
@@ -18,7 +14,7 @@ interface MapContainerProps {
   results: Result[];
   center: [number, number];
   radius?: number;
-  radiusUnit?: string; // Updated to accept string to handle both 'km', 'mi' and 'miles'
+  radiusUnit?: 'km' | 'miles';
   radiusType?: 'distance' | 'duration';
   duration?: number;
   timeUnit?: 'minutes' | 'hours';
@@ -68,7 +64,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
   });
   const [popupInfo, setPopupInfo] = useState<any>(null);
   const [map, setMap] = useState<mapboxgl.Map | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   
   // Update viewport when center changes
   useEffect(() => {
@@ -78,11 +73,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
       longitude: center[0]
     }));
   }, [center]);
-
-  // Reset subcategory when category changes
-  useEffect(() => {
-    setSelectedSubcategory(null);
-  }, [selectedCategory]);
 
   // Handle marker click
   const handleMarkerClick = (place: any) => {
@@ -111,74 +101,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
     }
   }, [map, onMapInitialized]);
 
-  // Handle radius visualization
-  useEffect(() => {
-    if (!map || !map.loaded()) return;
-    
-    // Only add the radius circle if we have a center point
-    if (center) {
-      // Convert radius to kilometers for consistent calculations
-      // radiusUnit could be 'km', 'mi', or 'miles'
-      let radiusInKm = radius;
-      if (radiusUnit === 'mi' || radiusUnit === 'miles') {
-        radiusInKm = convertDistance(radius, radiusUnit, 'km');
-      }
-      
-      // Function to update or create the radius circle
-      const updateRadiusCircle = () => {
-        const geojson = {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [center[0], center[1]]
-          },
-          properties: {
-            radius: radiusInKm
-          }
-        };
-        
-        // Check if the source exists
-        if (map.getSource('radius-source')) {
-          // Update existing source
-          (map.getSource('radius-source') as mapboxgl.GeoJSONSource).setData(geojson as any);
-        } else {
-          // Create new source and layers
-          map.addSource('radius-source', {
-            type: 'geojson',
-            data: geojson as any
-          });
-          
-          // Add a transparent circle layer
-          map.addLayer({
-            id: 'radius-circle',
-            type: 'circle',
-            source: 'radius-source',
-            paint: {
-              'circle-radius': {
-                stops: [
-                  [0, 0],
-                  [20, radiusInKm * 1000 / 0.075] // Scale radius based on zoom level
-                ],
-                base: 2
-              },
-              'circle-color': '#3b82f6',
-              'circle-opacity': 0.15,
-              'circle-stroke-width': 2,
-              'circle-stroke-color': '#3b82f6',
-              'circle-stroke-opacity': 0.3
-            }
-          });
-        }
-      };
-      
-      if (map.loaded()) {
-        updateRadiusCircle();
-      } else {
-        map.on('load', updateRadiusCircle);
-      }
-    }
-  }, [map, center, radius, radiusUnit]);
-
   // Map Result type to the format expected by MapDisplay
   const placesForMapDisplay = results.map(result => ({
     id: result.id,
@@ -191,13 +113,6 @@ const MapContainer: React.FC<MapContainerProps> = ({
     duration: result.duration,
     color: result.color || ''
   }));
-
-  // Handle subcategory selection
-  const handleSubcategorySelect = (subcategoryId: string | null) => {
-    setSelectedSubcategory(subcategoryId);
-    // Here you could add filtering logic based on subcategory
-    console.log(`Selected subcategory: ${subcategoryId}`);
-  };
 
   return (
     <div className="relative w-full h-full">
@@ -216,23 +131,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
         handleLocationClick={onLocationClick || (() => {})}
         transportMode={transportMode || 'driving'}
         setMap={setMap}
-        showRoutes={showRoutes}
       />
-      
-      {/* Category Filter */}
-      <CategoryScroller 
-        selectedCategory={selectedCategory} 
-        onCategorySelect={onCategorySelect || (() => {})} 
-      />
-      
-      {/* Subcategory Filter - Only show when a category is selected */}
-      {selectedCategory && (
-        <SubcategoryScroller
-          selectedCategory={selectedCategory}
-          selectedSubcategory={selectedSubcategory}
-          onSubcategorySelect={handleSubcategorySelect}
-        />
-      )}
       
       {/* Map Results */}
       <div className="absolute bottom-0 left-0 right-0 bg-white bg-opacity-80 p-2 text-center text-sm">
