@@ -52,5 +52,6 @@ export const getMapboxToken = (): string => {
 };
 
 export const isMapboxTokenSet = (): boolean => {
-  return getMapboxToken().length > 0;
+  const token = getMapboxToken();
+  return token !== undefined && token !== null && token.length > 0;
 };

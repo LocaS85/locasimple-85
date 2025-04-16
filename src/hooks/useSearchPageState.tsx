@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLocationHandling } from './search/useLocationHandling';
@@ -139,7 +138,7 @@ export const useSearchPageState = () => {
 
   // Check MAPBOX_TOKEN at initialization
   useEffect(() => {
-    if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN.length === 0) {
       setShowNoMapboxTokenWarning(true);
       toast.error('Token Mapbox manquant ou invalide. Vérifiez votre fichier .env');
       console.error('MAPBOX_TOKEN is missing or invalid');

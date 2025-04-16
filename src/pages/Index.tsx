@@ -1,230 +1,198 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recherche Géolocalisée</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <link href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    :root {
-      --primary-color: #2A5C82;
-      --secondary-color: #5BA4E6;
-    }
 
-    body {
-      margin: 0;
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      height: 100vh;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+import React, { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { MAPBOX_TOKEN } from '@/config/environment';
 
-    .filters-panel {
-      background: white;
-      padding: 20px;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      overflow-y: auto;
-      z-index: 1001;
-    }
+const Index = () => {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<any>(null);
+  const [currentRadius, setCurrentRadius] = useState<any>(null);
+  const [unit, setUnitState] = useState<'km' | 'mi'>('km');
+  const [radiusValue, setRadiusValue] = useState<number>(5);
 
-    .search-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainerRef.current || map) return;
 
-    #searchInput {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 25px;
+    // Check if we're in a browser environment with Leaflet available
+    if (typeof window !== 'undefined' && 'L' in window) {
+      const L = (window as any).L;
+      
+      const newMap = L.map(mapContainerRef.current, { 
+        zoomControl: false 
+      }).setView([48.8566, 2.3522], 13);
+      
+      L.control.zoom({ position: 'bottomright' }).addTo(newMap);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(newMap);
+      
+      setMap(newMap);
+      
+      // Initial radius circle
+      updateRadiusCircle(radiusValue, newMap);
     }
-
-    .voice-search {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-      cursor: pointer;
-    }
-
-    .voice-search:hover {
-      background: var(--secondary-color);
-    }
-
-    .filter-group {
-      margin: 20px 0;
-    }
-
-    .transport-filter {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .transport-btn {
-      border: none;
-      padding: 8px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: white;
-      font-size: 14px;
-      transition: transform 0.2s ease;
-    }
-
-    .transport-btn:hover {
-      transform: scale(1.05);
-    }
-
-    .subcategories-scroll {
-      display: flex;
-      overflow-x: auto;
-      gap: 15px;
-      padding: 10px 0;
-    }
-
-    .subcategory-item {
-      flex: 0 0 auto;
-      padding: 8px 15px;
-      border-radius: 20px;
-      background: #f5f5f5;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .subcategory-item:hover {
-      background: var(--secondary-color);
-      color: white;
-    }
-
-    #map {
-      height: 100vh;
-      z-index: 0;
-    }
-
-    .distance-filter {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    button:focus {
-      outline: none;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        grid-template-columns: 1fr;
+    
+    return () => {
+      if (map) {
+        map.remove();
       }
+    };
+  }, []);
 
-      .filters-panel {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 60vh;
-        transform: translateY(100%);
-        transition: transform 0.3s;
-      }
-
-      .filters-active .filters-panel {
-        transform: translateY(0);
-      }
+  // Update radius when changed
+  useEffect(() => {
+    if (map) {
+      updateRadiusCircle(radiusValue, map);
     }
-  </style>
-</head>
-<body>
-  <div class="filters-panel">
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Rechercher..." />
-      <button class="voice-search" title="Recherche vocale"><i class="fas fa-microphone"></i></button>
-    </div>
+  }, [radiusValue, unit, map]);
 
-    <div class="filter-group">
-      <h4>Catégorie</h4>
-      <select onchange="showSubcategories(this.value)">
-        <option value="">Choisir</option>
-        <option value="Adresse principale">Adresse principale</option>
-        <option value="Famille">Famille</option>
-        <option value="Travail">Travail</option>
-        <option value="École">École</option>
-        <option value="Alimentation et Boissons">Alimentation et Boissons</option>
-        <option value="Achats">Achats</option>
-        <option value="Services">Services</option>
-        <option value="Santé et Bien-être">Santé et Bien-être</option>
-        <option value="Divertissement et Loisirs">Divertissement et Loisirs</option>
-        <option value="Hébergement">Hébergement</option>
-      </select>
-    </div>
+  // Function to update radius circle on map
+  const updateRadiusCircle = (radius: number, mapInstance: any) => {
+    if (currentRadius) {
+      mapInstance.removeLayer(currentRadius);
+    }
+    
+    const radiusInMeters = unit === 'km' ? radius * 1000 : radius * 1609.34;
+    
+    const newRadius = (window as any).L.circle(mapInstance.getCenter(), {
+      radius: radiusInMeters,
+      color: '#2A5C82',
+      fillOpacity: 0.1
+    }).addTo(mapInstance);
+    
+    setCurrentRadius(newRadius);
+  };
 
-    <div class="filter-group">
-      <div class="subcategories-scroll" id="subcategories"></div>
-    </div>
+  const handleUnitChange = (selected: 'km' | 'mi') => {
+    setUnitState(selected);
+  };
 
-    <div class="filter-group">
-      <h4>Nombre de résultats</h4>
-      <input type="range" min="1" max="10" value="5" id="resultRange" />
-    </div>
+  const handleRadiusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRadiusValue(Number(e.target.value));
+  };
 
-    <div class="filter-group">
-      <h4>Rayon de recherche</h4>
-      <div class="distance-filter">
-        <button onclick="setUnit('km')">km</button>
-        <button onclick="setUnit('mi')">mi</button>
-        <input type="number" id="distanceInput" value="5" onchange="updateRadius(this.value)" />
+  const showSubcategories = (value: string) => {
+    // This would be implemented to show subcategories based on the selected category
+    console.log("Selected category:", value);
+  };
+
+  return (
+    <div className="grid grid-cols-[300px_1fr] h-screen">
+      <div className="filters-panel bg-white p-5 shadow-md overflow-y-auto z-[1001]">
+        <div className="search-bar flex gap-2.5 mb-5">
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Rechercher..." 
+            className="flex-1 py-3 px-3 border border-gray-300 rounded-3xl"
+          />
+          <button 
+            className="voice-search bg-[#2A5C82] text-white border-none rounded-full w-[45px] h-[45px] cursor-pointer hover:bg-[#5BA4E6]"
+            title="Recherche vocale"
+          >
+            <i className="fas fa-microphone"></i>
+          </button>
+        </div>
+
+        <div className="filter-group my-5">
+          <h4>Catégorie</h4>
+          <select 
+            onChange={(e) => showSubcategories(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded"
+          >
+            <option value="">Choisir</option>
+            <option value="Adresse principale">Adresse principale</option>
+            <option value="Famille">Famille</option>
+            <option value="Travail">Travail</option>
+            <option value="École">École</option>
+            <option value="Alimentation et Boissons">Alimentation et Boissons</option>
+            <option value="Achats">Achats</option>
+            <option value="Services">Services</option>
+            <option value="Santé et Bien-être">Santé et Bien-être</option>
+            <option value="Divertissement et Loisirs">Divertissement et Loisirs</option>
+            <option value="Hébergement">Hébergement</option>
+          </select>
+        </div>
+
+        <div className="filter-group my-5">
+          <div id="subcategories" className="subcategories-scroll flex overflow-x-auto gap-[15px] py-2.5"></div>
+        </div>
+
+        <div className="filter-group my-5">
+          <h4>Nombre de résultats</h4>
+          <input 
+            type="range" 
+            min="1" 
+            max="10" 
+            defaultValue="5" 
+            id="resultRange"
+            className="w-full" 
+          />
+        </div>
+
+        <div className="filter-group my-5">
+          <h4>Rayon de recherche</h4>
+          <div className="distance-filter flex items-center gap-2.5">
+            <Button 
+              onClick={() => handleUnitChange('km')}
+              variant={unit === 'km' ? 'default' : 'outline'}
+              size="sm"
+            >
+              km
+            </Button>
+            <Button 
+              onClick={() => handleUnitChange('mi')}
+              variant={unit === 'mi' ? 'default' : 'outline'}
+              size="sm"
+            >
+              mi
+            </Button>
+            <input 
+              type="number" 
+              id="distanceInput" 
+              value={radiusValue} 
+              onChange={handleRadiusChange}
+              className="w-20 p-2 border border-gray-300 rounded" 
+            />
+          </div>
+        </div>
+
+        <div className="filter-group my-5">
+          <h4>Mode de transport</h4>
+          <div className="transport-filter flex flex-wrap gap-2">
+            <button className="transport-btn" style={{ background: '#FF6B6B' }}>
+              <i className="fas fa-car"></i> Voiture
+            </button>
+            <button className="transport-btn" style={{ background: '#4ECDC4' }}>
+              <i className="fas fa-walking"></i> À pied
+            </button>
+            <button className="transport-btn" style={{ background: '#45B7D1' }}>
+              <i className="fas fa-bicycle"></i> Vélo
+            </button>
+            <button className="transport-btn" style={{ background: '#96CEB4' }}>
+              <i className="fas fa-bus"></i> Transports
+            </button>
+            <button className="transport-btn" style={{ background: '#FFEEAD' }}>
+              <i className="fas fa-train"></i> Train
+            </button>
+            <button className="transport-btn" style={{ background: '#D4A5A5' }}>
+              <i className="fas fa-ship"></i> Bateau
+            </button>
+            <button className="transport-btn" style={{ background: '#774F38' }}>
+              <i className="fas fa-users"></i> Co-voiturage
+            </button>
+            <button className="transport-btn" style={{ background: '#8E44AD' }}>
+              <i className="fas fa-plane"></i> Avion
+            </button>
+          </div>
+        </div>
       </div>
+
+      <div ref={mapContainerRef} id="map" className="h-screen"></div>
     </div>
+  );
+};
 
-    <div class="filter-group">
-      <h4>Mode de transport</h4>
-      <div class="transport-filter">
-        <button class="transport-btn" style="background: #FF6B6B"><i class="fas fa-car"></i> Voiture</button>
-        <button class="transport-btn" style="background: #4ECDC4"><i class="fas fa-walking"></i> À pied</button>
-        <button class="transport-btn" style="background: #45B7D1"><i class="fas fa-bicycle"></i> Vélo</button>
-        <button class="transport-btn" style="background: #96CEB4"><i class="fas fa-bus"></i> Transports</button>
-        <button class="transport-btn" style="background: #FFEEAD"><i class="fas fa-train"></i> Train</button>
-        <button class="transport-btn" style="background: #D4A5A5"><i class="fas fa-ship"></i> Bateau</button>
-        <button class="transport-btn" style="background: #774F38"><i class="fas fa-users"></i> Co-voiturage</button>
-        <button class="transport-btn" style="background: #8E44AD"><i class="fas fa-plane"></i> Avion</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="map"></div>
-
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script>
-    const map = L.map('map', { zoomControl: false }).setView([48.8566, 2.3522], 13);
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    let currentRadius;
-    function updateRadius(radius) {
-      if (currentRadius) map.removeLayer(currentRadius);
-      currentRadius = L.circle(map.getCenter(), {
-        radius: radius * 1000,
-        color: '#2A5C82',
-        fillOpacity: 0.1
-      }).addTo(map);
-    }
-
-    let unit = 'km';
-    function setUnit(selected) {
-      unit = selected;
-    }
-  </script>
-</body>
-</html>
-
+export default Index;
