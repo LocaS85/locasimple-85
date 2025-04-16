@@ -4,7 +4,7 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 export const initializeMapbox = () => {
   const token = MAPBOX_TOKEN || (window as any).TEMPORARY_MAPBOX_TOKEN;
   
-  if (!token || token.length === 0) {
+  if (!token || token.trim().length === 0) {
     console.warn('Mapbox token not found. Maps will not work correctly.');
     return false;
   }
@@ -25,7 +25,7 @@ export const initializeMapbox = () => {
 };
 
 export const setMapboxToken = (token: string): boolean => {
-  if (!token || token.length === 0) return false;
+  if (!token || token.trim().length === 0) return false;
   
   try {
     // Store the token temporarily
@@ -53,5 +53,5 @@ export const getMapboxToken = (): string => {
 
 export const isMapboxTokenSet = (): boolean => {
   const token = getMapboxToken();
-  return token !== undefined && token !== null && token.length > 0;
+  return token !== undefined && token !== null && token.trim().length > 0;
 };

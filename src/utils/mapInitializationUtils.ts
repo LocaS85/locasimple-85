@@ -26,7 +26,7 @@ export const setMapboxToken = (): boolean => {
  * @returns boolean indicating if token is valid
  */
 export const verifyMapboxToken = (): boolean => {
-  if (!MAPBOX_TOKEN || MAPBOX_TOKEN === '') {
+  if (!MAPBOX_TOKEN || MAPBOX_TOKEN.trim().length === 0) {
     const errorMsg = 'Mapbox token is missing or empty';
     console.error(errorMsg);
     toast.error('Token Mapbox manquant. Vérifiez votre fichier .env');
