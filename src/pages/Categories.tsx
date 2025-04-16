@@ -1,180 +1,132 @@
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Check, ChevronRight, Home, Briefcase, Users, MapPin, GraduationCap, Book, BookOpen, School, Pencil, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import CategoryForm from '@/components/category/CategoryForm';
-import { toast } from 'sonner';
-import categoryService, { Category } from '@/services/categoryService';
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string; // Adding the missing icon property
+  color: string;
+}
 
 const Categories = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [activeTab, setActiveTab] = useState("list");
-  const [isAdding, setIsAdding] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const fetchedCategories = await categoryService.getAllCategories();
-      setCategories(fetchedCategories);
-    } catch (error: any) {
-      toast.error(`Error fetching categories: ${error.message}`);
-    }
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState<Category[]>([
+    { id: '1', name: 'Restaurants', icon: '🍽️', color: '#FF5733' },
+    { id: '2', name: 'Shopping', icon: '🛍️', color: '#33FF57' },
+    { id: '3', name: 'Divertissement', icon: '🎭', color: '#3357FF' },
+    { id: '4', name: 'Santé', icon: '💊', color: '#FF33A8' },
+    { id: '5', name: 'Services', icon: '🔧', color: '#33FFF3' },
+    { id: '6', name: 'Transport', icon: '🚗', color: '#F3FF33' },
+  ]);
+  
+  const [newCategory, setNewCategory] = useState<{ name: string; icon: string; color: string }>({
+    name: '',
+    icon: '📌',
+    color: '#FF5733'
+  });
+  
+  const addCategory = () => {
+    if (newCategory.name.trim() === '') return;
+    
+    const newCat: Category = {
+      id: Date.now().toString(),
+      name: newCategory.name,
+      icon: newCategory.icon,
+      color: newCategory.color
+    };
+    
+    setCategories([...categories, newCat]);
+    setNewCategory({ name: '', icon: '📌', color: '#FF5733' });
   };
-
-  const handleAddCategory = async (categoryData: Omit<Category, 'id' | 'type' | 'subcategories'>) => {
-    try {
-      // In a real app, this would call an API endpoint
-      // For now, we'll just refresh the categories list
-      toast.success("Category added successfully!");
-      setIsAdding(false);
-      fetchCategories();
-    } catch (error: any) {
-      toast.error(`Error adding category: ${error.message}`);
-    }
+  
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/categories/${categoryId}`);
   };
-
-  const handleUpdateCategory = async (id: string, categoryData: Omit<Category, 'id' | 'type' | 'subcategories'>) => {
-    try {
-      // In a real app, this would call an API endpoint
-      // For now, we'll just refresh the categories list
-      toast.success("Category updated successfully!");
-      setIsEditing(false);
-      setSelectedCategory(null);
-      fetchCategories();
-    } catch (error: any) {
-      toast.error(`Error updating category: ${error.message}`);
-    }
-  };
-
-  const handleDeleteCategory = async (id: string) => {
-    try {
-      // In a real app, this would call an API endpoint
-      // For now, we'll just refresh the categories list
-      toast.success("Category deleted successfully!");
-      fetchCategories();
-    } catch (error: any) {
-      toast.error(`Error deleting category: ${error.message}`);
-    }
-  };
-
-  // Function to get icon component based on icon name
-  const getIconComponent = (iconName: string) => {
-    switch (iconName) {
-      case 'Home': return <Home />;
-      case 'Briefcase': return <Briefcase />;
-      case 'Users': return <Users />;
-      case 'MapPin': return <MapPin />;
-      case 'GraduationCap': return <GraduationCap />;
-      case 'Book': return <Book />;
-      case 'BookOpen': return <BookOpen />;
-      case 'School': return <School />;
-      default: return <MapPin />;
-    }
-  };
-
+  
   return (
-    <motion.div
-      className="container mx-auto p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList>
-          <TabsTrigger value="list">Liste des Catégories</TabsTrigger>
-          <TabsTrigger value="add">Ajouter une Catégorie</TabsTrigger>
-        </TabsList>
-        <TabsContent value="list">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => (
-              <Card key={category.id} className="bg-white shadow-md rounded-lg overflow-hidden">
-                <div className="p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">{category.name}</h3>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          setIsEditing(true);
-                          setSelectedCategory(category);
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDeleteCategory(category.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="flex items-center mt-2">
-                    {getIconComponent(category.type)}
-                    <span className="ml-2 text-sm text-gray-500">Type: {category.type}</span>
-                  </div>
-                  <div className="mt-2">
-                    <span
-                      className="inline-block px-2 py-1 text-xs font-semibold rounded-full"
-                      style={{ backgroundColor: category.color || '#333', color: 'white' }}
-                    >
-                      Color: {category.color}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="add">
-          <CategoryForm
-            onSubmit={handleAddCategory}
-            onCancel={() => setIsAdding(false)}
-          />
-        </TabsContent>
-      </Tabs>
-
-      {/* Edit Category Dialog */}
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-8">Catégories</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {categories.map(category => (
+          <Card 
+            key={category.id} 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleCategoryClick(category.id)}
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">{category.icon}</span>
+                <span style={{ color: category.color }}>{category.name}</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">Cliquez pour voir les sous-catégories</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className="w-full md:w-auto">Ajouter une catégorie</Button>
+        </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Category</DialogTitle>
-            <DialogDescription>
-              Edit the details of the selected category.
-            </DialogDescription>
+            <DialogTitle>Nouvelle catégorie</DialogTitle>
           </DialogHeader>
-          {selectedCategory && (
-            <CategoryForm
-              initialData={selectedCategory}
-              onSubmit={(categoryData) => handleUpdateCategory(selectedCategory.id, categoryData)}
-              onCancel={() => {
-                setIsEditing(false);
-                setSelectedCategory(null);
-              }}
-            />
-          )}
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => {
-              setIsEditing(false);
-              setSelectedCategory(null);
-            }}>
-              Cancel
-            </Button>
-          </DialogFooter>
+          
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="name">Nom</Label>
+              <Input 
+                id="name" 
+                value={newCategory.name} 
+                onChange={e => setNewCategory({...newCategory, name: e.target.value})} 
+                placeholder="Nom de la catégorie"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="icon">Icône</Label>
+              <Input 
+                id="icon" 
+                value={newCategory.icon} 
+                onChange={e => setNewCategory({...newCategory, icon: e.target.value})} 
+                placeholder="Emoji ou icône"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="color">Couleur</Label>
+              <div className="flex gap-4">
+                <Input 
+                  id="color" 
+                  type="color" 
+                  value={newCategory.color} 
+                  onChange={e => setNewCategory({...newCategory, color: e.target.value})} 
+                  className="w-20 h-10"
+                />
+                <Input 
+                  value={newCategory.color} 
+                  onChange={e => setNewCategory({...newCategory, color: e.target.value})} 
+                  placeholder="#HEX"
+                />
+              </div>
+            </div>
+            
+            <Button onClick={addCategory} className="w-full">Ajouter</Button>
+          </div>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 };
 
