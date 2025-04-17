@@ -1,45 +1,31 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X } from 'lucide-react';
 import { MAPBOX_TOKEN } from '@/config/environment';
 import { toast } from 'sonner';
 
 interface AddressSearchProps {
-  onAddressSelect: (location: {
-    name: string;
-    longitude: number;
-    latitude: number;
-  }) => void;
-  placeholder?: string;
-  userLocation?: [number, number];
-}
-
-interface Suggestion {
-  id: string;
-  place_name: string;
-  center: [number, number];
+  onAddressSelect: (location: any) => void;
+  placeholder: string;
 }
 
 const AddressSearch: React.FC<AddressSearchProps> = ({
   onAddressSelect,
-  placeholder = "Rechercher une adresse...",
-  userLocation
+  placeholder
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
-  
-  // Close suggestions when clicking outside
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    // Add click outside listener to close results dropdown
     const handleClickOutside = (event: MouseEvent) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
-          inputRef.current && !inputRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
       }
     };
 
@@ -49,113 +35,112 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
     };
   }, []);
 
-  // Fetch suggestions from Mapbox API
   useEffect(() => {
-    if (!searchQuery.trim() || !MAPBOX_TOKEN || searchQuery.length < 3) return;
+    // Don't search on empty query
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
 
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        // Create the proximity parameter if user location is available
-        const proximityParam = userLocation
-          ? `&proximity=${userLocation[0]},${userLocation[1]}`
-          : '';
-
-        const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${MAPBOX_TOKEN}&limit=5${proximityParam}`
-        );
-
-        if (!response.ok) throw new Error('Failed to fetch suggestions');
-
-        const data = await response.json();
-        setSuggestions(data.features);
-        setShowSuggestions(true);
-      } catch (error) {
-        console.error('Error fetching address suggestions:', error);
-        toast.error("Impossible de récupérer les suggestions d'adresses");
-      } finally {
-        setLoading(false);
+    const searchAddress = async () => {
+      if (!MAPBOX_TOKEN) {
+        console.error("Mapbox token is missing");
+        toast.error("Configuration manquante pour la recherche d'adresse");
+        return;
       }
-    }, 300);
 
-    return () => clearTimeout(timer);
-  }, [searchQuery, userLocation]);
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&country=fr`
+        );
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        
+        const data = await response.json();
+        
+        if (data.features && data.features.length > 0) {
+          const mappedResults = data.features.map((feature: any) => ({
+            id: feature.id,
+            name: feature.place_name,
+            latitude: feature.center[1],
+            longitude: feature.center[0],
+            type: feature.place_type[0]
+          }));
+          setResults(mappedResults);
+          setShowResults(true);
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        console.error('Error searching address:', error);
+        toast.error("Erreur lors de la recherche d'adresse");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    const debounceTimeout = setTimeout(() => {
+      searchAddress();
+    }, 500);
+
+    return () => clearTimeout(debounceTimeout);
+  }, [query]);
+
+  const handleSelectLocation = (location: any) => {
+    setQuery(location.name);
+    setShowResults(false);
+    onAddressSelect(location);
   };
 
-  const handleSuggestionClick = (suggestion: Suggestion) => {
-    setSearchQuery(suggestion.place_name);
-    setShowSuggestions(false);
-    onAddressSelect({
-      name: suggestion.place_name,
-      longitude: suggestion.center[0],
-      latitude: suggestion.center[1]
-    });
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setSuggestions([]);
-    if (inputRef.current) inputRef.current.focus();
+  const handleClearInput = () => {
+    setQuery('');
+    setResults([]);
   };
 
   return (
-    <div className="relative w-full">
+    <div ref={searchRef} className="relative w-full">
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Search className="h-4 w-4 text-gray-500" />
-        </div>
         <Input
-          ref={inputRef}
           type="text"
-          value={searchQuery}
-          onChange={handleInputChange}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="pl-10 pr-10"
-          onFocus={() => {
-            if (suggestions.length > 0) {
-              setShowSuggestions(true);
-            }
-          }}
+          className="pr-20 pl-10 py-2 w-full"
         />
-        {searchQuery && (
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleClearSearch}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        
+        {query && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
+            onClick={handleClearInput}
+          >
+            <X size={16} />
+          </Button>
         )}
       </div>
 
-      {/* Suggestions dropdown */}
-      {showSuggestions && suggestions.length > 0 && (
-        <div
-          ref={suggestionsRef}
-          className="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md overflow-auto border border-gray-200"
-        >
-          {suggestions.map((suggestion) => (
-            <div
-              key={suggestion.id}
-              onClick={() => handleSuggestionClick(suggestion)}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-start"
-            >
-              <MapPin className="h-5 w-5 mr-2 text-gray-500 mt-1 flex-shrink-0" />
-              <div>
-                <div className="text-sm font-medium">{suggestion.place_name.split(',')[0]}</div>
-                <div className="text-xs text-gray-500">
-                  {suggestion.place_name.substring(suggestion.place_name.indexOf(',') + 1).trim()}
-                </div>
-              </div>
-            </div>
-          ))}
+      {showResults && results.length > 0 && (
+        <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg overflow-hidden border border-gray-200">
+          <ul className="max-h-60 overflow-y-auto">
+            {results.map((result) => (
+              <li
+                key={result.id}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelectLocation(result)}
+              >
+                <div className="text-sm">{result.name}</div>
+                <div className="text-xs text-gray-500">{result.type}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
+          <div className="animate-spin h-4 w-4 border-2 border-blue-500 rounded-full border-t-transparent"></div>
         </div>
       )}
     </div>

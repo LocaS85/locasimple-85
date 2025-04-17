@@ -1,143 +1,187 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, MapPin } from 'lucide-react';
-import { mockCategories } from '@/data/mockCategories';
-import { cn } from '@/lib/utils';
 
-interface CategoriesScrollerProps {
-  selectedCategory: string | null;
-  onCategorySelect: (categoryId: string | null) => void;
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color?: string;
 }
 
-export const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({ 
-  selectedCategory, 
-  onCategorySelect 
+interface CategoriesScrollerProps {
+  categories: Category[];
+  onCategorySelect: (category: string | null) => void;
+  selectedCategory: string | null;
+}
+
+const CategoriesScroller: React.FC<CategoriesScrollerProps> = ({
+  categories,
+  onCategorySelect,
+  selectedCategory
 }) => {
-  const categoriesRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!categoriesRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - categoriesRef.current.offsetLeft);
-    setScrollLeft(categoriesRef.current.scrollLeft);
+  const checkScroll = () => {
+    if (!scrollContainerRef.current) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 10);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!categoriesRef.current) return;
-    setIsDragging(true);
-    setStartX(e.touches[0].pageX - categoriesRef.current.offsetLeft);
-    setScrollLeft(categoriesRef.current.scrollLeft);
-  };
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', checkScroll);
+      // Check initial scroll state
+      checkScroll();
+      
+      return () => scrollContainer.removeEventListener('scroll', checkScroll);
+    }
+  }, []);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !categoriesRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - categoriesRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !categoriesRef.current) return;
-    const x = e.touches[0].pageX - categoriesRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    categoriesRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  const handleCategoryClick = (categoryId: string) => {
-    onCategorySelect(categoryId === selectedCategory ? null : categoryId);
-  };
-
-  // Define category colors
-  const getCategoryColor = (categoryId: string) => {
-    switch(categoryId) {
-      case 'restaurants': return 'bg-red-500 hover:bg-red-500 text-white border-red-500';
-      case 'bars': return 'bg-orange-500 hover:bg-orange-500 text-white border-orange-500';
-      case 'cafes': return 'bg-amber-500 hover:bg-amber-500 text-white border-amber-500';
-      case 'shopping': return 'bg-yellow-500 hover:bg-yellow-500 text-white border-yellow-500';
-      case 'hotels': return 'bg-lime-500 hover:bg-lime-500 text-white border-lime-500';
-      case 'entertainment': return 'bg-green-500 hover:bg-green-500 text-white border-green-500';
-      case 'health': return 'bg-teal-500 hover:bg-teal-500 text-white border-teal-500';
-      case 'services': return 'bg-cyan-500 hover:bg-cyan-500 text-white border-cyan-500';
-      case 'education': return 'bg-blue-500 hover:bg-blue-500 text-white border-blue-500';
-      case 'transport': return 'bg-indigo-500 hover:bg-indigo-500 text-white border-indigo-500';
-      default: return 'bg-black hover:bg-black text-white border-black';
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
     }
   };
-  
-  const getHoverColor = (categoryId: string) => {
-    switch(categoryId) {
-      case 'restaurants': return 'hover:bg-red-200 hover:text-red-700 hover:border-red-500';
-      case 'bars': return 'hover:bg-orange-200 hover:text-orange-700 hover:border-orange-500';
-      case 'cafes': return 'hover:bg-amber-200 hover:text-amber-700 hover:border-amber-500';
-      case 'shopping': return 'hover:bg-yellow-200 hover:text-yellow-700 hover:border-yellow-500';
-      case 'hotels': return 'hover:bg-lime-200 hover:text-lime-700 hover:border-lime-500';
-      case 'entertainment': return 'hover:bg-green-200 hover:text-green-700 hover:border-green-500';
-      case 'health': return 'hover:bg-teal-200 hover:text-teal-700 hover:border-teal-500';
-      case 'services': return 'hover:bg-cyan-200 hover:text-cyan-700 hover:border-cyan-500';
-      case 'education': return 'hover:bg-blue-200 hover:text-blue-700 hover:border-blue-500';
-      case 'transport': return 'hover:bg-indigo-200 hover:text-indigo-700 hover:border-indigo-500';
-      default: return 'hover:bg-gray-200 hover:text-gray-700 hover:border-gray-500';
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
     }
+  };
+
+  // Handle subcategory display based on selected category
+  const [showSubcategories, setShowSubcategories] = useState(false);
+  const [currentSubcategories, setCurrentSubcategories] = useState<string[]>([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+
+  const subcategories: Record<string, string[]> = {
+    'restaurants': ['Français', 'Italien', 'Asiatique', 'Vegan', 'Fast Food'],
+    'bars': ['Cocktail', 'Rooftop', 'Bière artisanale', 'Karaoké'],
+    'culture': ['Cinéma', 'Théâtre', 'Musée', 'Galerie', 'Concert'],
+    'nature': ['Parc', 'Plage', 'Lac', 'Montagne'],
+    'hebergement': ['Hôtel', 'Auberge', 'Appartement', 'Camping']
+  };
+
+  useEffect(() => {
+    if (selectedCategory && subcategories[selectedCategory]) {
+      setCurrentSubcategories(subcategories[selectedCategory]);
+      setShowSubcategories(true);
+    } else {
+      setShowSubcategories(false);
+      setSelectedSubcategory(null);
+    }
+  }, [selectedCategory]);
+
+  const handleSubcategoryClick = (subcategory: string) => {
+    setSelectedSubcategory(subcategory === selectedSubcategory ? null : subcategory);
+    console.log("Recherche en cours pour :", subcategory);
   };
 
   return (
-    <div className="px-2 py-1">
-      <div className="mb-1.5 flex justify-center">
-        <div className="rounded-full border border-black px-4 py-0.5 bg-white text-sm">
-          Catégorie
-        </div>
-      </div>
-      
-      <div className="flex justify-center items-center">
-        <ArrowLeft className="h-4 w-4 mr-1.5 text-gray-400" />
+    <div className="relative mb-4">
+      {/* Main categories */}
+      <div className="relative">
+        {showLeftArrow && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md"
+            onClick={scrollLeft}
+          >
+            <ChevronLeft size={20} />
+          </Button>
+        )}
         
-        <div 
-          ref={categoriesRef}
-          className="flex gap-1.5 overflow-x-auto no-scrollbar py-1 px-1 max-w-full"
-          style={{ 
-            cursor: isDragging ? 'grabbing' : 'grab',
-            userSelect: 'none'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleDragEnd}
+        <div
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto py-2 px-2 hide-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {mockCategories.map((category) => {
-            const isSelected = category.id === selectedCategory;
-            
-            return (
-              <Button 
-                key={category.id} 
-                className={cn(
-                  "rounded-full border whitespace-nowrap px-2 py-0.5 h-7 flex-shrink-0 text-xs transition-colors",
-                  isSelected 
-                    ? getCategoryColor(category.id)
-                    : `bg-white text-black border-black ${getHoverColor(category.id)}`
-                )}
-                onClick={() => handleCategoryClick(category.id)}
-              >
-                <MapPin className="h-3 w-3 mr-1" />
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className={`flex-shrink-0 mx-1 px-4 py-2 rounded-full cursor-pointer transition-all duration-200
+                ${selectedCategory === category.id
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'bg-white hover:bg-gray-100 border border-gray-300'}`}
+              onClick={() => onCategorySelect(selectedCategory === category.id ? null : category.id)}
+            >
+              <div className="flex items-center space-x-2">
+                <span>{category.icon}</span>
                 <span>{category.name}</span>
-              </Button>
-            );
-          })}
+              </div>
+            </div>
+          ))}
         </div>
         
-        <ArrowRight className="h-4 w-4 ml-1.5 text-gray-400" />
+        {showRightArrow && (
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full shadow-md"
+            onClick={scrollRight}
+          >
+            <ChevronRight size={20} />
+          </Button>
+        )}
       </div>
+
+      {/* Subcategories */}
+      {showSubcategories && (
+        <div className="mt-2 overflow-x-auto flex hide-scrollbar p-2" id="subcategories">
+          {currentSubcategories.map((subcategory, index) => (
+            <div
+              key={index}
+              className={`subcategory-item mr-2 ${selectedSubcategory === subcategory ? 'active' : ''}`}
+              onClick={() => handleSubcategoryClick(subcategory)}
+            >
+              {subcategory}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add CSS for subcategories */}
+      <style jsx>{`
+        .subcategory-item {
+          flex: 0 0 auto;
+          padding: 8px 15px;
+          border-radius: 20px;
+          background: #f5f5f5;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 0.2s ease-in-out;
+          border: 1px solid transparent;
+        }
+
+        .subcategory-item:hover {
+          background: var(--secondary-color, #6b7280);
+          color: white;
+        }
+
+        .subcategory-item.active {
+          background: var(--primary-color, #3b82f6);
+          color: white;
+          border-color: var(--secondary-color, #6b7280);
+          box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
+
+export default CategoriesScroller;

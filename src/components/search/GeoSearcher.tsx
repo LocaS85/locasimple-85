@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { Search, Mic, MapPin, Home, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import AddressSearch from './AddressSearch';
 
 interface GeoSearcherProps {
   modes: string[];
@@ -87,17 +88,27 @@ const GeoSearcher: React.FC<GeoSearcherProps> = ({
     );
   };
 
+  const handleAddressSelect = (location: any) => {
+    onResult({
+      name: location.name,
+      coordinates: [location.longitude, location.latitude],
+      type: 'address'
+    });
+    setSearchValue(location.name);
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
   return (
     <div className="relative flex flex-col sm:flex-row items-center w-full gap-2">
       <div className="relative flex-1 w-full">
-        <Input
-          type="text"
+        <AddressSearch
+          onAddressSelect={handleAddressSelect}
           placeholder={placeholder}
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="pr-10 pl-4 py-2 rounded-md border border-gray-300 w-full shadow-sm"
         />
+        
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
           {enableVoice && (
             <Button 

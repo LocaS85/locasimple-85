@@ -1,86 +1,109 @@
 
-/* Ensure MapboxGeocoder looks good */
-.mapboxgl-ctrl-geocoder {
-  min-width: 100%;
-  width: 100%;
-  max-width: none;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Mapbox Styles */
+.mapboxgl-map {
+  font: inherit;
+  overflow: hidden;
+  position: relative;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-.mapboxgl-ctrl-geocoder--input {
-  height: 40px;
-  padding-left: 32px;
-}
-
-.mapboxgl-ctrl-geocoder--icon-search {
-  top: 10px;
-  left: 10px;
-}
-
-.mapboxgl-ctrl-geocoder--button {
-  width: 24px;
-  height: 24px;
-  top: 8px;
-  right: 8px;
-}
-
-/* Mapbox popup customization */
-.mapboxgl-popup-content {
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 3;
-  border: 1px solid rgba(0,0,0,0.05);
-}
-
-.mapboxgl-popup-close-button {
-  font-size: 16px;
-  color: #6b7280;
-  padding: 6px;
-  border-radius: 50%;
-  right: 8px;
-  top: 8px;
-}
-
-.mapboxgl-popup-close-button:hover {
-  background-color: rgba(0,0,0,0.05);
-}
-
-/* Hide the actual Mapbox zoom controls (since we're using our own) */
-.mapboxgl-ctrl-top-right {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Make sure map canvas is visible */
 .mapboxgl-canvas {
-  outline: none;
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
-/* Ensure controls don't overlap */
-.mapboxgl-ctrl-bottom-right {
-  bottom: 100px !important;
+.mapboxgl-ctrl-attrib-inner a {
+  color: rgba(0, 0, 0, 0.75);
+  text-decoration: none;
 }
 
-/* Custom controls styling to match Mapbox controls */
-.map-custom-controls {
-  margin: 0 !important;
-  width: 30px;
+.mapboxgl-ctrl-attrib-inner a:hover {
+  color: inherit;
+  text-decoration: underline;
 }
 
-/* Match the Mapbox control button style */
-.map-ctrl-btn {
-  width: 30px !important;
-  height: 30px !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  border: none !important;
-  background-color: white !important;
-  border-radius: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0 !important;
+/* Custom styles for subcategories horizontal scroller */
+.subcategory-scroller {
+  display: flex;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.subcategory-scroller::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+.subcategory-item {
+  flex: 0 0 auto;
+  padding: 8px 15px;
+  border-radius: 20px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+  margin-right: 8px;
+}
+
+.subcategory-item:hover {
+  background: var(--secondary-color, #6b7280);
+  color: white;
+}
+
+.subcategory-item.active {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border-color: var(--secondary-color, #6b7280);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Flask server status indicator */
+.flask-server-status {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 20px;
+  padding: 6px 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  z-index: 1000;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-connected {
+  background-color: #10b981;
+}
+
+.status-disconnected {
+  background-color: #ef4444;
+}
+
+/* Waiting for Flask server spinner */
+.waiting-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
