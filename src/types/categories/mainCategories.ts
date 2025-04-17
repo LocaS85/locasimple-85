@@ -1,35 +1,56 @@
 
 import { Category } from '../categoryTypes';
+import { createEmojiIcon } from '@/utils/iconHelpers';
 
+// Catégories principales
 export const MAIN_CATEGORIES: Category[] = [
   {
-    id: 'quotidien',
+    id: 'daily',
     name: 'Quotidien',
-    icon: '👨‍👩‍👧‍👦',
+    icon: createEmojiIcon('🏠'),
+    color: '#4CAF50',
+    subcategories: []
   },
   {
-    id: 'adresse-principale',
-    name: 'Adresse principale',
-    icon: '🏠',
+    id: 'food',
+    name: 'Alimentation',
+    icon: createEmojiIcon('🍽️'),
+    color: '#FF9800',
+    subcategories: []
   },
   {
-    id: 'famille',
-    name: 'Famille',
-    icon: '👨‍👩‍👧‍👦',
+    id: 'shopping',
+    name: 'Achats',
+    icon: createEmojiIcon('🛍️'),
+    color: '#2196F3',
+    subcategories: []
   },
   {
-    id: 'amis',
-    name: 'Amis',
-    icon: '🫂',
+    id: 'services',
+    name: 'Services',
+    icon: createEmojiIcon('🔧'),
+    color: '#9C27B0',
+    subcategories: []
   },
   {
-    id: 'travail',
-    name: 'Travail',
-    icon: '💼',
+    id: 'health',
+    name: 'Santé et Bien-être',
+    icon: createEmojiIcon('💊'),
+    color: '#F44336',
+    subcategories: []
   },
   {
-    id: 'ecole',
-    name: 'École',
-    icon: '🏫',
+    id: 'entertainment',
+    name: 'Divertissement',
+    icon: createEmojiIcon('🎭'),
+    color: '#3F51B5',
+    subcategories: []
+  },
+  {
+    id: 'accommodation',
+    name: 'Hébergement',
+    icon: createEmojiIcon('🏨'),
+    color: '#795548',
+    subcategories: []
   }
 ];

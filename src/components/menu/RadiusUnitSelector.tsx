@@ -1,39 +1,39 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 import { DistanceUnit } from '@/types/categoryTypes';
 
 interface RadiusUnitSelectorProps {
-  unit: DistanceUnit;
-  onUnitChange: (unit: DistanceUnit) => void;
+  value: DistanceUnit;
+  onChange: (unit: DistanceUnit) => void;
+  className?: string;
 }
 
-export const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
-  unit,
-  onUnitChange
+const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
+  value,
+  onChange,
+  className = ''
 }) => {
-  const { t } = useLanguage();
-
   return (
-    <div className="flex gap-2">
-      <Button 
-        size="sm" 
-        variant={unit === 'km' ? 'default' : 'outline'} 
-        onClick={() => onUnitChange('km')}
-        className={cn("px-2 py-1 h-7 text-white", unit === 'km' ? "bg-primary hover:bg-primary/90" : "")}
+    <div className={`flex items-center gap-1 ${className}`}>
+      <Button
+        variant={value === 'km' ? 'default' : 'outline'}
+        size="xs"
+        className="px-2 h-6 text-xs"
+        onClick={() => onChange('km')}
       >
-        KM
+        km
       </Button>
-      <Button 
-        size="sm" 
-        variant={unit === 'miles' ? 'default' : 'outline'} 
-        onClick={() => onUnitChange('miles')}
-        className={cn("px-2 py-1 h-7 text-white", unit === 'miles' ? "bg-accent hover:bg-accent/90" : "")}
+      <Button
+        variant={value === 'mi' ? 'default' : 'outline'}
+        size="xs"
+        className="px-2 h-6 text-xs"
+        onClick={() => onChange('mi')}
       >
-        {t('miles')}
+        mi
       </Button>
     </div>
   );
 };
+
+export default RadiusUnitSelector;

@@ -33,8 +33,7 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
           </div>
         ))}
       </div>
-      <style>
-        {`
+      <style dangerouslySetInnerHTML={{ __html: `
         .subcategory-item {
           white-space: nowrap;
           border: 1px solid transparent;
@@ -45,8 +44,7 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
         .subcategory-item.active {
           box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
-        `}
-      </style>
+      `}} />
     </ScrollArea>
   );
 };

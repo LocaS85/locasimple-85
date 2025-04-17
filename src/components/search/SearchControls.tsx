@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Map from '@/components/Map';
 import type { Result } from '@/components/ResultsList';
@@ -9,7 +8,7 @@ interface SearchControlsProps {
   userLocation: [number, number];
   selectedDistance: number | null;
   selectedDuration: number | null;
-  distanceUnit: DistanceUnit;
+  distanceUnit: 'km' | 'mi';
   transportMode: string;
   searchQuery: string;
   isRecording: boolean;

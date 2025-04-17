@@ -1,186 +1,50 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { Category, SubCategory, Address, TransportMode } from '@/types/categories';
+import { createContext, useState, ReactNode } from 'react';
+import { Category, Subcategory } from '@/types/categoryTypes';
 
+// Définition du type pour le contexte
 interface CategoryContextType {
-  selectedCategory: string | null;
-  setSelectedCategory: (category: string) => void;
-  addresses: Record<string, Address[]>;
-  addAddress: (categoryId: string, address: Address) => void;
-  removeAddress: (categoryId: string, addressId: string) => void;
-  updateAddress: (categoryId: string, addressId: string, newAddress: Address) => void;
-  categoryColors: Record<string, string>;
-  updateCategoryColor: (categoryId: string, color: string) => void;
-  categoryVisibility: Record<string, boolean>;
-  toggleCategoryVisibility: (categoryId: string) => void;
-  categoryNames: Record<string, string>;
-  updateCategoryName: (categoryId: string, name: string) => void;
-  customFields: Record<string, Array<{id: string, name: string, value: string}>>;
-  addCustomField: (categoryId: string, field: {id: string, name: string, value: string}) => void;
-  updateCustomField: (categoryId: string, fieldId: string, field: {name: string, value: string}) => void;
-  removeCustomField: (categoryId: string, fieldId: string) => void;
+  categories: Category[];
+  selectedCategory: Category | null;
+  selectedSubcategory: Subcategory | null;
+  setCategories: (categories: Category[]) => void;
+  setSelectedCategory: (category: Category | null) => void;
+  setSelectedSubcategory: (subcategory: Subcategory | null) => void;
 }
 
-const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
+// Création du contexte avec une valeur par défaut
+export const CategoryContext = createContext<CategoryContextType>({
+  categories: [],
+  selectedCategory: null,
+  selectedSubcategory: null,
+  setCategories: () => {},
+  setSelectedCategory: () => {},
+  setSelectedSubcategory: () => {},
+});
 
-export const CategoryProvider = ({ children }: { children: React.ReactNode }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [addresses, setAddresses] = useState<Record<string, Address[]>>({});
-  const [categoryColors, setCategoryColors] = useState<Record<string, string>>({
-    'quotidien': '#8B5CF6',
-    'adresse-principale': '#8B5CF6',
-    'famille': '#D946EF',
-    'amis': '#F59E0B', 
-    'travail': '#F97316',
-    'ecole': '#0EA5E9',
-    'alimentation': '#1EAEDB',
-    'shopping': '#9b87f5',
-    'services': '#7E69AB',
-    'sante': '#6E59A5',
-    'divertissement': '#F2FCE2',
-    'hebergement': '#FEC6A1',
-    'divers': '#4ADE80',
-  });
-  const [categoryVisibility, setCategoryVisibility] = useState<Record<string, boolean>>({
-    'quotidien': true,
-    'adresse-principale': true,
-    'famille': true,
-    'amis': true,
-    'travail': true,
-    'ecole': true,
-    'alimentation': true,
-    'shopping': true,
-    'services': true,
-    'sante': true,
-    'divertissement': true,
-    'hebergement': true,
-    'divers': true,
-  });
-  const [categoryNames, setCategoryNames] = useState<Record<string, string>>({
-    'quotidien': 'Quotidien',
-    'adresse-principale': 'Adresse Principale',
-    'famille': 'Famille',
-    'amis': 'Amis',
-    'travail': 'Travail',
-    'ecole': 'École',
-    'alimentation': 'Alimentation',
-    'shopping': 'Achats',
-    'services': 'Services',
-    'sante': 'Santé',
-    'divertissement': 'Divertissement',
-    'hebergement': 'Hébergement',
-    'divers': 'Divers',
-  });
-  const [customFields, setCustomFields] = useState<Record<string, Array<{id: string, name: string, value: string}>>>({
-    'divers': []
-  });
+// Props du provider
+interface CategoryProviderProps {
+  children: ReactNode;
+}
 
-  const addAddress = (categoryId: string, address: Address) => {
-    setAddresses(prev => ({
-      ...prev,
-      [categoryId]: [...(prev[categoryId] || []), address].slice(0, 10)
-    }));
-  };
-
-  const removeAddress = (categoryId: string, addressId: string) => {
-    setAddresses(prev => ({
-      ...prev,
-      [categoryId]: prev[categoryId]?.filter(addr => addr.id !== addressId) || []
-    }));
-  };
-
-  const updateAddress = (categoryId: string, addressId: string, newAddress: Address) => {
-    setAddresses(prev => ({
-      ...prev,
-      [categoryId]: prev[categoryId]?.map(addr => 
-        addr.id === addressId ? { ...addr, ...newAddress } : addr
-      ) || []
-    }));
-  };
-
-  const updateCategoryColor = (categoryId: string, color: string) => {
-    setCategoryColors(prev => ({
-      ...prev,
-      [categoryId]: color
-    }));
-  };
-
-  const toggleCategoryVisibility = (categoryId: string) => {
-    setCategoryVisibility(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
-  };
-
-  const updateCategoryName = (categoryId: string, name: string) => {
-    setCategoryNames(prev => ({
-      ...prev,
-      [categoryId]: name
-    }));
-  };
-
-  const addCustomField = (categoryId: string, field: {id: string, name: string, value: string}) => {
-    setCustomFields(prev => {
-      const currentFields = prev[categoryId] || [];
-      if (currentFields.length >= 10) return prev;
-
-      return {
-        ...prev,
-        [categoryId]: [...currentFields, field]
-      };
-    });
-  };
-
-  const updateCustomField = (categoryId: string, fieldId: string, field: {name: string, value: string}) => {
-    setCustomFields(prev => {
-      const currentFields = prev[categoryId] || [];
-      return {
-        ...prev,
-        [categoryId]: currentFields.map(f => 
-          f.id === fieldId ? { ...f, ...field } : f
-        )
-      };
-    });
-  };
-
-  const removeCustomField = (categoryId: string, fieldId: string) => {
-    setCustomFields(prev => {
-      const currentFields = prev[categoryId] || [];
-      return {
-        ...prev,
-        [categoryId]: currentFields.filter(f => f.id !== fieldId)
-      };
-    });
-  };
+// Provider qui encapsule l'application
+export const CategoryProvider = ({ children }: CategoryProviderProps) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
 
   return (
-    <CategoryContext.Provider value={{
-      selectedCategory,
-      setSelectedCategory,
-      addresses,
-      addAddress,
-      removeAddress,
-      updateAddress,
-      categoryColors,
-      updateCategoryColor,
-      categoryVisibility,
-      toggleCategoryVisibility,
-      categoryNames,
-      updateCategoryName,
-      customFields,
-      addCustomField,
-      updateCustomField,
-      removeCustomField,
-    }}>
+    <CategoryContext.Provider
+      value={{
+        categories,
+        selectedCategory,
+        selectedSubcategory,
+        setCategories,
+        setSelectedCategory,
+        setSelectedSubcategory,
+      }}
+    >
       {children}
     </CategoryContext.Provider>
   );
-};
-
-export const useCategory = () => {
-  const context = useContext(CategoryContext);
-  if (context === undefined) {
-    throw new Error('useCategory must be used within a CategoryProvider');
-  }
-  return context;
 };

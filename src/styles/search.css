@@ -6,13 +6,30 @@
   overflow: hidden;
 }
 
+#map {
+  height: 60vh;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
 .map-control {
-  background-color: white;
+  position: absolute;
+  background: white;
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   cursor: pointer;
-  transition: all 0.2s ease;
+  z-index: 10;
 }
+
+#zoom-in { top: 10px; right: 60px; }
+#zoom-out { top: 10px; right: 10px; }
+#my-location { bottom: 10px; right: 10px; }
 
 .map-control:hover {
   background-color: #f5f5f5;
@@ -20,6 +37,13 @@
 }
 
 /* Category and subcategory styles */
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 1rem 0;
+}
+
 .category-icon {
   width: 40px;
   height: 40px;
@@ -60,18 +84,30 @@
   border-radius: 1rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   transition: transform 0.2s;
+  padding: 1rem;
   background-color: white;
+  margin-bottom: 1rem;
 }
 
 .result-card:hover {
   transform: translateY(-3px);
 }
 
+/* Filters */
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.filter-label {
+  font-weight: 600;
+}
+
 /* Flask server status */
 .flask-server-status {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
+  position: relative;
   z-index: 10;
   background: white;
   border-radius: 999px;
@@ -98,11 +134,24 @@
 }
 
 /* Responsive results layout */
+#results {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.result-card {
+  scroll-snap-align: start;
+  flex: 0 0 85%;
+}
+
 @media(min-width: 768px) {
-  .results-container {
-    display: flex;
+  #results {
     flex-wrap: wrap;
-    gap: 1rem;
+    overflow-x: visible;
   }
   
   .result-card {

@@ -39,7 +39,7 @@ export interface SearchFilters {
   useCurrentLocation: boolean;
 }
 
-// Add Address interface for any components that need it
+// Address interface for any components that need it
 export interface Address {
   id: string;
   name: string;
@@ -51,4 +51,6 @@ export interface Address {
   longitude: number;
   category?: string;
   subcategory?: string;
+  favorite?: boolean;
+  transportMode?: TransportMode;
 }

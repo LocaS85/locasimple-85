@@ -1,11 +1,9 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config/environment';
 
-// Création du client Supabase avec les clés de l'environnement
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Créer le client Supabase avec les variables d'environnement
+// Ces valeurs doivent être remplacées par vos vraies clés si vous connectez Supabase
+const supabaseUrl = 'https://your-project-url.supabase.co';
+const supabaseAnonKey = 'your-anon-key';
 
-// Log pour s'assurer que le client est correctement initialisé
-console.log('Supabase client initialized');
-
-export default supabase;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
