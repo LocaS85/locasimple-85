@@ -22,3 +22,8 @@ export const FEATURES = {
   ENABLE_CATEGORIES: true,
   ENABLE_SUBCATEGORIES: true
 };
+
+// Utility to check if API keys are valid
+export const isApiKeyValid = (key: string | undefined): boolean => {
+  return !!key && key.length > 0 && key !== 'YOUR_MAPBOX_ACCESS_TOKEN';
+};

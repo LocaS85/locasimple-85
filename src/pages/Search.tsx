@@ -18,10 +18,13 @@ import ResultsList from '@/components/ResultsList';
 import CategoryFilters from '@/components/search/CategoryFilters';
 import SubcategoryScroller from '@/components/search/SubcategoryScroller';
 import DistanceUnitToggle from '@/components/search/DistanceUnitToggle';
+import FlaskServerStatus from '@/components/search/FlaskServerStatus';
 import { CATEGORIES } from '@/types/categories';
 import { DistanceUnit } from '@/types/categoryTypes';
+import { getTransportModeColor, getTransportModeIcon } from '@/data/transportModesWithColors';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import '../styles/search.css';
 import '../styles/mapbox.css';
 
 const SearchPage: React.FC = () => {
@@ -61,20 +64,20 @@ const SearchPage: React.FC = () => {
     handleSearchPress
   } = searchPanel;
 
+  // Category to subcategory mapping
+  const subcategoryMap: Record<string, string[]> = {
+    'alimentation': ['Restaurants', 'Bars', 'Cafés', 'Boulangeries', 'Supermarchés'],
+    'shopping': ['Vêtements', 'Électronique', 'Pharmacies', 'Bijouteries', 'Opticiens'],
+    'services': ['Banques', 'Postes', 'Coiffeurs', 'Pressings', 'Laveries'],
+    'sante': ['Hôpitaux', 'Cliniques', 'Dentistes', 'Pharmacies', 'Opticiens'],
+    'divertissement': ['Cinémas', 'Théâtres', 'Musées', 'Parcs', 'Clubs'],
+    'hebergement': ['Hôtels', 'Auberges', 'Chambres d\'hôtes', 'Camping'],
+    'quotidien': ['Adresse principale', 'Famille', 'Amis', 'Travail', 'École']
+  };
+
   // Update subcategories when category changes
   useEffect(() => {
     if (selectedCategory) {
-      // This would be replaced with actual subcategory data from your API
-      const subcategoryMap: Record<string, string[]> = {
-        'alimentation': ['Restaurants', 'Bars', 'Cafés', 'Boulangeries', 'Supermarchés'],
-        'shopping': ['Vêtements', 'Électronique', 'Pharmacies', 'Bijouteries', 'Opticiens'],
-        'services': ['Banques', 'Postes', 'Coiffeurs', 'Pressings', 'Laveries'],
-        'sante': ['Hôpitaux', 'Cliniques', 'Dentistes', 'Pharmacies', 'Opticiens'],
-        'divertissement': ['Cinémas', 'Théâtres', 'Musées', 'Parcs', 'Clubs'],
-        'hebergement': ['Hôtels', 'Auberges', 'Chambres d\'hôtes', 'Camping'],
-        'quotidien': ['Adresse principale', 'Famille', 'Amis', 'Travail', 'École']
-      };
-      
       setSubcategories(subcategoryMap[selectedCategory] || []);
     } else {
       setSubcategories([]);
@@ -105,7 +108,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
+      {/* Header with back button and search box */}
       <div className="p-4 bg-white shadow-sm z-10 border-b">
         <div className="flex items-center gap-2 mb-3">
           <Button 
@@ -240,6 +243,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('driving')}
+                  style={{ 
+                    backgroundColor: transportMode === 'driving' ? getTransportModeColor('driving') : undefined,
+                    borderColor: transportMode !== 'driving' ? getTransportModeColor('driving') : undefined,
+                    color: transportMode === 'driving' ? 'white' : getTransportModeColor('driving')
+                  }}
                 >
                   <Car size={16} />
                   <span className="hidden sm:inline">Voiture</span>
@@ -250,6 +258,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('walking')}
+                  style={{ 
+                    backgroundColor: transportMode === 'walking' ? getTransportModeColor('walking') : undefined,
+                    borderColor: transportMode !== 'walking' ? getTransportModeColor('walking') : undefined,
+                    color: transportMode === 'walking' ? 'white' : getTransportModeColor('walking')
+                  }}
                 >
                   <Users size={16} />
                   <span className="hidden sm:inline">À pied</span>
@@ -260,6 +273,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('cycling')}
+                  style={{ 
+                    backgroundColor: transportMode === 'cycling' ? getTransportModeColor('cycling') : undefined,
+                    borderColor: transportMode !== 'cycling' ? getTransportModeColor('cycling') : undefined,
+                    color: transportMode === 'cycling' ? 'white' : getTransportModeColor('cycling')
+                  }}
                 >
                   <Bike size={16} />
                   <span className="hidden sm:inline">Vélo</span>
@@ -270,6 +288,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('transit')}
+                  style={{ 
+                    backgroundColor: transportMode === 'transit' ? getTransportModeColor('transit') : undefined,
+                    borderColor: transportMode !== 'transit' ? getTransportModeColor('transit') : undefined,
+                    color: transportMode === 'transit' ? 'white' : getTransportModeColor('transit')
+                  }}
                 >
                   <Bus size={16} />
                   <span className="hidden sm:inline">Bus</span>
@@ -280,6 +303,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('train')}
+                  style={{ 
+                    backgroundColor: transportMode === 'train' ? getTransportModeColor('train') : undefined,
+                    borderColor: transportMode !== 'train' ? getTransportModeColor('train') : undefined,
+                    color: transportMode === 'train' ? 'white' : getTransportModeColor('train')
+                  }}
                 >
                   <Train size={16} />
                   <span className="hidden sm:inline">Train</span>
@@ -290,6 +318,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('ship')}
+                  style={{ 
+                    backgroundColor: transportMode === 'ship' ? getTransportModeColor('ship') : undefined,
+                    borderColor: transportMode !== 'ship' ? getTransportModeColor('ship') : undefined,
+                    color: transportMode === 'ship' ? 'white' : getTransportModeColor('ship')
+                  }}
                 >
                   <Ship size={16} />
                   <span className="hidden sm:inline">Bateau</span>
@@ -300,6 +333,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('plane')}
+                  style={{ 
+                    backgroundColor: transportMode === 'plane' ? getTransportModeColor('plane') : undefined,
+                    borderColor: transportMode !== 'plane' ? getTransportModeColor('plane') : undefined,
+                    color: transportMode === 'plane' ? 'white' : getTransportModeColor('plane')
+                  }}
                 >
                   <Plane size={16} />
                   <span className="hidden sm:inline">Avion</span>
@@ -310,6 +348,11 @@ const SearchPage: React.FC = () => {
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={() => handleTransportModeChange('carpool')}
+                  style={{ 
+                    backgroundColor: transportMode === 'carpool' ? getTransportModeColor('carpool') : undefined,
+                    borderColor: transportMode !== 'carpool' ? getTransportModeColor('carpool') : undefined,
+                    color: transportMode === 'carpool' ? 'white' : getTransportModeColor('carpool')
+                  }}
                 >
                   <Users size={16} />
                   <span className="hidden sm:inline">Co-voiturage</span>
@@ -405,7 +448,6 @@ const SearchPage: React.FC = () => {
               results={searchResults}
               loading={loading}
               onResultClick={(result) => {
-                // Handle result click
                 toast.info(`Sélection: ${result.name}`);
                 setView('map'); // Switch to map view to show the selected result
               }}
@@ -416,10 +458,7 @@ const SearchPage: React.FC = () => {
       </div>
       
       {/* Flask server status indicator */}
-      <div className="flask-server-status">
-        <div className="status-indicator status-connected"></div>
-        <span>Serveur connecté</span>
-      </div>
+      <FlaskServerStatus className="absolute bottom-4 left-4 z-20" />
     </div>
   );
 };

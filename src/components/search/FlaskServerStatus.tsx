@@ -1,10 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import axios from 'axios';
-import { Server, WifiOff, RefreshCw } from 'lucide-react';
-import { API_BASE_URL, MAPBOX_TOKEN, isApiKeyValid } from '@/config/environment';
-import { Button } from '@/components/ui/button';
+import { FEATURES } from '@/config/environment';
 
 interface FlaskServerStatusProps {
   className?: string;
@@ -12,91 +9,45 @@ interface FlaskServerStatusProps {
 
 const FlaskServerStatus: React.FC<FlaskServerStatusProps> = ({ className = '' }) => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [checking, setChecking] = useState(false);
-  const [apiStatus, setApiStatus] = useState({
-    flask: false,
-    mapbox: isApiKeyValid(MAPBOX_TOKEN)
-  });
-
-  const checkConnection = async () => {
-    setChecking(true);
-    try {
-      // Check Flask server connection
-      const response = await axios.get(`${API_BASE_URL}/health`, { timeout: 3000 });
-      setIsConnected(true);
-      setApiStatus(prev => ({ ...prev, flask: true }));
-      
-      // If Flask server has Mapbox token info, update status
-      if (response.data && response.data.mapbox_token_available !== undefined) {
-        setApiStatus(prev => ({ ...prev, mapbox: response.data.mapbox_token_available }));
-      }
-      
-      return response.data;
-    } catch (error) {
-      console.error('Failed to connect to Flask server:', error);
-      setIsConnected(false);
-      setApiStatus(prev => ({ ...prev, flask: false }));
-      return null;
-    } finally {
-      setChecking(false);
-    }
-  };
 
   useEffect(() => {
-    checkConnection();
+    if (!FEATURES.USE_FLASK_SERVER) return;
+
+    const checkServer = async () => {
+      try {
+        const response = await fetch('/api/health', { 
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok) {
+          setIsConnected(true);
+        } else {
+          setIsConnected(false);
+          toast.error("Serveur Flask non accessible", {
+            description: "Certaines fonctionnalités peuvent être limitées",
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification du serveur Flask:", error);
+        setIsConnected(false);
+      }
+    };
+
+    checkServer();
     
-    // Check connection every minute
-    const interval = setInterval(checkConnection, 60000);
+    // Check server periodically
+    const interval = setInterval(checkServer, 60000); // Every minute
+    
     return () => clearInterval(interval);
   }, []);
 
-  const handleManualCheck = async () => {
-    const result = await checkConnection();
-    if (isConnected) {
-      toast.success('Serveur Flask connecté !');
-      if (result && result.mapbox_token_available) {
-        toast.success('Token Mapbox disponible sur le serveur');
-      } else {
-        toast.warning('Token Mapbox non disponible sur le serveur');
-        
-        // Check if token is available in the frontend
-        if (isApiKeyValid(MAPBOX_TOKEN)) {
-          toast.success('Token Mapbox disponible dans le frontend');
-        } else {
-          toast.error('Token Mapbox manquant dans le frontend. Vérifiez votre fichier .env');
-        }
-      }
-    } else {
-      toast.error('Impossible de se connecter au serveur Flask');
-    }
-  };
+  if (isConnected === null || !FEATURES.USE_FLASK_SERVER) return null;
 
   return (
-    <div className={`flex items-center ${className}`}>
-      <Button 
-        variant="ghost" 
-        size="sm"
-        className="flex items-center gap-2 px-2"
-        onClick={handleManualCheck}
-        title={isConnected ? 'Serveur Flask connecté' : 'Serveur Flask non connecté'}
-      >
-        {checking ? (
-          <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />
-        ) : isConnected ? (
-          <Server className="h-4 w-4 text-green-500" />
-        ) : (
-          <WifiOff className="h-4 w-4 text-red-500" />
-        )}
-        <span className="text-xs hidden md:inline-block">
-          {isConnected ? 'Flask connecté' : 'Flask non connecté'}
-        </span>
-        
-        {/* Added indicator for Mapbox token status */}
-        <div 
-          className={`h-2 w-2 rounded-full ml-1 ${apiStatus.mapbox ? 'bg-green-500' : 'bg-red-500'}`}
-          title={apiStatus.mapbox ? 'Token Mapbox disponible' : 'Token Mapbox non disponible'}
-        />
-      </Button>
+    <div className={`flask-server-status flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm text-xs ${className}`}>
+      <div className={`status-indicator w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+      <span>{isConnected ? 'Serveur connecté' : 'Serveur non connecté'}</span>
     </div>
   );
 };

@@ -38,3 +38,17 @@ export interface SearchFilters {
   resultsCount: number;
   useCurrentLocation: boolean;
 }
+
+// Add Address interface for any components that need it
+export interface Address {
+  id: string;
+  name: string;
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  category?: string;
+  subcategory?: string;
+}

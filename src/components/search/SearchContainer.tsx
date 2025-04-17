@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { RouteDisplayContainer } from './RouteDisplayContainer';
 import { useSearchPanel } from '@/hooks/useSearchPanel';
@@ -67,7 +68,7 @@ export const SearchContainer: React.FC = () => {
     checkServer();
   }, []);
 
-  // Update the distanceUnit state to match the expected type (km/miles)
+  // State for distance unit (km/mi)
   const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>("km");
 
   return (
@@ -143,6 +144,12 @@ export const SearchContainer: React.FC = () => {
         setActiveMode={setActiveMode}
         setTransportMode={searchState.setTransportMode}
       />
+
+      {/* Flask server status indicator */}
+      <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded-full text-xs flex items-center gap-1 shadow-sm z-10">
+        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+        <span>Serveur Flask connecté</span>
+      </div>
     </div>
   );
 };

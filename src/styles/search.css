@@ -1,0 +1,119 @@
+
+/* Map styles */
+.map-container {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.map-control {
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-control:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-1px);
+}
+
+/* Category and subcategory styles */
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.subcategory-item {
+  padding: 8px 15px;
+  border-radius: 20px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.subcategory-item:hover {
+  background: #e5e7eb;
+}
+
+.subcategory-item.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #1d4ed8;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Result cards */
+.result-card {
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  background-color: white;
+}
+
+.result-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Flask server status */
+.flask-server-status {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 10;
+  background: white;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-connected {
+  background-color: #10b981;
+}
+
+.status-disconnected {
+  background-color: #ef4444;
+}
+
+/* Responsive results layout */
+@media(min-width: 768px) {
+  .results-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .result-card {
+    flex: 1 1 calc(50% - 1rem);
+    max-width: calc(50% - 1rem);
+  }
+}
+
+@media(min-width: 1024px) {
+  .result-card {
+    flex: 1 1 calc(33.333% - 1rem);
+    max-width: calc(33.333% - 1rem);
+  }
+}
