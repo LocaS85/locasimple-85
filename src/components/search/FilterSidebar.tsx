@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Car, User, Bicycle, Filter, X } from 'lucide-react';
+import { Car, User, Bike, Filter, X } from 'lucide-react';
 import ResultsCountSlider from './ResultsCountSlider';
 
 interface FilterSidebarProps {
@@ -70,7 +70,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               className="flex-1"
               onClick={() => onTransportModeChange('cycling')}
             >
-              <Bicycle size={18} className="mr-2" />
+              <Bike size={18} className="mr-2" />
               Vélo
             </Button>
           </div>

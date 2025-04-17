@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import Search from "./pages/Search";
 import PlaceDetails from "./pages/PlaceDetails";
 import Pricing from "./pages/Pricing";
 import FAQ from "./pages/FAQ";
@@ -48,6 +49,7 @@ const App = () => (
                     {/* User pages */}
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/place/:id" element={<PlaceDetails />} />
+                    <Route path="/search" element={<Search />} />
                     
                     {/* Information pages */}
                     <Route path="/pricing" element={<Pricing />} />

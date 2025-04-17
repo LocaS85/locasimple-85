@@ -1,47 +1,40 @@
 
+import React from 'react';
+
 export interface Category {
   id: string;
   name: string;
-  icon: string;
-  subCategories?: SubCategory[];
+  icon?: React.FC;
+  subcategories?: Subcategory[];
+  color?: string;
 }
 
-export interface SubCategory {
+export interface Subcategory {
   id: string;
   name: string;
-  parentId: string;
-  children?: SubCategory[];
+  icon?: React.FC;
+  apiKey?: string;
 }
 
-export interface Address {
-  id: string;
-  name: string;
-  street: string;
-  city: string;
-  postalCode: string;
-  country: string;
-  transportMode: string;
-  latitude: number;
-  longitude: number;
-  category: string;
-  favorite: boolean;
-  title?: string;
-  address?: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
-}
+export type DistanceUnit = 'km' | 'mi';
 
-export type DistanceUnit = "km" | "miles";
-export type TransportMode = "driving" | "walking" | "bicycling" | "transit" | 
-  "car" | "train" | "bus" | "public" | "bike" | "walk" | "plane" | 
-  "metro" | "tram" | "coach" | "airport" | "airstrip";
+export type TransportMode = 
+  | 'driving' 
+  | 'walking' 
+  | 'cycling' 
+  | 'transit' 
+  | 'train' 
+  | 'ship' 
+  | 'plane' 
+  | 'carpool';
 
-export interface TransportModeWithColor {
-  id: TransportMode;
-  name: string;
-  icon: string;
-  color: string;
-  defaultColor?: string;
+export interface SearchFilters {
+  category: string | null;
+  subcategory: string | null;
+  distance: number;
+  distanceUnit: DistanceUnit;
+  duration: number | null;
+  transportMode: TransportMode;
+  resultsCount: number;
+  useCurrentLocation: boolean;
 }

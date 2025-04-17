@@ -1,50 +1,24 @@
 
-// Détection d'environnement
-export const isDevelopment = import.meta.env.DEV;
-export const isProduction = import.meta.env.PROD;
+// Environment Variables
 
-// Mapbox configuration
-export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || '';
+// Mapbox Access Token
+export const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN || import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
 
-// Supabase Configuration
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+// API Base URL
+export const API_BASE_URL = process.env.REACT_APP_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// API URL configuration - Utilisez l'API de prod en production, sinon localhost
-export const API_BASE_URL = isDevelopment 
-  ? 'http://127.0.0.1:5000' 
-  : 'https://api.locasimple.fr';
+// Google Maps API Key (if used)
+export const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
-// Fonction pour vérifier si une API key est valide
-export const isApiKeyValid = (key?: string): boolean => {
-  return Boolean(key && key.length > 0 && !key.includes('YOUR_'));
-};
+// Environment settings
+export const IS_DEVELOPMENT = import.meta.env.DEV || process.env.NODE_ENV === 'development';
+export const IS_PRODUCTION = import.meta.env.PROD || process.env.NODE_ENV === 'production';
 
-// Vérification de la présence du token Mapbox
-if (!isApiKeyValid(MAPBOX_TOKEN)) {
-  console.warn('⚠️ VITE_MAPBOX_TOKEN non défini dans les variables d\'environnement. La carte ne fonctionnera pas correctement.');
-  if (isDevelopment) {
-    console.info('Pour utiliser Mapbox en développement, créez un fichier .env à la racine du projet avec la variable VITE_MAPBOX_TOKEN=votre_token_mapbox');
-  }
-}
-
-// Vérification de la configuration Supabase
-if (!isApiKeyValid(SUPABASE_URL) || !isApiKeyValid(SUPABASE_ANON_KEY)) {
-  console.warn('⚠️ Configuration Supabase incomplète. Certaines fonctionnalités peuvent ne pas fonctionner.');
-}
-
-// Exportation des configurations API validées
-export const API_CONFIG = {
-  mapbox: {
-    token: MAPBOX_TOKEN,
-    isValid: isApiKeyValid(MAPBOX_TOKEN)
-  },
-  supabase: {
-    url: SUPABASE_URL,
-    anonKey: SUPABASE_ANON_KEY,
-    isValid: isApiKeyValid(SUPABASE_URL) && isApiKeyValid(SUPABASE_ANON_KEY)
-  },
-  serverApi: {
-    baseUrl: API_BASE_URL
-  }
+// Feature flags
+export const FEATURES = {
+  USE_FLASK_SERVER: true,
+  USE_MAPBOX: true,
+  ENABLE_VOICE_SEARCH: true,
+  ENABLE_CATEGORIES: true,
+  ENABLE_SUBCATEGORIES: true
 };
