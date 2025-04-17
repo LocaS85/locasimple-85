@@ -19,7 +19,7 @@ const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
       <Button
         variant={value === 'km' ? 'default' : 'outline'}
         size="xs"
-        className="px-2 h-6 text-xs"
+        className="px-2 h-6 text-xs font-medium"
         onClick={() => onChange('km')}
       >
         km
@@ -27,7 +27,7 @@ const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
       <Button
         variant={value === 'mi' ? 'default' : 'outline'}
         size="xs"
-        className="px-2 h-6 text-xs"
+        className="px-2 h-6 text-xs font-medium"
         onClick={() => onChange('mi')}
       >
         mi

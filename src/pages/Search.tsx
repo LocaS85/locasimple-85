@@ -10,6 +10,8 @@ import { MAPBOX_TOKEN } from '@/config/environment';
 import SubcategoryScroller from '@/components/search/SubcategoryScroller';
 import FlaskServerStatus from '@/components/search/FlaskServerStatus';
 import { FEATURES } from '@/config/environment';
+import RadiusUnitSelector from '@/components/menu/RadiusUnitSelector';
+import { DistanceUnit } from '@/types/categoryTypes';
 import '../styles/search.css';
 
 const SearchPage: React.FC = () => {
@@ -28,6 +30,7 @@ const SearchPage: React.FC = () => {
   // Filtres
   const [transportMode, setTransportMode] = useState('driving');
   const [distance, setDistance] = useState(10);
+  const [distanceUnit, setDistanceUnit] = useState<DistanceUnit>('km');
   const [resultCount, setResultCount] = useState(5);
   
   // Sous-catégories (exemple)
@@ -119,7 +122,7 @@ const SearchPage: React.FC = () => {
     
     if (FEATURES.USE_FLASK_SERVER) {
       // Utiliser le serveur Flask
-      url = `/api/search?query=${encodeURIComponent(searchQuery)}&lat=${lat}&lon=${lng}&limit=${resultCount}&mode=${transportMode}`;
+      url = `/api/search?query=${encodeURIComponent(searchQuery)}&lat=${lat}&lon=${lng}&limit=${resultCount}&mode=${transportMode}&distance=${distance}&unit=${distanceUnit}`;
     } else {
       // Utiliser directement Mapbox
       url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?proximity=${lng},${lat}&limit=${resultCount}&access_token=${MAPBOX_TOKEN}`;
@@ -142,7 +145,7 @@ const SearchPage: React.FC = () => {
             address: feature.place_name,
             latitude: feature.center[1],
             longitude: feature.center[0],
-            distance: `~${Math.round(Math.random() * distance)} km`,
+            distance: `~${Math.round(Math.random() * distance)} ${distanceUnit}`,
             duration: `~${Math.round(Math.random() * 30)} min`
           }));
         }
@@ -187,6 +190,12 @@ const SearchPage: React.FC = () => {
       setSearchQuery(subcategory);
       fetchPlaces();
     }
+  };
+
+  const handleDistanceUnitChange = (unit: DistanceUnit) => {
+    setDistanceUnit(unit);
+    // Recalculer les distances après changement d'unité
+    fetchPlaces();
   };
 
   return (
@@ -262,20 +271,25 @@ const SearchPage: React.FC = () => {
         </div>
         
         <div className="form-group">
-          <label className="filter-label block mb-2">Distance max (km)</label>
-          <div className="flex items-center gap-2">
-            <Slider
-              value={[distance]}
-              min={1}
-              max={50}
-              step={1}
-              onValueChange={(values) => {
-                setDistance(values[0]);
-                fetchPlaces();
-              }}
+          <label className="filter-label block mb-2">
+            Distance max 
+            <span className="ml-2 font-semibold">{distance}</span>
+            <RadiusUnitSelector
+              value={distanceUnit}
+              onChange={handleDistanceUnitChange}
+              className="ml-2 inline-flex"
             />
-            <span className="font-semibold w-8 text-center">{distance}</span>
-          </div>
+          </label>
+          <Slider
+            value={[distance]}
+            min={1}
+            max={50}
+            step={1}
+            onValueChange={(values) => {
+              setDistance(values[0]);
+              fetchPlaces();
+            }}
+          />
         </div>
         
         <div className="form-group">
@@ -283,7 +297,7 @@ const SearchPage: React.FC = () => {
           <Input
             type="number"
             min={1}
-            max={10}
+            max={20}
             value={resultCount}
             className="w-full"
             onChange={(e) => {
