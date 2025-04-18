@@ -11,7 +11,13 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Enhanced SWC configuration for better performance
+      plugins: [],
+      jsxImportSource: undefined,
+      tsDecorators: false,
+      fastRefresh: true
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -25,5 +31,17 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true,
     // Reduce chunk size for better performance on mobile
     chunkSizeWarningLimit: 1000,
+    // Optimize build performance
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: mode === 'production'
+      }
+    }
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  }
 }));
