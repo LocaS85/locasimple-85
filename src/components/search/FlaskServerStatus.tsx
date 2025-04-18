@@ -45,8 +45,8 @@ const FlaskServerStatus: React.FC<FlaskServerStatusProps> = ({ className = '' })
   if (isConnected === null || !FEATURES.USE_FLASK_SERVER) return null;
 
   return (
-    <div className={`flask-server-status flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm text-xs ${className}`}>
-      <div className={`status-indicator w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+    <div className={`flask-server-status ${className}`}>
+      <div className={`status-indicator ${isConnected ? 'status-connected' : 'status-disconnected'}`}></div>
       <span>{isConnected ? 'Serveur connecté' : 'Serveur non connecté'}</span>
     </div>
   );

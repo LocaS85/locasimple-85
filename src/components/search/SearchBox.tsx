@@ -1,113 +1,84 @@
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Mic, X, Map, Loader2 } from 'lucide-react';
+import { Search, Mic, MapPin } from 'lucide-react';
 
-export interface SearchBoxProps {
-  value?: string;
-  onChange?: (value: string) => void;
-  onSearch?: (query?: string) => void;
-  onReset?: () => void;
-  onLocationClick?: () => void;
-  isLocationActive?: boolean;
-  loading?: boolean;
+interface SearchBoxProps {
+  value: string;
+  onChange: (value: string) => void;
+  onSearch: () => void;
+  onLocationClick: () => void;
+  isLocationActive: boolean;
+  loading: boolean;
+  isRecording: boolean;
+  onMicClick: () => void;
   placeholder?: string;
-  isRecording?: boolean;
-  onMicClick?: () => void;
 }
 
 const SearchBox: React.FC<SearchBoxProps> = ({
-  value = '',
-  onChange = () => {},
-  onSearch = () => {},
-  onReset = () => {},
-  onLocationClick = () => {},
-  isLocationActive = false,
-  loading = false,
-  placeholder = 'Rechercher...',
-  isRecording = false,
-  onMicClick = () => {}
+  value,
+  onChange,
+  onSearch,
+  onLocationClick,
+  isLocationActive,
+  loading,
+  isRecording,
+  onMicClick,
+  placeholder = 'Rechercher...'
 }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
-  };
-
-  const handleClear = () => {
-    onChange('');
-    onReset();
-    if (inputRef.current) {
-      inputRef.current.focus();
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onSearch();
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(value);
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2">
-      <div className="relative flex-1">
-        <Input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          className="pl-9 pr-8 py-2 h-9 text-sm"
+    <div className="relative flex items-center mb-4">
+      <Input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="pr-20 py-6 rounded-lg shadow-sm"
+        onKeyPress={handleKeyPress}
+      />
+      <div className="absolute right-2 flex items-center space-x-1">
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={onMicClick}
+          className={`h-8 w-8 ${isRecording ? 'text-red-500' : ''}`}
           disabled={loading}
-        />
-        <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        {value && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
+        >
+          <Mic size={18} />
+        </Button>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={onLocationClick}
+          className={`h-8 w-8 ${isLocationActive ? 'text-blue-500' : ''}`}
+          disabled={loading}
+        >
+          <MapPin size={18} />
+        </Button>
+        <Button
+          type="button"
+          size="icon"
+          onClick={onSearch}
+          className="h-8 w-8 bg-primary text-white hover:bg-primary/90"
+          disabled={loading}
+        >
+          {loading ? (
+            <div className="h-4 w-4 border-t-2 border-b-2 border-white rounded-full animate-spin" />
+          ) : (
+            <Search size={18} />
+          )}
+        </Button>
       </div>
-      
-      <Button
-        type="button"
-        size="icon"
-        variant={isLocationActive ? "default" : "outline"}
-        className="h-9 w-9 shrink-0"
-        onClick={onLocationClick}
-        title={isLocationActive ? "Désactiver la localisation" : "Utiliser ma position"}
-      >
-        <Map className="h-4 w-4" />
-      </Button>
-      
-      <Button
-        type="button" 
-        size="icon"
-        variant={isRecording ? "destructive" : "outline"}
-        className="h-9 w-9 shrink-0"
-        onClick={onMicClick}
-        title={isRecording ? "Arrêter l'enregistrement" : "Recherche vocale"}
-      >
-        <Mic className="h-4 w-4" />
-      </Button>
-      
-      <Button 
-        type="submit"
-        disabled={loading || value.trim() === ''}
-        size="sm"
-        className="h-9 px-3"
-      >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Search className="h-4 w-4" />
-        )}
-        <span className="ml-1.5">Rechercher</span>
-      </Button>
-    </form>
+    </div>
   );
 };
 

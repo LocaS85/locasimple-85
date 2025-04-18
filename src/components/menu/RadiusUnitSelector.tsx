@@ -18,7 +18,7 @@ const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
     <div className={`flex items-center gap-1 ${className}`}>
       <Button
         variant={value === 'km' ? 'default' : 'outline'}
-        size="xs"
+        size="sm"
         className="px-2 h-6 text-xs font-medium"
         onClick={() => onChange('km')}
       >
@@ -26,7 +26,7 @@ const RadiusUnitSelector: React.FC<RadiusUnitSelectorProps> = ({
       </Button>
       <Button
         variant={value === 'mi' ? 'default' : 'outline'}
-        size="xs"
+        size="sm"
         className="px-2 h-6 text-xs font-medium"
         onClick={() => onChange('mi')}
       >

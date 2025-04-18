@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SubcategoryScrollerProps {
   subcategories: string[];
@@ -18,34 +17,19 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
   }
 
   return (
-    <ScrollArea className="w-full" type="scroll" scrollHideDelay={400}>
-      <div className="flex gap-2 py-2 overflow-x-auto">
+    <div className="overflow-x-auto mb-4">
+      <div className="flex gap-2 pb-2">
         {subcategories.map((subcategory) => (
-          <div
+          <button
             key={subcategory}
-            className={`subcategory-item px-3 py-2 rounded-full text-sm flex-shrink-0 cursor-pointer transition-all 
-              ${selectedSubcategory === subcategory 
-                ? 'bg-primary text-white border-secondary shadow-sm' 
-                : 'bg-gray-100 hover:bg-primary/10'}`}
+            className={`subcategory-item ${selectedSubcategory === subcategory ? 'active' : ''}`}
             onClick={() => onSubcategorySelect(subcategory)}
           >
             {subcategory}
-          </div>
+          </button>
         ))}
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `
-        .subcategory-item {
-          white-space: nowrap;
-          border: 1px solid transparent;
-        }
-        .subcategory-item:hover {
-          transform: translateY(-1px);
-        }
-        .subcategory-item.active {
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-      `}} />
-    </ScrollArea>
+    </div>
   );
 };
 
