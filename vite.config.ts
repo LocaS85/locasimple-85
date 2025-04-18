@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => ({
       plugins: [],
       jsxImportSource: undefined,
       tsDecorators: false,
-      fastRefresh: true
+      // Remove fastRefresh as it's not a valid option in this context
     }),
     mode === 'development' &&
     componentTagger(),

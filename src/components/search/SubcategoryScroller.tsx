@@ -19,8 +19,14 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
     if (selectedSubcategory && scrollRef.current) {
       const selectedElement = scrollRef.current.querySelector(`.subcategory-item.active`) as HTMLElement;
       if (selectedElement) {
+        // Calculate the center position for smooth scrolling
+        const containerWidth = scrollRef.current.offsetWidth;
+        const elementLeft = selectedElement.offsetLeft;
+        const elementWidth = selectedElement.offsetWidth;
+        const centerPosition = elementLeft - (containerWidth / 2) + (elementWidth / 2);
+        
         scrollRef.current.scrollTo({
-          left: selectedElement.offsetLeft - scrollRef.current.offsetWidth / 2 + selectedElement.offsetWidth / 2,
+          left: Math.max(0, centerPosition),
           behavior: 'smooth'
         });
       }
@@ -32,14 +38,14 @@ const SubcategoryScroller: React.FC<SubcategoryScrollerProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto mb-4" ref={scrollRef}>
-      <div className="flex gap-2 pb-2 px-1">
+    <div className="overflow-x-auto mb-4 scrollbar-hide" ref={scrollRef}>
+      <div className="flex gap-2 pb-2 px-1 py-1 min-w-max">
         {subcategories.map((subcategory) => (
           <button
             key={subcategory}
             className={`subcategory-item whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedSubcategory === subcategory 
-                ? 'bg-primary text-white' 
+                ? 'bg-primary text-white active' 
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
             }`}
             onClick={() => onSubcategorySelect(subcategory)}

@@ -38,6 +38,9 @@ const FlaskServerStatus: React.FC<FlaskServerStatusProps> = ({ className = '' })
       } catch (error) {
         console.error("Erreur lors de la vérification du serveur Flask:", error);
         setIsConnected(false);
+        toast.error("Erreur de connexion au serveur Flask", {
+          description: "Vérifiez que le serveur est en cours d'exécution",
+        });
       } finally {
         setIsChecking(false);
       }
