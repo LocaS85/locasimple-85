@@ -1,4 +1,16 @@
 
+/* Reset and base styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+  color: #1f1f1f;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
 /* Map styles */
 .map-container {
   position: relative;
