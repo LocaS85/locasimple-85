@@ -47,4 +47,3 @@ export const createEmojiIcon = (emoji: string): EmojiIconComponent => {
   EmojiIcon.displayName = `EmojiIcon(${displayEmoji})`;
   return EmojiIcon;
 };
-

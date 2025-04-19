@@ -17,7 +17,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      jsxRuntime: 'automatic',
       devTarget: 'es2022',
       plugins: [],
       jsxImportSource: undefined,

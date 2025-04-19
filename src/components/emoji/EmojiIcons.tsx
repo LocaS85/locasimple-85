@@ -55,4 +55,3 @@ export const EmojiLibrary: React.FC<EmojiLibraryProps> = ({
     </div>
   );
 };
-
